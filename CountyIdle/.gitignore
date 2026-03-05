@@ -18,6 +18,7 @@ mono_crash.*.json
 *.csproj
 *.sln
 *.csproj.old
+!CountyIdle.csproj
 
 # Common IDE/project user files
 .vs/

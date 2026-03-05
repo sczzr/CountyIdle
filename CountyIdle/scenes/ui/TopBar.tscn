@@ -1,0 +1,21 @@
+[gd_scene format=3]
+
+[node name="TopBar" type="PanelContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="BarContent" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="SummaryLabel" type="Label" parent="BarContent"]
+layout_mode = 2
+text = "-"
+
+[node name="ResourceLabel" type="Label" parent="BarContent"]
+layout_mode = 2
+text = "-"
+
+[node name="CombatLabel" type="Label" parent="BarContent"]
+layout_mode = 2
+text = "-"

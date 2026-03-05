@@ -7,6 +7,13 @@ namespace CountyIdle;
 
 public partial class Main : Control
 {
+    private const string MainLayoutPath = "RootMargin/MainLayout";
+    private const string TopBarPath = $"{MainLayoutPath}/TopBar";
+    private const string BodyRowPath = $"{MainLayoutPath}/BodyRow";
+    private const string LeftPanelPath = $"{BodyRowPath}/LeftPanel";
+    private const string RightPanelPath = $"{BodyRowPath}/RightPanel";
+    private const string BottomBarPath = $"{MainLayoutPath}/BottomBar";
+
     private readonly Queue<string> _logs = new();
     private readonly SaveSystem _saveSystem = new();
     private readonly Dictionary<JobType, Label> _jobLabels = new();
@@ -15,13 +22,13 @@ public partial class Main : Control
     private Label _summaryLabel = null!;
     private Label _resourceLabel = null!;
     private Label _combatLabel = null!;
-    private Label _statusLabel = null!;
     private RichTextLabel _logLabel = null!;
     private Button _exploreButton = null!;
 
     public override void _Ready()
     {
-        BuildUi();
+        BindUiNodes();
+        BindUiEvents();
         SetupGameLoop();
         LoadInitialState();
     }
@@ -87,114 +94,60 @@ public partial class Main : Control
         _logLabel.Text = string.Join("\n", _logs);
     }
 
-    private void BuildUi()
+    private void BindUiNodes()
     {
-        var root = new MarginContainer
-        {
-            AnchorsPreset = (int)LayoutPreset.FullRect,
-            OffsetLeft = 16,
-            OffsetTop = 12,
-            OffsetRight = -16,
-            OffsetBottom = -12
-        };
-        AddChild(root);
+        _summaryLabel = GetNode<Label>($"{TopBarPath}/BarContent/SummaryLabel");
+        _resourceLabel = GetNode<Label>($"{TopBarPath}/BarContent/ResourceLabel");
+        _combatLabel = GetNode<Label>($"{TopBarPath}/BarContent/CombatLabel");
+        _logLabel = GetNode<RichTextLabel>($"{RightPanelPath}/PanelContent/LogLabel");
+        _exploreButton = GetNode<Button>($"{BottomBarPath}/ButtonsRow/ExploreButton");
 
-        var column = new VBoxContainer { SizeFlagsVertical = Control.SizeFlags.ExpandFill };
-        root.AddChild(column);
+        _jobLabels[JobType.Farmer] = GetNode<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/FarmerRow/JobLabel");
+        _jobLabels[JobType.Worker] = GetNode<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/WorkerRow/JobLabel");
+        _jobLabels[JobType.Merchant] = GetNode<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/MerchantRow/JobLabel");
+        _jobLabels[JobType.Scholar] = GetNode<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/ScholarRow/JobLabel");
+    }
 
-        var title = new Label { Text = "郡守挂机原型（Godot C#）", HorizontalAlignment = HorizontalAlignment.Center };
-        column.AddChild(title);
-
-        _summaryLabel = new Label();
-        _resourceLabel = new Label();
-        _combatLabel = new Label();
-        column.AddChild(_summaryLabel);
-        column.AddChild(_resourceLabel);
-        column.AddChild(_combatLabel);
-
-        var jobsTitle = new Label { Text = "职业分工（每次 ±5）" };
-        column.AddChild(jobsTitle);
-
-        AddJobRow(column, JobType.Farmer);
-        AddJobRow(column, JobType.Worker);
-        AddJobRow(column, JobType.Merchant);
-        AddJobRow(column, JobType.Scholar);
-
-        var actionRow = new HBoxContainer();
-        column.AddChild(actionRow);
-
-        _exploreButton = new Button { Text = "暂停探险", SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
+    private void BindUiEvents()
+    {
         _exploreButton.Pressed += () => _gameLoop.ToggleExploration();
-        actionRow.AddChild(_exploreButton);
 
-        var saveButton = new Button { Text = "存档", SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
-        saveButton.Pressed += () =>
+        GetNode<Button>($"{BottomBarPath}/ButtonsRow/SaveButton").Pressed += () =>
         {
             _saveSystem.Save(_gameLoop.State, out var msg);
             AppendLog(msg);
         };
-        actionRow.AddChild(saveButton);
 
-        var loadButton = new Button { Text = "读档", SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
-        loadButton.Pressed += () =>
+        GetNode<Button>($"{BottomBarPath}/ButtonsRow/LoadButton").Pressed += () =>
         {
             _saveSystem.TryLoad(out var state, out var msg);
             _gameLoop.LoadState(state);
             AppendLog(msg);
         };
-        actionRow.AddChild(loadButton);
 
-        var resetButton = new Button { Text = "重开", SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
-        resetButton.Pressed += () => _gameLoop.ResetState();
-        actionRow.AddChild(resetButton);
+        GetNode<Button>($"{BottomBarPath}/ButtonsRow/ResetButton").Pressed += () => _gameLoop.ResetState();
 
-        _statusLabel = new Label
-        {
-            Text = "规则：1秒=1游戏分钟，每60分钟结算一次资源/人口/探险。",
-            AutowrapMode = TextServer.AutowrapMode.WordSmart
-        };
-        column.AddChild(_statusLabel);
-
-        _logLabel = new RichTextLabel
-        {
-            FitContent = true,
-            ScrollActive = false,
-            SizeFlagsVertical = Control.SizeFlags.ExpandFill
-        };
-        column.AddChild(_logLabel);
+        BindJobButtons(
+            JobType.Farmer,
+            $"{LeftPanelPath}/PanelContent/JobsVBox/FarmerRow/MinusButton",
+            $"{LeftPanelPath}/PanelContent/JobsVBox/FarmerRow/PlusButton");
+        BindJobButtons(
+            JobType.Worker,
+            $"{LeftPanelPath}/PanelContent/JobsVBox/WorkerRow/MinusButton",
+            $"{LeftPanelPath}/PanelContent/JobsVBox/WorkerRow/PlusButton");
+        BindJobButtons(
+            JobType.Merchant,
+            $"{LeftPanelPath}/PanelContent/JobsVBox/MerchantRow/MinusButton",
+            $"{LeftPanelPath}/PanelContent/JobsVBox/MerchantRow/PlusButton");
+        BindJobButtons(
+            JobType.Scholar,
+            $"{LeftPanelPath}/PanelContent/JobsVBox/ScholarRow/MinusButton",
+            $"{LeftPanelPath}/PanelContent/JobsVBox/ScholarRow/PlusButton");
     }
 
-    private void AddJobRow(VBoxContainer parent, JobType jobType)
+    private void BindJobButtons(JobType jobType, string minusButtonPath, string plusButtonPath)
     {
-        var row = new HBoxContainer();
-        parent.AddChild(row);
-
-        var label = new Label
-        {
-            Text = $"{JobToShortName(jobType)}：0",
-            SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
-        };
-        _jobLabels[jobType] = label;
-        row.AddChild(label);
-
-        var minus = new Button { Text = "-5" };
-        minus.Pressed += () => _gameLoop.AdjustJob(jobType, -5);
-        row.AddChild(minus);
-
-        var plus = new Button { Text = "+5" };
-        plus.Pressed += () => _gameLoop.AdjustJob(jobType, 5);
-        row.AddChild(plus);
-    }
-
-    private static string JobToShortName(JobType jobType)
-    {
-        return jobType switch
-        {
-            JobType.Farmer => "农",
-            JobType.Worker => "工",
-            JobType.Merchant => "商",
-            JobType.Scholar => "士",
-            _ => "?"
-        };
+        GetNode<Button>(minusButtonPath).Pressed += () => _gameLoop.AdjustJob(jobType, -5);
+        GetNode<Button>(plusButtonPath).Pressed += () => _gameLoop.AdjustJob(jobType, 5);
     }
 }

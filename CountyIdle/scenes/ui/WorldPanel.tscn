@@ -1,0 +1,23 @@
+[gd_scene format=3]
+
+[node name="WorldPanel" type="PanelContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="PanelContent" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="TitleLabel" type="Label" parent="PanelContent"]
+layout_mode = 2
+text = "郡县总览"
+horizontal_alignment = 1
+
+[node name="CenterHintLabel" type="Label" parent="PanelContent"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "（预留：世界视图 / 建筑层 / 事件地图）"
+horizontal_alignment = 1
+vertical_alignment = 1

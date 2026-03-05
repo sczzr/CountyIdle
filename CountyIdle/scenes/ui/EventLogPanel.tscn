@@ -1,0 +1,25 @@
+[gd_scene format=3]
+
+[node name="EventLogPanel" type="PanelContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PanelContent" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="TitleLabel" type="Label" parent="PanelContent"]
+layout_mode = 2
+text = "命令与日志"
+
+[node name="StatusLabel" type="Label" parent="PanelContent"]
+layout_mode = 2
+autowrap_mode = 3
+text = "规则：1秒=1游戏分钟，每60分钟结算一次。"
+
+[node name="LogLabel" type="RichTextLabel" parent="PanelContent"]
+layout_mode = 2
+size_flags_vertical = 3
+fit_content = true
+scroll_active = false

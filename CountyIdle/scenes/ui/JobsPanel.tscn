@@ -1,0 +1,37 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/JobRow.tscn" id="1_3a8dq"]
+
+[node name="JobsPanel" type="PanelContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PanelContent" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="TitleLabel" type="Label" parent="PanelContent"]
+layout_mode = 2
+text = "殖民岗位"
+
+[node name="HintLabel" type="Label" parent="PanelContent"]
+layout_mode = 2
+text = "每次调整 ±5 人口"
+
+[node name="JobsVBox" type="VBoxContainer" parent="PanelContent"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 4
+
+[node name="FarmerRow" parent="PanelContent/JobsVBox" instance=ExtResource("1_3a8dq")]
+layout_mode = 2
+
+[node name="WorkerRow" parent="PanelContent/JobsVBox" instance=ExtResource("1_3a8dq")]
+layout_mode = 2
+
+[node name="MerchantRow" parent="PanelContent/JobsVBox" instance=ExtResource("1_3a8dq")]
+layout_mode = 2
+
+[node name="ScholarRow" parent="PanelContent/JobsVBox" instance=ExtResource("1_3a8dq")]
+layout_mode = 2
