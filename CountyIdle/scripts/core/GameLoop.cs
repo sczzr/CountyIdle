@@ -12,6 +12,7 @@ public partial class GameLoop : Node
 
     private readonly PopulationSystem _populationSystem = new();
     private readonly EconomySystem _economySystem = new();
+    private readonly ResearchSystem _researchSystem = new();
     private readonly BreedingSystem _breedingSystem = new();
     private readonly CombatSystem _combatSystem = new();
     private readonly EventBus _eventBus = new();
@@ -129,6 +130,12 @@ public partial class GameLoop : Node
         _state.HourSettlements += 1;
 
         _economySystem.TickHour(_state);
+
+        if (_researchSystem.TickHour(_state, out var researchLog) && !string.IsNullOrWhiteSpace(researchLog))
+        {
+            _eventBus.PublishLog(researchLog);
+        }
+
         _populationSystem.TickHour(_state);
 
         if (_breedingSystem.TickHour(_state, out var breedingLog) && !string.IsNullOrWhiteSpace(breedingLog))

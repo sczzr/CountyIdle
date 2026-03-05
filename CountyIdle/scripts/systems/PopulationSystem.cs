@@ -21,8 +21,9 @@ public class PopulationSystem
         var housingFactor = Math.Clamp((double)state.HousingCapacity / Math.Max(state.Population, 1), 0.5, 1.15);
         var foodReserveFactor = Math.Clamp(state.Food / Math.Max(state.Population * 2.0, 1.0), 0.4, 1.2);
         var happinessFactor = Math.Clamp(state.Happiness / 100.0, 0.3, 1.3);
+        var growthMultiplier = Math.Max(state.PopulationGrowthMultiplier, 1.0);
 
-        var growthRate = 0.006 * housingFactor * foodReserveFactor * happinessFactor;
+        var growthRate = 0.006 * housingFactor * foodReserveFactor * happinessFactor * growthMultiplier;
         var newCitizens = (int)Math.Floor(state.Population * growthRate);
         state.Population += Math.Max(newCitizens, 0);
 

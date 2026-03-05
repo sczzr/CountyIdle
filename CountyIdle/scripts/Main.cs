@@ -13,10 +13,16 @@ public partial class Main : Control
     private const string LeftPanelPath = $"{BodyRowPath}/LeftPanel";
     private const string RightPanelPath = $"{BodyRowPath}/RightPanel";
     private const string BottomBarPath = $"{MainLayoutPath}/BottomBar";
+    private const double LanternPulseDurationSeconds = 0.42;
+    private const double LanternResetDurationSeconds = 0.14;
+
+    private static readonly Color BaseButtonModulate = Colors.White;
+    private static readonly Color LanternGlowModulate = new(1.0f, 0.86f, 0.64f, 1.0f);
 
     private readonly Queue<string> _logs = new();
     private readonly SaveSystem _saveSystem = new();
     private readonly Dictionary<JobType, Label> _jobLabels = new();
+    private readonly Dictionary<Button, Tween> _buttonPulseTweens = new();
 
     private GameLoop _gameLoop = null!;
     private Label _summaryLabel = null!;
@@ -29,8 +35,19 @@ public partial class Main : Control
     {
         BindUiNodes();
         BindUiEvents();
+        BindLanternHoverEffects();
         SetupGameLoop();
         LoadInitialState();
+    }
+
+    public override void _ExitTree()
+    {
+        foreach (var tween in _buttonPulseTweens.Values)
+        {
+            tween.Kill();
+        }
+
+        _buttonPulseTweens.Clear();
     }
 
     private void SetupGameLoop()
@@ -57,7 +74,7 @@ public partial class Main : Control
     private void OnStateChanged(GameState state)
     {
         _summaryLabel.Text =
-            $"人口 {state.Population}（精英 {state.ElitePopulation}） | 幸福 {state.Happiness:0.0} | 空闲 {state.GetUnassignedPopulation()} | 小时结算 {state.HourSettlements}";
+            $"人口 {state.Population}（精英 {state.ElitePopulation}） | 幸福 {state.Happiness:0.0} | 科技阶 T{state.TechLevel} | 空闲 {state.GetUnassignedPopulation()} | 小时结算 {state.HourSettlements}";
 
         _resourceLabel.Text =
             $"粮食 {state.Food:0}  木材 {state.Wood:0}  石料 {state.Stone:0}  金币 {state.Gold:0}  科研 {state.Research:0}  稀有 {state.RareMaterial:0}";
@@ -149,5 +166,67 @@ public partial class Main : Control
     {
         GetNode<Button>(minusButtonPath).Pressed += () => _gameLoop.AdjustJob(jobType, -5);
         GetNode<Button>(plusButtonPath).Pressed += () => _gameLoop.AdjustJob(jobType, 5);
+    }
+
+    private void BindLanternHoverEffects()
+    {
+        var buttons = new List<Button>();
+        CollectButtons(this, buttons);
+
+        foreach (var button in buttons)
+        {
+            button.SelfModulate = BaseButtonModulate;
+            button.MouseEntered += () => StartLanternPulse(button);
+            button.MouseExited += () => StopLanternPulse(button);
+            button.FocusEntered += () => StartLanternPulse(button);
+            button.FocusExited += () => StopLanternPulse(button);
+        }
+    }
+
+    private static void CollectButtons(Node node, List<Button> result)
+    {
+        foreach (var child in node.GetChildren())
+        {
+            if (child is Button button)
+            {
+                result.Add(button);
+            }
+
+            CollectButtons(child, result);
+        }
+    }
+
+    private void StartLanternPulse(Button button)
+    {
+        StopLanternPulse(button, smoothReset: false);
+
+        var tween = CreateTween();
+        tween.SetTrans(Tween.TransitionType.Sine);
+        tween.SetEase(Tween.EaseType.InOut);
+        tween.SetLoops();
+        tween.TweenProperty(button, "self_modulate", LanternGlowModulate, LanternPulseDurationSeconds);
+        tween.TweenProperty(button, "self_modulate", BaseButtonModulate, LanternPulseDurationSeconds);
+
+        _buttonPulseTweens[button] = tween;
+    }
+
+    private void StopLanternPulse(Button button, bool smoothReset = true)
+    {
+        if (_buttonPulseTweens.TryGetValue(button, out var tween))
+        {
+            tween.Kill();
+            _buttonPulseTweens.Remove(button);
+        }
+
+        if (!smoothReset)
+        {
+            button.SelfModulate = BaseButtonModulate;
+            return;
+        }
+
+        var resetTween = CreateTween();
+        resetTween.SetTrans(Tween.TransitionType.Sine);
+        resetTween.SetEase(Tween.EaseType.Out);
+        resetTween.TweenProperty(button, "self_modulate", BaseButtonModulate, LanternResetDurationSeconds);
     }
 }

@@ -23,6 +23,12 @@ public class GameState
     public double Research { get; set; } = 0;
     public double RareMaterial { get; set; } = 0;
 
+    public int TechLevel { get; set; } = 0;
+    public double FoodProductionMultiplier { get; set; } = 1.0;
+    public double IndustryProductionMultiplier { get; set; } = 1.0;
+    public double TradeProductionMultiplier { get; set; } = 1.0;
+    public double PopulationGrowthMultiplier { get; set; } = 1.0;
+
     public int ExplorationDepth { get; set; } = 1;
     public bool ExplorationEnabled { get; set; } = true;
     public int ExplorationProgressHours { get; set; } = 0;

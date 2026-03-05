@@ -9,6 +9,9 @@
 - `03_change_management.md`：改动流程（治理层）
 - `04_weekly_flywheel_review.md`：每周飞轮体检（运营层）
 - `skills_usage.md`：项目 Skill 路由与使用方式
+- `feature-cards/`：功能卡实例归档
+- `change-proposals/`：机制/平衡改动提案归档
+- `balance-logs/`：改动后结果记录
 - `templates/system-spec-template.md`：系统规格模板
 - `templates/feature-card-template.md`：功能卡模板
 - `templates/change-proposal-template.md`：改动提案模板
