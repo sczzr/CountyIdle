@@ -1,0 +1,23 @@
+[
+  {
+    "id": "hall_1",
+    "name": "市政厅 I",
+    "cost_wood": 80,
+    "cost_stone": 50,
+    "effect": { "housing_cap": 40, "unlock": "basic_management" }
+  },
+  {
+    "id": "residence_1",
+    "name": "民居 I",
+    "cost_wood": 35,
+    "cost_stone": 12,
+    "effect": { "housing_cap": 20 }
+  },
+  {
+    "id": "wall_1",
+    "name": "城墙 I",
+    "cost_wood": 40,
+    "cost_stone": 40,
+    "effect": { "threat_reduce": 3 }
+  }
+]

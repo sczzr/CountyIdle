@@ -1,0 +1,6 @@
+[
+  { "id": "born_strong", "name": "天生神力", "rarity": "rare", "effect": { "combat_power_pct": 12 } },
+  { "id": "trade_genius", "name": "商业奇才", "rarity": "rare", "effect": { "gold_gain_pct": 15 } },
+  { "id": "night_owl", "name": "夜猫子", "rarity": "common", "effect": { "explore_success_pct": 6 } },
+  { "id": "glass_cannon", "name": "玻璃大炮", "rarity": "epic", "effect": { "damage_pct": 20, "hp_pct": -10 } }
+]

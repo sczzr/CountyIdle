@@ -1,0 +1,6 @@
+[
+  { "id": "goblin", "name": "哥布林斥候", "tier": 1, "power": 10 },
+  { "id": "direwolf", "name": "荒原狼王", "tier": 2, "power": 14 },
+  { "id": "troll", "name": "峡谷巨魔", "tier": 3, "power": 19 },
+  { "id": "wyrm", "name": "深林古龙", "tier": 5, "power": 28 }
+]

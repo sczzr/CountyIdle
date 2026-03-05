@@ -1,0 +1,6 @@
+[
+  { "id": "rust_sword", "name": "锈铁剑", "quality": "white", "gear_score": 4, "tags": ["physical"] },
+  { "id": "hunter_bow", "name": "猎手长弓", "quality": "green", "gear_score": 8, "tags": ["ranged"] },
+  { "id": "arc_staff", "name": "奥术法杖", "quality": "blue", "gear_score": 13, "tags": ["magic"] },
+  { "id": "dragon_blade", "name": "龙纹战刃", "quality": "gold", "gear_score": 24, "tags": ["legendary"] }
+]

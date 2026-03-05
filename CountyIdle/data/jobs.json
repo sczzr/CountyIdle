@@ -1,0 +1,6 @@
+[
+  { "id": "farmer", "name": "农", "food_per_hour": 2.8, "happiness_mod": 0.1 },
+  { "id": "worker", "name": "工", "wood_per_hour": 0.9, "stone_per_hour": 0.55 },
+  { "id": "merchant", "name": "商", "gold_per_hour": 0.85, "happiness_mod": 0.15 },
+  { "id": "scholar", "name": "士", "research_per_hour": 0.4, "gold_cost_per_hour": 0.2 }
+]
