@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/Main.cs" id="1_qb3g0"]
 [ext_resource type="PackedScene" path="res://scenes/ui/TopBar.tscn" id="2_43kr5"]
@@ -6,6 +6,10 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/WorldPanel.tscn" id="4_a8trh"]
 [ext_resource type="PackedScene" path="res://scenes/ui/EventLogPanel.tscn" id="5_2c9up"]
 [ext_resource type="PackedScene" path="res://scenes/ui/BottomBar.tscn" id="6_empmh"]
+[ext_resource type="PackedScene" path="res://scenes/ui/figma/MakeGameUI.tscn" id="7_q2j8d"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_root"]
+bg_color = Color(0.0588235, 0.0627451, 0.0745098, 1)
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -16,14 +20,23 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_qb3g0")
 
+[node name="Background" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_root")
+
 [node name="RootMargin" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 12.0
+offset_left = 8.0
 offset_top = 8.0
-offset_right = -12.0
+offset_right = -8.0
 offset_bottom = -8.0
 grow_horizontal = 2
 grow_vertical = 2
@@ -42,19 +55,31 @@ size_flags_vertical = 3
 theme_override_constants/separation = 8
 
 [node name="LeftPanel" parent="RootMargin/MainLayout/BodyRow" instance=ExtResource("3_7d4x0")]
-custom_minimum_size = Vector2(320, 0)
+custom_minimum_size = Vector2(280, 0)
 layout_mode = 2
 size_flags_vertical = 3
+clip_contents = true
 
 [node name="CenterPanel" parent="RootMargin/MainLayout/BodyRow" instance=ExtResource("4_a8trh")]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+clip_contents = true
 
 [node name="RightPanel" parent="RootMargin/MainLayout/BodyRow" instance=ExtResource("5_2c9up")]
-custom_minimum_size = Vector2(340, 0)
+custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 size_flags_vertical = 3
+clip_contents = true
 
 [node name="BottomBar" parent="RootMargin/MainLayout" instance=ExtResource("6_empmh")]
 layout_mode = 2
+
+[node name="FigmaLayout" parent="." instance=ExtResource("7_q2j8d")]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2

@@ -1,0 +1,72 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/figma/HUDTopBar.tscn" id="1_1kfgt"]
+[ext_resource type="PackedScene" path="res://scenes/ui/figma/EquipmentPanel.tscn" id="2_gsx1i"]
+[ext_resource type="PackedScene" path="res://scenes/ui/figma/CenterView.tscn" id="3_r28t3"]
+[ext_resource type="PackedScene" path="res://scenes/ui/figma/TimelinePanel.tscn" id="4_fj33r"]
+[ext_resource type="PackedScene" path="res://scenes/ui/figma/BottomBar.tscn" id="5_fv71h"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_root"]
+bg_color = Color(0.101961, 0.121569, 0.180392, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_backdrop"]
+bg_color = Color(0.101961, 0.121569, 0.180392, 1)
+
+[node name="MakeGameUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_root")
+
+[node name="Background" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_backdrop")
+
+[node name="RootMargin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MainColumn" type="VBoxContainer" parent="RootMargin"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="HUDTopBar" parent="RootMargin/MainColumn" instance=ExtResource("1_1kfgt")]
+layout_mode = 2
+
+[node name="BodyRow" type="HBoxContainer" parent="RootMargin/MainColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="EquipmentPanel" parent="RootMargin/MainColumn/BodyRow" instance=ExtResource("2_gsx1i")]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CenterView" parent="RootMargin/MainColumn/BodyRow" instance=ExtResource("3_r28t3")]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="TimelinePanel" parent="RootMargin/MainColumn/BodyRow" instance=ExtResource("4_fj33r")]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="BottomBar" parent="RootMargin/MainColumn" instance=ExtResource("5_fv71h")]
+layout_mode = 2

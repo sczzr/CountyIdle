@@ -1,0 +1,92 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/figma/CenterView.cs" id="1_nb9p1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_center"]
+bg_color = Color(0.101961, 0.121569, 0.180392, 1)
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_center_card"]
+bg_color = Color(0.0941176, 0.113725, 0.152941, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.227451, 0.266667, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+
+[node name="CenterView" type="PanelContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_center")
+script = ExtResource("1_nb9p1")
+
+[node name="PanelPadding" type="MarginContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MainColumn" type="VBoxContainer" parent="PanelPadding"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="TopActionRow" type="HBoxContainer" parent="PanelPadding/MainColumn"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="LeftActionButton" type="Button" parent="PanelPadding/MainColumn/TopActionRow"]
+custom_minimum_size = Vector2(160, 32)
+layout_mode = 2
+text = "钻轴销购 (2.50)"
+
+[node name="MiddleActionButton" type="Button" parent="PanelPadding/MainColumn/TopActionRow"]
+custom_minimum_size = Vector2(120, 32)
+layout_mode = 2
+text = "租品明细"
+
+[node name="RightActionButton" type="Button" parent="PanelPadding/MainColumn/TopActionRow"]
+custom_minimum_size = Vector2(120, 32)
+layout_mode = 2
+text = "关于国师"
+
+[node name="CenterSpacer" type="Control" parent="PanelPadding/MainColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CenterInfoBox" type="PanelContainer" parent="PanelPadding/MainColumn"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_center_card")
+
+[node name="CenterInfoColumn" type="VBoxContainer" parent="PanelPadding/MainColumn/CenterInfoBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CenterTitleLabel" type="Label" parent="PanelPadding/MainColumn/CenterInfoBox/CenterInfoColumn"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "安度提界"
+horizontal_alignment = 1
+
+[node name="CenterDescriptionLabel" type="Label" parent="PanelPadding/MainColumn/CenterInfoBox/CenterInfoColumn"]
+layout_mode = 2
+text = "[楼下入口]等级提升 2.50 中的楼陆性能Q"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="BottomSpacer" type="Control" parent="PanelPadding/MainColumn"]
+layout_mode = 2
+size_flags_vertical = 3

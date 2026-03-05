@@ -7,18 +7,23 @@ namespace CountyIdle.Core;
 
 public partial class GameLoop : Node
 {
-    private const double RealSecondsPerGameMinute = 1.0;
+    private const double BaseRealSecondsPerGameMinute = 1.0;
+    private const double MinTimeScale = 1.0;
+    private const double MaxTimeScale = 2.0;
     private const int MinutesPerSettlement = 60;
 
     private readonly PopulationSystem _populationSystem = new();
+    private readonly IndustrySystem _industrySystem = new();
     private readonly EconomySystem _economySystem = new();
     private readonly ResearchSystem _researchSystem = new();
     private readonly BreedingSystem _breedingSystem = new();
     private readonly CombatSystem _combatSystem = new();
+    private readonly CountyEventSystem _countyEventSystem = new();
     private readonly EventBus _eventBus = new();
 
     private double _secondAccumulator;
     private int _minuteAccumulator;
+    private double _timeScale = MinTimeScale;
     private GameState _state = new();
 
     public GameState State => _state;
@@ -27,17 +32,25 @@ public partial class GameLoop : Node
     public override void _Process(double delta)
     {
         _secondAccumulator += delta;
+        var secondsPerGameMinute = BaseRealSecondsPerGameMinute / _timeScale;
 
-        while (_secondAccumulator >= RealSecondsPerGameMinute)
+        while (_secondAccumulator >= secondsPerGameMinute)
         {
-            _secondAccumulator -= RealSecondsPerGameMinute;
+            _secondAccumulator -= secondsPerGameMinute;
             AdvanceOneGameMinute();
         }
+    }
+
+    public void SetTimeScale(double scale)
+    {
+        _timeScale = Math.Clamp(scale, MinTimeScale, MaxTimeScale);
     }
 
     public void LoadState(GameState state)
     {
         _state = state ?? new GameState();
+        IndustryRules.EnsureDefaults(_state);
+        ClampJobsToIndustryCapacity(publishLogs: false);
         _eventBus.PublishState(_state.Clone());
     }
 
@@ -57,6 +70,31 @@ public partial class GameLoop : Node
         _eventBus.PublishState(_state.Clone());
     }
 
+    public void BuildIndustryBuilding(IndustryBuildingType buildingType)
+    {
+        if (_industrySystem.TryConstructBuilding(_state, buildingType, out var log))
+        {
+            ClampJobsToIndustryCapacity(publishLogs: false);
+            _eventBus.PublishLog(log);
+            _eventBus.PublishState(_state.Clone());
+            return;
+        }
+
+        _eventBus.PublishLog(log);
+    }
+
+    public void CraftIndustryTools()
+    {
+        if (_industrySystem.TryCraftTools(_state, out var log))
+        {
+            _eventBus.PublishLog(log);
+            _eventBus.PublishState(_state.Clone());
+            return;
+        }
+
+        _eventBus.PublishLog(log);
+    }
+
     public void AdjustJob(JobType jobType, int delta)
     {
         if (delta == 0)
@@ -64,29 +102,38 @@ public partial class GameLoop : Node
             return;
         }
 
-        if (delta > 0 && _state.GetUnassignedPopulation() < delta)
+        IndustryRules.EnsureDefaults(_state);
+
+        var currentAssigned = IndustryRules.GetAssigned(_state, jobType);
+        var targetAssigned = currentAssigned;
+
+        if (delta > 0)
         {
-            _eventBus.PublishLog("空闲人口不足，无法继续分配。");
-            return;
+            var availablePopulation = _state.GetUnassignedPopulation();
+            if (availablePopulation <= 0)
+            {
+                _eventBus.PublishLog("空闲人口不足，无法继续分配。");
+                return;
+            }
+
+            var capacity = IndustryRules.GetCapacity(_state, jobType);
+            var allowedByCapacity = Math.Max(capacity - currentAssigned, 0);
+            var actualIncrease = Math.Min(delta, Math.Min(availablePopulation, allowedByCapacity));
+
+            if (actualIncrease <= 0)
+            {
+                _eventBus.PublishLog($"{GetJobDisplayName(jobType)}受产业容量限制，请先扩建建筑或补充工具。");
+                return;
+            }
+
+            targetAssigned += actualIncrease;
+        }
+        else
+        {
+            targetAssigned = Math.Max(currentAssigned + delta, 0);
         }
 
-        switch (jobType)
-        {
-            case JobType.Farmer:
-                _state.Farmers = Math.Max(_state.Farmers + delta, 0);
-                break;
-            case JobType.Worker:
-                _state.Workers = Math.Max(_state.Workers + delta, 0);
-                break;
-            case JobType.Merchant:
-                _state.Merchants = Math.Max(_state.Merchants + delta, 0);
-                break;
-            case JobType.Scholar:
-                _state.Scholars = Math.Max(_state.Scholars + delta, 0);
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(jobType), jobType, null);
-        }
+        IndustryRules.SetAssigned(_state, jobType, targetAssigned);
 
         var overAssigned = _state.GetAssignedPopulation() - _state.Population;
         if (overAssigned > 0)
@@ -99,21 +146,44 @@ public partial class GameLoop : Node
 
     private void RemoveFromJob(JobType jobType, int amount)
     {
-        switch (jobType)
+        var currentAssigned = IndustryRules.GetAssigned(_state, jobType);
+        IndustryRules.SetAssigned(_state, jobType, Math.Max(currentAssigned - amount, 0));
+    }
+
+    private void ClampJobsToIndustryCapacity(bool publishLogs)
+    {
+        ClampJobToIndustryCapacity(JobType.Worker, publishLogs);
+        ClampJobToIndustryCapacity(JobType.Scholar, publishLogs);
+        ClampJobToIndustryCapacity(JobType.Merchant, publishLogs);
+        ClampJobToIndustryCapacity(JobType.Farmer, publishLogs);
+    }
+
+    private void ClampJobToIndustryCapacity(JobType jobType, bool publishLogs)
+    {
+        var capacity = IndustryRules.GetCapacity(_state, jobType);
+        var assigned = IndustryRules.GetAssigned(_state, jobType);
+        if (assigned <= capacity)
         {
-            case JobType.Farmer:
-                _state.Farmers = Math.Max(_state.Farmers - amount, 0);
-                break;
-            case JobType.Worker:
-                _state.Workers = Math.Max(_state.Workers - amount, 0);
-                break;
-            case JobType.Merchant:
-                _state.Merchants = Math.Max(_state.Merchants - amount, 0);
-                break;
-            case JobType.Scholar:
-                _state.Scholars = Math.Max(_state.Scholars - amount, 0);
-                break;
+            return;
         }
+
+        IndustryRules.SetAssigned(_state, jobType, capacity);
+        if (publishLogs)
+        {
+            _eventBus.PublishLog($"{GetJobDisplayName(jobType)}已回退至产业容量 {capacity}。");
+        }
+    }
+
+    private static string GetJobDisplayName(JobType jobType)
+    {
+        return jobType switch
+        {
+            JobType.Farmer => "产业工人",
+            JobType.Worker => "管理人员",
+            JobType.Merchant => "商业人员",
+            JobType.Scholar => "研发人员",
+            _ => "岗位"
+        };
     }
 
     private void AdvanceOneGameMinute()
@@ -128,6 +198,11 @@ public partial class GameLoop : Node
 
         _minuteAccumulator = 0;
         _state.HourSettlements += 1;
+
+        if (_industrySystem.TickHour(_state, out var industryLog) && !string.IsNullOrWhiteSpace(industryLog))
+        {
+            _eventBus.PublishLog(industryLog);
+        }
 
         _economySystem.TickHour(_state);
 
@@ -146,6 +221,11 @@ public partial class GameLoop : Node
         if (_combatSystem.TickHour(_state, out var combatLog) && !string.IsNullOrWhiteSpace(combatLog))
         {
             _eventBus.PublishLog(combatLog);
+        }
+
+        if (_countyEventSystem.TickHour(_state, out var eventLog) && !string.IsNullOrWhiteSpace(eventLog))
+        {
+            _eventBus.PublishLog(eventLog);
         }
 
         _eventBus.PublishState(_state.Clone());

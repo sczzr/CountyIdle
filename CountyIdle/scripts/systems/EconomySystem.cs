@@ -7,18 +7,29 @@ public class EconomySystem
 {
     public void TickHour(GameState state)
     {
+        IndustryRules.EnsureDefaults(state);
+
         var foodMultiplier = Math.Max(state.FoodProductionMultiplier, 1.0);
         var industryMultiplier = Math.Max(state.IndustryProductionMultiplier, 1.0);
         var tradeMultiplier = Math.Max(state.TradeProductionMultiplier, 1.0);
+        var managementBoost = IndustryRules.GetManagementBoost(state);
+        var toolCoverage = IndustryRules.GetToolCoverage(state);
 
-        state.Food += state.Farmers * 2.8 * foodMultiplier;
-        state.Wood += state.Workers * 0.9 * industryMultiplier;
-        state.Stone += state.Workers * 0.55 * industryMultiplier;
-        state.Gold += state.Merchants * 0.85 * tradeMultiplier;
-        state.Research += state.Scholars * 0.4;
+        var effectiveProductionWorkers = Math.Min(state.Farmers, IndustryRules.GetProductionCapacity(state));
+        var effectiveResearchers = Math.Min(state.Scholars, IndustryRules.GetResearchCapacity(state));
+        var effectiveMerchants = Math.Min(state.Merchants, IndustryRules.GetCommerceCapacity(state));
+
+        var productionFactor = managementBoost * toolCoverage;
+
+        state.Food += effectiveProductionWorkers * 2.4 * foodMultiplier * productionFactor;
+        state.Wood += effectiveProductionWorkers * 0.62 * industryMultiplier * productionFactor;
+        state.Stone += effectiveProductionWorkers * 0.48 * industryMultiplier * productionFactor;
+        state.Gold += effectiveMerchants * 0.86 * tradeMultiplier * productionFactor;
+        state.Research += effectiveResearchers * 0.46 * productionFactor;
 
         var citizenWageCost = state.Population * 0.05;
-        state.Gold -= citizenWageCost;
+        var managerWageCost = state.Workers * 0.11;
+        state.Gold -= citizenWageCost + managerWageCost;
 
         if (state.Gold < 0)
         {

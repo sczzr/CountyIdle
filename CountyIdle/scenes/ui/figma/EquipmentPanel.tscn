@@ -1,0 +1,90 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/figma/EquipmentPanel.cs" id="1_3myl2"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.0588235, 0.0784314, 0.0980392, 1)
+border_width_right = 1
+border_color = Color(0.2, 0.227451, 0.266667, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slot"]
+bg_color = Color(0.101961, 0.121569, 0.14902, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.184314, 0.207843, 0.247059, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+content_margin_left = 8.0
+content_margin_top = 6.0
+content_margin_right = 8.0
+content_margin_bottom = 6.0
+
+[node name="EquipmentPanel" type="PanelContainer"]
+custom_minimum_size = Vector2(248, 0)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+script = ExtResource("1_3myl2")
+
+[node name="PanelPadding" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="MainColumn" type="VBoxContainer" parent="PanelPadding"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TitleLabel" type="Label" parent="PanelPadding/MainColumn"]
+layout_mode = 2
+text = "装备 · ID 1国翼"
+
+[node name="SummaryPanel" type="PanelContainer" parent="PanelPadding/MainColumn"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
+
+[node name="SummaryLabel" type="Label" parent="PanelPadding/MainColumn/SummaryPanel"]
+layout_mode = 2
+text = "护盾：升级银币 100%"
+
+[node name="SlotsColumn" type="VBoxContainer" parent="PanelPadding/MainColumn"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SlotOnePanel" type="PanelContainer" parent="PanelPadding/MainColumn/SlotsColumn"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
+
+[node name="SlotOneLabel" type="Label" parent="PanelPadding/MainColumn/SlotsColumn/SlotOnePanel"]
+layout_mode = 2
+text = "武士刀 · 血 贤圣 试练"
+
+[node name="SlotTwoPanel" type="PanelContainer" parent="PanelPadding/MainColumn/SlotsColumn"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
+
+[node name="SlotTwoLabel" type="Label" parent="PanelPadding/MainColumn/SlotsColumn/SlotTwoPanel"]
+layout_mode = 2
+text = "盔甲统 · 真 红叶轮"
+
+[node name="SlotThreePanel" type="PanelContainer" parent="PanelPadding/MainColumn/SlotsColumn"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
+
+[node name="SlotThreeLabel" type="Label" parent="PanelPadding/MainColumn/SlotsColumn/SlotThreePanel"]
+layout_mode = 2
+text = "精炼件 · 真 红战神怒"
+
+[node name="SlotFourPanel" type="PanelContainer" parent="PanelPadding/MainColumn/SlotsColumn"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
+
+[node name="SlotFourLabel" type="Label" parent="PanelPadding/MainColumn/SlotsColumn/SlotFourPanel"]
+layout_mode = 2
+text = "学士抱 · ★ 星云"

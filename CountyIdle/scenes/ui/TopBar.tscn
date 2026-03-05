@@ -1,21 +1,123 @@
-[gd_scene format=3]
+[gd_scene load_steps=4 format=3]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_topbar"]
+bg_color = Color(0.137255, 0.145098, 0.168627, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.207843, 0.243137, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_progress_bg"]
+bg_color = Color(0.0352941, 0.0392157, 0.0470588, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_progress_fill"]
+bg_color = Color(0.831373, 0.662745, 0.32549, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
 
 [node name="TopBar" type="PanelContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 64)
+theme_override_styles/panel = SubResource("StyleBoxFlat_topbar")
 
-[node name="BarContent" type="VBoxContainer" parent="."]
+[node name="BarContent" type="MarginContainer" parent="."]
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 8
 
-[node name="SummaryLabel" type="Label" parent="BarContent"]
+[node name="MainRow" type="HBoxContainer" parent="BarContent"]
 layout_mode = 2
-text = "-"
+theme_override_constants/separation = 18
 
-[node name="ResourceLabel" type="Label" parent="BarContent"]
+[node name="StatsRow" type="HBoxContainer" parent="BarContent/MainRow"]
 layout_mode = 2
-text = "-"
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
 
-[node name="CombatLabel" type="Label" parent="BarContent"]
+[node name="PopulationLabel" type="Label" parent="BarContent/MainRow/StatsRow"]
 layout_mode = 2
-text = "-"
+text = "👥 人口 120"
+vertical_alignment = 1
+
+[node name="HappinessLabel" type="Label" parent="BarContent/MainRow/StatsRow"]
+layout_mode = 2
+text = "💖 民心 72"
+vertical_alignment = 1
+
+[node name="DividerA" type="ColorRect" parent="BarContent/MainRow/StatsRow"]
+custom_minimum_size = Vector2(1, 22)
+layout_mode = 2
+color = Color(0.2, 0.207843, 0.243137, 1)
+
+[node name="FoodLabel" type="Label" parent="BarContent/MainRow/StatsRow"]
+layout_mode = 2
+text = "🌾 粮 680 +9.4/s"
+vertical_alignment = 1
+
+[node name="WoodLabel" type="Label" parent="BarContent/MainRow/StatsRow"]
+layout_mode = 2
+text = "🪵 木 220 +5.0/s"
+vertical_alignment = 1
+
+[node name="GoldLabel" type="Label" parent="BarContent/MainRow/StatsRow"]
+layout_mode = 2
+text = "💰 金 90 -1.4/s"
+vertical_alignment = 1
+
+[node name="DividerB" type="ColorRect" parent="BarContent/MainRow/StatsRow"]
+custom_minimum_size = Vector2(1, 22)
+layout_mode = 2
+color = Color(0.2, 0.207843, 0.243137, 1)
+
+[node name="ThreatLabel" type="Label" parent="BarContent/MainRow/StatsRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.768627, 0.329412, 0.329412, 1)
+text = "⚔ 威胁 42%"
+vertical_alignment = 1
+
+[node name="TechLabel" type="Label" parent="BarContent/MainRow/StatsRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.333333, 0.47451, 0.619608, 1)
+text = "📜 科技 T1"
+vertical_alignment = 1
+
+[node name="CycleBox" type="VBoxContainer" parent="BarContent/MainRow"]
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="CycleLabel" type="Label" parent="BarContent/MainRow/CycleBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.831373, 0.662745, 0.32549, 1)
+text = "纪元 Ⅰ · 第 1 周期"
+horizontal_alignment = 2
+
+[node name="SettlementProgress" type="ProgressBar" parent="BarContent/MainRow/CycleBox"]
+custom_minimum_size = Vector2(0, 5)
+layout_mode = 2
+max_value = 60.0
+value = 24.0
+show_percentage = false
+theme_override_styles/background = SubResource("StyleBoxFlat_progress_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_progress_fill")
+
+[node name="CountdownLabel" type="Label" parent="BarContent/MainRow/CycleBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.517647, 0.52549, 0.556863, 1)
+theme_override_font_sizes/font_size = 11
+text = "距离大暑结算还有 59 秒"
+horizontal_alignment = 2

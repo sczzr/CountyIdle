@@ -1,25 +1,156 @@
-[gd_scene format=3]
+[gd_scene load_steps=6 format=3]
 
-[node name="EventLogPanel" type="PanelContainer"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_alerts"]
+bg_color = Color(0.101961, 0.105882, 0.12549, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.207843, 0.243137, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_log"]
+bg_color = Color(0.101961, 0.105882, 0.12549, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.207843, 0.243137, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_alert_bad"]
+bg_color = Color(0.160784, 0.109804, 0.109804, 1)
+border_width_left = 4
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.290196, 0.164706, 0.164706, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+content_margin_left = 8.0
+content_margin_top = 7.0
+content_margin_right = 8.0
+content_margin_bottom = 7.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_alert_good"]
+bg_color = Color(0.160784, 0.145098, 0.109804, 1)
+border_width_left = 4
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.290196, 0.25098, 0.164706, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+content_margin_left = 8.0
+content_margin_top = 7.0
+content_margin_right = 8.0
+content_margin_bottom = 7.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_log_content"]
+bg_color = Color(0.0705882, 0.0745098, 0.0901961, 1)
+border_width_top = 1
+border_color = Color(0.2, 0.207843, 0.243137, 1)
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
+
+[node name="EventLogPanel" type="VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
+clip_contents = true
+theme_override_constants/separation = 8
 
 [node name="PanelContent" type="VBoxContainer" parent="."]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 6
+theme_override_constants/separation = 8
 
-[node name="TitleLabel" type="Label" parent="PanelContent"]
-layout_mode = 2
-text = "命令与日志"
-
-[node name="StatusLabel" type="Label" parent="PanelContent"]
-layout_mode = 2
-autowrap_mode = 3
-text = "规则：1秒=1游戏分钟，每60分钟结算一次。"
-
-[node name="LogLabel" type="RichTextLabel" parent="PanelContent"]
+[node name="MainVBox" type="VBoxContainer" parent="PanelContent"]
 layout_mode = 2
 size_flags_vertical = 3
-fit_content = true
-scroll_active = false
+theme_override_constants/separation = 8
+
+[node name="AlertsBox" type="PanelContainer" parent="PanelContent/MainVBox"]
+custom_minimum_size = Vector2(0, 180)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_alerts")
+
+[node name="AlertsVBox" type="VBoxContainer" parent="PanelContent/MainVBox/AlertsBox"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="AlertHeader" type="Label" parent="PanelContent/MainVBox/AlertsBox/AlertsVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.768627, 0.329412, 0.329412, 1)
+theme_override_font_sizes/font_size = 14
+text = "军情急报"
+
+[node name="AlertsPadding" type="MarginContainer" parent="PanelContent/MainVBox/AlertsBox/AlertsVBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="AlertsList" type="VBoxContainer" parent="PanelContent/MainVBox/AlertsBox/AlertsVBox/AlertsPadding"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="AlertItem1" type="PanelContainer" parent="PanelContent/MainVBox/AlertsBox/AlertsVBox/AlertsPadding/AlertsList"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_alert_bad")
+
+[node name="AlertLabel" type="Label" parent="PanelContent/MainVBox/AlertsBox/AlertsVBox/AlertsPadding/AlertsList/AlertItem1"]
+layout_mode = 2
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 12
+text = "[危] 国库空虚\n金币赤字，部分官署与建筑面临停摆风险。"
+
+[node name="AlertItem2" type="PanelContainer" parent="PanelContent/MainVBox/AlertsBox/AlertsVBox/AlertsPadding/AlertsList"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_alert_good")
+
+[node name="AlertLabel" type="Label" parent="PanelContent/MainVBox/AlertsBox/AlertsVBox/AlertsPadding/AlertsList/AlertItem2"]
+layout_mode = 2
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 12
+text = "[喜] 天降祥瑞\n姻缘祠喜得麟儿，具备罕见【武骨】天赋。"
+
+[node name="LogBox" type="PanelContainer" parent="PanelContent/MainVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_log")
+
+[node name="LogVBox" type="VBoxContainer" parent="PanelContent/MainVBox/LogBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 0
+
+[node name="LogHeader" type="Label" parent="PanelContent/MainVBox/LogBox/LogVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "郡县志 (日志)"
+
+[node name="LogContent" type="PanelContainer" parent="PanelContent/MainVBox/LogBox/LogVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_log_content")
+
+[node name="LogLabel" type="RichTextLabel" parent="PanelContent/MainVBox/LogBox/LogVBox/LogContent"]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+fit_content = false
+scroll_active = true
+text = "[color=#5f7fb2][00:00] 系统初始化完成，新官上任。[/color]\n[color=#5f7fb2][00:02] 户部重编，调拨 69 人至农亩。[/color]\n[color=#7c9dff][00:56] 文书已封存（存档成功）。[/color]\n[color=#59c995][01:20] 探险队大捷，缴获金银+21。[/color]\n[color=#6f82b8][03:00] 度支岁修，消耗粮食 130 担。[/color]"

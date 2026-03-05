@@ -1,0 +1,64 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/figma/HUDTopBar.cs" id="1_tj3r1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_topbar"]
+bg_color = Color(0.0588235, 0.0784314, 0.0980392, 1)
+border_width_bottom = 1
+border_color = Color(0.2, 0.227451, 0.266667, 1)
+
+[node name="HUDTopBar" type="PanelContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 44)
+theme_override_styles/panel = SubResource("StyleBoxFlat_topbar")
+script = ExtResource("1_tj3r1")
+
+[node name="BarPadding" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 8
+
+[node name="MainRow" type="HBoxContainer" parent="BarPadding"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ResourceRow" type="HBoxContainer" parent="BarPadding/MainRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="PopulationLabel" type="Label" parent="BarPadding/MainRow/ResourceRow"]
+layout_mode = 2
+text = "人口 220"
+
+[node name="MoraleLabel" type="Label" parent="BarPadding/MainRow/ResourceRow"]
+layout_mode = 2
+text = "军心 72"
+
+[node name="FoodLabel" type="Label" parent="BarPadding/MainRow/ResourceRow"]
+layout_mode = 2
+text = "粮 688"
+
+[node name="StoneLabel" type="Label" parent="BarPadding/MainRow/ResourceRow"]
+layout_mode = 2
+text = "石 220"
+
+[node name="FireLabel" type="Label" parent="BarPadding/MainRow/ResourceRow"]
+layout_mode = 2
+text = "火 98"
+
+[node name="MoneyLabel" type="Label" parent="BarPadding/MainRow/ResourceRow"]
+layout_mode = 2
+text = "钱 325"
+
+[node name="QiLabel" type="Label" parent="BarPadding/MainRow/ResourceRow"]
+layout_mode = 2
+text = "真气 11"
+
+[node name="EraLabel" type="Label" parent="BarPadding/MainRow"]
+layout_mode = 2
+text = "纪年：L 第1期间"
+horizontal_alignment = 2

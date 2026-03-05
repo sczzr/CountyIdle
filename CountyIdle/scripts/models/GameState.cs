@@ -33,6 +33,14 @@ public class GameState
     public bool ExplorationEnabled { get; set; } = true;
     public int ExplorationProgressHours { get; set; } = 0;
     public double AvgGearScore { get; set; } = 12;
+    public int EventCooldownHours { get; set; } = 0;
+
+    public int AgricultureBuildings { get; set; } = 3;
+    public int WorkshopBuildings { get; set; } = 2;
+    public int ResearchBuildings { get; set; } = 1;
+    public int TradeBuildings { get; set; } = 1;
+    public int AdministrationBuildings { get; set; } = 4;
+    public double IndustryTools { get; set; } = 120;
 
     public int GameMinutes { get; set; } = 0;
     public int HourSettlements { get; set; } = 0;

@@ -1,17 +1,145 @@
-[gd_scene format=3]
+[gd_scene load_steps=6 format=3]
 
-[node name="JobRow" type="HBoxContainer"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jobrow"]
+bg_color = Color(0.137255, 0.145098, 0.168627, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.207843, 0.243137, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_prio"]
+bg_color = Color(0.101961, 0.105882, 0.12549, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.207843, 0.243137, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+content_margin_left = 6.0
+content_margin_top = 3.0
+content_margin_right = 6.0
+content_margin_bottom = 3.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_stepper"]
+bg_color = Color(0.0666667, 0.0705882, 0.0823529, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.207843, 0.243137, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_step_count"]
+bg_color = Color(0.0588235, 0.0627451, 0.0745098, 1)
+border_width_left = 1
+border_width_top = 0
+border_width_right = 1
+border_width_bottom = 0
+border_color = Color(0.2, 0.207843, 0.243137, 1)
+content_margin_left = 6.0
+content_margin_top = 2.0
+content_margin_right = 6.0
+content_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_elite"]
+bg_color = Color(0.0588235, 0.0627451, 0.0745098, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.360784, 0.305882, 0.211765, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+content_margin_left = 6.0
+content_margin_top = 3.0
+content_margin_right = 6.0
+content_margin_bottom = 3.0
+
+[node name="JobRow" type="PanelContainer"]
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_jobrow")
 
-[node name="JobLabel" type="Label" parent="."]
+[node name="RowVBox" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HeaderRow" type="HBoxContainer" parent="RowVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="JobLabel" type="Label" parent="RowVBox/HeaderRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "岗位：0"
+text = "🌾 农工岗"
 
-[node name="MinusButton" type="Button" parent="."]
+[node name="PriorityLabel" type="Button" parent="RowVBox/HeaderRow"]
 layout_mode = 2
-text = "-5"
+theme_override_styles/normal = SubResource("StyleBoxFlat_prio")
+theme_override_styles/hover = SubResource("StyleBoxFlat_prio")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_prio")
+theme_override_styles/focus = SubResource("StyleBoxFlat_prio")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_prio")
+theme_override_font_sizes/font_size = 11
+text = "★ 优先保供"
 
-[node name="PlusButton" type="Button" parent="."]
+[node name="ControlRow" type="HBoxContainer" parent="RowVBox"]
 layout_mode = 2
-text = "+5"
+theme_override_constants/separation = 8
+
+[node name="Stepper" type="PanelContainer" parent="RowVBox/ControlRow"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_stepper")
+
+[node name="StepperRow" type="HBoxContainer" parent="RowVBox/ControlRow/Stepper"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="MinusButton" type="Button" parent="RowVBox/ControlRow/Stepper/StepperRow"]
+custom_minimum_size = Vector2(26, 24)
+layout_mode = 2
+text = "-"
+
+[node name="CountPanel" type="PanelContainer" parent="RowVBox/ControlRow/Stepper/StepperRow"]
+custom_minimum_size = Vector2(38, 24)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_step_count")
+
+[node name="CountLabel" type="Label" parent="RowVBox/ControlRow/Stepper/StepperRow/CountPanel"]
+layout_mode = 2
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PlusButton" type="Button" parent="RowVBox/ControlRow/Stepper/StepperRow"]
+custom_minimum_size = Vector2(26, 24)
+layout_mode = 2
+text = "+"
+
+[node name="EliteBox" type="PanelContainer" parent="RowVBox/ControlRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_elite")
+
+[node name="EliteLabel" type="Label" parent="RowVBox/ControlRow/EliteBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.831373, 0.662745, 0.32549, 1)
+theme_override_font_sizes/font_size = 11
+text = "无领队"
+horizontal_alignment = 1

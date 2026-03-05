@@ -1,0 +1,68 @@
+{
+  "tile_size": 256,
+  "columns": 4,
+  "rows": 3,
+  "atlas_file": "assets/tiles/building_elements_basic/chinese_building_elements_atlas_256.png",
+  "tiles": [
+    {
+      "name": "beam_bracket_a",
+      "atlas_x": 0,
+      "atlas_y": 0.0
+    },
+    {
+      "name": "column_red_a",
+      "atlas_x": 1,
+      "atlas_y": 0.0
+    },
+    {
+      "name": "fence_bamboo_a",
+      "atlas_x": 2,
+      "atlas_y": 0.0
+    },
+    {
+      "name": "gate_small_a",
+      "atlas_x": 3,
+      "atlas_y": 0.0
+    },
+    {
+      "name": "moon_gate_a",
+      "atlas_x": 0,
+      "atlas_y": 1.0
+    },
+    {
+      "name": "platform_stone_a",
+      "atlas_x": 1,
+      "atlas_y": 1.0
+    },
+    {
+      "name": "roof_corner_a",
+      "atlas_x": 2,
+      "atlas_y": 1.0
+    },
+    {
+      "name": "roof_straight_a",
+      "atlas_x": 3,
+      "atlas_y": 1.0
+    },
+    {
+      "name": "stair_stone_a",
+      "atlas_x": 0,
+      "atlas_y": 2.0
+    },
+    {
+      "name": "wall_door_a",
+      "atlas_x": 1,
+      "atlas_y": 2.0
+    },
+    {
+      "name": "wall_plain_a",
+      "atlas_x": 2,
+      "atlas_y": 2.0
+    },
+    {
+      "name": "wall_window_a",
+      "atlas_x": 3,
+      "atlas_y": 2.0
+    }
+  ]
+}

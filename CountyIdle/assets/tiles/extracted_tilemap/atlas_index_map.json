@@ -1,0 +1,1025 @@
+{
+  "atlas": "extracted_tile_atlas_256.png",
+  "atlas_size": [
+    2048,
+    1792
+  ],
+  "grid": {
+    "cols": 8,
+    "rows": 7,
+    "cell_size": [
+      256,
+      256
+    ]
+  },
+  "tile_count": 53,
+  "tiles": [
+    {
+      "tile_id": 1,
+      "atlas_coord": [
+        0,
+        0
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_001.png",
+      "source_bbox_xywh": [
+        30,
+        7,
+        177,
+        107
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 2,
+      "atlas_coord": [
+        1,
+        0
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_002.png",
+      "source_bbox_xywh": [
+        1069,
+        13,
+        130,
+        115
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 3,
+      "atlas_coord": [
+        2,
+        0
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_003.png",
+      "source_bbox_xywh": [
+        1210,
+        20,
+        131,
+        229
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 4,
+      "atlas_coord": [
+        3,
+        0
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_004.png",
+      "source_bbox_xywh": [
+        747,
+        21,
+        145,
+        89
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 5,
+      "atlas_coord": [
+        4,
+        0
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_005.png",
+      "source_bbox_xywh": [
+        456,
+        22,
+        140,
+        88
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 6,
+      "atlas_coord": [
+        5,
+        0
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_006.png",
+      "source_bbox_xywh": [
+        602,
+        22,
+        138,
+        88
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 7,
+      "atlas_coord": [
+        6,
+        0
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_007.png",
+      "source_bbox_xywh": [
+        903,
+        22,
+        146,
+        89
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 8,
+      "atlas_coord": [
+        7,
+        0
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_008.png",
+      "source_bbox_xywh": [
+        310,
+        32,
+        134,
+        83
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 9,
+      "atlas_coord": [
+        0,
+        1
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_009.png",
+      "source_bbox_xywh": [
+        166,
+        34,
+        134,
+        83
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 10,
+      "atlas_coord": [
+        1,
+        1
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_010.png",
+      "source_bbox_xywh": [
+        805,
+        85,
+        145,
+        89
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 11,
+      "atlas_coord": [
+        2,
+        1
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_011.png",
+      "source_bbox_xywh": [
+        96,
+        87,
+        118,
+        73
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 12,
+      "atlas_coord": [
+        3,
+        1
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_012.png",
+      "source_bbox_xywh": [
+        240,
+        88,
+        118,
+        73
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 13,
+      "atlas_coord": [
+        4,
+        1
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_013.png",
+      "source_bbox_xywh": [
+        906,
+        118,
+        166,
+        101
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 14,
+      "atlas_coord": [
+        5,
+        1
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_014.png",
+      "source_bbox_xywh": [
+        602,
+        121,
+        140,
+        87
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 15,
+      "atlas_coord": [
+        6,
+        1
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_015.png",
+      "source_bbox_xywh": [
+        451,
+        124,
+        140,
+        87
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 16,
+      "atlas_coord": [
+        7,
+        1
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_016.png",
+      "source_bbox_xywh": [
+        305,
+        127,
+        134,
+        83
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 17,
+      "atlas_coord": [
+        0,
+        2
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_017.png",
+      "source_bbox_xywh": [
+        162,
+        129,
+        135,
+        83
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 18,
+      "atlas_coord": [
+        1,
+        2
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_018.png",
+      "source_bbox_xywh": [
+        18,
+        132,
+        134,
+        82
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 19,
+      "atlas_coord": [
+        2,
+        2
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_019.png",
+      "source_bbox_xywh": [
+        1075,
+        132,
+        125,
+        108
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 20,
+      "atlas_coord": [
+        3,
+        2
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_020.png",
+      "source_bbox_xywh": [
+        322,
+        204,
+        786,
+        305
+      ],
+      "scaled_to_fit": true
+    },
+    {
+      "tile_id": 21,
+      "atlas_coord": [
+        4,
+        2
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_021.png",
+      "source_bbox_xywh": [
+        185,
+        218,
+        154,
+        92
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 22,
+      "atlas_coord": [
+        5,
+        2
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_022.png",
+      "source_bbox_xywh": [
+        15,
+        220,
+        154,
+        92
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 23,
+      "atlas_coord": [
+        6,
+        2
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_023.png",
+      "source_bbox_xywh": [
+        362,
+        228,
+        105,
+        65
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 24,
+      "atlas_coord": [
+        7,
+        2
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_024.png",
+      "source_bbox_xywh": [
+        1002,
+        256,
+        46,
+        19
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 25,
+      "atlas_coord": [
+        0,
+        3
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_025.png",
+      "source_bbox_xywh": [
+        101,
+        274,
+        154,
+        92
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 26,
+      "atlas_coord": [
+        1,
+        3
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_026.png",
+      "source_bbox_xywh": [
+        1173,
+        278,
+        118,
+        53
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 27,
+      "atlas_coord": [
+        2,
+        3
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_027.png",
+      "source_bbox_xywh": [
+        280,
+        279,
+        129,
+        77
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 28,
+      "atlas_coord": [
+        3,
+        3
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_028.png",
+      "source_bbox_xywh": [
+        1113,
+        319,
+        55,
+        63
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 29,
+      "atlas_coord": [
+        4,
+        3
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_029.png",
+      "source_bbox_xywh": [
+        15,
+        326,
+        155,
+        92
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 30,
+      "atlas_coord": [
+        5,
+        3
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_030.png",
+      "source_bbox_xywh": [
+        1257,
+        337,
+        64,
+        48
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 31,
+      "atlas_coord": [
+        6,
+        3
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_031.png",
+      "source_bbox_xywh": [
+        199,
+        345,
+        113,
+        69
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 32,
+      "atlas_coord": [
+        7,
+        3
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_032.png",
+      "source_bbox_xywh": [
+        1200,
+        347,
+        45,
+        35
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 33,
+      "atlas_coord": [
+        0,
+        4
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_033.png",
+      "source_bbox_xywh": [
+        95,
+        381,
+        155,
+        92
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 34,
+      "atlas_coord": [
+        1,
+        4
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_034.png",
+      "source_bbox_xywh": [
+        1092,
+        385,
+        68,
+        55
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 35,
+      "atlas_coord": [
+        2,
+        4
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_035.png",
+      "source_bbox_xywh": [
+        273,
+        396,
+        107,
+        66
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 36,
+      "atlas_coord": [
+        3,
+        4
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_036.png",
+      "source_bbox_xywh": [
+        1158,
+        402,
+        190,
+        97
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 37,
+      "atlas_coord": [
+        4,
+        4
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_037.png",
+      "source_bbox_xywh": [
+        1015,
+        455,
+        61,
+        27
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 38,
+      "atlas_coord": [
+        5,
+        4
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_038.png",
+      "source_bbox_xywh": [
+        9,
+        481,
+        168,
+        275
+      ],
+      "scaled_to_fit": true
+    },
+    {
+      "tile_id": 39,
+      "atlas_coord": [
+        6,
+        4
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_039.png",
+      "source_bbox_xywh": [
+        163,
+        490,
+        145,
+        266
+      ],
+      "scaled_to_fit": true
+    },
+    {
+      "tile_id": 40,
+      "atlas_coord": [
+        7,
+        4
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_040.png",
+      "source_bbox_xywh": [
+        386,
+        498,
+        88,
+        252
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 41,
+      "atlas_coord": [
+        0,
+        5
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_041.png",
+      "source_bbox_xywh": [
+        574,
+        499,
+        383,
+        251
+      ],
+      "scaled_to_fit": true
+    },
+    {
+      "tile_id": 42,
+      "atlas_coord": [
+        1,
+        5
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_042.png",
+      "source_bbox_xywh": [
+        1239,
+        517,
+        107,
+        84
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 43,
+      "atlas_coord": [
+        2,
+        5
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_043.png",
+      "source_bbox_xywh": [
+        1133,
+        520,
+        95,
+        78
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 44,
+      "atlas_coord": [
+        3,
+        5
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_044.png",
+      "source_bbox_xywh": [
+        950,
+        521,
+        86,
+        75
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 45,
+      "atlas_coord": [
+        4,
+        5
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_045.png",
+      "source_bbox_xywh": [
+        1044,
+        525,
+        84,
+        71
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 46,
+      "atlas_coord": [
+        5,
+        5
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_046.png",
+      "source_bbox_xywh": [
+        310,
+        540,
+        70,
+        210
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 47,
+      "atlas_coord": [
+        6,
+        5
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_047.png",
+      "source_bbox_xywh": [
+        476,
+        570,
+        91,
+        180
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 48,
+      "atlas_coord": [
+        7,
+        5
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_048.png",
+      "source_bbox_xywh": [
+        1071,
+        611,
+        134,
+        148
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 49,
+      "atlas_coord": [
+        0,
+        6
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_049.png",
+      "source_bbox_xywh": [
+        1076,
+        611,
+        33,
+        70
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 50,
+      "atlas_coord": [
+        1,
+        6
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_050.png",
+      "source_bbox_xywh": [
+        1204,
+        626,
+        72,
+        91
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 51,
+      "atlas_coord": [
+        2,
+        6
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_051.png",
+      "source_bbox_xywh": [
+        1020,
+        648,
+        45,
+        102
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 52,
+      "atlas_coord": [
+        3,
+        6
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_052.png",
+      "source_bbox_xywh": [
+        1257,
+        650,
+        101,
+        106
+      ],
+      "scaled_to_fit": false
+    },
+    {
+      "tile_id": 53,
+      "atlas_coord": [
+        4,
+        6
+      ],
+      "atlas_cell_size": [
+        256,
+        256
+      ],
+      "source_file": "tiles/tile_053.png",
+      "source_bbox_xywh": [
+        967,
+        672,
+        39,
+        77
+      ],
+      "scaled_to_fit": false
+    }
+  ]
+}

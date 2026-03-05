@@ -1,0 +1,110 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/figma/BottomBar.cs" id="1_6n60o"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bottom"]
+bg_color = Color(0.0588235, 0.0784314, 0.0980392, 1)
+border_width_top = 1
+border_color = Color(0.2, 0.227451, 0.266667, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
+bg_color = Color(0.101961, 0.121569, 0.14902, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.184314, 0.207843, 0.247059, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+
+[node name="BottomBar" type="PanelContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 128)
+theme_override_styles/panel = SubResource("StyleBoxFlat_bottom")
+script = ExtResource("1_6n60o")
+
+[node name="PanelPadding" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="MainColumn" type="VBoxContainer" parent="PanelPadding"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="EquipmentRow" type="HBoxContainer" parent="PanelPadding/MainColumn"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CardOnePanel" type="PanelContainer" parent="PanelPadding/MainColumn/EquipmentRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="CardOneLabel" type="Label" parent="PanelPadding/MainColumn/EquipmentRow/CardOnePanel"]
+layout_mode = 2
+text = "钢铁剑 · Lv.2"
+
+[node name="CardTwoPanel" type="PanelContainer" parent="PanelPadding/MainColumn/EquipmentRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="CardTwoLabel" type="Label" parent="PanelPadding/MainColumn/EquipmentRow/CardTwoPanel"]
+layout_mode = 2
+text = "伏木弓部族 · Lv.5"
+
+[node name="CardThreePanel" type="PanelContainer" parent="PanelPadding/MainColumn/EquipmentRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="CardThreeLabel" type="Label" parent="PanelPadding/MainColumn/EquipmentRow/CardThreePanel"]
+layout_mode = 2
+text = "初始砸星 · Lv.5"
+
+[node name="ActionRow" type="HBoxContainer" parent="PanelPadding/MainColumn"]
+layout_mode = 2
+
+[node name="LeftActions" type="HBoxContainer" parent="PanelPadding/MainColumn/ActionRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="SpeedButton" type="Button" parent="PanelPadding/MainColumn/ActionRow/LeftActions"]
+custom_minimum_size = Vector2(88, 28)
+layout_mode = 2
+text = "▶ 51"
+
+[node name="BurstButton" type="Button" parent="PanelPadding/MainColumn/ActionRow/LeftActions"]
+custom_minimum_size = Vector2(88, 28)
+layout_mode = 2
+text = "■ ×2"
+
+[node name="RightActions" type="HBoxContainer" parent="PanelPadding/MainColumn/ActionRow"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SaveButton" type="Button" parent="PanelPadding/MainColumn/ActionRow/RightActions"]
+custom_minimum_size = Vector2(108, 28)
+layout_mode = 2
+text = "封存档整理"
+
+[node name="HelpButton" type="Button" parent="PanelPadding/MainColumn/ActionRow/RightActions"]
+custom_minimum_size = Vector2(100, 28)
+layout_mode = 2
+text = "作业帮您"
+
+[node name="AlertButton" type="Button" parent="PanelPadding/MainColumn/ActionRow/RightActions"]
+custom_minimum_size = Vector2(100, 28)
+layout_mode = 2
+text = "资为立场"

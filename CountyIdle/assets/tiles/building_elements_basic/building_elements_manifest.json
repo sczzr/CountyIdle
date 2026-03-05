@@ -1,0 +1,62 @@
+[
+  {
+    "usage": "屋顶角模块",
+    "category": "roof",
+    "name": "roof_corner_a"
+  },
+  {
+    "usage": "屋顶直段模块",
+    "category": "roof",
+    "name": "roof_straight_a"
+  },
+  {
+    "usage": "普通墙体段",
+    "category": "wall",
+    "name": "wall_plain_a"
+  },
+  {
+    "usage": "窗墙段",
+    "category": "wall",
+    "name": "wall_window_a"
+  },
+  {
+    "usage": "门墙段",
+    "category": "wall",
+    "name": "wall_door_a"
+  },
+  {
+    "usage": "红柱",
+    "category": "structure",
+    "name": "column_red_a"
+  },
+  {
+    "usage": "梁托段",
+    "category": "structure",
+    "name": "beam_bracket_a"
+  },
+  {
+    "usage": "石阶",
+    "category": "foundation",
+    "name": "stair_stone_a"
+  },
+  {
+    "usage": "台基",
+    "category": "foundation",
+    "name": "platform_stone_a"
+  },
+  {
+    "usage": "小门楼",
+    "category": "gate",
+    "name": "gate_small_a"
+  },
+  {
+    "usage": "月洞门",
+    "category": "gate",
+    "name": "moon_gate_a"
+  },
+  {
+    "usage": "竹篱笆直段",
+    "category": "fence",
+    "name": "fence_bamboo_a"
+  }
+]
