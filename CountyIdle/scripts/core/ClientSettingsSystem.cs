@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text.Json;
 using Godot;
 using CountyIdle.Models;
@@ -17,6 +18,24 @@ public class ClientSettingsSystem
         new Vector2I(1600, 900),
         new Vector2I(1920, 1080),
         new Vector2I(2560, 1440)
+    };
+    private static readonly string[] ShortcutFallbackPool =
+    {
+        ClientSettings.DefaultOpenSettingsKey,
+        ClientSettings.DefaultOpenWarehouseKey,
+        ClientSettings.DefaultToggleExplorationKey,
+        ClientSettings.DefaultToggleSpeedKey,
+        ClientSettings.DefaultQuickSaveKey,
+        ClientSettings.DefaultQuickLoadKey,
+        ClientSettings.DefaultQuickResetKey,
+        "F2",
+        "F3",
+        "F4",
+        "F6",
+        "F7",
+        "F8",
+        "G",
+        "T"
     };
 
     public ClientSettings Load(out string message)
@@ -50,7 +69,7 @@ public class ClientSettingsSystem
             var json = JsonSerializer.Serialize(sanitized, JsonOptions);
             using var file = FileAccess.Open(SavePath, FileAccess.ModeFlags.Write);
             file.StoreString(json);
-            message = "基础设置已保存。";
+            message = "基础设置已保存（含快捷键）。";
             return true;
         }
         catch (Exception ex)
@@ -78,6 +97,7 @@ public class ClientSettingsSystem
 
         normalized.FontScale = Mathf.Clamp(normalized.FontScale, MinFontScale, MaxFontScale);
         normalized.MasterVolume = Mathf.Clamp(normalized.MasterVolume, 0.0f, 1.0f);
+        NormalizeShortcuts(normalized);
         return normalized;
     }
 
@@ -98,5 +118,67 @@ public class ClientSettingsSystem
         }
 
         return false;
+    }
+
+    private static void NormalizeShortcuts(ClientSettings settings)
+    {
+        var usedKeys = new HashSet<Key>();
+        settings.OpenSettingsKey = NormalizeUniqueShortcut(settings.OpenSettingsKey, ClientSettings.DefaultOpenSettingsKey, usedKeys);
+        settings.OpenWarehouseKey = NormalizeUniqueShortcut(settings.OpenWarehouseKey, ClientSettings.DefaultOpenWarehouseKey, usedKeys);
+        settings.ToggleExplorationKey = NormalizeUniqueShortcut(settings.ToggleExplorationKey, ClientSettings.DefaultToggleExplorationKey, usedKeys);
+        settings.ToggleSpeedKey = NormalizeUniqueShortcut(settings.ToggleSpeedKey, ClientSettings.DefaultToggleSpeedKey, usedKeys);
+        settings.QuickSaveKey = NormalizeUniqueShortcut(settings.QuickSaveKey, ClientSettings.DefaultQuickSaveKey, usedKeys);
+        settings.QuickLoadKey = NormalizeUniqueShortcut(settings.QuickLoadKey, ClientSettings.DefaultQuickLoadKey, usedKeys);
+        settings.QuickResetKey = NormalizeUniqueShortcut(settings.QuickResetKey, ClientSettings.DefaultQuickResetKey, usedKeys);
+    }
+
+    private static string NormalizeUniqueShortcut(string rawKey, string fallbackKey, HashSet<Key> usedKeys)
+    {
+        if (TryParseKey(rawKey, out var parsedKey) && usedKeys.Add(parsedKey))
+        {
+            return parsedKey.ToString();
+        }
+
+        if (TryParseKey(fallbackKey, out var fallbackParsed) && usedKeys.Add(fallbackParsed))
+        {
+            return fallbackParsed.ToString();
+        }
+
+        foreach (var candidate in ShortcutFallbackPool)
+        {
+            if (!TryParseKey(candidate, out var candidateKey))
+            {
+                continue;
+            }
+
+            if (usedKeys.Add(candidateKey))
+            {
+                return candidateKey.ToString();
+            }
+        }
+
+        return fallbackKey;
+    }
+
+    private static bool TryParseKey(string? keyName, out Key key)
+    {
+        key = Key.None;
+        if (string.IsNullOrWhiteSpace(keyName))
+        {
+            return false;
+        }
+
+        if (!Enum.TryParse<Key>(keyName, true, out var parsedKey))
+        {
+            return false;
+        }
+
+        if (parsedKey == Key.None)
+        {
+            return false;
+        }
+
+        key = parsedKey;
+        return true;
     }
 }

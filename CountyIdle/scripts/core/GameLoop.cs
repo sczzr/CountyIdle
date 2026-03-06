@@ -14,7 +14,9 @@ public partial class GameLoop : Node
 
     private readonly PopulationSystem _populationSystem = new();
     private readonly IndustrySystem _industrySystem = new();
+    private readonly ResourceSystem _resourceSystem = new();
     private readonly EconomySystem _economySystem = new();
+    private readonly MapOperationalLinkSystem _mapOperationalLinkSystem = new();
     private readonly ResearchSystem _researchSystem = new();
     private readonly BreedingSystem _breedingSystem = new();
     private readonly CombatSystem _combatSystem = new();
@@ -50,6 +52,7 @@ public partial class GameLoop : Node
     {
         _state = state ?? new GameState();
         IndustryRules.EnsureDefaults(_state);
+        PopulationRules.EnsureDefaults(_state);
         ClampJobsToIndustryCapacity(publishLogs: false);
         _eventBus.PublishState(_state.Clone());
     }
@@ -57,6 +60,7 @@ public partial class GameLoop : Node
     public void ResetState()
     {
         _state = new GameState();
+        PopulationRules.EnsureDefaults(_state);
         _minuteAccumulator = 0;
         _secondAccumulator = 0;
         _eventBus.PublishLog("已重置到初始状态。");
@@ -87,6 +91,31 @@ public partial class GameLoop : Node
     {
         if (_industrySystem.TryCraftTools(_state, out var log))
         {
+            _eventBus.PublishLog(log);
+            _eventBus.PublishState(_state.Clone());
+            return;
+        }
+
+        _eventBus.PublishLog(log);
+    }
+
+    public void UpgradeMineAndWarehouse()
+    {
+        if (_industrySystem.TryUpgradeMineAndWarehouse(_state, out var log))
+        {
+            _eventBus.PublishLog(log);
+            _eventBus.PublishState(_state.Clone());
+            return;
+        }
+
+        _eventBus.PublishLog(log);
+    }
+
+    public void ExecuteMapDirective(MapDirectiveAction directiveAction)
+    {
+        if (_mapOperationalLinkSystem.TryExecuteDirective(_state, directiveAction, out var log))
+        {
+            PopulationRules.EnsureDefaults(_state);
             _eventBus.PublishLog(log);
             _eventBus.PublishState(_state.Clone());
             return;
@@ -204,6 +233,11 @@ public partial class GameLoop : Node
             _eventBus.PublishLog(industryLog);
         }
 
+        if (_resourceSystem.TickHour(_state, out var resourceLog) && !string.IsNullOrWhiteSpace(resourceLog))
+        {
+            _eventBus.PublishLog(resourceLog);
+        }
+
         _economySystem.TickHour(_state);
 
         if (_researchSystem.TickHour(_state, out var researchLog) && !string.IsNullOrWhiteSpace(researchLog))
@@ -211,7 +245,10 @@ public partial class GameLoop : Node
             _eventBus.PublishLog(researchLog);
         }
 
-        _populationSystem.TickHour(_state);
+        if (_populationSystem.TickHour(_state, out var populationLog) && !string.IsNullOrWhiteSpace(populationLog))
+        {
+            _eventBus.PublishLog(populationLog);
+        }
 
         if (_breedingSystem.TickHour(_state, out var breedingLog) && !string.IsNullOrWhiteSpace(breedingLog))
         {

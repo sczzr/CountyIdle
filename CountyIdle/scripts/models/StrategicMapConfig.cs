@@ -37,6 +37,9 @@ public sealed class StrategicMapDefinition
 
     [JsonPropertyName("nodes")]
     public List<StrategicNodeDefinition> Nodes { get; set; } = [];
+
+    [JsonPropertyName("labels")]
+    public List<StrategicLabelDefinition> Labels { get; set; } = [];
 }
 
 public sealed class StrategicPolygonDefinition
@@ -82,6 +85,9 @@ public sealed class StrategicNodeDefinition
 
     [JsonPropertyName("color")]
     public string Color { get; set; } = string.Empty;
+
+    [JsonPropertyName("kind")]
+    public string Kind { get; set; } = string.Empty;
 }
 
 public sealed class StrategicPointDefinition
@@ -91,4 +97,25 @@ public sealed class StrategicPointDefinition
 
     [JsonPropertyName("y")]
     public float Y { get; set; }
+}
+
+public sealed class StrategicLabelDefinition
+{
+    [JsonPropertyName("x")]
+    public float X { get; set; }
+
+    [JsonPropertyName("y")]
+    public float Y { get; set; }
+
+    [JsonPropertyName("text")]
+    public string Text { get; set; } = string.Empty;
+
+    [JsonPropertyName("color")]
+    public string Color { get; set; } = string.Empty;
+
+    [JsonPropertyName("font_size")]
+    public int FontSize { get; set; } = 12;
+
+    [JsonPropertyName("min_zoom")]
+    public float MinZoom { get; set; } = 0.6f;
 }

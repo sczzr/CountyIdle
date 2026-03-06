@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Godot;
 using CountyIdle.Core;
@@ -121,6 +121,7 @@ public partial class Main : Control
         InitializeClientSettings();
         BindUiNodes();
         CreateSettingsPanel();
+        CreateWarehousePanel();
         BindUiEvents();
         BindLanternHoverEffects();
         SetupGameLoop();
@@ -141,6 +142,7 @@ public partial class Main : Control
             _settlementCountdownSeconds += SettlementDurationSeconds;
         }
 
+        _countyTownMapRenderer?.SetResidentClock(_gameLoop.State.GameMinutes, _isSpeedX2 ? 2.0f : 1.0f);
         UpdateSettlementCountdownUi();
     }
 
@@ -153,6 +155,7 @@ public partial class Main : Control
 
         _buttonPulseTweens.Clear();
         UnbindClientSettingEvents();
+        UnbindWarehousePanelEvents();
     }
 
     private void SetupGameLoop()
@@ -210,11 +213,15 @@ public partial class Main : Control
             : (state.ExplorationEnabled ? "⏸" : "▶");
 
         _countyTownMapRenderer?.RefreshMap(state.Population, state.HousingCapacity, state.ElitePopulation);
+        _countyTownMapRenderer?.RefreshResidents(state);
+        _countyTownMapRenderer?.SetResidentClock(state.GameMinutes, _isSpeedX2 ? 2.0f : 1.0f);
+        RefreshWarehousePanelPopup(state);
 
         RefreshJobPanels(state);
         RefreshMineButtonState(state);
         UpdateFigmaPanels(state);
         UpdateSettlementCountdownUi();
+        RefreshMapOperationalLinkUi(state);
     }
 
     private static string FormatSigned(double value)
@@ -422,6 +429,7 @@ public partial class Main : Control
         _mapZoomInButton = GetNode<Button>($"{CenterTopTabRowPath}/MapZoomInButton");
         _mapZoomResetButton = GetNode<Button>($"{CenterTopTabRowPath}/MapZoomResetButton");
         _mapZoomLabel = GetNode<Label>($"{CenterTopTabRowPath}/MapZoomLabel");
+        BindMapOperationalLegacyNodes();
 
         _worldMapView = GetNode<Control>($"{CenterMapPagesPath}/WorldMapView");
         _prefectureMapView = GetNode<Control>($"{CenterMapPagesPath}/PrefectureMapView");
@@ -518,6 +526,7 @@ public partial class Main : Control
         _expeditionMapView = null;
         _mineUpgradeButton = null;
         _countyTownMapRenderer = null;
+        ClearMapOperationalNodes();
 
         _jobCountLabels.Clear();
         _jobTitleLabels.Clear();
@@ -536,6 +545,7 @@ public partial class Main : Control
     {
         _exploreButton.Pressed += () => _gameLoop.ToggleExploration();
         BindSettingsButtonEvent();
+        BindWarehouseButtonEvent();
 
         if (_speedX1Button != null)
         {
@@ -576,6 +586,8 @@ public partial class Main : Control
             _mapZoomInButton.Pressed += () => AdjustCurrentMapZoom(MapZoomStep);
             _mapZoomResetButton.Pressed += ResetCurrentMapZoom;
         }
+
+        BindMapOperationalEvents();
 
         _saveButton.Pressed += () =>
         {
@@ -721,6 +733,7 @@ public partial class Main : Control
 
         _currentMapTab = mapTab;
         RefreshMapZoomUi();
+        RefreshMapOperationalLinkUi();
     }
 
     private void AdjustCurrentMapZoom(float delta)
@@ -931,3 +944,6 @@ public partial class Main : Control
         resetTween.TweenProperty(button, "self_modulate", BaseButtonModulate, LanternResetDurationSeconds);
     }
 }
+
+
+

@@ -10,6 +10,9 @@ public static class IndustryRules
     private const int ResearchPerBuilding = 10;
     private const int CommercePerBuilding = 14;
     private const int ManagementPerBuilding = 8;
+    private const int BaseWarehouseCapacity = 900;
+    private const int WarehouseCapacityPerLevel = 260;
+    private const int WarehouseCapacityPerAdministration = 45;
 
     public static void EnsureDefaults(GameState state)
     {
@@ -19,6 +22,9 @@ public static class IndustryRules
         state.TradeBuildings = Math.Max(state.TradeBuildings, 1);
         state.AdministrationBuildings = Math.Max(state.AdministrationBuildings, 1);
         state.IndustryTools = Math.Max(state.IndustryTools, 0);
+        state.MiningLevel = Math.Max(state.MiningLevel, 1);
+        state.WarehouseLevel = Math.Max(state.WarehouseLevel, 1);
+        state.WarehouseCapacity = Math.Max(state.WarehouseCapacity, CalculateWarehouseCapacity(state));
     }
 
     public static int GetCapacity(GameState state, JobType jobType)
@@ -106,5 +112,12 @@ public static class IndustryRules
     {
         var ratio = state.Population <= 0 ? 0 : (double)state.Workers / state.Population;
         return 1.0 + Math.Clamp(ratio, 0, 0.28);
+    }
+
+    public static double CalculateWarehouseCapacity(GameState state)
+    {
+        return BaseWarehouseCapacity +
+               (state.WarehouseLevel * WarehouseCapacityPerLevel) +
+               (state.AdministrationBuildings * WarehouseCapacityPerAdministration);
     }
 }

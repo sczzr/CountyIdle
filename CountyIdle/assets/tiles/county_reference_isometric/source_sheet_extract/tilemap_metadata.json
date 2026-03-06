@@ -1,0 +1,732 @@
+﻿{
+    "source_image":  "E:\\2_Personal\\Finally\\CountyIdle\\assets\\picture\\Isometric_game_asset_sheet_topdown_view_zen_chines_delpmaspu.png",
+    "source_size":  [
+                        2752,
+                        1536
+                    ],
+    "estimated_background_rgb":  [
+                                     250,
+                                     250,
+                                     250
+                                 ],
+    "foreground_threshold":  18,
+    "min_component_area":  300,
+    "tile_count":  65,
+    "tiles":  [
+                  {
+                      "id":  1,
+                      "file":  "tiles/tile_001.png",
+                      "source_bbox_xywh":  [
+                                               61,
+                                               14,
+                                               544,
+                                               220
+                                           ],
+                      "pixel_area":  60145
+                  },
+                  {
+                      "id":  2,
+                      "file":  "tiles/tile_002.png",
+                      "source_bbox_xywh":  [
+                                               2137,
+                                               28,
+                                               260,
+                                               229
+                                           ],
+                      "pixel_area":  35318
+                  },
+                  {
+                      "id":  3,
+                      "file":  "tiles/tile_003.png",
+                      "source_bbox_xywh":  [
+                                               1491,
+                                               40,
+                                               293,
+                                               181
+                                           ],
+                      "pixel_area":  29204
+                  },
+                  {
+                      "id":  4,
+                      "file":  "tiles/tile_004.png",
+                      "source_bbox_xywh":  [
+                                               2421,
+                                               40,
+                                               260,
+                                               459
+                                           ],
+                      "pixel_area":  69957
+                  },
+                  {
+                      "id":  5,
+                      "file":  "tiles/tile_005.png",
+                      "source_bbox_xywh":  [
+                                               1202,
+                                               42,
+                                               279,
+                                               178
+                                           ],
+                      "pixel_area":  26140
+                  },
+                  {
+                      "id":  6,
+                      "file":  "tiles/tile_006.png",
+                      "source_bbox_xywh":  [
+                                               1804,
+                                               43,
+                                               297,
+                                               180
+                                           ],
+                      "pixel_area":  29356
+                  },
+                  {
+                      "id":  7,
+                      "file":  "tiles/tile_007.png",
+                      "source_bbox_xywh":  [
+                                               911,
+                                               44,
+                                               279,
+                                               177
+                                           ],
+                      "pixel_area":  26163
+                  },
+                  {
+                      "id":  8,
+                      "file":  "tiles/tile_008.png",
+                      "source_bbox_xywh":  [
+                                               618,
+                                               65,
+                                               270,
+                                               167
+                                           ],
+                      "pixel_area":  25077
+                  },
+                  {
+                      "id":  9,
+                      "file":  "tiles/tile_009.png",
+                      "source_bbox_xywh":  [
+                                               1609,
+                                               170,
+                                               535,
+                                               268
+                                           ],
+                      "pixel_area":  66861
+                  },
+                  {
+                      "id":  10,
+                      "file":  "tiles/tile_010.png",
+                      "source_bbox_xywh":  [
+                                               193,
+                                               173,
+                                               236,
+                                               147
+                                           ],
+                      "pixel_area":  19526
+                  },
+                  {
+                      "id":  11,
+                      "file":  "tiles/tile_011.png",
+                      "source_bbox_xywh":  [
+                                               480,
+                                               174,
+                                               237,
+                                               148
+                                           ],
+                      "pixel_area":  19697
+                  },
+                  {
+                      "id":  12,
+                      "file":  "tiles/tile_012.png",
+                      "source_bbox_xywh":  [
+                                               1203,
+                                               238,
+                                               281,
+                                               180
+                                           ],
+                      "pixel_area":  26554
+                  },
+                  {
+                      "id":  13,
+                      "file":  "tiles/tile_013.png",
+                      "source_bbox_xywh":  [
+                                               901,
+                                               247,
+                                               280,
+                                               176
+                                           ],
+                      "pixel_area":  26231
+                  },
+                  {
+                      "id":  14,
+                      "file":  "tiles/tile_014.png",
+                      "source_bbox_xywh":  [
+                                               612,
+                                               254,
+                                               266,
+                                               167
+                                           ],
+                      "pixel_area":  25189
+                  },
+                  {
+                      "id":  15,
+                      "file":  "tiles/tile_015.png",
+                      "source_bbox_xywh":  [
+                                               324,
+                                               258,
+                                               269,
+                                               167
+                                           ],
+                      "pixel_area":  25183
+                  },
+                  {
+                      "id":  16,
+                      "file":  "tiles/tile_016.png",
+                      "source_bbox_xywh":  [
+                                               35,
+                                               260,
+                                               271,
+                                               168
+                                           ],
+                      "pixel_area":  25279
+                  },
+                  {
+                      "id":  17,
+                      "file":  "tiles/tile_017.png",
+                      "source_bbox_xywh":  [
+                                               2150,
+                                               262,
+                                               249,
+                                               218
+                                           ],
+                      "pixel_area":  32099
+                  },
+                  {
+                      "id":  18,
+                      "file":  "tiles/tile_018.png",
+                      "source_bbox_xywh":  [
+                                               1430,
+                                               362,
+                                               424,
+                                               290
+                                           ],
+                      "pixel_area":  60757
+                  },
+                  {
+                      "id":  19,
+                      "file":  "tiles/tile_019.png",
+                      "source_bbox_xywh":  [
+                                               935,
+                                               427,
+                                               449,
+                                               302
+                                           ],
+                      "pixel_area":  65796
+                  },
+                  {
+                      "id":  20,
+                      "file":  "tiles/tile_020.png",
+                      "source_bbox_xywh":  [
+                                               372,
+                                               436,
+                                               307,
+                                               185
+                                           ],
+                      "pixel_area":  31909
+                  },
+                  {
+                      "id":  21,
+                      "file":  "tiles/tile_021.png",
+                      "source_bbox_xywh":  [
+                                               30,
+                                               438,
+                                               307,
+                                               187
+                                           ],
+                      "pixel_area":  32096
+                  },
+                  {
+                      "id":  22,
+                      "file":  "tiles/tile_022.png",
+                      "source_bbox_xywh":  [
+                                               722,
+                                               452,
+                                               211,
+                                               133
+                                           ],
+                      "pixel_area":  16208
+                  },
+                  {
+                      "id":  23,
+                      "file":  "tiles/tile_023.png",
+                      "source_bbox_xywh":  [
+                                               2002,
+                                               509,
+                                               95,
+                                               42
+                                           ],
+                      "pixel_area":  2409
+                  },
+                  {
+                      "id":  24,
+                      "file":  "tiles/tile_024.png",
+                      "source_bbox_xywh":  [
+                                               2051,
+                                               545,
+                                               72,
+                                               34
+                                           ],
+                      "pixel_area":  1471
+                  },
+                  {
+                      "id":  25,
+                      "file":  "tiles/tile_025.png",
+                      "source_bbox_xywh":  [
+                                               201,
+                                               546,
+                                               308,
+                                               185
+                                           ],
+                      "pixel_area":  31727
+                  },
+                  {
+                      "id":  26,
+                      "file":  "tiles/tile_026.png",
+                      "source_bbox_xywh":  [
+                                               1255,
+                                               550,
+                                               377,
+                                               271
+                                           ],
+                      "pixel_area":  53434
+                  },
+                  {
+                      "id":  27,
+                      "file":  "tiles/tile_027.png",
+                      "source_bbox_xywh":  [
+                                               562,
+                                               556,
+                                               253,
+                                               157
+                                           ],
+                      "pixel_area":  22417
+                  },
+                  {
+                      "id":  28,
+                      "file":  "tiles/tile_028.png",
+                      "source_bbox_xywh":  [
+                                               2345,
+                                               556,
+                                               238,
+                                               106
+                                           ],
+                      "pixel_area":  13818
+                  },
+                  {
+                      "id":  29,
+                      "file":  "tiles/tile_029.png",
+                      "source_bbox_xywh":  [
+                                               1783,
+                                               559,
+                                               280,
+                                               211
+                                           ],
+                      "pixel_area":  34533
+                  },
+                  {
+                      "id":  30,
+                      "file":  "tiles/tile_030.png",
+                      "source_bbox_xywh":  [
+                                               2114,
+                                               567,
+                                               30,
+                                               23
+                                           ],
+                      "pixel_area":  410
+                  },
+                  {
+                      "id":  31,
+                      "file":  "tiles/tile_031.png",
+                      "source_bbox_xywh":  [
+                                               2161,
+                                               578,
+                                               73,
+                                               60
+                                           ],
+                      "pixel_area":  2312
+                  },
+                  {
+                      "id":  32,
+                      "file":  "tiles/tile_032.png",
+                      "source_bbox_xywh":  [
+                                               2223,
+                                               634,
+                                               112,
+                                               130
+                                           ],
+                      "pixel_area":  6784
+                  },
+                  {
+                      "id":  33,
+                      "file":  "tiles/tile_033.png",
+                      "source_bbox_xywh":  [
+                                               727,
+                                               637,
+                                               280,
+                                               211
+                                           ],
+                      "pixel_area":  34750
+                  },
+                  {
+                      "id":  34,
+                      "file":  "tiles/tile_034.png",
+                      "source_bbox_xywh":  [
+                                               29,
+                                               650,
+                                               309,
+                                               186
+                                           ],
+                      "pixel_area":  31824
+                  },
+                  {
+                      "id":  35,
+                      "file":  "tiles/tile_035.png",
+                      "source_bbox_xywh":  [
+                                               2513,
+                                               674,
+                                               129,
+                                               94
+                                           ],
+                      "pixel_area":  7301
+                  },
+                  {
+                      "id":  36,
+                      "file":  "tiles/tile_036.png",
+                      "source_bbox_xywh":  [
+                                               1457,
+                                               689,
+                                               377,
+                                               265
+                                           ],
+                      "pixel_area":  52718
+                  },
+                  {
+                      "id":  37,
+                      "file":  "tiles/tile_037.png",
+                      "source_bbox_xywh":  [
+                                               401,
+                                               690,
+                                               223,
+                                               138
+                                           ],
+                      "pixel_area":  18043
+                  },
+                  {
+                      "id":  38,
+                      "file":  "tiles/tile_038.png",
+                      "source_bbox_xywh":  [
+                                               2400,
+                                               693,
+                                               97,
+                                               71
+                                           ],
+                      "pixel_area":  4054
+                  },
+                  {
+                      "id":  39,
+                      "file":  "tiles/tile_039.png",
+                      "source_bbox_xywh":  [
+                                               1975,
+                                               724,
+                                               218,
+                                               126
+                                           ],
+                      "pixel_area":  18200
+                  },
+                  {
+                      "id":  40,
+                      "file":  "tiles/tile_040.png",
+                      "source_bbox_xywh":  [
+                                               949,
+                                               729,
+                                               379,
+                                               270
+                                           ],
+                      "pixel_area":  53317
+                  },
+                  {
+                      "id":  41,
+                      "file":  "tiles/tile_041.png",
+                      "source_bbox_xywh":  [
+                                               189,
+                                               762,
+                                               311,
+                                               184
+                                           ],
+                      "pixel_area":  32066
+                  },
+                  {
+                      "id":  42,
+                      "file":  "tiles/tile_042.png",
+                      "source_bbox_xywh":  [
+                                               2182,
+                                               768,
+                                               138,
+                                               113
+                                           ],
+                      "pixel_area":  5282
+                  },
+                  {
+                      "id":  43,
+                      "file":  "tiles/tile_043.png",
+                      "source_bbox_xywh":  [
+                                               545,
+                                               790,
+                                               216,
+                                               135
+                                           ],
+                      "pixel_area":  16622
+                  },
+                  {
+                      "id":  44,
+                      "file":  "tiles/tile_044.png",
+                      "source_bbox_xywh":  [
+                                               2317,
+                                               803,
+                                               380,
+                                               196
+                                           ],
+                      "pixel_area":  38201
+                  },
+                  {
+                      "id":  45,
+                      "file":  "tiles/tile_045.png",
+                      "source_bbox_xywh":  [
+                                               1786,
+                                               825,
+                                               212,
+                                               126
+                                           ],
+                      "pixel_area":  17481
+                  },
+                  {
+                      "id":  46,
+                      "file":  "tiles/tile_046.png",
+                      "source_bbox_xywh":  [
+                                               2144,
+                                               888,
+                                               43,
+                                               26
+                                           ],
+                      "pixel_area":  668
+                  },
+                  {
+                      "id":  47,
+                      "file":  "tiles/tile_047.png",
+                      "source_bbox_xywh":  [
+                                               2031,
+                                               910,
+                                               123,
+                                               53
+                                           ],
+                      "pixel_area":  3837
+                  },
+                  {
+                      "id":  48,
+                      "file":  "tiles/tile_048.png",
+                      "source_bbox_xywh":  [
+                                               18,
+                                               962,
+                                               336,
+                                               551
+                                           ],
+                      "pixel_area":  109481
+                  },
+                  {
+                      "id":  49,
+                      "file":  "tiles/tile_049.png",
+                      "source_bbox_xywh":  [
+                                               327,
+                                               980,
+                                               289,
+                                               533
+                                           ],
+                      "pixel_area":  89796
+                  },
+                  {
+                      "id":  50,
+                      "file":  "tiles/tile_050.png",
+                      "source_bbox_xywh":  [
+                                               773,
+                                               994,
+                                               175,
+                                               507
+                                           ],
+                      "pixel_area":  34978
+                  },
+                  {
+                      "id":  51,
+                      "file":  "tiles/tile_051.png",
+                      "source_bbox_xywh":  [
+                                               1147,
+                                               997,
+                                               768,
+                                               502
+                                           ],
+                      "pixel_area":  251072
+                  },
+                  {
+                      "id":  52,
+                      "file":  "tiles/tile_052.png",
+                      "source_bbox_xywh":  [
+                                               2478,
+                                               1034,
+                                               215,
+                                               169
+                                           ],
+                      "pixel_area":  19955
+                  },
+                  {
+                      "id":  53,
+                      "file":  "tiles/tile_053.png",
+                      "source_bbox_xywh":  [
+                                               2265,
+                                               1041,
+                                               192,
+                                               156
+                                           ],
+                      "pixel_area":  14060
+                  },
+                  {
+                      "id":  54,
+                      "file":  "tiles/tile_054.png",
+                      "source_bbox_xywh":  [
+                                               1901,
+                                               1043,
+                                               173,
+                                               149
+                                           ],
+                      "pixel_area":  14612
+                  },
+                  {
+                      "id":  55,
+                      "file":  "tiles/tile_055.png",
+                      "source_bbox_xywh":  [
+                                               2089,
+                                               1051,
+                                               167,
+                                               140
+                                           ],
+                      "pixel_area":  12853
+                  },
+                  {
+                      "id":  56,
+                      "file":  "tiles/tile_056.png",
+                      "source_bbox_xywh":  [
+                                               621,
+                                               1079,
+                                               140,
+                                               422
+                                           ],
+                      "pixel_area":  17537
+                  },
+                  {
+                      "id":  57,
+                      "file":  "tiles/tile_057.png",
+                      "source_bbox_xywh":  [
+                                               951,
+                                               1141,
+                                               184,
+                                               361
+                                           ],
+                      "pixel_area":  27579
+                  },
+                  {
+                      "id":  58,
+                      "file":  "tiles/tile_058.png",
+                      "source_bbox_xywh":  [
+                                               2142,
+                                               1219,
+                                               268,
+                                               299
+                                           ],
+                      "pixel_area":  31293
+                  },
+                  {
+                      "id":  59,
+                      "file":  "tiles/tile_059.png",
+                      "source_bbox_xywh":  [
+                                               2152,
+                                               1221,
+                                               67,
+                                               141
+                                           ],
+                      "pixel_area":  6043
+                  },
+                  {
+                      "id":  60,
+                      "file":  "tiles/tile_060.png",
+                      "source_bbox_xywh":  [
+                                               2411,
+                                               1250,
+                                               82,
+                                               158
+                                           ],
+                      "pixel_area":  9637
+                  },
+                  {
+                      "id":  61,
+                      "file":  "tiles/tile_061.png",
+                      "source_bbox_xywh":  [
+                                               2040,
+                                               1296,
+                                               89,
+                                               202
+                                           ],
+                      "pixel_area":  10801
+                  },
+                  {
+                      "id":  62,
+                      "file":  "tiles/tile_062.png",
+                      "source_bbox_xywh":  [
+                                               2513,
+                                               1300,
+                                               200,
+                                               213
+                                           ],
+                      "pixel_area":  23517
+                  },
+                  {
+                      "id":  63,
+                      "file":  "tiles/tile_063.png",
+                      "source_bbox_xywh":  [
+                                               1934,
+                                               1343,
+                                               80,
+                                               155
+                                           ],
+                      "pixel_area":  7492
+                  },
+                  {
+                      "id":  64,
+                      "file":  "tiles/tile_064.png",
+                      "source_bbox_xywh":  [
+                                               2475,
+                                               1385,
+                                               78,
+                                               49
+                                           ],
+                      "pixel_area":  2448
+                  },
+                  {
+                      "id":  65,
+                      "file":  "tiles/tile_065.png",
+                      "source_bbox_xywh":  [
+                                               2456,
+                                               1429,
+                                               39,
+                                               34
+                                           ],
+                      "pixel_area":  859
+                  }
+              ]
+}

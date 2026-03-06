@@ -1,0 +1,462 @@
+{
+  "source_image": "res://assets/picture/Isometric_game_asset_sheet_topdown_view_zen_chines_delpmaspu.png",
+  "extracted_from": "E:\\2_Personal\\Finally\\CountyIdle\\assets\\tiles\\county_reference_isometric\\source_sheet_extract_t30",
+  "tile_pixel_size": [
+    128,
+    128
+  ],
+  "render_anchor": [
+    64,
+    83
+  ],
+  "logical_tile_size": [
+    32,
+    16
+  ],
+  "tile_shape": "isometric",
+  "tile_layout": "diamond_down",
+  "tiles": {
+    "grass_0": {
+      "source_tile_id": 21,
+      "atlas_coord": [
+        0,
+        0
+      ],
+      "pixel_region": [
+        0,
+        0,
+        128,
+        128
+      ]
+    },
+    "grass_1": {
+      "source_tile_id": 22,
+      "atlas_coord": [
+        1,
+        0
+      ],
+      "pixel_region": [
+        128,
+        0,
+        128,
+        128
+      ]
+    },
+    "grass_2": {
+      "source_tile_id": 25,
+      "atlas_coord": [
+        2,
+        0
+      ],
+      "pixel_region": [
+        256,
+        0,
+        128,
+        128
+      ]
+    },
+    "grass_3": {
+      "source_tile_id": 35,
+      "atlas_coord": [
+        3,
+        0
+      ],
+      "pixel_region": [
+        384,
+        0,
+        128,
+        128
+      ]
+    },
+    "courtyard_0": {
+      "source_tile_id": 17,
+      "atlas_coord": [
+        4,
+        0
+      ],
+      "pixel_region": [
+        512,
+        0,
+        128,
+        128
+      ]
+    },
+    "courtyard_1": {
+      "source_tile_id": 23,
+      "atlas_coord": [
+        5,
+        0
+      ],
+      "pixel_region": [
+        640,
+        0,
+        128,
+        128
+      ]
+    },
+    "courtyard_2": {
+      "source_tile_id": 44,
+      "atlas_coord": [
+        0,
+        1
+      ],
+      "pixel_region": [
+        0,
+        128,
+        128,
+        128
+      ]
+    },
+    "water_0": {
+      "source_tile_id": 42,
+      "atlas_coord": [
+        1,
+        1
+      ],
+      "pixel_region": [
+        128,
+        128,
+        128,
+        128
+      ]
+    },
+    "road_0": {
+      "source_tile_id": 11,
+      "atlas_coord": [
+        2,
+        1
+      ],
+      "pixel_region": [
+        256,
+        128,
+        128,
+        128
+      ]
+    },
+    "road_1": {
+      "source_tile_id": 15,
+      "atlas_coord": [
+        3,
+        1
+      ],
+      "pixel_region": [
+        384,
+        128,
+        128,
+        128
+      ]
+    },
+    "road_2": {
+      "source_tile_id": 16,
+      "atlas_coord": [
+        4,
+        1
+      ],
+      "pixel_region": [
+        512,
+        128,
+        128,
+        128
+      ]
+    },
+    "road_3": {
+      "source_tile_id": 13,
+      "atlas_coord": [
+        5,
+        1
+      ],
+      "pixel_region": [
+        640,
+        128,
+        128,
+        128
+      ]
+    },
+    "road_4": {
+      "source_tile_id": 15,
+      "atlas_coord": [
+        0,
+        2
+      ],
+      "pixel_region": [
+        0,
+        256,
+        128,
+        128
+      ]
+    },
+    "road_5": {
+      "source_tile_id": 8,
+      "atlas_coord": [
+        1,
+        2
+      ],
+      "pixel_region": [
+        128,
+        256,
+        128,
+        128
+      ]
+    },
+    "road_6": {
+      "source_tile_id": 6,
+      "atlas_coord": [
+        2,
+        2
+      ],
+      "pixel_region": [
+        256,
+        256,
+        128,
+        128
+      ]
+    },
+    "road_7": {
+      "source_tile_id": 5,
+      "atlas_coord": [
+        3,
+        2
+      ],
+      "pixel_region": [
+        384,
+        256,
+        128,
+        128
+      ]
+    },
+    "road_8": {
+      "source_tile_id": 16,
+      "atlas_coord": [
+        4,
+        2
+      ],
+      "pixel_region": [
+        512,
+        256,
+        128,
+        128
+      ]
+    },
+    "road_9": {
+      "source_tile_id": 14,
+      "atlas_coord": [
+        5,
+        2
+      ],
+      "pixel_region": [
+        640,
+        256,
+        128,
+        128
+      ]
+    },
+    "road_10": {
+      "source_tile_id": 9,
+      "atlas_coord": [
+        0,
+        3
+      ],
+      "pixel_region": [
+        0,
+        384,
+        128,
+        128
+      ]
+    },
+    "road_11": {
+      "source_tile_id": 7,
+      "atlas_coord": [
+        1,
+        3
+      ],
+      "pixel_region": [
+        128,
+        384,
+        128,
+        128
+      ]
+    },
+    "road_12": {
+      "source_tile_id": 8,
+      "atlas_coord": [
+        2,
+        3
+      ],
+      "pixel_region": [
+        256,
+        384,
+        128,
+        128
+      ]
+    },
+    "road_13": {
+      "source_tile_id": 5,
+      "atlas_coord": [
+        3,
+        3
+      ],
+      "pixel_region": [
+        384,
+        384,
+        128,
+        128
+      ]
+    },
+    "road_14": {
+      "source_tile_id": 7,
+      "atlas_coord": [
+        4,
+        3
+      ],
+      "pixel_region": [
+        512,
+        384,
+        128,
+        128
+      ]
+    },
+    "road_15": {
+      "source_tile_id": 6,
+      "atlas_coord": [
+        5,
+        3
+      ],
+      "pixel_region": [
+        640,
+        384,
+        128,
+        128
+      ]
+    },
+    "prop_bush": {
+      "source_tile_id": 54,
+      "atlas_coord": [
+        0,
+        4
+      ],
+      "pixel_region": [
+        0,
+        512,
+        128,
+        128
+      ]
+    },
+    "prop_flowers": {
+      "source_tile_id": 55,
+      "atlas_coord": [
+        1,
+        4
+      ],
+      "pixel_region": [
+        128,
+        512,
+        128,
+        128
+      ]
+    },
+    "prop_rock_small": {
+      "source_tile_id": 39,
+      "atlas_coord": [
+        2,
+        4
+      ],
+      "pixel_region": [
+        256,
+        512,
+        128,
+        128
+      ]
+    },
+    "prop_rock_large": {
+      "source_tile_id": 36,
+      "atlas_coord": [
+        3,
+        4
+      ],
+      "pixel_region": [
+        384,
+        512,
+        128,
+        128
+      ]
+    },
+    "prop_stump": {
+      "source_tile_id": 60,
+      "atlas_coord": [
+        4,
+        4
+      ],
+      "pixel_region": [
+        512,
+        512,
+        128,
+        128
+      ]
+    },
+    "prop_lilies": {
+      "source_tile_id": 56,
+      "atlas_coord": [
+        5,
+        4
+      ],
+      "pixel_region": [
+        640,
+        512,
+        128,
+        128
+      ]
+    },
+    "prop_reed": {
+      "source_tile_id": 57,
+      "atlas_coord": [
+        0,
+        5
+      ],
+      "pixel_region": [
+        0,
+        640,
+        128,
+        128
+      ]
+    },
+    "prop_stepping": {
+      "source_tile_id": 48,
+      "atlas_coord": [
+        1,
+        5
+      ],
+      "pixel_region": [
+        128,
+        640,
+        128,
+        128
+      ]
+    },
+    "accent_plaza": {
+      "source_tile_id": 46,
+      "atlas_coord": [
+        2,
+        5
+      ],
+      "pixel_region": [
+        256,
+        640,
+        128,
+        128
+      ]
+    },
+    "accent_border": {
+      "source_tile_id": 43,
+      "atlas_coord": [
+        3,
+        5
+      ],
+      "pixel_region": [
+        384,
+        640,
+        128,
+        128
+      ]
+    }
+  }
+}

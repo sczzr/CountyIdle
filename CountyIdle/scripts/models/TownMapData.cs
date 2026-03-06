@@ -20,6 +20,16 @@ public enum TownFacing
     West
 }
 
+public enum TownActivityAnchorType
+{
+    Farmstead,
+    Workshop,
+    Market,
+    Academy,
+    Administration,
+    Leisure
+}
+
 public sealed class TownBuildingData
 {
     public TownBuildingData(Vector2I cell, TownFacing facing, int floors, bool hasMoonGate)
@@ -36,6 +46,35 @@ public sealed class TownBuildingData
     public bool HasMoonGate { get; }
 }
 
+public sealed class TownActivityAnchorData
+{
+    public TownActivityAnchorData(
+        TownActivityAnchorType anchorType,
+        Vector2I roadCell,
+        Vector2I lotCell,
+        TownFacing facing,
+        int floors,
+        int visualVariant,
+        string label)
+    {
+        AnchorType = anchorType;
+        RoadCell = roadCell;
+        LotCell = lotCell;
+        Facing = facing;
+        Floors = Math.Max(floors, 1);
+        VisualVariant = Math.Max(visualVariant, 0);
+        Label = string.IsNullOrWhiteSpace(label) ? anchorType.ToString() : label;
+    }
+
+    public TownActivityAnchorType AnchorType { get; }
+    public Vector2I RoadCell { get; }
+    public Vector2I LotCell { get; }
+    public TownFacing Facing { get; }
+    public int Floors { get; }
+    public int VisualVariant { get; }
+    public string Label { get; }
+}
+
 public sealed class TownMapData
 {
     private readonly TownTerrainType[,] _terrain;
@@ -46,6 +85,7 @@ public sealed class TownMapData
         Height = Math.Max(height, 1);
         _terrain = new TownTerrainType[Width, Height];
         Buildings = new List<TownBuildingData>();
+        ActivityAnchors = new List<TownActivityAnchorData>();
 
         for (var x = 0; x < Width; x++)
         {
@@ -59,6 +99,7 @@ public sealed class TownMapData
     public int Width { get; }
     public int Height { get; }
     public List<TownBuildingData> Buildings { get; }
+    public List<TownActivityAnchorData> ActivityAnchors { get; }
 
     public bool IsInside(int x, int y)
     {
@@ -95,6 +136,16 @@ public sealed class TownMapData
         Buildings.Add(building);
     }
 
+    public void AddActivityAnchor(TownActivityAnchorData activityAnchor)
+    {
+        if (!IsInside(activityAnchor.RoadCell) || !IsInside(activityAnchor.LotCell))
+        {
+            return;
+        }
+
+        ActivityAnchors.Add(activityAnchor);
+    }
+
     public IEnumerable<Vector2I> EnumerateAllCells()
     {
         for (var y = 0; y < Height; y++)
@@ -116,6 +167,17 @@ public sealed class TownMapData
                 {
                     yield return new Vector2I(x, y);
                 }
+            }
+        }
+    }
+
+    public IEnumerable<TownActivityAnchorData> EnumerateActivityAnchors(TownActivityAnchorType anchorType)
+    {
+        foreach (var anchor in ActivityAnchors)
+        {
+            if (anchor.AnchorType == anchorType)
+            {
+                yield return anchor;
             }
         }
     }

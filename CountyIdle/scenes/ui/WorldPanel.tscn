@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dluw3nntcv37i"]
 
 [ext_resource type="Script" uid="uid://dhr4ncquregwg" path="res://scripts/systems/CountyTownMapViewSystem.cs" id="1_town_map"]
-[ext_resource type="Script" path="res://scripts/systems/StrategicMapViewSystem.cs" id="2_strategic_map"]
+[ext_resource type="Script" uid="uid://dih1wr3e2nle6" path="res://scripts/systems/StrategicMapViewSystem.cs" id="2_strategic_map"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab"]
 content_margin_left = 14.0
@@ -137,7 +137,7 @@ theme_override_styles/focus = SubResource("StyleBoxFlat_tab")
 toggle_mode = true
 text = "天下州域"
 
-[node name="EventPanelButton" type="Button" parent="PanelContent/TopTabRow"]
+[node name="EventPanelButton" type="Button" parent="PanelContent/TopTabRow" unique_id=1236762491]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 theme_override_styles/normal = SubResource("StyleBoxFlat_tab")
@@ -148,7 +148,7 @@ theme_override_styles/focus = SubResource("StyleBoxFlat_tab")
 toggle_mode = true
 text = "事件面板"
 
-[node name="ReportPanelButton" type="Button" parent="PanelContent/TopTabRow"]
+[node name="ReportPanelButton" type="Button" parent="PanelContent/TopTabRow" unique_id=1932674030]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 theme_override_styles/normal = SubResource("StyleBoxFlat_tab")
@@ -159,7 +159,17 @@ theme_override_styles/focus = SubResource("StyleBoxFlat_tab")
 toggle_mode = true
 text = "统计报表"
 
-[node name="ExpeditionMapButton" type="Button" parent="PanelContent/TopTabRow"]
+[node name="WarehousePanelButton" type="Button" parent="PanelContent/TopTabRow" unique_id=1044462820]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_tab")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_tab")
+theme_override_styles/focus = SubResource("StyleBoxFlat_tab")
+text = "仓储弹窗"
+
+[node name="ExpeditionMapButton" type="Button" parent="PanelContent/TopTabRow" unique_id=1045661255]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 theme_override_styles/normal = SubResource("StyleBoxFlat_tab")
@@ -170,11 +180,11 @@ theme_override_styles/focus = SubResource("StyleBoxFlat_tab")
 toggle_mode = true
 text = "野外探险"
 
-[node name="TopTabSpacer" type="Control" parent="PanelContent/TopTabRow"]
+[node name="TopTabSpacer" type="Control" parent="PanelContent/TopTabRow" unique_id=1913753420]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="MapZoomOutButton" type="Button" parent="PanelContent/TopTabRow"]
+[node name="MapZoomOutButton" type="Button" parent="PanelContent/TopTabRow" unique_id=1551302441]
 custom_minimum_size = Vector2(36, 0)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_tab")
@@ -184,14 +194,14 @@ theme_override_styles/disabled = SubResource("StyleBoxFlat_tab")
 theme_override_styles/focus = SubResource("StyleBoxFlat_tab")
 text = "－"
 
-[node name="MapZoomLabel" type="Label" parent="PanelContent/TopTabRow"]
+[node name="MapZoomLabel" type="Label" parent="PanelContent/TopTabRow" unique_id=1523788382]
 custom_minimum_size = Vector2(72, 0)
 layout_mode = 2
 text = "100%"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="MapZoomInButton" type="Button" parent="PanelContent/TopTabRow"]
+[node name="MapZoomInButton" type="Button" parent="PanelContent/TopTabRow" unique_id=1813150991]
 custom_minimum_size = Vector2(36, 0)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_tab")
@@ -201,7 +211,7 @@ theme_override_styles/disabled = SubResource("StyleBoxFlat_tab")
 theme_override_styles/focus = SubResource("StyleBoxFlat_tab")
 text = "＋"
 
-[node name="MapZoomResetButton" type="Button" parent="PanelContent/TopTabRow"]
+[node name="MapZoomResetButton" type="Button" parent="PanelContent/TopTabRow" unique_id=73566006]
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_tab")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_tab")
@@ -209,6 +219,41 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_tab")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_tab")
 theme_override_styles/focus = SubResource("StyleBoxFlat_tab")
 text = "重置"
+
+[node name="MapDirectiveRow" type="HBoxContainer" parent="PanelContent"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="MapStatusLabel" type="Label" parent="PanelContent/MapDirectiveRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.94902, 0.909804, 0.788235, 1)
+theme_override_font_sizes/font_size = 13
+text = "地图经营状态"
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="MapPrimaryActionButton" type="Button" parent="PanelContent/MapDirectiveRow"]
+custom_minimum_size = Vector2(170, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_tab")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_tab")
+theme_override_styles/focus = SubResource("StyleBoxFlat_tab")
+text = "地图调度 A"
+
+[node name="MapSecondaryActionButton" type="Button" parent="PanelContent/MapDirectiveRow"]
+custom_minimum_size = Vector2(170, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_tab")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_tab")
+theme_override_styles/focus = SubResource("StyleBoxFlat_tab")
+text = "地图调度 B"
 
 [node name="MapViewport" type="PanelContainer" parent="PanelContent" unique_id=907259002]
 layout_mode = 2
@@ -231,7 +276,6 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_map_layer")
 script = ExtResource("2_strategic_map")
-_mode = 0
 
 [node name="Label" type="Label" parent="PanelContent/MapViewport/MapPages/WorldMapView" unique_id=235955371]
 layout_mode = 2
@@ -288,7 +332,7 @@ custom_minimum_size = Vector2(110, 28)
 layout_mode = 2
 text = "重生成"
 
-[node name="EventPanelView" type="PanelContainer" parent="PanelContent/MapViewport/MapPages"]
+[node name="EventPanelView" type="PanelContainer" parent="PanelContent/MapViewport/MapPages" unique_id=1804476821]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -298,28 +342,21 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_map_layer")
 
-[node name="EventPanelPadding" type="MarginContainer" parent="PanelContent/MapViewport/MapPages/EventPanelView"]
+[node name="EventPanelPadding" type="MarginContainer" parent="PanelContent/MapViewport/MapPages/EventPanelView" unique_id=2108701547]
 layout_mode = 2
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-offset_left = 20.0
-offset_top = 20.0
-offset_right = -20.0
-offset_bottom = -20.0
 
-[node name="EventPanelLabel" type="Label" parent="PanelContent/MapViewport/MapPages/EventPanelView/EventPanelPadding"]
+[node name="EventPanelLabel" type="Label" parent="PanelContent/MapViewport/MapPages/EventPanelView/EventPanelPadding" unique_id=1473480953]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-text = "事件面板\n\n可扩展事件节点、路线和遭遇概率。"
+text = "事件面板
+
+可扩展事件节点、路线和遭遇概率。"
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 
-[node name="ReportPanelView" type="PanelContainer" parent="PanelContent/MapViewport/MapPages"]
+[node name="ReportPanelView" type="PanelContainer" parent="PanelContent/MapViewport/MapPages" unique_id=1293145190]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -329,13 +366,8 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_map_layer")
 
-[node name="ReportScroll" type="ScrollContainer" parent="PanelContent/MapViewport/MapPages/ReportPanelView"]
+[node name="ReportScroll" type="ScrollContainer" parent="PanelContent/MapViewport/MapPages/ReportPanelView" unique_id=1543434692]
 layout_mode = 2
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
 horizontal_scroll_mode = 0
 
 [node name="DetailPages" type="HBoxContainer" parent="PanelContent/MapViewport/MapPages/ReportPanelView/ReportScroll" unique_id=878722015]
@@ -364,7 +396,8 @@ text = "● 繁育中"
 layout_mode = 2
 theme_override_colors/font_color = Color(0.517647, 0.52549, 0.556863, 1)
 theme_override_font_sizes/font_size = 12
-text = "当前消耗食物维持运转。\n进度：80% (下回合降生)"
+text = "当前消耗食物维持运转。
+进度：80% (下回合降生)"
 autowrap_mode = 3
 
 [node name="UpgradeButton" type="Button" parent="PanelContent/MapViewport/MapPages/ReportPanelView/ReportScroll/DetailPages/MulberryCard/CardVBox" unique_id=1221344022]
@@ -393,7 +426,8 @@ text = "● 运转正常"
 layout_mode = 2
 theme_override_colors/font_color = Color(0.517647, 0.52549, 0.556863, 1)
 theme_override_font_sizes/font_size = 12
-text = "满载产出：+5 木材/s\n劳工：20 / 20"
+text = "满载产出：+5 木材/s
+劳工：20 / 20"
 autowrap_mode = 3
 
 [node name="UpgradeButton" type="Button" parent="PanelContent/MapViewport/MapPages/ReportPanelView/ReportScroll/DetailPages/LumberCard/CardVBox" unique_id=898680347]
@@ -422,7 +456,8 @@ text = "● 效率低下"
 layout_mode = 2
 theme_override_colors/font_color = Color(0.831373, 0.662745, 0.32549, 1)
 theme_override_font_sizes/font_size = 12
-text = "劳动力严重不足 (5/25)\n当前产量已减半。"
+text = "劳动力严重不足 (5/25)
+当前产量已减半。"
 autowrap_mode = 3
 
 [node name="UpgradeButton" type="Button" parent="PanelContent/MapViewport/MapPages/ReportPanelView/ReportScroll/DetailPages/MineCard/CardVBox" unique_id=990766982]
@@ -441,11 +476,12 @@ size_flags_vertical = 3
 [node name="NewLabel" type="Label" parent="PanelContent/MapViewport/MapPages/ReportPanelView/ReportScroll/DetailPages/NewCard/CenterBox" unique_id=1310921667]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.517647, 0.52549, 0.556863, 1)
-text = "＋\n破土动工 (新建)"
+text = "＋
+破土动工 (新建)"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ExpeditionMapView" type="PanelContainer" parent="PanelContent/MapViewport/MapPages"]
+[node name="ExpeditionMapView" type="PanelContainer" parent="PanelContent/MapViewport/MapPages" unique_id=1043110234]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -455,23 +491,16 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_map_layer")
 
-[node name="ExpeditionPadding" type="MarginContainer" parent="PanelContent/MapViewport/MapPages/ExpeditionMapView"]
+[node name="ExpeditionPadding" type="MarginContainer" parent="PanelContent/MapViewport/MapPages/ExpeditionMapView" unique_id=890280626]
 layout_mode = 2
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-offset_left = 20.0
-offset_top = 20.0
-offset_right = -20.0
-offset_bottom = -20.0
 
-[node name="ExpeditionLabel" type="Label" parent="PanelContent/MapViewport/MapPages/ExpeditionMapView/ExpeditionPadding"]
+[node name="ExpeditionLabel" type="Label" parent="PanelContent/MapViewport/MapPages/ExpeditionMapView/ExpeditionPadding" unique_id=1742055344]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-text = "野外探险地图\n\n可扩展据点、路线风险和战斗遭遇。"
+text = "野外探险地图
+
+可扩展据点、路线风险和战斗遭遇。"
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3

@@ -13,6 +13,10 @@ public class StrategicMapConfigSystem
     private const float CoordinateWarnLimit = 1.20f;
     private const float MinLineWidth = 0.4f;
     private const float MinNodeRadius = 1.0f;
+    private const int MinLabelFontSize = 10;
+    private const int MaxLabelFontSize = 18;
+    private const float MinLabelZoom = 0.6f;
+    private const float MaxLabelZoom = 2.2f;
     private static readonly Regex HexColorRegex = new("^#(?:[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$", RegexOptions.Compiled);
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -105,6 +109,7 @@ public class StrategicMapConfigSystem
         definition.Routes ??= [];
         definition.Rivers ??= [];
         definition.Nodes ??= [];
+        definition.Labels ??= [];
 
         foreach (var region in definition.Regions)
         {
@@ -141,6 +146,7 @@ public class StrategicMapConfigSystem
         ValidatePolylines(definition.Routes, $"{mapKey}.routes", warnings);
         ValidatePolylines(definition.Rivers, $"{mapKey}.rivers", warnings);
         ValidateNodes(definition.Nodes, mapKey, warnings);
+        ValidateLabels(definition.Labels, mapKey, warnings);
     }
 
     private static void ValidateRegions(
@@ -232,6 +238,44 @@ public class StrategicMapConfigSystem
             {
                 warnings.Add($"{nodePath}.radius={node.Radius:0.###} 过小，已重置为 4.0。");
                 node.Radius = 4f;
+            }
+        }
+    }
+
+    private static void ValidateLabels(
+        List<StrategicLabelDefinition> labels,
+        string mapKey,
+        List<string> warnings)
+    {
+        for (var labelIndex = 0; labelIndex < labels.Count; labelIndex++)
+        {
+            var label = labels[labelIndex];
+            var labelPath = $"{mapKey}.labels[{labelIndex}]";
+            ValidateCoordinate(label.X, label.Y, labelPath, warnings);
+
+            if (string.IsNullOrWhiteSpace(label.Text))
+            {
+                warnings.Add($"{labelPath}.text 为空，渲染时将忽略该标签。");
+            }
+
+            if (!string.IsNullOrWhiteSpace(label.Color) && !IsColorHexValid(label.Color))
+            {
+                warnings.Add($"{labelPath}.color='{label.Color}' 非法，渲染时将使用回退颜色。");
+                label.Color = string.Empty;
+            }
+
+            var clampedFontSize = Math.Clamp(label.FontSize, MinLabelFontSize, MaxLabelFontSize);
+            if (clampedFontSize != label.FontSize)
+            {
+                warnings.Add($"{labelPath}.font_size={label.FontSize} 超出范围，已夹紧到 {clampedFontSize}。");
+                label.FontSize = clampedFontSize;
+            }
+
+            var clampedMinZoom = Mathf.Clamp(label.MinZoom, MinLabelZoom, MaxLabelZoom);
+            if (!Mathf.IsEqualApprox(clampedMinZoom, label.MinZoom))
+            {
+                warnings.Add($"{labelPath}.min_zoom={label.MinZoom:0.##} 超出范围，已夹紧到 {clampedMinZoom:0.##}。");
+                label.MinZoom = clampedMinZoom;
             }
         }
     }

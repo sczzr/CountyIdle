@@ -1,4 +1,4 @@
-# CountyIdle 历史归档注册表（整合精简）
+﻿# CountyIdle 历史归档注册表（整合精简）
 
 > 目标：避免同主题反复建档，统一“功能卡/提案/日志”三件套追踪。
 
@@ -31,6 +31,9 @@
 | `chinese-seamless-tileset-atlas` | FC（无 CP/BL） | 资产交付 | 保持独立资产 topic |
 | `building-elements-pack` | FC（无 CP/BL） | 资产交付 | 保持独立资产 topic |
 | `client-settings-panel` | FC（无 CP/BL） | 已实现 | 下次涉及机制联动时补 CP/BL |
+| `prefecture-village-style-generator` | FC/CP/BL（本次新增） | 演进 | 并入战略地图史诗链路，后续扩展可复用同 topic |
+| `population-allocation-lifecycle-commute` | FC/CP/BL（本次新增） | 演进 | 已完成一期落地，后续沿用同 topic 持续调参 |
+| `countytown-resident-walkers` | FC/BL（本次新增） | 演进 | 并入 `countytown-25d-map` 史诗链路，后续可替换正式人物美术 |
 
 ## 2) 建议收敛的“归档史诗”分组
 
@@ -62,3 +65,4 @@
 1. 机制或平衡改动：必须落 FC + CP + BL。
 2. 纯表现层改动：至少落 FC + BL；若影响玩法感知阈值，补 CP。
 3. 每月整理一次注册表，把“演进/历史”归并到对应史诗。
+

@@ -1,0 +1,329 @@
+using System;
+using Godot;
+using CountyIdle.Models;
+
+namespace CountyIdle.Systems;
+
+public partial class CountyTownMapViewSystem
+{
+    private static readonly Color FarmsteadAnchorColor = new(0.56f, 0.79f, 0.34f, 0.92f);
+    private static readonly Color WorkshopAnchorColor = new(0.79f, 0.62f, 0.33f, 0.92f);
+    private static readonly Color MarketAnchorColor = new(0.90f, 0.53f, 0.32f, 0.92f);
+    private static readonly Color AcademyAnchorColor = new(0.47f, 0.64f, 0.93f, 0.92f);
+    private static readonly Color AdministrationAnchorColor = new(0.72f, 0.52f, 0.86f, 0.92f);
+    private static readonly Color LeisureAnchorColor = new(0.33f, 0.78f, 0.76f, 0.92f);
+    private static readonly Color AnchorShadowColor = new(0.04f, 0.05f, 0.05f, 0.18f);
+    private static readonly Color AnchorSelectionGlowColor = new(1.00f, 0.96f, 0.72f, 0.22f);
+
+    private void DrawActivityAnchorBuilding(TownActivityAnchorData anchor, Vector2 origin)
+    {
+        var baseColor = GetAnchorColor(anchor.AnchorType);
+        var footprintScale = GetAnchorFootprintScale(anchor.AnchorType);
+        var center = GetIsoCellCenter(anchor.LotCell, origin);
+        var footprint = CreateDiamond(center, ScaleValue(TileHalfWidth * footprintScale), ScaleValue(TileHalfHeight * footprintScale));
+        var baseTop = footprint[0];
+        var baseRight = footprint[1];
+        var baseBottom = footprint[2];
+        var baseLeft = footprint[3];
+        var isSelected = IsSelectedActivityAnchor(anchor);
+
+        var wallHeight = ScaleValue(anchor.Floors == 1 ? 13f : 20f);
+        var roofLift = ScaleValue(anchor.Floors == 1 ? 4.5f : 6.5f);
+        var wallOffset = new Vector2(0f, -wallHeight);
+        var roofTop = baseTop + wallOffset;
+        var roofRight = baseRight + wallOffset;
+        var roofBottom = baseBottom + wallOffset;
+        var roofLeft = baseLeft + wallOffset;
+
+        if (isSelected)
+        {
+            var selectionFootprint = CreateDiamond(
+                center + new Vector2(0f, -ScaleValue(1.2f)),
+                ScaleValue(TileHalfWidth * footprintScale * 1.24f),
+                ScaleValue(TileHalfHeight * footprintScale * 1.18f));
+            DrawColoredPolygon(selectionFootprint, AnchorSelectionGlowColor);
+            DrawPolyline(selectionFootprint, baseColor.Lightened(0.28f), Math.Max(1.2f, ScaleValue(1.6f)), true);
+        }
+
+        var shadow = CreateDiamond(center + new Vector2(ScaleValue(2.4f), ScaleValue(3.6f)), ScaleValue(TileHalfWidth * footprintScale * 0.78f), ScaleValue(TileHalfHeight * footprintScale * 0.70f));
+        DrawColoredPolygon(shadow, AnchorShadowColor);
+
+        var wallBright = WallBrightColor.Lerp(baseColor, 0.18f);
+        var wallDark = WallDarkColor.Lerp(baseColor.Darkened(0.28f), 0.22f);
+        var roofMain = RoofMainColor.Lerp(baseColor, 0.58f);
+        var roofShade = RoofShadeColor.Lerp(baseColor.Darkened(0.18f), 0.44f);
+
+        DrawAnchorPath(anchor, origin, baseBottom, baseColor);
+
+        var leftWall = new[] { baseLeft, baseBottom, roofBottom, roofLeft };
+        var rightWall = new[] { baseBottom, baseRight, roofRight, roofBottom };
+        DrawTexturedPolygon(leftWall, _wallDarkTexture, wallDark);
+        DrawTexturedPolygon(rightWall, _wallBrightTexture, wallBright);
+
+        var eaveTop = roofTop + new Vector2(0f, -roofLift);
+        var eaveRight = roofRight + new Vector2(ScaleValue(3.6f), ScaleValue(1.9f));
+        var eaveBottom = roofBottom + new Vector2(0f, ScaleValue(2.6f));
+        var eaveLeft = roofLeft + new Vector2(-ScaleValue(3.6f), ScaleValue(1.9f));
+
+        var roofFace = new[] { eaveTop, eaveRight, eaveBottom, eaveLeft };
+        DrawTexturedPolygon(roofFace, _roofTexture, roofMain);
+
+        var roofShadeFace = new[] { roofTop, roofRight, eaveRight, eaveTop };
+        DrawTexturedPolygon(roofShadeFace, _roofTexture, roofShade);
+
+        var ridgeStart = (eaveTop + eaveLeft) * 0.5f;
+        var ridgeEnd = (eaveTop + eaveRight) * 0.5f;
+        DrawLine(ridgeStart, ridgeEnd, RoofRidgeColor.Lerp(baseColor, 0.22f), Math.Max(0.9f, ScaleValue(1.4f)));
+
+        var edgeWidth = Math.Max(0.7f, ScaleValue(0.9f));
+        DrawLine(eaveTop, eaveRight, GridLineColor, edgeWidth);
+        DrawLine(eaveRight, eaveBottom, GridLineColor, edgeWidth);
+        DrawLine(eaveBottom, eaveLeft, GridLineColor, edgeWidth);
+        DrawLine(eaveLeft, eaveTop, GridLineColor, edgeWidth);
+
+        if (isSelected)
+        {
+            DrawPolyline(roofFace, baseColor.Lightened(0.35f), Math.Max(1.0f, ScaleValue(1.3f)), true);
+        }
+
+        DrawAnchorAccent(anchor, baseColor, wallBright, roofMain, ridgeStart, ridgeEnd, eaveTop, eaveRight, eaveBottom, eaveLeft);
+    }
+
+    private void DrawAnchorPath(TownActivityAnchorData anchor, Vector2 origin, Vector2 baseBottom, Color baseColor)
+    {
+        var roadCenter = GetIsoCellCenter(anchor.RoadCell, origin) + new Vector2(0f, ScaleValue(0.8f));
+        var entrancePoint = GetAnchorEntrancePoint(anchor, baseBottom);
+        DrawLine(roadCenter, entrancePoint, baseColor * 0.50f, Math.Max(0.9f, ScaleValue(1.3f)));
+        DrawCircle(entrancePoint, Math.Max(0.9f, ScaleValue(1.6f)), baseColor * 0.78f);
+    }
+
+    private Vector2 GetAnchorEntrancePoint(TownActivityAnchorData anchor, Vector2 baseBottom)
+    {
+        var roadOffset = GetRoadOffset(anchor.Facing);
+        return baseBottom + new Vector2(ScaleValue(roadOffset.X * 2.2f), ScaleValue(roadOffset.Y * 1.1f) - ScaleValue(2.4f));
+    }
+
+    private string BuildSelectedAnchorHint(TownActivityAnchorData anchor)
+    {
+        var anchorTypeText = GetAnchorTypeText(anchor.AnchorType);
+        var statusText = GetSelectedAnchorStatusText(anchor);
+        var assignedResidents = GetAssignedResidentCount(anchor);
+        var presentResidents = GetPresentResidentCount(anchor);
+        var inboundResidents = GetInboundResidentCount(anchor);
+
+        return $"{anchor.Label}（{anchorTypeText}）· {statusText} · 可视 {presentResidents}/{assignedResidents} · 前往中 {inboundResidents}";
+    }
+
+    private string GetSelectedAnchorStatusText(TownActivityAnchorData anchor)
+    {
+        if (anchor.AnchorType == TownActivityAnchorType.Administration)
+        {
+            return "政务节点";
+        }
+
+        var assignedResidents = GetAssignedResidentCount(anchor);
+        if (assignedResidents <= 0)
+        {
+            return anchor.AnchorType == TownActivityAnchorType.Leisure ? "清闲中" : "暂无可视常驻居民";
+        }
+
+        var presentResidents = GetPresentResidentCount(anchor);
+        var inboundResidents = GetInboundResidentCount(anchor);
+
+        if (anchor.AnchorType == TownActivityAnchorType.Leisure)
+        {
+            if (presentResidents > 0)
+            {
+                return "热闹中";
+            }
+
+            if (inboundResidents > 0)
+            {
+                return "有人前往";
+            }
+
+            return "清闲中";
+        }
+
+        if (presentResidents > 0)
+        {
+            return "开工中";
+        }
+
+        if (inboundResidents > 0)
+        {
+            return "上工路上";
+        }
+
+        return "已收工";
+    }
+
+    private static string GetAnchorTypeText(TownActivityAnchorType anchorType)
+    {
+        return anchorType switch
+        {
+            TownActivityAnchorType.Farmstead => "农田",
+            TownActivityAnchorType.Workshop => "工坊",
+            TownActivityAnchorType.Market => "市集",
+            TownActivityAnchorType.Academy => "学宫",
+            TownActivityAnchorType.Administration => "官署",
+            TownActivityAnchorType.Leisure => "茶肆",
+            _ => "场所"
+        };
+    }
+
+    private TownActivityAnchorData? PickActivityAnchorAt(Vector2 localPosition, Vector2 origin)
+    {
+        if (_mapData == null || _mapData.ActivityAnchors.Count == 0)
+        {
+            return null;
+        }
+
+        TownActivityAnchorData? selectedAnchor = null;
+        var selectedDepth = int.MinValue;
+
+        foreach (var anchor in _mapData.ActivityAnchors)
+        {
+            if (!IsPointInsideActivityAnchor(anchor, origin, localPosition))
+            {
+                continue;
+            }
+
+            var depth = anchor.LotCell.X + anchor.LotCell.Y;
+            if (depth >= selectedDepth)
+            {
+                selectedDepth = depth;
+                selectedAnchor = anchor;
+            }
+        }
+
+        return selectedAnchor;
+    }
+
+    private bool IsPointInsideActivityAnchor(TownActivityAnchorData anchor, Vector2 origin, Vector2 point)
+    {
+        var center = GetIsoCellCenter(anchor.LotCell, origin) + new Vector2(0f, -ScaleValue(anchor.Floors == 1 ? 7f : 10f));
+        var hitbox = CreateDiamond(
+            center,
+            ScaleValue(TileHalfWidth * GetAnchorFootprintScale(anchor.AnchorType) * 1.12f),
+            ScaleValue(TileHalfHeight * 1.90f));
+        return Geometry2D.IsPointInPolygon(point, hitbox);
+    }
+
+    private bool IsSelectedActivityAnchor(TownActivityAnchorData anchor)
+    {
+        return _selectedActivityAnchor != null &&
+               _selectedActivityAnchor.AnchorType == anchor.AnchorType &&
+               _selectedActivityAnchor.LotCell == anchor.LotCell &&
+               string.Equals(_selectedActivityAnchor.Label, anchor.Label, StringComparison.Ordinal);
+    }
+
+    private void DrawAnchorAccent(
+        TownActivityAnchorData anchor,
+        Color baseColor,
+        Color wallColor,
+        Color roofColor,
+        Vector2 ridgeStart,
+        Vector2 ridgeEnd,
+        Vector2 eaveTop,
+        Vector2 eaveRight,
+        Vector2 eaveBottom,
+        Vector2 eaveLeft)
+    {
+        switch (anchor.AnchorType)
+        {
+            case TownActivityAnchorType.Farmstead:
+            {
+                var hayCenter = eaveBottom + new Vector2(-ScaleValue(4f), ScaleValue(3f));
+                DrawCircle(hayCenter, Math.Max(1.2f, ScaleValue(1.9f)), wallColor);
+                DrawCircle(hayCenter + new Vector2(ScaleValue(3.3f), ScaleValue(1.1f)), Math.Max(1.0f, ScaleValue(1.5f)), baseColor.Lightened(0.18f));
+                DrawLine(ridgeStart, ridgeStart + new Vector2(-ScaleValue(2.6f), -ScaleValue(5f)), baseColor.Darkened(0.18f), Math.Max(0.8f, ScaleValue(1.0f)));
+                break;
+            }
+            case TownActivityAnchorType.Workshop:
+            {
+                var chimneyBase = eaveRight + new Vector2(-ScaleValue(1.8f), -ScaleValue(1.4f));
+                var chimneyTop = chimneyBase + new Vector2(0f, -ScaleValue(9f));
+                DrawLine(chimneyBase, chimneyTop, wallColor.Darkened(0.15f), Math.Max(1.0f, ScaleValue(1.5f)));
+                DrawLine(chimneyTop + new Vector2(-ScaleValue(1.3f), 0f), chimneyTop + new Vector2(ScaleValue(1.3f), 0f), wallColor, Math.Max(0.8f, ScaleValue(1.0f)));
+                if (anchor.VisualVariant % 2 == 0)
+                {
+                    DrawCircle(chimneyTop + new Vector2(ScaleValue(0.8f), -ScaleValue(2.4f)), Math.Max(0.8f, ScaleValue(1.3f)), baseColor * 0.55f);
+                }
+                break;
+            }
+            case TownActivityAnchorType.Market:
+            {
+                var canopyDrop = ScaleValue(anchor.VisualVariant == 0 ? 4.4f : 3.6f);
+                var awning = new[]
+                {
+                    eaveLeft + new Vector2(ScaleValue(1.8f), ScaleValue(1.0f)),
+                    eaveRight + new Vector2(-ScaleValue(1.4f), ScaleValue(0.8f)),
+                    eaveRight + new Vector2(-ScaleValue(3.2f), canopyDrop),
+                    eaveLeft + new Vector2(ScaleValue(3.0f), canopyDrop)
+                };
+                DrawColoredPolygon(awning, baseColor.Lightened(0.12f));
+                DrawLine(awning[0], awning[1], roofColor.Darkened(0.10f), Math.Max(0.7f, ScaleValue(0.9f)));
+                break;
+            }
+            case TownActivityAnchorType.Academy:
+            {
+                var plaqueCenter = ((eaveTop + eaveLeft) * 0.5f) + new Vector2(ScaleValue(0.8f), -ScaleValue(4.2f));
+                var plaqueRect = new Rect2(plaqueCenter - new Vector2(ScaleValue(1.6f), ScaleValue(4.2f)), new Vector2(ScaleValue(3.2f), ScaleValue(8.4f)));
+                DrawRect(plaqueRect, wallColor.Lightened(0.08f));
+                DrawLine(plaqueCenter + new Vector2(0f, ScaleValue(4.2f)), plaqueCenter + new Vector2(0f, ScaleValue(8f)), roofColor.Darkened(0.12f), Math.Max(0.8f, ScaleValue(1.0f)));
+                break;
+            }
+            case TownActivityAnchorType.Administration:
+            {
+                var poleBase = (ridgeStart + ridgeEnd) * 0.5f;
+                var poleTop = poleBase + new Vector2(0f, -ScaleValue(10f));
+                DrawLine(poleBase, poleTop, wallColor.Darkened(0.18f), Math.Max(1.0f, ScaleValue(1.4f)));
+                var pennant = new[]
+                {
+                    poleTop,
+                    poleTop + new Vector2(ScaleValue(5.2f), ScaleValue(1.8f)),
+                    poleTop + new Vector2(ScaleValue(1.2f), ScaleValue(5.2f))
+                };
+                DrawColoredPolygon(pennant, baseColor.Lightened(0.06f));
+                break;
+            }
+            case TownActivityAnchorType.Leisure:
+            {
+                var leftLantern = eaveLeft + new Vector2(ScaleValue(2.0f), ScaleValue(3.6f));
+                var rightLantern = eaveRight + new Vector2(-ScaleValue(2.0f), ScaleValue(3.6f));
+                DrawLine(eaveLeft + new Vector2(ScaleValue(2.0f), ScaleValue(1.4f)), leftLantern, wallColor.Darkened(0.08f), Math.Max(0.7f, ScaleValue(0.9f)));
+                DrawLine(eaveRight + new Vector2(-ScaleValue(2.0f), ScaleValue(1.4f)), rightLantern, wallColor.Darkened(0.08f), Math.Max(0.7f, ScaleValue(0.9f)));
+                DrawCircle(leftLantern, Math.Max(0.9f, ScaleValue(1.4f)), baseColor.Lightened(0.20f));
+                DrawCircle(rightLantern, Math.Max(0.9f, ScaleValue(1.4f)), baseColor.Lightened(0.20f));
+                break;
+            }
+        }
+    }
+
+    private static float GetAnchorFootprintScale(TownActivityAnchorType anchorType)
+    {
+        return anchorType switch
+        {
+            TownActivityAnchorType.Market => 0.66f,
+            TownActivityAnchorType.Administration => 0.64f,
+            TownActivityAnchorType.Academy => 0.62f,
+            TownActivityAnchorType.Workshop => 0.60f,
+            _ => 0.58f
+        };
+    }
+
+    private static Color GetAnchorColor(TownActivityAnchorType anchorType)
+    {
+        return anchorType switch
+        {
+            TownActivityAnchorType.Farmstead => FarmsteadAnchorColor,
+            TownActivityAnchorType.Workshop => WorkshopAnchorColor,
+            TownActivityAnchorType.Market => MarketAnchorColor,
+            TownActivityAnchorType.Academy => AcademyAnchorColor,
+            TownActivityAnchorType.Administration => AdministrationAnchorColor,
+            TownActivityAnchorType.Leisure => LeisureAnchorColor,
+            _ => Colors.White
+        };
+    }
+}
