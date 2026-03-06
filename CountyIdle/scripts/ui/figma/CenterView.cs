@@ -15,8 +15,8 @@ public partial class CenterView : PanelContainer
         _leftActionButton = GetNode<Button>("PanelPadding/MainColumn/TopActionRow/LeftActionButton");
         _middleActionButton = GetNode<Button>("PanelPadding/MainColumn/TopActionRow/MiddleActionButton");
         _rightActionButton = GetNode<Button>("PanelPadding/MainColumn/TopActionRow/RightActionButton");
-        _titleLabel = GetNode<Label>("PanelPadding/MainColumn/CenterInfoBox/CenterTitleLabel");
-        _descriptionLabel = GetNode<Label>("PanelPadding/MainColumn/CenterInfoBox/CenterDescriptionLabel");
+        _titleLabel = GetNode<Label>("PanelPadding/MainColumn/CenterInfoBox/CenterInfoColumn/CenterTitleLabel");
+        _descriptionLabel = GetNode<Label>("PanelPadding/MainColumn/CenterInfoBox/CenterInfoColumn/CenterDescriptionLabel");
 
         SetTopActions("钻轴销购 (2.50)", "租品明细", "关于国师");
         SetCenterInfo("安度提界", "[楼下入口]等级提升 2.50 中的楼陆性能Q");

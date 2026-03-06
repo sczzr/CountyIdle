@@ -10,7 +10,8 @@ public partial class BottomBar : PanelContainer
     private Button _speedButton = null!;
     private Button _burstButton = null!;
     private Button _saveButton = null!;
-    private Button _helpButton = null!;
+    private Button _loadButton = null!;
+    private Button _settingsButton = null!;
     private Button _alertButton = null!;
 
     public override void _Ready()
@@ -22,11 +23,12 @@ public partial class BottomBar : PanelContainer
         _speedButton = GetNode<Button>("PanelPadding/MainColumn/ActionRow/LeftActions/SpeedButton");
         _burstButton = GetNode<Button>("PanelPadding/MainColumn/ActionRow/LeftActions/BurstButton");
         _saveButton = GetNode<Button>("PanelPadding/MainColumn/ActionRow/RightActions/SaveButton");
-        _helpButton = GetNode<Button>("PanelPadding/MainColumn/ActionRow/RightActions/HelpButton");
+        _loadButton = GetNode<Button>("PanelPadding/MainColumn/ActionRow/RightActions/LoadButton");
+        _settingsButton = GetNode<Button>("PanelPadding/MainColumn/ActionRow/RightActions/SettingsButton");
         _alertButton = GetNode<Button>("PanelPadding/MainColumn/ActionRow/RightActions/AlertButton");
 
         SetEquipmentCards("钢铁剑 · Lv.2", "伏木弓部族 · Lv.5", "初始砸星 · Lv.5");
-        SetActionText("▶ 51", "■ ×2", "封存档整理", "作业帮您", "资为立场");
+        SetActionText("▶ 51", "■ ×2", "封存档整理", "读档", "设置", "资为立场");
     }
 
     public void SetEquipmentCards(string cardOne, string cardTwo, string cardThree)
@@ -36,12 +38,13 @@ public partial class BottomBar : PanelContainer
         _cardThreeLabel.Text = cardThree;
     }
 
-    public void SetActionText(string speed, string burst, string save, string help, string alert)
+    public void SetActionText(string speed, string burst, string save, string load, string settings, string alert)
     {
         _speedButton.Text = speed;
         _burstButton.Text = burst;
         _saveButton.Text = save;
-        _helpButton.Text = help;
+        _loadButton.Text = load;
+        _settingsButton.Text = settings;
         _alertButton.Text = alert;
     }
 }

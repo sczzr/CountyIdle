@@ -4,7 +4,7 @@
 
 - 日期：2026-03-06
 - 版本：v0.x
-- 关联提案：`CP-20260306-countytown-25d-generator.md`
+- 关联提案：`docs/change-proposals/CP-20260306-countytown-25d-map.md`
 
 ## 改动摘要
 

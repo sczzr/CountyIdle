@@ -7,6 +7,7 @@ namespace CountyIdle.Systems;
 public class CombatSystem
 {
     private readonly RandomNumberGenerator _rng = new();
+    private readonly EquipmentSystem _equipmentSystem = new();
 
     public CombatSystem()
     {
@@ -47,7 +48,14 @@ public class CombatSystem
                 state.ExplorationDepth += 1;
             }
 
-            log = $"探险胜利：获得金币+{goldGain}，稀有素材+{rareGain}，当前层数 {state.ExplorationDepth}。";
+            var combatLog = $"探险胜利：获得金币+{goldGain}，稀有素材+{rareGain}，当前层数 {state.ExplorationDepth}。";
+            if (_equipmentSystem.TryResolveExplorationDrop(state, out var gearLog) && !string.IsNullOrWhiteSpace(gearLog))
+            {
+                log = $"{combatLog} {gearLog}";
+                return true;
+            }
+
+            log = combatLog;
             return true;
         }
 

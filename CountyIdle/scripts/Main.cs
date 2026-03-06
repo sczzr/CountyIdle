@@ -16,7 +16,10 @@ public partial class Main : Control
     {
         World,
         Prefecture,
-        CountyTown
+        CountyTown,
+        EventPanel,
+        ReportPanel,
+        Expedition
     }
 
     private const string MainLayoutPath = "RootMargin/MainLayout";
@@ -25,6 +28,10 @@ public partial class Main : Control
     private const string LeftPanelPath = $"{BodyRowPath}/LeftPanel";
     private const string RightPanelPath = $"{BodyRowPath}/RightPanel";
     private const string BottomBarPath = $"{MainLayoutPath}/BottomBar";
+    private const string CenterPanelContentPath = $"{BodyRowPath}/CenterPanel/PanelContent";
+    private const string CenterTopTabRowPath = $"{CenterPanelContentPath}/TopTabRow";
+    private const string CenterMapPagesPath = $"{CenterPanelContentPath}/MapViewport/MapPages";
+    private const string CenterReportDetailPagesPath = $"{CenterMapPagesPath}/ReportPanelView/ReportScroll/DetailPages";
     private const string LegacyLayoutPath = "RootMargin";
     private const string FigmaLayoutPath = "FigmaLayout";
 
@@ -39,6 +46,7 @@ public partial class Main : Control
     private const double SettlementDurationSeconds = 60.0;
     private const double LanternPulseDurationSeconds = 0.42;
     private const double LanternResetDurationSeconds = 0.14;
+    private const float MapZoomStep = 0.1f;
     private const int MineUnlockTechLevel = 1;
     private const string MineLockedText = "🔒 需科技 锻造术(T1)";
     private const string MineUnlockedText = "↑ 扩建学宫 (木16 石22 金22)";
@@ -75,9 +83,19 @@ public partial class Main : Control
     private Button? _worldMapButton;
     private Button? _prefectureMapButton;
     private Button? _countyTownMapButton;
+    private Button? _eventPanelButton;
+    private Button? _reportPanelButton;
+    private Button? _expeditionMapButton;
+    private Button? _mapZoomOutButton;
+    private Button? _mapZoomInButton;
+    private Button? _mapZoomResetButton;
+    private Label? _mapZoomLabel;
     private Control? _worldMapView;
     private Control? _prefectureMapView;
     private Control? _countyTownMapView;
+    private Control? _eventPanelView;
+    private Control? _reportPanelView;
+    private Control? _expeditionMapView;
     private Button? _mineUpgradeButton;
     private Control _legacyLayoutRoot = null!;
     private Control _figmaLayoutRoot = null!;
@@ -94,12 +112,15 @@ public partial class Main : Control
 
     private bool _isUsingFigmaLayout;
     private bool _isSpeedX2;
+    private MapTab _currentMapTab = MapTab.CountyTown;
     private JobType? _priorityJobType = JobType.Farmer;
     private double _settlementCountdownSeconds = SettlementDurationSeconds;
 
     public override void _Ready()
     {
+        InitializeClientSettings();
         BindUiNodes();
+        CreateSettingsPanel();
         BindUiEvents();
         BindLanternHoverEffects();
         SetupGameLoop();
@@ -131,6 +152,7 @@ public partial class Main : Control
         }
 
         _buttonPulseTweens.Clear();
+        UnbindClientSettingEvents();
     }
 
     private void SetupGameLoop()
@@ -285,7 +307,8 @@ public partial class Main : Control
         if (_figmaEquipmentSummaryLabel != null)
         {
             _figmaEquipmentSummaryLabel.Text =
-                $"农坊 {state.AgricultureBuildings} · 工坊 {state.WorkshopBuildings} · 学宫 {state.ResearchBuildings}";
+                $"战备评分 {state.AvgGearScore:0.0} · 传说 {state.LegendaryGearCount} · 史诗 {state.EpicGearCount}\n" +
+                $"精良 {state.RareGearCount} · 普通 {state.CommonGearCount}";
         }
 
         if (_figmaNotificationLabel != null)
@@ -386,17 +409,28 @@ public partial class Main : Control
         _speedX2Button = GetNode<Button>($"{BottomBarPath}/BarPadding/MainRow/SpeedRow/SpeedX2Button");
         _saveButton = GetNode<Button>($"{BottomBarPath}/BarPadding/MainRow/ActionRow/SaveButton");
         _loadButton = GetNode<Button>($"{BottomBarPath}/BarPadding/MainRow/ActionRow/LoadButton");
+        _settingsButton = GetNode<Button>($"{BottomBarPath}/BarPadding/MainRow/ActionRow/SettingsButton");
         _resetButton = GetNode<Button>($"{BottomBarPath}/BarPadding/MainRow/ActionRow/ResetButton");
 
-        _worldMapButton = GetNode<Button>($"{BodyRowPath}/CenterPanel/PanelContent/MapViewport/TopTabRow/WorldMapButton");
-        _prefectureMapButton = GetNode<Button>($"{BodyRowPath}/CenterPanel/PanelContent/MapViewport/TopTabRow/PrefectureMapButton");
-        _countyTownMapButton = GetNode<Button>($"{BodyRowPath}/CenterPanel/PanelContent/MapViewport/TopTabRow/CountyTownMapButton");
+        _worldMapButton = GetNode<Button>($"{CenterTopTabRowPath}/WorldMapButton");
+        _prefectureMapButton = GetNode<Button>($"{CenterTopTabRowPath}/PrefectureMapButton");
+        _countyTownMapButton = GetNode<Button>($"{CenterTopTabRowPath}/CountyTownMapButton");
+        _eventPanelButton = GetNode<Button>($"{CenterTopTabRowPath}/EventPanelButton");
+        _reportPanelButton = GetNode<Button>($"{CenterTopTabRowPath}/ReportPanelButton");
+        _expeditionMapButton = GetNode<Button>($"{CenterTopTabRowPath}/ExpeditionMapButton");
+        _mapZoomOutButton = GetNode<Button>($"{CenterTopTabRowPath}/MapZoomOutButton");
+        _mapZoomInButton = GetNode<Button>($"{CenterTopTabRowPath}/MapZoomInButton");
+        _mapZoomResetButton = GetNode<Button>($"{CenterTopTabRowPath}/MapZoomResetButton");
+        _mapZoomLabel = GetNode<Label>($"{CenterTopTabRowPath}/MapZoomLabel");
 
-        _worldMapView = GetNode<Control>($"{BodyRowPath}/CenterPanel/PanelContent/MapViewport/MapPages/WorldMapView");
-        _prefectureMapView = GetNode<Control>($"{BodyRowPath}/CenterPanel/PanelContent/MapViewport/MapPages/PrefectureMapView");
-        _countyTownMapView = GetNode<Control>($"{BodyRowPath}/CenterPanel/PanelContent/MapViewport/MapPages/CountyTownMapView");
-        _countyTownMapRenderer = GetNode<CountyTownMapViewSystem>($"{BodyRowPath}/CenterPanel/PanelContent/MapViewport/MapPages/CountyTownMapView");
-        _mineUpgradeButton = GetNodeOrNull<Button>($"{BodyRowPath}/CenterPanel/PanelContent/InfrastructureScroll/DetailPages/MineCard/CardVBox/UpgradeButton");
+        _worldMapView = GetNode<Control>($"{CenterMapPagesPath}/WorldMapView");
+        _prefectureMapView = GetNode<Control>($"{CenterMapPagesPath}/PrefectureMapView");
+        _countyTownMapView = GetNode<Control>($"{CenterMapPagesPath}/CountyTownMapView");
+        _eventPanelView = GetNode<Control>($"{CenterMapPagesPath}/EventPanelView");
+        _reportPanelView = GetNode<Control>($"{CenterMapPagesPath}/ReportPanelView");
+        _expeditionMapView = GetNode<Control>($"{CenterMapPagesPath}/ExpeditionMapView");
+        _countyTownMapRenderer = GetNode<CountyTownMapViewSystem>($"{CenterMapPagesPath}/CountyTownMapView");
+        _mineUpgradeButton = GetNodeOrNull<Button>($"{CenterReportDetailPagesPath}/MineCard/CardVBox/UpgradeButton");
 
         _jobCountLabels.Clear();
         _jobTitleLabels.Clear();
@@ -453,7 +487,8 @@ public partial class Main : Control
         _speedX1Button = null;
         _speedX2Button = GetNode<Button>($"{FigmaBottomBarPath}/ActionRow/LeftActions/BurstButton");
         _saveButton = GetNode<Button>($"{FigmaBottomBarPath}/ActionRow/RightActions/SaveButton");
-        _loadButton = GetNode<Button>($"{FigmaBottomBarPath}/ActionRow/RightActions/HelpButton");
+        _loadButton = GetNode<Button>($"{FigmaBottomBarPath}/ActionRow/RightActions/LoadButton");
+        _settingsButton = GetNode<Button>($"{FigmaBottomBarPath}/ActionRow/RightActions/SettingsButton");
         _resetButton = GetNode<Button>($"{FigmaBottomBarPath}/ActionRow/RightActions/AlertButton");
 
         _figmaBuildAgricultureButton = GetNode<Button>($"{FigmaCenterPath}/TopActionRow/LeftActionButton");
@@ -468,9 +503,19 @@ public partial class Main : Control
         _worldMapButton = null;
         _prefectureMapButton = null;
         _countyTownMapButton = null;
+        _eventPanelButton = null;
+        _reportPanelButton = null;
+        _expeditionMapButton = null;
+        _mapZoomOutButton = null;
+        _mapZoomInButton = null;
+        _mapZoomResetButton = null;
+        _mapZoomLabel = null;
         _worldMapView = null;
         _prefectureMapView = null;
         _countyTownMapView = null;
+        _eventPanelView = null;
+        _reportPanelView = null;
+        _expeditionMapView = null;
         _mineUpgradeButton = null;
         _countyTownMapRenderer = null;
 
@@ -490,6 +535,7 @@ public partial class Main : Control
     private void BindUiEvents()
     {
         _exploreButton.Pressed += () => _gameLoop.ToggleExploration();
+        BindSettingsButtonEvent();
 
         if (_speedX1Button != null)
         {
@@ -509,11 +555,26 @@ public partial class Main : Control
             };
         }
 
-        if (_worldMapButton != null && _prefectureMapButton != null && _countyTownMapButton != null)
+        if (_worldMapButton != null &&
+            _prefectureMapButton != null &&
+            _countyTownMapButton != null &&
+            _eventPanelButton != null &&
+            _reportPanelButton != null &&
+            _expeditionMapButton != null)
         {
             _worldMapButton.Pressed += () => SetMapTab(MapTab.World);
             _prefectureMapButton.Pressed += () => SetMapTab(MapTab.Prefecture);
             _countyTownMapButton.Pressed += () => SetMapTab(MapTab.CountyTown);
+            _eventPanelButton.Pressed += () => SetMapTab(MapTab.EventPanel);
+            _reportPanelButton.Pressed += () => SetMapTab(MapTab.ReportPanel);
+            _expeditionMapButton.Pressed += () => SetMapTab(MapTab.Expedition);
+        }
+
+        if (_mapZoomOutButton != null && _mapZoomInButton != null && _mapZoomResetButton != null)
+        {
+            _mapZoomOutButton.Pressed += () => AdjustCurrentMapZoom(-MapZoomStep);
+            _mapZoomInButton.Pressed += () => AdjustCurrentMapZoom(MapZoomStep);
+            _mapZoomResetButton.Pressed += ResetCurrentMapZoom;
         }
 
         _saveButton.Pressed += () =>
@@ -577,18 +638,19 @@ public partial class Main : Control
 
         _saveButton.Text = "💾 存档";
         _loadButton.Text = "📂 读档";
+        _settingsButton.Text = "⚙ 设置";
         _resetButton.Text = "↺ 重置";
     }
 
     private void BindLegacyIndustryButtons()
     {
-        var agricultureButton = GetNodeOrNull<Button>($"{BodyRowPath}/CenterPanel/PanelContent/InfrastructureScroll/DetailPages/MulberryCard/CardVBox/UpgradeButton");
+        var agricultureButton = GetNodeOrNull<Button>($"{CenterReportDetailPagesPath}/MulberryCard/CardVBox/UpgradeButton");
         if (agricultureButton != null)
         {
             agricultureButton.Pressed += () => _gameLoop.BuildIndustryBuilding(IndustryBuildingType.Agriculture);
         }
 
-        var workshopButton = GetNodeOrNull<Button>($"{BodyRowPath}/CenterPanel/PanelContent/InfrastructureScroll/DetailPages/LumberCard/CardVBox/UpgradeButton");
+        var workshopButton = GetNodeOrNull<Button>($"{CenterReportDetailPagesPath}/LumberCard/CardVBox/UpgradeButton");
         if (workshopButton != null)
         {
             workshopButton.Pressed += () => _gameLoop.BuildIndustryBuilding(IndustryBuildingType.Workshop);
@@ -627,8 +689,18 @@ public partial class Main : Control
 
     private void SetMapTab(MapTab mapTab)
     {
-        if (_worldMapView == null || _prefectureMapView == null || _countyTownMapView == null ||
-            _worldMapButton == null || _prefectureMapButton == null || _countyTownMapButton == null)
+        if (_worldMapView == null ||
+            _prefectureMapView == null ||
+            _countyTownMapView == null ||
+            _eventPanelView == null ||
+            _reportPanelView == null ||
+            _expeditionMapView == null ||
+            _worldMapButton == null ||
+            _prefectureMapButton == null ||
+            _countyTownMapButton == null ||
+            _eventPanelButton == null ||
+            _reportPanelButton == null ||
+            _expeditionMapButton == null)
         {
             return;
         }
@@ -636,10 +708,76 @@ public partial class Main : Control
         _worldMapView.Visible = mapTab == MapTab.World;
         _prefectureMapView.Visible = mapTab == MapTab.Prefecture;
         _countyTownMapView.Visible = mapTab == MapTab.CountyTown;
+        _eventPanelView.Visible = mapTab == MapTab.EventPanel;
+        _reportPanelView.Visible = mapTab == MapTab.ReportPanel;
+        _expeditionMapView.Visible = mapTab == MapTab.Expedition;
 
         _worldMapButton.ButtonPressed = mapTab == MapTab.World;
         _prefectureMapButton.ButtonPressed = mapTab == MapTab.Prefecture;
         _countyTownMapButton.ButtonPressed = mapTab == MapTab.CountyTown;
+        _eventPanelButton.ButtonPressed = mapTab == MapTab.EventPanel;
+        _reportPanelButton.ButtonPressed = mapTab == MapTab.ReportPanel;
+        _expeditionMapButton.ButtonPressed = mapTab == MapTab.Expedition;
+
+        _currentMapTab = mapTab;
+        RefreshMapZoomUi();
+    }
+
+    private void AdjustCurrentMapZoom(float delta)
+    {
+        var mapView = GetActiveMapZoomView();
+        if (mapView == null)
+        {
+            return;
+        }
+
+        mapView.AdjustZoom(delta);
+        RefreshMapZoomUi();
+    }
+
+    private void ResetCurrentMapZoom()
+    {
+        var mapView = GetActiveMapZoomView();
+        if (mapView == null)
+        {
+            return;
+        }
+
+        mapView.SetZoom(mapView.DefaultZoom);
+        RefreshMapZoomUi();
+    }
+
+    private IMapZoomView? GetActiveMapZoomView()
+    {
+        return _currentMapTab switch
+        {
+            MapTab.World => _worldMapView as IMapZoomView,
+            MapTab.Prefecture => _prefectureMapView as IMapZoomView,
+            MapTab.CountyTown => _countyTownMapView as IMapZoomView,
+            _ => null
+        };
+    }
+
+    private void RefreshMapZoomUi()
+    {
+        if (_mapZoomOutButton == null || _mapZoomInButton == null || _mapZoomResetButton == null || _mapZoomLabel == null)
+        {
+            return;
+        }
+
+        var mapView = GetActiveMapZoomView();
+        var canZoom = mapView != null;
+        _mapZoomOutButton.Disabled = !canZoom;
+        _mapZoomInButton.Disabled = !canZoom;
+        _mapZoomResetButton.Disabled = !canZoom;
+
+        if (!canZoom || mapView == null)
+        {
+            _mapZoomLabel.Text = "--";
+            return;
+        }
+
+        _mapZoomLabel.Text = $"{(int)Mathf.Round(mapView.Zoom * 100f)}%";
     }
 
     private void BindJobButtons(JobType jobType, string minusButtonPath, string plusButtonPath)

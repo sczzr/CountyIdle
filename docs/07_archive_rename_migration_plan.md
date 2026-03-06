@@ -1,0 +1,89 @@
+# CountyIdle 归档批量重命名迁移计划（已执行）
+
+> 目标：把历史归档统一到 `canonical-topic`，降低检索成本与同义命名扩散。
+
+> 执行状态：已于 `2026-03-06` 执行完成（共重命名 32 个文件）。
+
+## 1) 迁移原则
+
+1. 仅改文件名，不改文档正文内容。
+2. 历史文件按“史诗 topic”归并，保留日期前缀。
+3. 出现同目录同日同 topic 重名时，使用 `-01/-02/...` 序号后缀。
+4. 先 `FC`，再 `CP`，最后 `BL`，便于链路核验。
+
+## 2) 目标命名规则
+
+- `FC-YYYYMMDD-<canonical-topic>[-NN].md`
+- `CP-YYYYMMDD-<canonical-topic>[-NN].md`
+- `BL-YYYYMMDD-<canonical-topic>[-NN].md`
+
+## 3) 批量重命名映射（已执行）
+
+### 3.1 Feature Cards（FC）
+
+| 旧文件名 | 新文件名 |
+| --- | --- |
+| `FC-20260305-han-courtyard-theme.md` | `FC-20260305-han-courtyard-theme-pack-01.md` |
+| `FC-20260305-han-courtyard-textured-theme.md` | `FC-20260305-han-courtyard-theme-pack-02.md` |
+| `FC-20260305-lantern-hover-pulse.md` | `FC-20260305-han-courtyard-theme-pack-03.md` |
+| `FC-20260305-rimworld-modular-ui.md` | `FC-20260305-ui-layout-migration-01.md` |
+| `FC-20260305-ui-scene-split.md` | `FC-20260305-ui-layout-migration-02.md` |
+| `FC-20260306-figma-make-ui-skeleton.md` | `FC-20260306-ui-layout-migration-03.md` |
+| `FC-20260306-main-layout-switch.md` | `FC-20260306-ui-layout-migration-04.md` |
+| `FC-20260306-html-reference-ui-parity.md` | `FC-20260306-ui-layout-migration-05.md` |
+| `FC-20260306-reference-layout-rebuild.md` | `FC-20260306-ui-layout-migration-06.md` |
+| `FC-20260306-reference-layout-update-b.md` | `FC-20260306-ui-layout-migration-07.md` |
+| `FC-20260306-responsive-layout-fix.md` | `FC-20260306-ui-layout-migration-08.md` |
+| `FC-20260306-map-switch-tabs.md` | `FC-20260306-map-tabs-and-viewport-01.md` |
+| `FC-20260306-mapviewport-center-content-tabs.md` | `FC-20260306-map-tabs-and-viewport-02.md` |
+| `FC-20260306-three-map-render-zoom.md` | `FC-20260306-map-tabs-and-viewport-03.md` |
+| `FC-20260306-countytown-25d-generator.md` | `FC-20260306-countytown-25d-map-01.md` |
+| `FC-20260306-countytown-25d-textured-render.md` | `FC-20260306-countytown-25d-map-02.md` |
+
+### 3.2 Change Proposals（CP）
+
+| 旧文件名 | 新文件名 |
+| --- | --- |
+| `CP-20260306-countytown-25d-generator.md` | `CP-20260306-countytown-25d-map.md` |
+
+### 3.3 Balance Logs（BL）
+
+| 旧文件名 | 新文件名 |
+| --- | --- |
+| `BL-20260305-han-courtyard-theme.md` | `BL-20260305-han-courtyard-theme-pack-01.md` |
+| `BL-20260305-han-courtyard-textured-theme.md` | `BL-20260305-han-courtyard-theme-pack-02.md` |
+| `BL-20260305-lantern-hover-pulse.md` | `BL-20260305-han-courtyard-theme-pack-03.md` |
+| `BL-20260305-rimworld-modular-ui.md` | `BL-20260305-ui-layout-migration-01.md` |
+| `BL-20260305-ui-scene-split.md` | `BL-20260305-ui-layout-migration-02.md` |
+| `BL-20260306-figma-make-ui-skeleton.md` | `BL-20260306-ui-layout-migration-03.md` |
+| `BL-20260306-main-layout-switch.md` | `BL-20260306-ui-layout-migration-04.md` |
+| `BL-20260306-html-reference-ui-parity.md` | `BL-20260306-ui-layout-migration-05.md` |
+| `BL-20260306-reference-layout-rebuild.md` | `BL-20260306-ui-layout-migration-06.md` |
+| `BL-20260306-reference-layout-update-b.md` | `BL-20260306-ui-layout-migration-07.md` |
+| `BL-20260306-responsive-layout-fix.md` | `BL-20260306-ui-layout-migration-08.md` |
+| `BL-20260306-map-switch-tabs.md` | `BL-20260306-map-tabs-and-viewport-01.md` |
+| `BL-20260306-mapviewport-center-content-tabs.md` | `BL-20260306-map-tabs-and-viewport-02.md` |
+| `BL-20260306-countytown-25d-generator.md` | `BL-20260306-countytown-25d-map-01.md` |
+| `BL-20260306-countytown-25d-textured-render.md` | `BL-20260306-countytown-25d-map-02.md` |
+
+## 4) 执行记录（2026-03-06）
+
+1. 已按 3.1 -> 3.2 -> 3.3 顺序完成批量重命名。
+2. 已同步修正文档引用（含提案路径更新）。
+3. 已完成构建校验：`dotnet build .\\Finally.sln` 通过。
+4. 后续新增文档继续遵循 `06_archive_registry.md` 的命名与去重规则。
+
+## 5) 一键执行模板（PowerShell）
+
+```powershell
+# 示例：逐条替换为计划中的 old/new
+git mv docs/feature-cards/FC-20260305-han-courtyard-theme.md docs/feature-cards/FC-20260305-han-courtyard-theme-pack-01.md
+git mv docs/change-proposals/CP-20260306-countytown-25d-generator.md docs/change-proposals/CP-20260306-countytown-25d-map.md
+git mv docs/balance-logs/BL-20260306-map-switch-tabs.md docs/balance-logs/BL-20260306-map-tabs-and-viewport-01.md
+```
+
+## 6) 迁移后预期收益
+
+- 同一史诗链路可按 topic 聚类检索。
+- 后续 FC/CP/BL 命名规则统一，减少重复开题。
+- 历史资产交付类与机制类文档边界更清晰。

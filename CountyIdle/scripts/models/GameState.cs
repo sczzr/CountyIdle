@@ -33,6 +33,10 @@ public class GameState
     public bool ExplorationEnabled { get; set; } = true;
     public int ExplorationProgressHours { get; set; } = 0;
     public double AvgGearScore { get; set; } = 12;
+    public int CommonGearCount { get; set; } = 0;
+    public int RareGearCount { get; set; } = 0;
+    public int EpicGearCount { get; set; } = 0;
+    public int LegendaryGearCount { get; set; } = 0;
     public int EventCooldownHours { get; set; } = 0;
 
     public int AgricultureBuildings { get; set; } = 3;

@@ -81,7 +81,12 @@ text = "💾 封存档案"
 [node name="LoadButton" type="Button" parent="BarPadding/MainRow/ActionRow"]
 custom_minimum_size = Vector2(100, 26)
 layout_mode = 2
-text = "⚙ 府衙设置"
+text = "📂 载入档案"
+
+[node name="SettingsButton" type="Button" parent="BarPadding/MainRow/ActionRow"]
+custom_minimum_size = Vector2(100, 26)
+layout_mode = 2
+text = "⚙ 基础设置"
 
 [node name="ResetButton" type="Button" parent="BarPadding/MainRow/ActionRow"]
 custom_minimum_size = Vector2(110, 26)
