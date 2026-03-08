@@ -7,21 +7,20 @@
 
 - 玩法机制：`research-breakthrough`、`industrial-job-logic`、`equipment-rarity-affix-drop`、`county-dynamic-events`
 - 交互功能：`ui-interaction-rewire`、`all-buttons-interactive`、`client-settings-panel`
-- 地图链路：`countytown-25d-map`、`countytown-source-sheet-tilemap`、`map-tabs-and-viewport`
+- 地图链路：`countytown-25d-map`、`map-tabs-and-viewport`
 - UI 史诗：`ui-layout-migration`
-- 资源与主题：`han-courtyard-theme-pack`、`chinese-seamless-tileset-atlas`、`building-elements-pack`
+- 资源与主题：`han-courtyard-theme-pack`、`building-elements-pack`
 
 ## 新文件名快速索引
 
 | 主题 | 文件名 |
 | --- | --- |
 | `ui-layout-migration` | `FC-20260305-ui-layout-migration-01.md` ~ `FC-20260306-ui-layout-migration-08.md` |
-| `map-tabs-and-viewport` | `FC-20260306-map-tabs-and-viewport-01.md` ~ `FC-20260306-map-tabs-and-viewport-07.md` |
+| `map-tabs-and-viewport` | `FC-20260306-map-tabs-and-viewport-01.md` ~ `FC-20260306-map-tabs-and-viewport-03.md` |
 | `countytown-25d-map` | `FC-20260306-countytown-25d-map-01.md`、`FC-20260306-countytown-25d-map-02.md` |
-| `countytown-source-sheet-tilemap` | `FC-20260306-countytown-source-sheet-tilemap.md` |
 | `han-courtyard-theme-pack` | `FC-20260305-han-courtyard-theme-pack-01.md` ~ `FC-20260305-han-courtyard-theme-pack-03.md` |
 | 单体机制/功能 | `FC-20260305-research-breakthrough.md`、`FC-20260306-industrial-job-logic.md`、`FC-20260306-equipment-rarity-affix-drop.md`、`FC-20260306-county-dynamic-events.md`、`FC-20260306-ui-interaction-rewire.md`、`FC-20260306-all-buttons-interactive.md` |
-| 资产与工具 | `FC-20260305-chinese-seamless-tileset-atlas.md`、`FC-20260306-building-elements-pack.md`、`FC-20260306-client-settings-panel.md` |
+| 资产与工具 | `FC-20260306-building-elements-pack.md`、`FC-20260306-client-settings-panel.md` |
 
 ## 使用建议
 

@@ -28,6 +28,7 @@ public class CountyEventSystem
     public bool TickHour(GameState state, out string? log)
     {
         log = null;
+        InventoryRules.EndTransaction(state);
         state.EventCooldownHours = Math.Max(state.EventCooldownHours, 0);
 
         if (state.EventCooldownHours > 0)
@@ -121,11 +122,11 @@ public class CountyEventSystem
         var goldGain = 16 + (state.Merchants * 0.9);
         var foodGain = 10 + (state.Merchants * 0.35);
 
-        state.Gold += goldGain;
-        state.Food += foodGain;
+        var actualGoldGain = InventoryRules.ApplyDelta(state, nameof(GameState.Gold), goldGain);
+        var actualFoodGain = InventoryRules.ApplyDelta(state, nameof(GameState.Food), foodGain);
         state.Happiness = Math.Clamp(state.Happiness + 0.9, MinHappiness, MaxHappiness);
 
-        return $"商路集市：商贾来往，获得金币+{goldGain:0}、粮食+{foodGain:0}。";
+        return $"商路集市：商贾来往，获得金币+{actualGoldGain}、粮食+{actualFoodGain}。";
     }
 
     private static string ResolveAcademyLecture(GameState state)
@@ -136,7 +137,7 @@ public class CountyEventSystem
         state.Research += researchGain;
         state.Happiness = Math.Clamp(state.Happiness + happinessGain, MinHappiness, MaxHappiness);
 
-        return $"学宫讲习：士子论学，获得科研+{researchGain:0}，民心提升。";
+                    return $"藏经阁讲习：弟子论道，获得科研+{researchGain:0}，民心提升。";
     }
 
     private static string ResolveBorderRaid(GameState state)
@@ -146,14 +147,24 @@ public class CountyEventSystem
         var foodLoss = (18 + (state.Threat * 0.50)) * mitigation;
         var happinessLoss = 2.4 * mitigation;
 
-        state.Gold = Math.Max(state.Gold - goldLoss, 0);
-        state.Food = Math.Max(state.Food - foodLoss, 0);
+        var actualGoldLoss = -InventoryRules.ApplyDelta(state, nameof(GameState.Gold), -goldLoss);
+        var actualFoodLoss = -InventoryRules.ApplyDelta(state, nameof(GameState.Food), -foodLoss);
+        if (state.Gold < 0)
+        {
+            InventoryRules.SetVisibleAmount(state, nameof(GameState.Gold), 0);
+        }
+
+        if (state.Food < 0)
+        {
+            InventoryRules.SetVisibleAmount(state, nameof(GameState.Food), 0);
+        }
+
         state.Happiness = Math.Clamp(state.Happiness - happinessLoss, MinHappiness, MaxHappiness);
         state.Threat = Math.Clamp(state.Threat - (state.ElitePopulation >= 6 ? 1.5 : 0.5), 0, 100);
 
         return mitigation < 1
-            ? $"警告：边境袭扰被精英队压制，仍损失金币-{goldLoss:0}、粮食-{foodLoss:0}。"
-            : $"警告：边境袭扰冲击郡县，损失金币-{goldLoss:0}、粮食-{foodLoss:0}。";
+            ? $"警告：边境袭扰被精英队压制，仍损失金币-{actualGoldLoss}、粮食-{actualFoodLoss}。"
+            : $"警告：边境袭扰冲击郡县，损失金币-{actualGoldLoss}、粮食-{actualFoodLoss}。";
     }
 
     private sealed class EventCandidate

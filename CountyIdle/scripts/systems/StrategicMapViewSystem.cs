@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Godot;
 using CountyIdle.Models;
 
@@ -22,6 +23,8 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     private const int HousingBucketSize = 30;
     private const int ThreatBucketSize = 8;
     private const int SettlementBucketSize = 6;
+    private const float HexGridFillAlphaEven = 0.08f;
+    private const float HexGridFillAlphaOdd = 0.12f;
     private static readonly Color MapBackdropColor = new(0.09f, 0.11f, 0.16f, 0.92f);
     private static readonly Color GridColor = new(0.16f, 0.20f, 0.28f, 0.55f);
     private static readonly Color DefaultOutlineColor = new(0.82f, 0.86f, 0.96f, 0.35f);
@@ -29,13 +32,27 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     private static readonly Color DefaultRiverColor = new(0.38f, 0.62f, 0.88f, 0.82f);
     private static readonly Color DefaultNodeColor = new(0.94f, 0.88f, 0.73f, 1f);
     private static readonly Color DefaultLabelColor = new(0.93f, 0.90f, 0.80f, 0.96f);
+    private static readonly HexEdgeDefinition[] WorldHexEdges =
+    [
+        new(HexDirectionMask.NorthEast, 0, 1, 1, -1),
+        new(HexDirectionMask.East, 1, 2, 1, 0),
+        new(HexDirectionMask.SouthEast, 2, 3, 0, 1),
+        new(HexDirectionMask.SouthWest, 3, 4, -1, 1),
+        new(HexDirectionMask.West, 4, 5, -1, 0),
+        new(HexDirectionMask.NorthWest, 5, 0, 0, -1)
+    ];
 
     [Export]
     private StrategicMapMode _mode = StrategicMapMode.World;
 
     private readonly StrategicMapConfigSystem _configSystem = new();
     private readonly PrefectureMapGeneratorSystem _prefectureGenerator = new();
+    private readonly XianxiaWorldGeneratorSystem _xianxiaWorldGenerator = new();
     private StrategicMapDefinition _mapDefinition = new();
+    private XianxiaWorldMapData? _xianxiaWorldMap;
+    private Dictionary<(int Q, int R), XianxiaHexCellData> _xianxiaWorldCellLookup = [];
+    private Dictionary<(int Q, int R), Vector2> _xianxiaWorldCenters = [];
+    private float _xianxiaWorldHexRadius = 0.01f;
     private Label? _titleLabel;
     private float _zoom = 1.0f;
     private float _targetZoom = 1.0f;
@@ -57,7 +74,20 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         _titleLabel = GetNodeOrNull<Label>("Label");
         if (_mode == StrategicMapMode.World)
         {
-            _mapDefinition = _configSystem.GetWorldDefinition();
+            try
+            {
+                _mapDefinition = _xianxiaWorldGenerator.GenerateStrategicDefinition(out var worldMap);
+                CacheWorldLayout(worldMap);
+            }
+            catch (Exception exception)
+            {
+                GD.PushWarning($"Xianxia world generation failed, fallback to configured world map: {exception.Message}");
+                _mapDefinition = _configSystem.GetWorldDefinition();
+                _xianxiaWorldMap = null;
+                _xianxiaWorldCellLookup = [];
+                _xianxiaWorldCenters = [];
+                _xianxiaWorldHexRadius = 0.01f;
+            }
         }
         else
         {
@@ -126,9 +156,17 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
             DrawPrefectureUrbanFabric(center, unit);
         }
 
+        if (_mode == StrategicMapMode.World && _xianxiaWorldMap != null)
+        {
+            DrawWorldEdgeOverlays(center, unit);
+        }
+
         DrawPolylines(center, unit, _mapDefinition.Outlines, _operationalStyle.OutlineColor, 1.2f);
         DrawPolylines(center, unit, _mapDefinition.Routes, _operationalStyle.RouteColor, 1.4f);
-        DrawPolylines(center, unit, _mapDefinition.Rivers, _operationalStyle.RiverColor, 1.8f);
+        if (!(_mode == StrategicMapMode.World && _xianxiaWorldMap != null))
+        {
+            DrawPolylines(center, unit, _mapDefinition.Rivers, _operationalStyle.RiverColor, 1.8f);
+        }
         DrawNodes(center, unit);
         DrawLabels(center, unit);
     }
@@ -230,24 +268,51 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         }
 
         var mapName = string.IsNullOrWhiteSpace(_mapDefinition.Title)
-            ? (_mode == StrategicMapMode.World ? "天下州域" : "周边郡图")
+            ? (_mode == StrategicMapMode.World ? SectMapSemanticRules.GetWorldMapTitle() : SectMapSemanticRules.GetLegacyPrefectureMapTitle())
             : _mapDefinition.Title;
         var statusSuffix = string.IsNullOrWhiteSpace(_operationalStyle.TitleSuffix)
             ? string.Empty
             : $" · {_operationalStyle.TitleSuffix}";
-        _titleLabel.Text = $"{mapName}{statusSuffix} · 缩放 {(int)Mathf.Round(_zoom * 100f)}%";
+        _titleLabel.Text = $"{mapName}{statusSuffix} · 六角俯视 · 缩放 {(int)Mathf.Round(_zoom * 100f)}%";
     }
 
     private void DrawGrid(Rect2 mapRect, int lineCount)
     {
-        var safeLineCount = Math.Clamp(lineCount, 2, 16);
-        for (var index = 1; index < safeLineCount; index++)
+        var safeLineCount = Math.Clamp(lineCount, 3, 18);
+        var columns = safeLineCount;
+        var rows = Math.Max(safeLineCount - 1, 3);
+        var sqrt3 = Mathf.Sqrt(3f);
+        var radiusFromWidth = mapRect.Size.X / (sqrt3 * (columns + 0.5f));
+        var radiusFromHeight = mapRect.Size.Y / ((rows * 1.5f) + 0.5f);
+        var radius = Math.Max(Math.Min(radiusFromWidth, radiusFromHeight), 8f);
+        var hexWidth = sqrt3 * radius;
+        var totalWidth = (columns * hexWidth) + (hexWidth * 0.5f);
+        var totalHeight = ((rows - 1) * radius * 1.5f) + (radius * 2f);
+        var startX = mapRect.Position.X + ((mapRect.Size.X - totalWidth) * 0.5f) + (hexWidth * 0.5f);
+        var startY = mapRect.Position.Y + ((mapRect.Size.Y - totalHeight) * 0.5f) + radius;
+        var outlineBase = _operationalStyle.GridColor;
+        var outlineColor = new Color(outlineBase.R, outlineBase.G, outlineBase.B, Math.Min(outlineBase.A + 0.08f, 0.70f));
+
+        for (var row = 0; row < rows; row++)
         {
-            var progress = index / (float)safeLineCount;
-            var x = mapRect.Position.X + (mapRect.Size.X * progress);
-            var y = mapRect.Position.Y + (mapRect.Size.Y * progress);
-            DrawLine(new Vector2(x, mapRect.Position.Y), new Vector2(x, mapRect.End.Y), _operationalStyle.GridColor, 1f);
-            DrawLine(new Vector2(mapRect.Position.X, y), new Vector2(mapRect.End.X, y), _operationalStyle.GridColor, 1f);
+            var rowOffset = row % 2 == 0 ? 0f : hexWidth * 0.5f;
+            var centerY = startY + (row * radius * 1.5f);
+
+            for (var column = 0; column < columns; column++)
+            {
+                var centerX = startX + rowOffset + (column * hexWidth);
+                var center = new Vector2(centerX, centerY);
+                if (!mapRect.Grow(radius * 0.6f).HasPoint(center))
+                {
+                    continue;
+                }
+
+                var fillAlpha = (row + column) % 2 == 0 ? HexGridFillAlphaEven : HexGridFillAlphaOdd;
+                var fillColor = new Color(outlineBase.R, outlineBase.G, outlineBase.B, fillAlpha);
+                var hex = BuildHexPolygon(center, radius * 0.98f);
+                DrawFilledPolygon(hex, fillColor);
+                DrawPath(hex, outlineColor, 1f, true);
+            }
         }
     }
 
@@ -310,7 +375,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
                 continue;
             }
 
-            DrawCircle(canvasPoint, radius, color);
+            DrawHexMarker(canvasPoint, radius, color);
         }
     }
 
@@ -329,6 +394,12 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     private void DrawPrefectureNode(Vector2 canvasPoint, float radius, Color color, string nodeKind, float nodeX, float nodeY)
     {
         var kind = string.IsNullOrWhiteSpace(nodeKind) ? "settlement" : nodeKind;
+        if (string.Equals(kind, "raw_source", StringComparison.OrdinalIgnoreCase))
+        {
+            DrawRawSourceNode(canvasPoint, radius, color);
+            return;
+        }
+
         if (string.Equals(kind, "ward", StringComparison.OrdinalIgnoreCase) && _zoom >= 3.4f)
         {
             var cityCenter = GetPrefectureCityCenter();
@@ -379,6 +450,41 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         }
 
         DrawCircle(canvasPoint, radius, color);
+    }
+
+    private void DrawRawSourceNode(Vector2 canvasPoint, float radius, Color color)
+    {
+        var outer = new[]
+        {
+            canvasPoint + new Vector2(0f, -radius * 1.12f),
+            canvasPoint + new Vector2(radius * 0.96f, 0f),
+            canvasPoint + new Vector2(0f, radius * 1.12f),
+            canvasPoint + new Vector2(-radius * 0.96f, 0f)
+        };
+        var inner = new[]
+        {
+            canvasPoint + new Vector2(0f, -radius * 0.62f),
+            canvasPoint + new Vector2(radius * 0.56f, 0f),
+            canvasPoint + new Vector2(0f, radius * 0.62f),
+            canvasPoint + new Vector2(-radius * 0.56f, 0f)
+        };
+
+        DrawFilledPolygon(outer, color.Darkened(0.10f));
+        DrawFilledPolygon(inner, color.Lightened(0.14f));
+        for (var index = 0; index < outer.Length; index++)
+        {
+            DrawLine(outer[index], outer[(index + 1) % outer.Length], color.Lightened(0.28f), 1.1f);
+        }
+
+        DrawCircle(canvasPoint, Math.Max(1.2f, radius * 0.22f), new Color(0.97f, 0.95f, 0.88f, 0.92f));
+    }
+
+    private void DrawHexMarker(Vector2 canvasPoint, float radius, Color color)
+    {
+        var hex = BuildHexPolygon(canvasPoint, Math.Max(radius * 1.12f, 3.2f));
+        DrawFilledPolygon(hex, color);
+        DrawPath(hex, color.Darkened(0.28f), Math.Max(radius * 0.16f, 1.0f), true);
+        DrawCircle(canvasPoint, Math.Max(1.2f, radius * 0.24f), new Color(0.97f, 0.95f, 0.88f, 0.92f));
     }
 
     private void SetAnimatedZoom(float value)
@@ -795,6 +901,273 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         }
     }
 
+    private void CacheWorldLayout(XianxiaWorldMapData worldMap)
+    {
+        _xianxiaWorldMap = worldMap;
+        _xianxiaWorldCellLookup = [];
+        _xianxiaWorldCenters = [];
+        _xianxiaWorldHexRadius = 0.01f;
+
+        var rawCenters = new Dictionary<(int Q, int R), Vector2>(worldMap.Cells.Count);
+        var minX = float.MaxValue;
+        var minY = float.MaxValue;
+        var maxX = float.MinValue;
+        var maxY = float.MinValue;
+        var sqrt3 = Mathf.Sqrt(3f);
+
+        foreach (var cell in worldMap.Cells)
+        {
+            _xianxiaWorldCellLookup[(cell.Coord.Q, cell.Coord.R)] = cell;
+            var row = cell.Coord.R;
+            var column = cell.Coord.Q + (row >> 1);
+            var rawCenter = new Vector2(
+                sqrt3 * (column + ((row & 1) == 0 ? 0f : 0.5f)),
+                row * 1.5f);
+            rawCenters[(cell.Coord.Q, cell.Coord.R)] = rawCenter;
+
+            minX = MathF.Min(minX, rawCenter.X - (sqrt3 * 0.5f));
+            maxX = MathF.Max(maxX, rawCenter.X + (sqrt3 * 0.5f));
+            minY = MathF.Min(minY, rawCenter.Y - 1f);
+            maxY = MathF.Max(maxY, rawCenter.Y + 1f);
+        }
+
+        if (rawCenters.Count == 0)
+        {
+            return;
+        }
+
+        var worldCenter = new Vector2((minX + maxX) * 0.5f, (minY + maxY) * 0.5f);
+        var spanX = Math.Max(maxX - minX, 0.01f);
+        var spanY = Math.Max(maxY - minY, 0.01f);
+        var scale = 1.82f / Math.Max(spanX, spanY);
+        _xianxiaWorldHexRadius = 0.94f * scale;
+
+        foreach (var pair in rawCenters)
+        {
+            _xianxiaWorldCenters[pair.Key] = (pair.Value - worldCenter) * scale;
+        }
+    }
+
+    private void DrawWorldEdgeOverlays(Vector2 center, float unit)
+    {
+        if (_xianxiaWorldMap == null || _xianxiaWorldCenters.Count == 0)
+        {
+            return;
+        }
+
+        var hexRadius = Math.Max(_xianxiaWorldHexRadius * unit, 2f);
+        var riverColor = new Color(_operationalStyle.RiverColor.R, _operationalStyle.RiverColor.G, _operationalStyle.RiverColor.B, 0.94f);
+        var riverOutline = riverColor.Darkened(0.32f);
+        riverOutline.A = 0.96f;
+        var roadColor = new Color(0.86f, 0.74f, 0.52f, 0.88f);
+        var roadOutline = new Color(0.52f, 0.40f, 0.25f, 0.92f);
+        var shoreColor = new Color(0.95f, 0.91f, 0.74f, 0.90f);
+        var shoreOutline = new Color(0.60f, 0.54f, 0.41f, 0.86f);
+        var cliffColor = new Color(0.19f, 0.16f, 0.17f, 0.86f);
+        var cliffOutline = new Color(0.08f, 0.06f, 0.07f, 0.94f);
+
+        foreach (var cell in _xianxiaWorldMap.Cells)
+        {
+            if (cell.RiverMask == HexDirectionMask.None &&
+                cell.RoadMask == HexDirectionMask.None &&
+                cell.CliffMask == HexDirectionMask.None &&
+                cell.Water == XianxiaWaterType.None)
+            {
+                continue;
+            }
+
+            if (!_xianxiaWorldCenters.TryGetValue((cell.Coord.Q, cell.Coord.R), out var normalizedCenter))
+            {
+                continue;
+            }
+
+            var canvasCenter = ToCanvas(center, unit, normalizedCenter.X, normalizedCenter.Y);
+            var hex = BuildHexPolygon(canvasCenter, hexRadius);
+
+            if (cell.CliffMask != HexDirectionMask.None)
+            {
+                DrawMaskedHexEdges(cell.Coord, cell.CliffMask, hex, hexRadius * 0.12f, cliffColor, cliffOutline);
+            }
+
+            if (cell.Water != XianxiaWaterType.None)
+            {
+                DrawWaterShorelines(cell, hex, hexRadius * 0.10f, shoreColor, shoreOutline);
+            }
+
+            if (cell.RiverMask != HexDirectionMask.None)
+            {
+                DrawMaskedHexEdges(cell.Coord, cell.RiverMask, hex, hexRadius * 0.34f, riverColor, riverOutline);
+            }
+
+            if (cell.RoadMask != HexDirectionMask.None)
+            {
+                DrawMaskedHexEdges(cell.Coord, cell.RoadMask, hex, hexRadius * 0.18f, roadColor, roadOutline);
+            }
+
+            var overlapMask = cell.RiverMask & cell.RoadMask;
+            if (overlapMask != HexDirectionMask.None)
+            {
+                DrawBridgeOverlays(cell.Coord, overlapMask, hex, hexRadius * 0.24f);
+            }
+
+            if (CountMaskBits(cell.RoadMask) >= 3)
+            {
+                DrawRoadJunction(canvasCenter, hexRadius, roadColor, roadOutline, CountMaskBits(cell.RoadMask));
+            }
+        }
+    }
+
+    private void DrawMaskedHexEdges(
+        HexAxialCoordData coord,
+        HexDirectionMask mask,
+        Vector2[] hex,
+        float thickness,
+        Color fillColor,
+        Color outlineColor)
+    {
+        foreach (var edge in WorldHexEdges)
+        {
+            if ((mask & edge.Mask) == HexDirectionMask.None || !OwnsWorldEdge(coord, edge))
+            {
+                continue;
+            }
+
+            DrawHexEdgeBand(hex[edge.StartIndex], hex[edge.EndIndex], Math.Max(thickness, 1.2f), fillColor, outlineColor);
+        }
+    }
+
+    private bool OwnsWorldEdge(HexAxialCoordData coord, HexEdgeDefinition edge)
+    {
+        var neighborKey = (coord.Q + edge.NeighborQ, coord.R + edge.NeighborR);
+        if (!_xianxiaWorldCenters.ContainsKey(neighborKey))
+        {
+            return true;
+        }
+
+        return coord.R < neighborKey.Item2 || (coord.R == neighborKey.Item2 && coord.Q < neighborKey.Item1);
+    }
+
+    private void DrawHexEdgeBand(Vector2 start, Vector2 end, float thickness, Color fillColor, Color outlineColor)
+    {
+        var tangent = end - start;
+        if (tangent.LengthSquared() <= 0.0001f)
+        {
+            return;
+        }
+
+        tangent = tangent.Normalized();
+        var normal = new Vector2(-tangent.Y, tangent.X);
+        var halfThickness = thickness * 0.5f;
+        var quad =
+            new[]
+            {
+                start + (normal * halfThickness),
+                end + (normal * halfThickness),
+                end - (normal * halfThickness),
+                start - (normal * halfThickness)
+            };
+
+        DrawFilledPolygon(quad, fillColor);
+        DrawPath(quad, outlineColor, Math.Max(0.7f, thickness * 0.18f), true);
+    }
+
+    private void DrawWaterShorelines(XianxiaHexCellData cell, Vector2[] hex, float thickness, Color fillColor, Color outlineColor)
+    {
+        foreach (var edge in WorldHexEdges)
+        {
+            if (!OwnsWorldEdge(cell.Coord, edge) || !IsWaterBoundary(cell.Coord, edge))
+            {
+                continue;
+            }
+
+            DrawHexEdgeBand(hex[edge.StartIndex], hex[edge.EndIndex], Math.Max(thickness, 1.0f), fillColor, outlineColor);
+        }
+    }
+
+    private bool IsWaterBoundary(HexAxialCoordData coord, HexEdgeDefinition edge)
+    {
+        if (!_xianxiaWorldCellLookup.TryGetValue((coord.Q, coord.R), out var cell) || cell.Water == XianxiaWaterType.None)
+        {
+            return false;
+        }
+
+        if (!_xianxiaWorldCellLookup.TryGetValue((coord.Q + edge.NeighborQ, coord.R + edge.NeighborR), out var neighbor))
+        {
+            return true;
+        }
+
+        return neighbor.Water == XianxiaWaterType.None;
+    }
+
+    private void DrawBridgeOverlays(HexAxialCoordData coord, HexDirectionMask overlapMask, Vector2[] hex, float scale)
+    {
+        var plankColor = new Color(0.73f, 0.61f, 0.44f, 0.96f);
+        var plankOutline = new Color(0.38f, 0.27f, 0.16f, 0.94f);
+
+        foreach (var edge in WorldHexEdges)
+        {
+            if ((overlapMask & edge.Mask) == HexDirectionMask.None || !OwnsWorldEdge(coord, edge))
+            {
+                continue;
+            }
+
+            DrawBridgeAtEdge(hex[edge.StartIndex], hex[edge.EndIndex], scale, plankColor, plankOutline);
+        }
+    }
+
+    private void DrawBridgeAtEdge(Vector2 start, Vector2 end, float scale, Color fillColor, Color outlineColor)
+    {
+        var tangent = end - start;
+        if (tangent.LengthSquared() <= 0.0001f)
+        {
+            return;
+        }
+
+        tangent = tangent.Normalized();
+        var normal = new Vector2(-tangent.Y, tangent.X);
+        var midpoint = (start + end) * 0.5f;
+        var halfSpan = Math.Max(scale * 0.38f, 1.8f);
+        var halfHeight = Math.Max(scale * 0.62f, 2.2f);
+
+        for (var offsetIndex = -1; offsetIndex <= 1; offsetIndex++)
+        {
+            var offset = tangent * (offsetIndex * Math.Max(scale * 0.42f, 1.4f));
+            var plankCenter = midpoint + offset;
+            var quad =
+                new[]
+                {
+                    plankCenter + (tangent * halfSpan) + (normal * halfHeight),
+                    plankCenter - (tangent * halfSpan) + (normal * halfHeight),
+                    plankCenter - (tangent * halfSpan) - (normal * halfHeight),
+                    plankCenter + (tangent * halfSpan) - (normal * halfHeight)
+                };
+            DrawFilledPolygon(quad, fillColor);
+            DrawPath(quad, outlineColor, Math.Max(0.7f, scale * 0.12f), true);
+        }
+    }
+
+    private void DrawRoadJunction(Vector2 centerPoint, float radius, Color fillColor, Color outlineColor, int edgeCount)
+    {
+        var junctionRadius = Math.Max(radius * (edgeCount >= 4 ? 0.20f : 0.16f), 1.9f);
+        var hex = BuildHexPolygon(centerPoint, junctionRadius);
+        DrawFilledPolygon(hex, fillColor.Lightened(0.08f));
+        DrawPath(hex, outlineColor, Math.Max(0.7f, junctionRadius * 0.18f), true);
+    }
+
+    private static int CountMaskBits(HexDirectionMask mask)
+    {
+        var bits = 0;
+        foreach (var edge in WorldHexEdges)
+        {
+            if ((mask & edge.Mask) != HexDirectionMask.None)
+            {
+                bits++;
+            }
+        }
+
+        return bits;
+    }
+
     private static Vector2[] BuildPoints(Vector2 center, float unit, System.Collections.Generic.List<StrategicPointDefinition>? points)
     {
         if (points == null || points.Count == 0)
@@ -814,6 +1187,22 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     private static Vector2 ToCanvas(Vector2 center, float unit, float x, float y)
     {
         return center + new Vector2(x * unit, y * unit);
+    }
+
+    private static Vector2[] BuildHexPolygon(Vector2 center, float radius)
+    {
+        var halfWidth = Mathf.Sqrt(3f) * radius * 0.5f;
+        var halfHeight = radius * 0.5f;
+
+        return
+        [
+            center + new Vector2(0f, -radius),
+            center + new Vector2(halfWidth, -halfHeight),
+            center + new Vector2(halfWidth, halfHeight),
+            center + new Vector2(0f, radius),
+            center + new Vector2(-halfWidth, halfHeight),
+            center + new Vector2(-halfWidth, -halfHeight)
+        ];
     }
 
     private void DrawPath(Vector2[] points, Color color, float width, bool closed)
@@ -849,4 +1238,6 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
 
         return Color.FromString(colorHex, fallback);
     }
+
+    private readonly record struct HexEdgeDefinition(HexDirectionMask Mask, int StartIndex, int EndIndex, int NeighborQ, int NeighborR);
 }

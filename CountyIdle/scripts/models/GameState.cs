@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace CountyIdle.Models;
 
@@ -28,13 +29,31 @@ public class GameState
     public double Food { get; set; } = 680;
     public double Wood { get; set; } = 220;
     public double Stone { get; set; } = 140;
+    public double Timber { get; set; } = 0;
+    public double RawStone { get; set; } = 0;
+    public double Clay { get; set; } = 0;
+    public double Brine { get; set; } = 0;
+    public double Herbs { get; set; } = 0;
+    public double HempFiber { get; set; } = 0;
+    public double Reeds { get; set; } = 0;
+    public double Hides { get; set; } = 0;
+    public int ForestryChainLevel { get; set; } = 0;
+    public int MasonryChainLevel { get; set; } = 0;
+    public int MedicinalChainLevel { get; set; } = 0;
+    public int FiberChainLevel { get; set; } = 0;
+    public double FineSalt { get; set; } = 3;
+    public double HerbalMedicine { get; set; } = 2;
+    public double HempCloth { get; set; } = 4;
+    public double Leather { get; set; } = 3;
     public double Gold { get; set; } = 90;
     public double Research { get; set; } = 0;
     public double RareMaterial { get; set; } = 0;
     public double IronOre { get; set; } = 65;
     public double CopperOre { get; set; } = 42;
     public double Coal { get; set; } = 58;
-    public double MetalIngot { get; set; } = 12;
+    public double CopperIngot { get; set; } = 4;
+    public double WroughtIron { get; set; } = 6;
+    public double MetalIngot { get; set; } = 0;
     public double CompositeMaterial { get; set; } = 0;
     public double IndustrialParts { get; set; } = 0;
     public double ConstructionMaterials { get; set; } = 6;
@@ -67,6 +86,7 @@ public class GameState
 
     public int GameMinutes { get; set; } = 0;
     public int HourSettlements { get; set; } = 0;
+    public Dictionary<string, double> DiscreteInventoryProgress { get; set; } = new();
 
     public int GetAssignedPopulation()
     {
@@ -83,11 +103,25 @@ public class GameState
         return Math.Max(Food, 0) +
                Math.Max(Wood, 0) +
                Math.Max(Stone, 0) +
+               Math.Max(Timber, 0) +
+               Math.Max(RawStone, 0) +
+               Math.Max(Clay, 0) +
+               Math.Max(Brine, 0) +
+               Math.Max(Herbs, 0) +
+               Math.Max(HempFiber, 0) +
+               Math.Max(Reeds, 0) +
+               Math.Max(Hides, 0) +
+               Math.Max(FineSalt, 0) +
+               Math.Max(HerbalMedicine, 0) +
+               Math.Max(HempCloth, 0) +
+               Math.Max(Leather, 0) +
                Math.Max(IndustryTools, 0) +
                Math.Max(RareMaterial, 0) +
                Math.Max(IronOre, 0) +
                Math.Max(CopperOre, 0) +
                Math.Max(Coal, 0) +
+               Math.Max(CopperIngot, 0) +
+               Math.Max(WroughtIron, 0) +
                Math.Max(MetalIngot, 0) +
                Math.Max(CompositeMaterial, 0) +
                Math.Max(IndustrialParts, 0) +
@@ -96,6 +130,8 @@ public class GameState
 
     public GameState Clone()
     {
-        return (GameState)MemberwiseClone();
+        var clone = (GameState)MemberwiseClone();
+        clone.DiscreteInventoryProgress = new Dictionary<string, double>(DiscreteInventoryProgress);
+        return clone;
     }
 }

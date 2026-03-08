@@ -89,7 +89,7 @@ public partial class CountyTownMapViewSystem
             QueueRedraw();
         }
 
-        _residentTimeScale = Math.Clamp(timeScale, 1.0f, 2.0f);
+        _residentTimeScale = Math.Clamp(timeScale, 1.0f, 4.0f);
     }
 
     public void RefreshResidents(GameState state)
@@ -310,7 +310,7 @@ public partial class CountyTownMapViewSystem
 
         if (minuteOfDay < schedule.LeaveHomeMinute || minuteOfDay >= schedule.ArriveHomeMinute)
         {
-            var homePosition = GetIsoCellCenter(walker.HomeRoadCell, origin) + verticalOffset + new Vector2(0f, ScaleValue(1.2f));
+            var homePosition = GetTownCellCenter(walker.HomeRoadCell, origin) + verticalOffset + new Vector2(0f, ScaleValue(1.2f));
             return new ResidentPose(homePosition, new Color(1f, 1f, 1f, 0.78f), 0.72f);
         }
 
@@ -323,7 +323,7 @@ public partial class CountyTownMapViewSystem
 
         if (minuteOfDay < schedule.LeaveWorkMinute)
         {
-            var workPosition = GetIsoCellCenter(walker.WorkRoadCell, origin) + verticalOffset;
+            var workPosition = GetTownCellCenter(walker.WorkRoadCell, origin) + verticalOffset;
             return new ResidentPose(workPosition, new Color(1f, 1f, 1f, 0.96f), 0.92f);
         }
 
@@ -336,7 +336,7 @@ public partial class CountyTownMapViewSystem
 
         if (minuteOfDay < schedule.LeaveLeisureMinute)
         {
-            var leisurePosition = GetIsoCellCenter(walker.LeisureRoadCell, origin) + verticalOffset + new Vector2(0f, -ScaleValue(0.6f));
+            var leisurePosition = GetTownCellCenter(walker.LeisureRoadCell, origin) + verticalOffset + new Vector2(0f, -ScaleValue(0.6f));
             return new ResidentPose(leisurePosition, new Color(1f, 1f, 1f, 1.0f), 1.08f);
         }
 
@@ -480,15 +480,15 @@ public partial class CountyTownMapViewSystem
 
         if (routeCells.Count == 1)
         {
-            return GetIsoCellCenter(routeCells[0], origin);
+            return GetTownCellCenter(routeCells[0], origin);
         }
 
         var segmentCount = routeCells.Count - 1;
         var routeProgress = Math.Clamp(progress, 0f, 1f) * segmentCount;
         var segmentIndex = Math.Min((int)Math.Floor(routeProgress), segmentCount - 1);
         var localProgress = routeProgress - segmentIndex;
-        var from = GetIsoCellCenter(routeCells[segmentIndex], origin);
-        var to = GetIsoCellCenter(routeCells[segmentIndex + 1], origin);
+        var from = GetTownCellCenter(routeCells[segmentIndex], origin);
+        var to = GetTownCellCenter(routeCells[segmentIndex + 1], origin);
         return from.Lerp(to, localProgress);
     }
 

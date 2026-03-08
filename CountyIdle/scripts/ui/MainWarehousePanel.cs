@@ -23,6 +23,10 @@ public partial class Main
         _warehousePanel.CraftToolsRequested += OnWarehouseCraftToolsRequested;
         _warehousePanel.BuildWorkshopRequested += OnWarehouseBuildWorkshopRequested;
         _warehousePanel.BuildAdministrationRequested += OnWarehouseBuildAdministrationRequested;
+        _warehousePanel.BuildForestryChainRequested += OnWarehouseBuildForestryChainRequested;
+        _warehousePanel.BuildMasonryChainRequested += OnWarehouseBuildMasonryChainRequested;
+        _warehousePanel.BuildMedicinalChainRequested += OnWarehouseBuildMedicinalChainRequested;
+        _warehousePanel.BuildFiberChainRequested += OnWarehouseBuildFiberChainRequested;
         AddChild(_warehousePanel);
         MoveChild(_warehousePanel, GetChildCount() - 1);
     }
@@ -73,6 +77,26 @@ public partial class Main
         _gameLoop.BuildIndustryBuilding(IndustryBuildingType.Administration);
     }
 
+    private void OnWarehouseBuildForestryChainRequested()
+    {
+        _gameLoop.BuildTierZeroChain(TierZeroMaterialChainType.Forestry);
+    }
+
+    private void OnWarehouseBuildMasonryChainRequested()
+    {
+        _gameLoop.BuildTierZeroChain(TierZeroMaterialChainType.Masonry);
+    }
+
+    private void OnWarehouseBuildMedicinalChainRequested()
+    {
+        _gameLoop.BuildTierZeroChain(TierZeroMaterialChainType.Medicinal);
+    }
+
+    private void OnWarehouseBuildFiberChainRequested()
+    {
+        _gameLoop.BuildTierZeroChain(TierZeroMaterialChainType.Fiber);
+    }
+
     private void UnbindWarehousePanelEvents()
     {
         var warehousePanelButton = GetWarehousePanelButton();
@@ -90,6 +114,10 @@ public partial class Main
         _warehousePanel.CraftToolsRequested -= OnWarehouseCraftToolsRequested;
         _warehousePanel.BuildWorkshopRequested -= OnWarehouseBuildWorkshopRequested;
         _warehousePanel.BuildAdministrationRequested -= OnWarehouseBuildAdministrationRequested;
+        _warehousePanel.BuildForestryChainRequested -= OnWarehouseBuildForestryChainRequested;
+        _warehousePanel.BuildMasonryChainRequested -= OnWarehouseBuildMasonryChainRequested;
+        _warehousePanel.BuildMedicinalChainRequested -= OnWarehouseBuildMedicinalChainRequested;
+        _warehousePanel.BuildFiberChainRequested -= OnWarehouseBuildFiberChainRequested;
     }
 
     private Button? GetWarehousePanelButton()

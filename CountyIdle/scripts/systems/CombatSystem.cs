@@ -17,6 +17,7 @@ public class CombatSystem
     public bool TickHour(GameState state, out string? log)
     {
         log = null;
+        InventoryRules.EndTransaction(state);
 
         if (!state.ExplorationEnabled || state.ElitePopulation <= 0)
         {
@@ -39,8 +40,8 @@ public class CombatSystem
         {
             var goldGain = 18 + state.ExplorationDepth * 3;
             var rareGain = 1 + (_rng.Randf() < 0.35 ? 1 : 0);
-            state.Gold += goldGain;
-            state.RareMaterial += rareGain;
+            var visibleGoldGain = InventoryRules.ApplyDelta(state, nameof(GameState.Gold), goldGain);
+            var visibleRareGain = InventoryRules.ApplyDelta(state, nameof(GameState.RareMaterial), rareGain);
             state.Threat = Math.Clamp(state.Threat - 2.2, 0, 100);
 
             if (_rng.Randf() < 0.38)
@@ -48,7 +49,7 @@ public class CombatSystem
                 state.ExplorationDepth += 1;
             }
 
-            var combatLog = $"探险胜利：获得金币+{goldGain}，稀有素材+{rareGain}，当前层数 {state.ExplorationDepth}。";
+            var combatLog = $"探险胜利：获得金币+{visibleGoldGain}，稀有素材+{visibleRareGain}，当前层数 {state.ExplorationDepth}。";
             if (_equipmentSystem.TryResolveExplorationDrop(state, out var gearLog) && !string.IsNullOrWhiteSpace(gearLog))
             {
                 log = $"{combatLog} {gearLog}";

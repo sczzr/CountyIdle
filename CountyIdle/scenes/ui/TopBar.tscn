@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_topbar"]
 bg_color = Color(0.137255, 0.145098, 0.168627, 1)
@@ -26,10 +26,17 @@ corner_radius_top_right = 2
 corner_radius_bottom_right = 2
 corner_radius_bottom_left = 2
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_progress_fill_day"]
+bg_color = Color(0.333333, 0.47451, 0.619608, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
 [node name="TopBar" type="PanelContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 64)
+custom_minimum_size = Vector2(0, 84)
 theme_override_styles/panel = SubResource("StyleBoxFlat_topbar")
 
 [node name="BarContent" type="MarginContainer" parent="."]
@@ -96,28 +103,63 @@ text = "📜 科技 T1"
 vertical_alignment = 1
 
 [node name="CycleBox" type="VBoxContainer" parent="BarContent/MainRow"]
-custom_minimum_size = Vector2(280, 0)
+custom_minimum_size = Vector2(320, 0)
 layout_mode = 2
-theme_override_constants/separation = 3
+theme_override_constants/separation = 4
 
 [node name="CycleLabel" type="Label" parent="BarContent/MainRow/CycleBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.831373, 0.662745, 0.32549, 1)
-text = "纪元 Ⅰ · 第 1 周期"
+text = "景禾元年 正月 初一"
 horizontal_alignment = 2
 
-[node name="SettlementProgress" type="ProgressBar" parent="BarContent/MainRow/CycleBox"]
+[node name="QuarterProgressRow" type="HBoxContainer" parent="BarContent/MainRow/CycleBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="QuarterTagLabel" type="Label" parent="BarContent/MainRow/CycleBox/QuarterProgressRow"]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.831373, 0.662745, 0.32549, 1)
+theme_override_font_sizes/font_size = 10
+text = "季"
+horizontal_alignment = 1
+
+[node name="QuarterProgress" type="ProgressBar" parent="BarContent/MainRow/CycleBox/QuarterProgressRow"]
 custom_minimum_size = Vector2(0, 5)
 layout_mode = 2
-max_value = 60.0
-value = 24.0
+size_flags_horizontal = 3
+max_value = 100.0
+value = 8.0
 show_percentage = false
 theme_override_styles/background = SubResource("StyleBoxFlat_progress_bg")
 theme_override_styles/fill = SubResource("StyleBoxFlat_progress_fill")
+
+[node name="DayProgressRow" type="HBoxContainer" parent="BarContent/MainRow/CycleBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="DayTagLabel" type="Label" parent="BarContent/MainRow/CycleBox/DayProgressRow"]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.333333, 0.47451, 0.619608, 1)
+theme_override_font_sizes/font_size = 10
+text = "日"
+horizontal_alignment = 1
+
+[node name="DayProgress" type="ProgressBar" parent="BarContent/MainRow/CycleBox/DayProgressRow"]
+custom_minimum_size = Vector2(0, 5)
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 100.0
+value = 8.0
+show_percentage = false
+theme_override_styles/background = SubResource("StyleBoxFlat_progress_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_progress_fill_day")
 
 [node name="CountdownLabel" type="Label" parent="BarContent/MainRow/CycleBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.517647, 0.52549, 0.556863, 1)
 theme_override_font_sizes/font_size = 11
-text = "距离大暑结算还有 59 秒"
+text = "春季 · 立春 · 子时 · 00:00"
 horizontal_alignment = 2

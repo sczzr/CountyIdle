@@ -115,7 +115,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_alert_bad")
 layout_mode = 2
 autowrap_mode = 3
 theme_override_font_sizes/font_size = 12
-text = "[危] 国库空虚\n金币赤字，部分官署与建筑面临停摆风险。"
+text = "[危] 国库空虚\n金币赤字，部分宗务殿与建筑面临停摆风险。"
 
 [node name="AlertItem2" type="PanelContainer" parent="PanelContent/MainVBox/AlertsBox/AlertsVBox/AlertsPadding/AlertsList"]
 layout_mode = 2

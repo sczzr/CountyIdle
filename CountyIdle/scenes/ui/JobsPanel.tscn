@@ -39,11 +39,11 @@ corner_radius_bottom_left = 2
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_farmer"]
 bg_color = Color(0.137255, 0.145098, 0.168627, 1)
-border_width_left = 3
+border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.321569, 0.607843, 0.486275, 1)
+border_color = Color(0.2, 0.207843, 0.243137, 1)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
@@ -55,11 +55,11 @@ content_margin_bottom = 10.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_worker"]
 bg_color = Color(0.137255, 0.145098, 0.168627, 1)
-border_width_left = 3
+border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.517647, 0.52549, 0.556863, 1)
+border_color = Color(0.2, 0.207843, 0.243137, 1)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
@@ -137,7 +137,7 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 11
-text = "📜 官署管理加成"
+text = "📜 宗务殿管理加成"
 
 [node name="BonusValue" type="Label" parent="PanelContent/JobsVBox/IndustryEfficiency/EfficiencyVBox/BonusRow"]
 layout_mode = 2
@@ -168,7 +168,6 @@ text = "🌾 农工岗"
 
 [node name="PriorityLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/FarmerRow/RowVBox/HeaderRow" index="1"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.831373, 0.662745, 0.32549, 1)
 text = "★ 优先保供"
 
 [node name="EliteLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/FarmerRow/RowVBox/ControlRow/EliteBox" index="0"]
@@ -185,7 +184,6 @@ text = "⛏ 匠役岗"
 
 [node name="PriorityLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/WorkerRow/RowVBox/HeaderRow" index="1"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.517647, 0.52549, 0.556863, 1)
 text = "☆ 默认顺位"
 
 [node name="EliteLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/WorkerRow/RowVBox/ControlRow/EliteBox" index="0"]
@@ -202,7 +200,6 @@ text = "💰 商贾岗"
 
 [node name="PriorityLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/MerchantRow/RowVBox/HeaderRow" index="1"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.517647, 0.52549, 0.556863, 1)
 text = "☆ 默认顺位"
 
 [node name="EliteLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/MerchantRow/RowVBox/ControlRow/EliteBox" index="0"]
@@ -215,12 +212,10 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_worker")
 
 [node name="JobLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/ScholarRow/RowVBox/HeaderRow" index="0"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.517647, 0.52549, 0.556863, 1)
 text = "📜 学士岗"
 
 [node name="PriorityLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/ScholarRow/RowVBox/HeaderRow" index="1"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.768627, 0.329412, 0.329412, 1)
 text = "⏸ 停工"
 
 [node name="EliteLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/ScholarRow/RowVBox/ControlRow/EliteBox" index="0"]

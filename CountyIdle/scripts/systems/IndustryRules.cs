@@ -5,11 +5,11 @@ namespace CountyIdle.Systems;
 
 public static class IndustryRules
 {
-    private const int ProductionPerAgricultureBuilding = 16;
-    private const int ProductionPerWorkshopBuilding = 12;
-    private const int ResearchPerBuilding = 10;
-    private const int CommercePerBuilding = 14;
-    private const int ManagementPerBuilding = 8;
+    public const int ProductionPerAgricultureBuilding = 16;
+    public const int ProductionPerWorkshopBuilding = 12;
+    public const int ResearchPerBuilding = 10;
+    public const int CommercePerBuilding = 14;
+    public const int ManagementPerBuilding = 8;
     private const int BaseWarehouseCapacity = 900;
     private const int WarehouseCapacityPerLevel = 260;
     private const int WarehouseCapacityPerAdministration = 45;

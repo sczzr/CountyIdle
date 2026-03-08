@@ -9,7 +9,7 @@ public partial class GameLoop : Node
 {
     private const double BaseRealSecondsPerGameMinute = 1.0;
     private const double MinTimeScale = 1.0;
-    private const double MaxTimeScale = 2.0;
+    private const double MaxTimeScale = 4.0;
     private const int MinutesPerSettlement = 60;
 
     private readonly PopulationSystem _populationSystem = new();
@@ -51,8 +51,12 @@ public partial class GameLoop : Node
     public void LoadState(GameState state)
     {
         _state = state ?? new GameState();
+        InventoryRules.EndTransaction(_state);
         IndustryRules.EnsureDefaults(_state);
         PopulationRules.EnsureDefaults(_state);
+        MaterialRules.EnsureDefaults(_state);
+        _minuteAccumulator = Math.Max(_state.GameMinutes % MinutesPerSettlement, 0);
+        _secondAccumulator = 0;
         ClampJobsToIndustryCapacity(publishLogs: false);
         _eventBus.PublishState(_state.Clone());
     }
@@ -60,7 +64,9 @@ public partial class GameLoop : Node
     public void ResetState()
     {
         _state = new GameState();
+        InventoryRules.EndTransaction(_state);
         PopulationRules.EnsureDefaults(_state);
+        MaterialRules.EnsureDefaults(_state);
         _minuteAccumulator = 0;
         _secondAccumulator = 0;
         _eventBus.PublishLog("已重置到初始状态。");
@@ -111,6 +117,18 @@ public partial class GameLoop : Node
         _eventBus.PublishLog(log);
     }
 
+    public void BuildTierZeroChain(TierZeroMaterialChainType chainType)
+    {
+        if (_industrySystem.TryBuildTierZeroChain(_state, chainType, out var log))
+        {
+            _eventBus.PublishLog(log);
+            _eventBus.PublishState(_state.Clone());
+            return;
+        }
+
+        _eventBus.PublishLog(log);
+    }
+
     public void ExecuteMapDirective(MapDirectiveAction directiveAction)
     {
         if (_mapOperationalLinkSystem.TryExecuteDirective(_state, directiveAction, out var log))
@@ -151,7 +169,7 @@ public partial class GameLoop : Node
 
             if (actualIncrease <= 0)
             {
-                _eventBus.PublishLog($"{GetJobDisplayName(jobType)}受产业容量限制，请先扩建建筑或补充工具。");
+                _eventBus.PublishLog($"{GetJobDisplayName(jobType)}受岗位容量限制，请先扩建相关建筑或补充工具。");
                 return;
             }
 
@@ -199,20 +217,13 @@ public partial class GameLoop : Node
         IndustryRules.SetAssigned(_state, jobType, capacity);
         if (publishLogs)
         {
-            _eventBus.PublishLog($"{GetJobDisplayName(jobType)}已回退至产业容量 {capacity}。");
+            _eventBus.PublishLog($"{GetJobDisplayName(jobType)}已回退至岗位容量 {capacity}。");
         }
     }
 
-    private static string GetJobDisplayName(JobType jobType)
+    private string GetJobDisplayName(JobType jobType)
     {
-        return jobType switch
-        {
-            JobType.Farmer => "产业工人",
-            JobType.Worker => "管理人员",
-            JobType.Merchant => "商业人员",
-            JobType.Scholar => "研发人员",
-            _ => "岗位"
-        };
+        return JobProgressionRules.GetActiveRoleName(_state, jobType);
     }
 
     private void AdvanceOneGameMinute()

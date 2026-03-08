@@ -6,34 +6,34 @@ namespace CountyIdle.Models;
 public sealed class PrefectureCityThemeConfig
 {
     [JsonPropertyName("map_title")]
-    public string MapTitle { get; set; } = "周边郡图（开封城式）";
+    public string MapTitle { get; set; } = "外域态势（云泽外域）";
 
     [JsonPropertyName("city_title")]
-    public string CityTitle { get; set; } = "开封郡城";
+    public string CityTitle { get; set; } = "云泽外城";
 
     [JsonPropertyName("forest_name")]
-    public string ForestName { get; set; } = "青岚森林";
+    public string ForestName { get; set; } = "青岚灵林";
 
     [JsonPropertyName("lake_name")]
-    public string LakeName { get; set; } = "月湖";
+    public string LakeName { get; set; } = "月魄湖";
 
     [JsonPropertyName("mountain_name")]
-    public string MountainName { get; set; } = "东岭山脉";
+    public string MountainName { get; set; } = "东岭灵脉";
 
     [JsonPropertyName("farmland_name")]
-    public string FarmlandName { get; set; } = "汴梁农田";
+    public string FarmlandName { get; set; } = "云泽灵田";
 
     [JsonPropertyName("main_avenue_name")]
-    public string MainAvenueName { get; set; } = "御街";
+    public string MainAvenueName { get; set; } = "问道长街";
 
     [JsonPropertyName("river_gate_name")]
-    public string RiverGateName { get; set; } = "汴河渡口";
+    public string RiverGateName { get; set; } = "云津渡口";
 
     [JsonPropertyName("inner_city_name")]
-    public string InnerCityName { get; set; } = "内城";
+    public string InnerCityName { get; set; } = "内坊";
 
     [JsonPropertyName("outer_wards_name")]
-    public string OuterWardsName { get; set; } = "外郭坊市";
+    public string OuterWardsName { get; set; } = "山门坊市";
 
     [JsonPropertyName("landmark_names")]
     public List<string> LandmarkNames { get; set; } = [];

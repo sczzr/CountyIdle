@@ -70,12 +70,13 @@ public class ResearchSystem
 
     private static string GetTierLog(int tier)
     {
+        var trackName = SectMapSemanticRules.GetTechnologyTrackName();
         return tier switch
         {
-            1 => "郡学突破 T1：农桑改良生效，粮食产量提升 15%。",
-            2 => "郡学突破 T2：工坊账册优化，木石产量 +15%，贸易产金 +10%。",
-            3 => "郡学突破 T3：户籍与医坊协同，人口增长效率提升 20%。",
-            _ => "郡学完成未知突破。"
+            1 => $"{trackName}悟道 T1：灵植改良生效，粮食产量提升 15%。",
+            2 => $"{trackName}悟道 T2：{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Workshop)}账册优化，木石产量 +15%，贸易产金 +10%。",
+            3 => $"{trackName}悟道 T3：宗门谱录协同完善，人口增长效率提升 20%。",
+            _ => $"{trackName}完成未知突破。"
         };
     }
 

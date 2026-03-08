@@ -62,7 +62,7 @@ border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.360784, 0.305882, 0.211765, 1)
+border_color = Color(0.2, 0.207843, 0.243137, 1)
 corner_radius_top_left = 2
 corner_radius_top_right = 2
 corner_radius_bottom_right = 2
@@ -87,10 +87,14 @@ theme_override_constants/separation = 8
 [node name="JobLabel" type="Label" parent="RowVBox/HeaderRow"]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.94902, 0.909804, 0.788235, 1)
 text = "🌾 农工岗"
 
 [node name="PriorityLabel" type="Button" parent="RowVBox/HeaderRow"]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.690196, 0.717647, 0.776471, 1)
+theme_override_colors/font_hover_color = Color(0.690196, 0.717647, 0.776471, 1)
+theme_override_colors/font_pressed_color = Color(0.690196, 0.717647, 0.776471, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_prio")
 theme_override_styles/hover = SubResource("StyleBoxFlat_prio")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_prio")
@@ -139,7 +143,15 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_elite")
 
 [node name="EliteLabel" type="Label" parent="RowVBox/ControlRow/EliteBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.831373, 0.662745, 0.32549, 1)
+theme_override_colors/font_color = Color(0.690196, 0.717647, 0.776471, 1)
 theme_override_font_sizes/font_size = 11
 text = "无领队"
 horizontal_alignment = 1
+
+[node name="DetailLabel" type="Label" parent="RowVBox"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.690196, 0.717647, 0.776471, 1)
+theme_override_font_sizes/font_size = 11
+text = "点击查看岗位规则。"

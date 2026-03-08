@@ -22,9 +22,9 @@ public partial class HUDTopBar : PanelContainer
         _fireLabel = GetNode<Label>("BarPadding/MainRow/ResourceRow/FireLabel");
         _moneyLabel = GetNode<Label>("BarPadding/MainRow/ResourceRow/MoneyLabel");
         _qiLabel = GetNode<Label>("BarPadding/MainRow/ResourceRow/QiLabel");
-        _eraLabel = GetNode<Label>("BarPadding/MainRow/EraLabel");
+        _eraLabel = GetNode<Label>("BarPadding/MainRow/CalendarBox/EraLabel");
 
-        SetResourceText("人口 220", "军心 72", "粮 688", "石 220", "火 98", "钱 325", "真气 11", "纪年：L 第1期间");
+        SetResourceText("人口 220", "军心 72", "粮 688", "石 220", "火 98", "钱 325", "真气 11", "景禾元年 正月 初一 · 立春");
     }
 
     public void SetResourceText(

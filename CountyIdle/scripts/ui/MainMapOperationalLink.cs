@@ -61,7 +61,7 @@ public partial class Main
         var snapshot = _mapOperationalLinkSystem.BuildSnapshot(state, ResolveMapRegionScope(_currentMapTab));
         (_worldMapView as StrategicMapViewSystem)?.RefreshOperationalState(snapshot.WorldStyle);
         (_prefectureMapView as StrategicMapViewSystem)?.RefreshOperationalState(snapshot.PrefectureStyle);
-        _countyTownMapRenderer?.RefreshOperationalState(snapshot.CountyTownStyle);
+        _sectMapRenderer?.RefreshOperationalState(snapshot.CountyTownStyle);
 
         if (_mapDirectiveRow == null || _mapStatusLabel == null || _mapPrimaryActionButton == null || _mapSecondaryActionButton == null)
         {
@@ -107,7 +107,7 @@ public partial class Main
         {
             MapTab.World => MapRegionScope.World,
             MapTab.Prefecture => MapRegionScope.Prefecture,
-            MapTab.CountyTown => MapRegionScope.CountyTown,
+            MapTab.Sect => MapRegionScope.CountyTown,
             _ => MapRegionScope.None
         };
     }

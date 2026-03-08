@@ -316,12 +316,12 @@ public class TownMapGeneratorSystem
             occupiedLotCells.Add(building.Cell);
         }
 
-        AddAnchorGroup(map, random, roadCells, occupiedRoadCells, occupiedLotCells, TownActivityAnchorType.Farmstead, "农田作业点", Math.Clamp(populationHint / 120, 1, 3), eliteHint);
-        AddAnchorGroup(map, random, roadCells, occupiedRoadCells, occupiedLotCells, TownActivityAnchorType.Workshop, "工坊作业点", Math.Clamp(populationHint / 150, 1, 2), eliteHint);
-        AddAnchorGroup(map, random, roadCells, occupiedRoadCells, occupiedLotCells, TownActivityAnchorType.Market, "市集", Math.Clamp(populationHint / 180, 1, 2), eliteHint);
-        AddAnchorGroup(map, random, roadCells, occupiedRoadCells, occupiedLotCells, TownActivityAnchorType.Academy, "学宫", Math.Clamp(1 + (eliteHint / 16), 1, 2), eliteHint);
-        AddAnchorGroup(map, random, roadCells, occupiedRoadCells, occupiedLotCells, TownActivityAnchorType.Administration, "官署", 1, eliteHint);
-        AddAnchorGroup(map, random, roadCells, occupiedRoadCells, occupiedLotCells, TownActivityAnchorType.Leisure, "茶肆", Math.Clamp(housingHint / 180, 1, 3), eliteHint);
+        AddAnchorGroup(map, random, roadCells, occupiedRoadCells, occupiedLotCells, TownActivityAnchorType.Farmstead, SectMapSemanticRules.GetAnchorLabelPrefix(TownActivityAnchorType.Farmstead), Math.Clamp(populationHint / 120, 1, 3), eliteHint);
+        AddAnchorGroup(map, random, roadCells, occupiedRoadCells, occupiedLotCells, TownActivityAnchorType.Workshop, SectMapSemanticRules.GetAnchorLabelPrefix(TownActivityAnchorType.Workshop), Math.Clamp(populationHint / 150, 1, 2), eliteHint);
+        AddAnchorGroup(map, random, roadCells, occupiedRoadCells, occupiedLotCells, TownActivityAnchorType.Market, SectMapSemanticRules.GetAnchorLabelPrefix(TownActivityAnchorType.Market), Math.Clamp(populationHint / 180, 1, 2), eliteHint);
+        AddAnchorGroup(map, random, roadCells, occupiedRoadCells, occupiedLotCells, TownActivityAnchorType.Academy, SectMapSemanticRules.GetAnchorLabelPrefix(TownActivityAnchorType.Academy), Math.Clamp(1 + (eliteHint / 16), 1, 2), eliteHint);
+        AddAnchorGroup(map, random, roadCells, occupiedRoadCells, occupiedLotCells, TownActivityAnchorType.Administration, SectMapSemanticRules.GetAnchorLabelPrefix(TownActivityAnchorType.Administration), 1, eliteHint);
+        AddAnchorGroup(map, random, roadCells, occupiedRoadCells, occupiedLotCells, TownActivityAnchorType.Leisure, SectMapSemanticRules.GetAnchorLabelPrefix(TownActivityAnchorType.Leisure), Math.Clamp(housingHint / 180, 1, 3), eliteHint);
     }
 
     private static void AddAnchorGroup(

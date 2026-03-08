@@ -8,8 +8,11 @@ namespace CountyIdle.Systems;
 
 public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
 {
-    private const float TileHalfWidth = 22f;
-    private const float TileHalfHeight = 11f;
+    private const float TileHalfWidth = 16f;
+    private const float TileHalfHeight = 9f;
+    private const float HexRadius = 18f;
+    private const float HexHalfWidthFactor = 0.8660254f;
+    private const float HexVerticalStepFactor = 1.5f;
     private const float TopPadding = 54f;
     private const float FootprintScale = 0.78f;
     private const float ZoomStep = 0.1f;
@@ -19,6 +22,13 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
     private static readonly Color CourtyardColor = new(0.35f, 0.31f, 0.24f, 1.0f);
     private static readonly Color WaterColor = new(0.20f, 0.34f, 0.43f, 1.0f);
     private static readonly Color GridLineColor = new(0.10f, 0.10f, 0.12f, 0.45f);
+    private static readonly Color RoadCoreColor = new(0.61f, 0.57f, 0.48f, 0.96f);
+    private static readonly Color RoadEdgeColor = new(0.78f, 0.72f, 0.60f, 0.82f);
+    private static readonly Color WaterCoreColor = new(0.27f, 0.45f, 0.56f, 0.94f);
+    private static readonly Color WaterShoreColor = new(0.67f, 0.83f, 0.92f, 0.82f);
+    private static readonly Color WaterRippleColor = new(0.84f, 0.93f, 0.98f, 0.46f);
+    private static readonly Color BuildingFootprintColor = new(0.26f, 0.24f, 0.21f, 0.92f);
+    private static readonly Color BuildingFootprintEdgeColor = new(0.58f, 0.51f, 0.42f, 0.86f);
 
     private static readonly Color WallBrightColor = new(0.86f, 0.78f, 0.64f, 1.0f);
     private static readonly Color WallDarkColor = new(0.72f, 0.64f, 0.52f, 1.0f);
@@ -29,16 +39,16 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
     private static readonly Vector2 AtlasFallbackTileSize = new(96f, 96f);
     private static readonly Vector2 AtlasFallbackAnchor = new(48f, 62f);
 
-    private const string TerrainAtlasTexturePath = "res://assets/tiles/county_reference_isometric/county_reference_isometric_atlas.png";
-    private const string TerrainAtlasManifestPath = "res://assets/tiles/county_reference_isometric/county_reference_isometric_manifest.json";
-    private const string TerrainGroundTexturePath = "res://assets/tiles/chinese_style_seamless/env_grass_meadow_a_seamless.png";
-    private const string TerrainRoadTexturePath = "res://assets/tiles/chinese_style_seamless/env_stone_path_moss_a_seamless.png";
-    private const string TerrainCourtyardTexturePath = "res://assets/tiles/chinese_style_seamless/env_soil_courtyard_a_seamless.png";
-    private const string TerrainWaterTexturePath = "res://assets/tiles/chinese_style_seamless/env_water_pond_lotus_a_seamless.png";
-    private const string WallBrightTexturePath = "res://assets/tiles/chinese_style_seamless_modular/house_wall_plaster_white_seamless.png";
-    private const string WallDarkTexturePath = "res://assets/tiles/chinese_style_seamless_modular/house_wall_lattice_wood_seamless.png";
-    private const string RoofTexturePath = "res://assets/tiles/chinese_style_seamless/house_roof_tile_bluegray_a_seamless.png";
-    private const string GateTexturePath = "res://assets/tiles/building_elements_basic/moon_gate_a.png";
+    private const string TerrainAtlasTexturePath = "";
+    private const string TerrainAtlasManifestPath = "";
+    private const string TerrainGroundTexturePath = "";
+    private const string TerrainRoadTexturePath = "";
+    private const string TerrainCourtyardTexturePath = "";
+    private const string TerrainWaterTexturePath = "";
+    private const string WallBrightTexturePath = "";
+    private const string WallDarkTexturePath = "";
+    private const string RoofTexturePath = "";
+    private const string GateTexturePath = "";
 
     private readonly TownMapGeneratorSystem _generator = new();
     private readonly Dictionary<TownTerrainType, Texture2D?> _terrainTextures = new();
@@ -221,10 +231,10 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         }
 
         var summaryLine =
-            $"县城地图（等距 Tilemap） · {_operationalStyle.TitleSuffix} · 房屋 {_mapData.Buildings.Count} · 场所 {_mapData.ActivityAnchors.Count} · 缩放 {(int)Mathf.Round(_zoom * 100f)}%";
+            $"宗门地图（hex 俯瞰） · {_operationalStyle.TitleSuffix} · 建筑 {_mapData.Buildings.Count} · 场所 {_mapData.ActivityAnchors.Count} · 缩放 {(int)Mathf.Round(_zoom * 100f)}%";
         var interactionLine = _selectedActivityAnchor != null
             ? BuildSelectedAnchorHint(_selectedActivityAnchor)
-            : "左键选中场所查看状态 · 右键取消选中";
+            : SectMapSemanticRules.GetMapInteractionHint();
         var operationalLine = string.IsNullOrWhiteSpace(_operationalStyle.HintText)
             ? interactionLine
             : $"{_operationalStyle.HintText}\n{interactionLine}";
@@ -235,19 +245,18 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
 
     private Vector2 CalculateMapOrigin(TownMapData mapData)
     {
-        var tileHalfWidth = ScaleValue(TileHalfWidth);
-        var tileHalfHeight = ScaleValue(TileHalfHeight);
+        var radius = GetScaledHexRadius();
+        var hexWidth = GetScaledHexWidth();
         var topPadding = ScaleValue(TopPadding);
+        var hasOddRow = mapData.Height > 1;
+        var mapWidth = (mapData.Width * hexWidth) + (hasOddRow ? hexWidth * 0.5f : 0f);
+        var mapHeight = (Math.Max(mapData.Height - 1, 0) * radius * HexVerticalStepFactor) + (radius * 2f);
+        var remainingHeight = Math.Max(Size.Y - topPadding - mapHeight, 0f);
+        var remainingWidth = Math.Max(Size.X - mapWidth, 0f);
+        var offsetX = (remainingWidth * 0.5f) + (hexWidth * 0.5f);
+        var offsetY = topPadding + (remainingHeight * 0.12f) + radius;
 
-        var minX = -(mapData.Height - 1) * tileHalfWidth;
-        var maxX = (mapData.Width - 1) * tileHalfWidth;
-        var mapCenterX = (minX + maxX) * 0.5f;
-
-        var isoHeight = (mapData.Width + mapData.Height - 2) * tileHalfHeight;
-        var remainingHeight = Math.Max(Size.Y - topPadding - isoHeight, 0f);
-        var offsetY = topPadding + (remainingHeight * 0.15f);
-
-        return new Vector2((Size.X * 0.5f) - mapCenterX, offsetY);
+        return new Vector2(offsetX, offsetY);
     }
 
     private bool HandleAnchorSelection(Vector2 localPosition)
@@ -297,11 +306,14 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         return null;
     }
 
-    private Vector2 GetIsoCellCenter(Vector2I cell, Vector2 origin)
+    private Vector2 GetTownCellCenter(Vector2I cell, Vector2 origin)
     {
-        var isoX = (cell.X - cell.Y) * ScaleValue(TileHalfWidth);
-        var isoY = (cell.X + cell.Y) * ScaleValue(TileHalfHeight);
-        return origin + new Vector2(isoX, isoY);
+        var hexWidth = GetScaledHexWidth();
+        var hexVerticalStep = GetScaledHexVerticalStep();
+        var rowOffset = (cell.Y & 1) == 0 ? 0f : hexWidth * 0.5f;
+        var centerX = origin.X + rowOffset + (cell.X * hexWidth);
+        var centerY = origin.Y + (cell.Y * hexVerticalStep);
+        return new Vector2(centerX, centerY);
     }
 
     private void DrawTerrain(TownMapData mapData, Vector2 origin)
@@ -314,8 +326,8 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
 
         foreach (var cell in mapData.EnumerateAllCells())
         {
-            var center = GetIsoCellCenter(cell, origin);
-            var tile = CreateDiamond(center, ScaleValue(TileHalfWidth), ScaleValue(TileHalfHeight));
+            var center = GetTownCellCenter(cell, origin);
+            var tile = CreateHex(center, GetScaledHexRadius() * 0.98f);
             var terrainType = mapData.GetTerrain(cell.X, cell.Y);
 
             DrawTexturedPolygon(
@@ -323,37 +335,126 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
                 _terrainTextures.TryGetValue(terrainType, out var texture) ? texture : null,
                 GetTerrainColor(terrainType));
             DrawGrid(tile);
+            DrawTerrainSemanticOverlay(mapData, cell, center, origin);
         }
     }
 
     private void DrawGrid(Vector2[] tile)
     {
         var lineWidth = Math.Max(0.6f, ScaleValue(0.8f));
-        DrawLine(tile[0], tile[1], GridLineColor, lineWidth);
-        DrawLine(tile[1], tile[2], GridLineColor, lineWidth);
-        DrawLine(tile[2], tile[3], GridLineColor, lineWidth);
-        DrawLine(tile[3], tile[0], GridLineColor, lineWidth);
+        for (var index = 0; index < tile.Length; index++)
+        {
+            DrawLine(tile[index], tile[(index + 1) % tile.Length], GridLineColor, lineWidth);
+        }
+    }
+
+    private void DrawTerrainSemanticOverlay(TownMapData mapData, Vector2I cell, Vector2 center, Vector2 origin)
+    {
+        var terrainType = mapData.GetTerrain(cell.X, cell.Y);
+        switch (terrainType)
+        {
+            case TownTerrainType.Road:
+                DrawRoadSemanticOverlay(mapData, cell, center, origin);
+                break;
+            case TownTerrainType.Water:
+                DrawWaterSemanticOverlay(mapData, cell, center);
+                break;
+        }
+    }
+
+    private void DrawRoadSemanticOverlay(TownMapData mapData, Vector2I cell, Vector2 center, Vector2 origin)
+    {
+        var roadHex = CreateHex(center, GetScaledHexRadius() * 0.44f);
+        DrawColoredPolygon(roadHex, TintColor(RoadCoreColor, _operationalStyle.TerrainTint));
+        DrawClosedPolyline(roadHex, TintColor(RoadEdgeColor, _operationalStyle.TerrainTint), Math.Max(0.8f, ScaleValue(0.9f)));
+
+        var cardinalNeighbors = new[] { Vector2I.Up, Vector2I.Right, Vector2I.Down, Vector2I.Left };
+        foreach (var neighborOffset in cardinalNeighbors)
+        {
+            var neighbor = cell + neighborOffset;
+            if (!IsTerrain(mapData, neighbor, TownTerrainType.Road))
+            {
+                continue;
+            }
+
+            if (neighbor.Y < cell.Y || (neighbor.Y == cell.Y && neighbor.X <= cell.X))
+            {
+                continue;
+            }
+
+            var neighborCenter = GetTownCellCenter(neighbor, origin);
+            DrawRoadConnector(center, neighborCenter);
+        }
+    }
+
+    private void DrawRoadConnector(Vector2 fromCenter, Vector2 toCenter)
+    {
+        var direction = toCenter - fromCenter;
+        var length = direction.Length();
+        if (length <= 0.01f)
+        {
+            return;
+        }
+
+        var normal = direction / length;
+        var perpendicular = new Vector2(-normal.Y, normal.X);
+        var inset = GetScaledHexRadius() * 0.24f;
+        var halfWidth = GetScaledHexRadius() * 0.16f;
+        var start = fromCenter + (normal * inset);
+        var end = toCenter - (normal * inset);
+        var connector = new[]
+        {
+            start + (perpendicular * halfWidth),
+            end + (perpendicular * halfWidth),
+            end - (perpendicular * halfWidth),
+            start - (perpendicular * halfWidth)
+        };
+
+        DrawColoredPolygon(connector, TintColor(RoadCoreColor, _operationalStyle.TerrainTint));
+        DrawOpenPolyline(connector, TintColor(RoadEdgeColor, _operationalStyle.TerrainTint), Math.Max(0.7f, ScaleValue(0.8f)));
+    }
+
+    private void DrawWaterSemanticOverlay(TownMapData mapData, Vector2I cell, Vector2 center)
+    {
+        var waterHex = CreateHex(center, GetScaledHexRadius() * 0.72f);
+        DrawColoredPolygon(waterHex, TintColor(WaterCoreColor, _operationalStyle.TerrainTint));
+
+        if (HasTerrainBoundary(mapData, cell, TownTerrainType.Water))
+        {
+            DrawClosedPolyline(waterHex, TintColor(WaterShoreColor, _operationalStyle.TerrainTint), Math.Max(0.9f, ScaleValue(1.0f)));
+        }
+
+        var rippleHex = CreateHex(center + new Vector2(0f, -ScaleValue(0.9f)), GetScaledHexRadius() * 0.34f);
+        DrawOpenPolyline(rippleHex, TintColor(WaterRippleColor, _operationalStyle.TerrainTint), Math.Max(0.7f, ScaleValue(0.8f)));
     }
 
     private void DrawStructures(TownMapData mapData, Vector2 origin)
     {
-        var sortedStructures = new List<(int Depth, int Priority, TownBuildingData? Building, TownActivityAnchorData? Anchor)>();
+        var sortedStructures = new List<(float DepthY, float DepthX, int Priority, TownBuildingData? Building, TownActivityAnchorData? Anchor)>();
         foreach (var building in mapData.Buildings)
         {
-            sortedStructures.Add((building.Cell.X + building.Cell.Y, 0, building, null));
+            var center = GetTownCellCenter(building.Cell, origin);
+            sortedStructures.Add((center.Y, center.X, 0, building, null));
         }
 
         foreach (var anchor in mapData.ActivityAnchors)
         {
-            sortedStructures.Add((anchor.LotCell.X + anchor.LotCell.Y, 1, null, anchor));
+            var center = GetTownCellCenter(anchor.LotCell, origin);
+            sortedStructures.Add((center.Y, center.X, 1, null, anchor));
         }
 
         sortedStructures.Sort((left, right) =>
         {
-            var depthCompare = left.Depth.CompareTo(right.Depth);
+            var depthCompare = left.DepthY.CompareTo(right.DepthY);
             if (depthCompare != 0)
             {
                 return depthCompare;
+            }
+
+            var xCompare = left.DepthX.CompareTo(right.DepthX);
+            if (xCompare != 0)
+            {
+                return xCompare;
             }
 
             return left.Priority.CompareTo(right.Priority);
@@ -376,7 +477,10 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
 
     private void DrawBuilding(TownBuildingData building, Vector2 origin)
     {
-        var center = GetIsoCellCenter(building.Cell, origin);
+        var center = GetTownCellCenter(building.Cell, origin);
+        var footprintPlate = CreateHex(center + new Vector2(0f, ScaleValue(1.6f)), GetScaledHexRadius() * 0.72f);
+        DrawColoredPolygon(footprintPlate, TintColor(BuildingFootprintColor, _operationalStyle.BuildingTint));
+        DrawPolyline(footprintPlate, TintColor(BuildingFootprintEdgeColor, _operationalStyle.BuildingTint), Math.Max(0.9f, ScaleValue(1.0f)), true);
 
         var footprint = CreateDiamond(center, ScaleValue(TileHalfWidth * FootprintScale), ScaleValue(TileHalfHeight * FootprintScale));
         var baseTop = footprint[0];
@@ -393,7 +497,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         var roofBottom = baseBottom + wallOffset;
         var roofLeft = baseLeft + wallOffset;
 
-        var shadow = CreateDiamond(center + new Vector2(ScaleValue(3f), ScaleValue(4f)), ScaleValue(TileHalfWidth * 0.58f), ScaleValue(TileHalfHeight * 0.54f));
+        var shadow = CreateHex(center + new Vector2(ScaleValue(3f), ScaleValue(4f)), GetScaledHexRadius() * 0.52f);
         DrawColoredPolygon(shadow, new Color(0f, 0f, 0f, 0.18f));
 
         var leftWall = new[] { baseLeft, baseBottom, roofBottom, roofLeft };
@@ -454,16 +558,17 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
     {
         _terrainTextures.Clear();
         _atlasRegions.Clear();
-        _terrainAtlasTexture = LoadTextureOrNull(TerrainAtlasTexturePath);
-        _terrainTextures[TownTerrainType.Ground] = LoadTextureOrNull(TerrainGroundTexturePath);
-        _terrainTextures[TownTerrainType.Road] = LoadTextureOrNull(TerrainRoadTexturePath);
-        _terrainTextures[TownTerrainType.Courtyard] = LoadTextureOrNull(TerrainCourtyardTexturePath);
-        _terrainTextures[TownTerrainType.Water] = LoadTextureOrNull(TerrainWaterTexturePath);
-        _wallBrightTexture = LoadTextureOrNull(WallBrightTexturePath);
-        _wallDarkTexture = LoadTextureOrNull(WallDarkTexturePath);
-        _roofTexture = LoadTextureOrNull(RoofTexturePath);
-        _gateTexture = LoadTextureOrNull(GateTexturePath);
-        LoadAtlasManifest();
+        _terrainAtlasTexture = null;
+        _terrainTextures[TownTerrainType.Ground] = null;
+        _terrainTextures[TownTerrainType.Road] = null;
+        _terrainTextures[TownTerrainType.Courtyard] = null;
+        _terrainTextures[TownTerrainType.Water] = null;
+        _wallBrightTexture = null;
+        _wallDarkTexture = null;
+        _roofTexture = null;
+        _gateTexture = null;
+        _atlasTileSize = AtlasFallbackTileSize;
+        _atlasAnchor = AtlasFallbackAnchor;
     }
 
     private void DrawTexturedPolygon(Vector2[] polygon, Texture2D? texture, Color fallbackColor)
@@ -511,6 +616,37 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
             new Vector2(center.X, center.Y + halfHeight),
             new Vector2(center.X - halfWidth, center.Y)
         ];
+    }
+
+    private static Vector2[] CreateHex(Vector2 center, float radius)
+    {
+        var halfWidth = radius * HexHalfWidthFactor;
+        var halfHeight = radius * 0.5f;
+        return
+        [
+            new Vector2(center.X, center.Y - radius),
+            new Vector2(center.X + halfWidth, center.Y - halfHeight),
+            new Vector2(center.X + halfWidth, center.Y + halfHeight),
+            new Vector2(center.X, center.Y + radius),
+            new Vector2(center.X - halfWidth, center.Y + halfHeight),
+            new Vector2(center.X - halfWidth, center.Y - halfHeight)
+        ];
+    }
+
+    private void DrawClosedPolyline(Vector2[] polygon, Color color, float width)
+    {
+        for (var index = 0; index < polygon.Length; index++)
+        {
+            DrawLine(polygon[index], polygon[(index + 1) % polygon.Length], color, width);
+        }
+    }
+
+    private void DrawOpenPolyline(Vector2[] polygon, Color color, float width)
+    {
+        for (var index = 0; index < polygon.Length - 1; index++)
+        {
+            DrawLine(polygon[index], polygon[index + 1], color, width);
+        }
     }
 
     private void LoadAtlasManifest()
@@ -598,7 +734,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
 
         foreach (var cell in sortedCells)
         {
-            var center = GetIsoCellCenter(cell, origin);
+            var center = GetTownCellCenter(cell, origin);
             DrawAtlasTile(GetTerrainAtlasKey(mapData, cell), center);
 
             var overlayKey = GetOverlayAtlasKey(mapData, cell, buildingCells);
@@ -733,6 +869,21 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         return false;
     }
 
+    private static bool HasTerrainBoundary(TownMapData mapData, Vector2I cell, TownTerrainType terrainType)
+    {
+        var cardinalNeighbors = new[] { Vector2I.Up, Vector2I.Right, Vector2I.Down, Vector2I.Left };
+        foreach (var neighborOffset in cardinalNeighbors)
+        {
+            var neighbor = cell + neighborOffset;
+            if (!mapData.IsInside(neighbor) || mapData.GetTerrain(neighbor.X, neighbor.Y) != terrainType)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private int GetCellHash(Vector2I cell, int salt)
     {
         unchecked
@@ -781,6 +932,21 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
     private float ScaleValue(float baseValue)
     {
         return baseValue * _zoom;
+    }
+
+    private float GetScaledHexRadius()
+    {
+        return ScaleValue(HexRadius);
+    }
+
+    private float GetScaledHexWidth()
+    {
+        return GetScaledHexRadius() * (HexHalfWidthFactor * 2f);
+    }
+
+    private float GetScaledHexVerticalStep()
+    {
+        return GetScaledHexRadius() * HexVerticalStepFactor;
     }
 }
 

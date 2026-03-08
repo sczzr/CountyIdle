@@ -18,7 +18,7 @@ public partial class Main
             return;
         }
 
-        if (_settingsPanel?.Visible == true || _warehousePanel?.Visible == true)
+        if (_settingsPanel?.Visible == true || _warehousePanel?.Visible == true || _saveSlotsPanel?.Visible == true)
         {
             return;
         }
@@ -101,13 +101,17 @@ public partial class Main
 
     private void ExecuteToggleSpeed()
     {
-        SetSpeedMode(!_isSpeedX2);
-        AppendLog(_isSpeedX2 ? "时间倍率切换至 x2。" : "时间倍率切换至 x1。");
+        CycleSpeedScale();
     }
 
     private void ExecuteQuickSave()
     {
-        _saveSystem.Save(_gameLoop.State, out var saveMessage);
+        var success = _saveSystem.Save(_gameLoop.State, out var saveMessage);
+        if (success)
+        {
+            UpdateSavePreviewForSlot(_saveSystem.DefaultSlotKey);
+        }
+
         AppendLog(saveMessage);
     }
 

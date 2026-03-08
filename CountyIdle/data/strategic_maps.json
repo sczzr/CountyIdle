@@ -1,6 +1,6 @@
 {
   "world": {
-    "title": "天下州域",
+    "title": "世界地图",
     "unit_scale": 0.42,
     "grid_lines": 8,
     "regions": [
@@ -111,7 +111,7 @@
     ]
   },
   "prefecture": {
-    "title": "周边郡图",
+    "title": "外域态势",
     "unit_scale": 0.42,
     "grid_lines": 8,
     "outlines": [

@@ -153,12 +153,50 @@ theme_override_constants/separation = 8
 [node name="BuildWorkshopButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/BuildActionRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "扩建工坊"
+text = "扩建炼器坊"
 
 [node name="BuildAdministrationButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/BuildActionRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "扩建官署"
+text = "扩建宗务殿"
+
+[node name="TierZeroTitle" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "T0 材料链"
+
+[node name="TierZeroStatusValue" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection"]
+layout_mode = 2
+text = "T0 链路：林木链 Lv.0 · 石陶链 Lv.0\n盐药链 Lv.0 · 纤皮链 Lv.0"
+autowrap_mode = 3
+
+[node name="TierZeroActionRowTop" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="BuildForestryChainButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/TierZeroActionRowTop"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "林木链"
+
+[node name="BuildMasonryChainButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/TierZeroActionRowTop"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "石陶链"
+
+[node name="TierZeroActionRowBottom" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="BuildMedicinalChainButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/TierZeroActionRowBottom"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "盐药链"
+
+[node name="BuildFiberChainButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/TierZeroActionRowBottom"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "纤皮链"
 
 [node name="FooterRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn"]
 layout_mode = 2

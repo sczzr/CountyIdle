@@ -1,8 +1,7 @@
 [gd_scene format=3 uid="uid://dluw3nntcv37i"]
 
-[ext_resource type="Script" uid="uid://dhr4ncquregwg" path="res://scripts/systems/CountyTownMapViewSystem.cs" id="1_town_map"]
+[ext_resource type="Script" path="res://scripts/systems/SectMapViewSystem.cs" id="1_town_map"]
 [ext_resource type="Script" uid="uid://dih1wr3e2nle6" path="res://scripts/systems/StrategicMapViewSystem.cs" id="2_strategic_map"]
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab"]
 content_margin_left = 14.0
 content_margin_top = 6.0
@@ -113,10 +112,11 @@ theme_override_styles/disabled = SubResource("StyleBoxFlat_tab")
 theme_override_styles/focus = SubResource("StyleBoxFlat_tab")
 toggle_mode = true
 button_pressed = true
-text = "县城俯瞰"
+text = "宗门地图"
 
 [node name="PrefectureMapButton" type="Button" parent="PanelContent/TopTabRow" unique_id=1374543731]
 layout_mode = 2
+visible = false
 theme_override_font_sizes/font_size = 12
 theme_override_styles/normal = SubResource("StyleBoxFlat_tab")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_tab")
@@ -124,7 +124,7 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_tab")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_tab")
 theme_override_styles/focus = SubResource("StyleBoxFlat_tab")
 toggle_mode = true
-text = "周边郡图"
+text = "外域态势"
 
 [node name="WorldMapButton" type="Button" parent="PanelContent/TopTabRow" unique_id=10507057]
 layout_mode = 2
@@ -135,10 +135,11 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_tab")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_tab")
 theme_override_styles/focus = SubResource("StyleBoxFlat_tab")
 toggle_mode = true
-text = "天下州域"
+text = "世界地图"
 
 [node name="EventPanelButton" type="Button" parent="PanelContent/TopTabRow" unique_id=1236762491]
 layout_mode = 2
+visible = false
 theme_override_font_sizes/font_size = 12
 theme_override_styles/normal = SubResource("StyleBoxFlat_tab")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_tab")
@@ -150,6 +151,7 @@ text = "事件面板"
 
 [node name="ReportPanelButton" type="Button" parent="PanelContent/TopTabRow" unique_id=1932674030]
 layout_mode = 2
+visible = false
 theme_override_font_sizes/font_size = 12
 theme_override_styles/normal = SubResource("StyleBoxFlat_tab")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_tab")
@@ -171,6 +173,7 @@ text = "仓储弹窗"
 
 [node name="ExpeditionMapButton" type="Button" parent="PanelContent/TopTabRow" unique_id=1045661255]
 layout_mode = 2
+visible = false
 theme_override_font_sizes/font_size = 12
 theme_override_styles/normal = SubResource("StyleBoxFlat_tab")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_tab")
@@ -282,7 +285,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.517647, 0.52549, 0.556863, 1)
-text = "天下州域（世界地图）"
+text = "世界地图（灵脉与奇观）"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -303,7 +306,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.517647, 0.52549, 0.556863, 1)
-text = "周边郡图（郡级地图）"
+text = "外域态势（隐藏备用视图）"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -323,14 +326,14 @@ script = ExtResource("1_town_map")
 layout_mode = 2
 theme_override_colors/font_color = Color(0.94902, 0.909804, 0.788235, 1)
 theme_override_font_sizes/font_size = 14
-text = "县城地图（2.5D）"
+text = "宗门地图（hex 俯瞰）"
 vertical_alignment = 1
 
 [node name="RegenerateButton" type="Button" parent="PanelContent/MapViewport/MapPages/CountyTownMapView" unique_id=1661132530]
 visible = false
 custom_minimum_size = Vector2(110, 28)
 layout_mode = 2
-text = "重生成"
+text = "重建宗门"
 
 [node name="EventPanelView" type="PanelContainer" parent="PanelContent/MapViewport/MapPages" unique_id=1804476821]
 visible = false

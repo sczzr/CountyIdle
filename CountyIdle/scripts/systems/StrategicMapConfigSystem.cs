@@ -82,8 +82,8 @@ public class StrategicMapConfigSystem
         config.World ??= BuildFallbackWorldDefinition();
         config.Prefecture ??= BuildFallbackPrefectureDefinition();
 
-        NormalizeDefinition(config.World, "world", "天下州域", warnings);
-        NormalizeDefinition(config.Prefecture, "prefecture", "周边郡图", warnings);
+        NormalizeDefinition(config.World, "world", SectMapSemanticRules.GetWorldMapTitle(), warnings);
+        NormalizeDefinition(config.Prefecture, "prefecture", SectMapSemanticRules.GetLegacyPrefectureMapTitle(), warnings);
 
         foreach (var warning in warnings)
         {
@@ -315,7 +315,7 @@ public class StrategicMapConfigSystem
     {
         return new StrategicMapDefinition
         {
-            Title = "天下州域",
+            Title = "世界地图",
             UnitScale = 0.42f,
             GridLines = 8,
             Regions =
@@ -385,7 +385,7 @@ public class StrategicMapConfigSystem
     {
         return new StrategicMapDefinition
         {
-            Title = "周边郡图",
+            Title = "外域态势",
             UnitScale = 0.42f,
             GridLines = 8,
             Outlines =

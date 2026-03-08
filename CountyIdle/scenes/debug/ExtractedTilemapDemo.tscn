@@ -1,13 +1,17 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://bo1loo80y2rpa"]
 
 [ext_resource type="Script" path="res://scripts/tools/ExtractedTilemapDemo.cs" id="1_demo"]
 [ext_resource type="TileSet" path="res://assets/tiles/extracted_tilemap/ExtractedTileSet.tres" id="2_tileset"]
 
-[node name="ExtractedTilemapDemo" type="Node2D"]
+[node name="ExtractedTilemapDemo" type="Node2D" unique_id=188366901]
 script = ExtResource("1_demo")
+AtlasIndexPath = null
+RenderColumns = null
+FallbackTileCount = null
+FallbackAtlasColumns = null
+FallbackTileSize = null
 
-[node name="TileMapLayer" type="TileMapLayer" parent="."]
+[node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=1261941491]
 tile_set = ExtResource("2_tileset")
 
-[node name="Camera2D" type="Camera2D" parent="."]
-enabled = true
+[node name="Camera2D" type="Camera2D" parent="." unique_id=492885350]

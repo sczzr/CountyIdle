@@ -15,6 +15,7 @@ public static class PopulationRules
 
     public static void EnsureDefaults(GameState state)
     {
+        MaterialRules.EnsureDefaults(state);
         state.Population = Math.Max(state.Population, MinimumPopulation);
         state.ChildPopulation = Math.Max(state.ChildPopulation, 0);
         state.AdultPopulation = Math.Max(state.AdultPopulation, 0);
@@ -88,7 +89,19 @@ public static class PopulationRules
 
     public static double GetClothingCoverage(GameState state)
     {
-        return Math.Clamp(state.ClothingStock / Math.Max(state.Population, 1.0), 0.30, 1.0);
+        return Math.Clamp(MaterialRules.GetClothingEquivalent(state) / Math.Max(state.Population, 1.0), 0.30, 1.0);
+    }
+
+    public static double GetSaltCoverage(GameState state)
+    {
+        var saltNeed = Math.Max(state.Population * 0.018, 1.0);
+        return Math.Clamp(state.FineSalt / saltNeed, 0.0, 1.0);
+    }
+
+    public static double GetMedicineCoverage(GameState state)
+    {
+        var medicineNeed = Math.Max((state.SickPopulation * 0.14) + (state.Population * 0.004), 1.0);
+        return Math.Clamp(state.HerbalMedicine / medicineNeed, 0.0, 1.0);
     }
 
     public static double GetCommuteMinutes(GameState state)

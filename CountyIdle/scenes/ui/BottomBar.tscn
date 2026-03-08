@@ -67,7 +67,13 @@ text = "▶ x1"
 custom_minimum_size = Vector2(54, 26)
 layout_mode = 2
 toggle_mode = true
-text = "⏭ x2"
+text = "x2"
+
+[node name="SpeedX4Button" type="Button" parent="BarPadding/MainRow/SpeedRow"]
+custom_minimum_size = Vector2(54, 26)
+layout_mode = 2
+toggle_mode = true
+text = "x4"
 
 [node name="ActionRow" type="HBoxContainer" parent="BarPadding/MainRow"]
 layout_mode = 2

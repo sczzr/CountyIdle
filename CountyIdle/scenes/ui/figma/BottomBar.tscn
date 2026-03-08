@@ -80,15 +80,29 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
-[node name="SpeedButton" type="Button" parent="PanelPadding/MainColumn/ActionRow/LeftActions"]
+[node name="ExploreButton" type="Button" parent="PanelPadding/MainColumn/ActionRow/LeftActions"]
 custom_minimum_size = Vector2(88, 28)
 layout_mode = 2
-text = "▶ 51"
+text = "▶ 探险"
 
-[node name="BurstButton" type="Button" parent="PanelPadding/MainColumn/ActionRow/LeftActions"]
-custom_minimum_size = Vector2(88, 28)
+[node name="SpeedX1Button" type="Button" parent="PanelPadding/MainColumn/ActionRow/LeftActions"]
+custom_minimum_size = Vector2(64, 28)
 layout_mode = 2
-text = "■ ×2"
+toggle_mode = true
+button_pressed = true
+text = "x1"
+
+[node name="SpeedX2Button" type="Button" parent="PanelPadding/MainColumn/ActionRow/LeftActions"]
+custom_minimum_size = Vector2(64, 28)
+layout_mode = 2
+toggle_mode = true
+text = "x2"
+
+[node name="SpeedX4Button" type="Button" parent="PanelPadding/MainColumn/ActionRow/LeftActions"]
+custom_minimum_size = Vector2(64, 28)
+layout_mode = 2
+toggle_mode = true
+text = "x4"
 
 [node name="RightActions" type="HBoxContainer" parent="PanelPadding/MainColumn/ActionRow"]
 layout_mode = 2

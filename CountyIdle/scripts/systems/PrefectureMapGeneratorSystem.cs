@@ -12,6 +12,7 @@ public sealed class PrefectureMapGeneratorSystem
     private const float BorderMinRadiusY = 0.58f;
     private const float BorderMaxRadiusY = 0.90f;
     private const float MainNodeRadius = 6.6f;
+    private const float RawSourceNodeRadius = 4.6f;
     private readonly PrefectureCityThemeConfigSystem _themeConfigSystem = new();
 
     private sealed class EnvironmentAnchors
@@ -65,7 +66,7 @@ public sealed class PrefectureMapGeneratorSystem
         var rivers = BuildRivers(random, countySeat, threatFactor, cityBounds, out var riverGate);
         anchors.RiverGate = riverGate;
         anchors.MainAvenue = new Vector2(countySeat.X, cityBounds.MinY - 0.02f);
-        var nodes = BuildNodeDefinitions(settlements, countySeat, cityBuildings);
+        var nodes = BuildNodeDefinitions(settlements, countySeat, cityBuildings, anchors);
         var labels = BuildLabels(settlements, countySeat, cityBuildings, cityBounds, anchors, theme);
 
         var outline = new StrategicPolylineDefinition
@@ -191,14 +192,14 @@ public sealed class PrefectureMapGeneratorSystem
 
         var defaultLandmarks = new (string fallbackName, Vector2 offset, float radius, string color)[]
         {
-            ("开封府衙", new Vector2(-0.01f, -0.04f), 4.4f, "#FFE6B8FF"),
-            ("州桥市集", new Vector2(0.08f, -0.01f), 4.1f, "#F1D4A7FF"),
-            ("大相国寺", new Vector2(-0.08f, -0.01f), 4.0f, "#E7D9BFFF"),
-            ("汴河码头", new Vector2(0.12f, 0.03f), 3.8f, "#DCC8AEFF"),
-            ("漕运官仓", new Vector2(0.00f, 0.09f), 3.9f, "#D8B88FFF"),
-            ("太学书院", new Vector2(-0.10f, 0.06f), 3.7f, "#D8D8CCFF"),
-            ("军营校场", new Vector2(-0.12f, -0.10f), 3.6f, "#D8C1A4FF"),
-            ("御街坊门", new Vector2(0.00f, -0.12f), 3.7f, "#F2DBB5FF")
+            ("外务殿", new Vector2(-0.01f, -0.04f), 4.4f, "#FFE6B8FF"),
+            ("云津坊市", new Vector2(0.08f, -0.01f), 4.1f, "#F1D4A7FF"),
+            ("观星台", new Vector2(-0.08f, -0.01f), 4.0f, "#E7D9BFFF"),
+            ("灵舟渡口", new Vector2(0.12f, 0.03f), 3.8f, "#DCC8AEFF"),
+            ("储灵库", new Vector2(0.00f, 0.09f), 3.9f, "#D8B88FFF"),
+            ("藏经别院", new Vector2(-0.10f, 0.06f), 3.7f, "#D8D8CCFF"),
+            ("演武校场", new Vector2(-0.12f, -0.10f), 3.6f, "#D8C1A4FF"),
+            ("山门牌坊", new Vector2(0.00f, -0.12f), 3.7f, "#F2DBB5FF")
         };
 
         for (var landmarkIndex = 0; landmarkIndex < defaultLandmarks.Length; landmarkIndex++)
@@ -223,7 +224,7 @@ public sealed class PrefectureMapGeneratorSystem
         var origin = countySeat - new Vector2(((wardCols - 1) * spacingX) * 0.5f, ((wardRows - 1) * spacingY) * 0.5f);
         var wardNamePool = theme.WardNamePool.Count > 0
             ? theme.WardNamePool
-            : new List<string> { "里坊民居", "工匠作坊", "沿街商铺", "茶肆客栈", "盐引商号", "漕运仓铺" };
+            : new List<string> { "外门居舍", "炼器作坊", "沿街商铺", "论道茶寮", "行商栈舍", "储运库房" };
         var wardColorPool = new[] { "#CDAA7AD0", "#C8A67AD0", "#D7B78ED0", "#C6A47BD0", "#D2B58ED0", "#BE9970D0" };
 
         for (var row = 0; row < wardRows; row++)
@@ -540,7 +541,8 @@ public sealed class PrefectureMapGeneratorSystem
     private static List<StrategicNodeDefinition> BuildNodeDefinitions(
         List<Vector2> settlements,
         Vector2 countySeat,
-        List<CityBuildingNode> cityBuildings)
+        List<CityBuildingNode> cityBuildings,
+        EnvironmentAnchors anchors)
     {
         var nodes = new List<StrategicNodeDefinition>
         {
@@ -553,6 +555,14 @@ public sealed class PrefectureMapGeneratorSystem
                 Kind = "city"
             }
         };
+
+        nodes.AddRange(
+        [
+            CreateRawSourceNode(anchors.Forest, "#6F985BFF"),
+            CreateRawSourceNode(anchors.Lake, "#70A8DDFF"),
+            CreateRawSourceNode(anchors.Mountain, "#A7ABB5FF"),
+            CreateRawSourceNode(anchors.Farmland, "#C3B368FF")
+        ]);
 
         for (var index = 0; index < settlements.Count; index++)
         {
@@ -582,6 +592,18 @@ public sealed class PrefectureMapGeneratorSystem
         return nodes;
     }
 
+    private static StrategicNodeDefinition CreateRawSourceNode(Vector2 position, string color)
+    {
+        return new StrategicNodeDefinition
+        {
+            X = position.X,
+            Y = position.Y,
+            Radius = RawSourceNodeRadius,
+            Color = color,
+            Kind = "raw_source"
+        };
+    }
+
     private static List<StrategicLabelDefinition> BuildLabels(
         List<Vector2> settlements,
         Vector2 countySeat,
@@ -598,10 +620,10 @@ public sealed class PrefectureMapGeneratorSystem
         var labels = new List<StrategicLabelDefinition>
         {
             new() { X = countySeat.X - 0.04f, Y = countySeat.Y - 0.13f, Text = theme.CityTitle, Color = "#FFE8BDFF", FontSize = 14, MinZoom = 0.6f },
-            new() { X = anchors.Forest.X, Y = anchors.Forest.Y, Text = theme.ForestName, Color = "#DAECD0FF", FontSize = 12, MinZoom = 0.65f },
-            new() { X = anchors.Lake.X, Y = anchors.Lake.Y, Text = theme.LakeName, Color = "#D8ECFFFF", FontSize = 12, MinZoom = 0.65f },
-            new() { X = anchors.Mountain.X, Y = anchors.Mountain.Y, Text = theme.MountainName, Color = "#E1E3EAFF", FontSize = 12, MinZoom = 0.65f },
-            new() { X = anchors.Farmland.X, Y = anchors.Farmland.Y, Text = theme.FarmlandName, Color = "#E9F1C8FF", FontSize = 12, MinZoom = 0.65f },
+            new() { X = anchors.Forest.X + 0.03f, Y = anchors.Forest.Y - 0.02f, Text = ComposeRawSourceLabel(theme.ForestName, "林木 / 药材 / 皮毛"), Color = "#DAECD0FF", FontSize = 12, MinZoom = 0.72f },
+            new() { X = anchors.Lake.X + 0.03f, Y = anchors.Lake.Y + 0.02f, Text = ComposeRawSourceLabel(theme.LakeName, "卤水 / 芦苇 / 黏土"), Color = "#D8ECFFFF", FontSize = 12, MinZoom = 0.72f },
+            new() { X = anchors.Mountain.X + 0.03f, Y = anchors.Mountain.Y - 0.02f, Text = ComposeRawSourceLabel(theme.MountainName, "原石 / 铜矿 / 铁矿"), Color = "#E1E3EAFF", FontSize = 12, MinZoom = 0.72f },
+            new() { X = anchors.Farmland.X + 0.03f, Y = anchors.Farmland.Y + 0.02f, Text = ComposeRawSourceLabel(theme.FarmlandName, "麻料"), Color = "#E9F1C8FF", FontSize = 12, MinZoom = 0.72f },
             new() { X = anchors.MainAvenue.X - 0.02f, Y = anchors.MainAvenue.Y, Text = theme.MainAvenueName, Color = "#F6DCAEFF", FontSize = 12, MinZoom = 0.85f },
             new() { X = anchors.RiverGate.X + 0.02f, Y = anchors.RiverGate.Y + 0.01f, Text = theme.RiverGateName, Color = "#CBE5FFFF", FontSize = 11, MinZoom = 0.9f },
             new() { X = cityBounds.MinX - 0.02f, Y = cityBounds.MinY - 0.02f, Text = theme.InnerCityName, Color = "#EBD2ADFF", FontSize = 11, MinZoom = 0.9f },
@@ -645,6 +667,16 @@ public sealed class PrefectureMapGeneratorSystem
         }
 
         return labels;
+    }
+
+    private static string ComposeRawSourceLabel(string regionName, string sourceText)
+    {
+        if (string.IsNullOrWhiteSpace(regionName))
+        {
+            return sourceText;
+        }
+
+        return $"{regionName} · {sourceText}";
     }
 
     private static CityBounds ComputeCityBounds(List<CityBuildingNode> cityBuildings, Vector2 countySeat)

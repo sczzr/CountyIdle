@@ -19,7 +19,11 @@ public partial class CountyTownMapViewSystem
     {
         var baseColor = GetAnchorColor(anchor.AnchorType);
         var footprintScale = GetAnchorFootprintScale(anchor.AnchorType);
-        var center = GetIsoCellCenter(anchor.LotCell, origin);
+        var center = GetTownCellCenter(anchor.LotCell, origin);
+        var foundationRadius = GetScaledHexRadius() * Mathf.Clamp(footprintScale * 0.98f, 0.54f, 0.82f);
+        var foundation = CreateHex(center + new Vector2(0f, ScaleValue(1.4f)), foundationRadius);
+        DrawColoredPolygon(foundation, baseColor.Darkened(0.42f) * 0.92f);
+        DrawPolyline(foundation, baseColor.Lightened(0.12f), Math.Max(0.8f, ScaleValue(1.0f)), true);
         var footprint = CreateDiamond(center, ScaleValue(TileHalfWidth * footprintScale), ScaleValue(TileHalfHeight * footprintScale));
         var baseTop = footprint[0];
         var baseRight = footprint[1];
@@ -37,15 +41,14 @@ public partial class CountyTownMapViewSystem
 
         if (isSelected)
         {
-            var selectionFootprint = CreateDiamond(
+            var selectionFootprint = CreateHex(
                 center + new Vector2(0f, -ScaleValue(1.2f)),
-                ScaleValue(TileHalfWidth * footprintScale * 1.24f),
-                ScaleValue(TileHalfHeight * footprintScale * 1.18f));
+                foundationRadius * 1.18f);
             DrawColoredPolygon(selectionFootprint, AnchorSelectionGlowColor);
             DrawPolyline(selectionFootprint, baseColor.Lightened(0.28f), Math.Max(1.2f, ScaleValue(1.6f)), true);
         }
 
-        var shadow = CreateDiamond(center + new Vector2(ScaleValue(2.4f), ScaleValue(3.6f)), ScaleValue(TileHalfWidth * footprintScale * 0.78f), ScaleValue(TileHalfHeight * footprintScale * 0.70f));
+        var shadow = CreateHex(center + new Vector2(ScaleValue(2.4f), ScaleValue(3.6f)), foundationRadius * 0.76f);
         DrawColoredPolygon(shadow, AnchorShadowColor);
 
         var wallBright = WallBrightColor.Lerp(baseColor, 0.18f);
@@ -91,7 +94,7 @@ public partial class CountyTownMapViewSystem
 
     private void DrawAnchorPath(TownActivityAnchorData anchor, Vector2 origin, Vector2 baseBottom, Color baseColor)
     {
-        var roadCenter = GetIsoCellCenter(anchor.RoadCell, origin) + new Vector2(0f, ScaleValue(0.8f));
+        var roadCenter = GetTownCellCenter(anchor.RoadCell, origin) + new Vector2(0f, ScaleValue(0.8f));
         var entrancePoint = GetAnchorEntrancePoint(anchor, baseBottom);
         DrawLine(roadCenter, entrancePoint, baseColor * 0.50f, Math.Max(0.9f, ScaleValue(1.3f)));
         DrawCircle(entrancePoint, Math.Max(0.9f, ScaleValue(1.6f)), baseColor * 0.78f);
@@ -105,7 +108,7 @@ public partial class CountyTownMapViewSystem
 
     private string BuildSelectedAnchorHint(TownActivityAnchorData anchor)
     {
-        var anchorTypeText = GetAnchorTypeText(anchor.AnchorType);
+        var anchorTypeText = SectMapSemanticRules.GetAnchorTypeText(anchor.AnchorType);
         var statusText = GetSelectedAnchorStatusText(anchor);
         var assignedResidents = GetAssignedResidentCount(anchor);
         var presentResidents = GetPresentResidentCount(anchor);
@@ -118,13 +121,13 @@ public partial class CountyTownMapViewSystem
     {
         if (anchor.AnchorType == TownActivityAnchorType.Administration)
         {
-            return "政务节点";
+            return SectMapSemanticRules.GetAdministrationStatusText();
         }
 
         var assignedResidents = GetAssignedResidentCount(anchor);
         if (assignedResidents <= 0)
         {
-            return anchor.AnchorType == TownActivityAnchorType.Leisure ? "清闲中" : "暂无可视常驻居民";
+            return SectMapSemanticRules.GetEmptyResidentStatusText(anchor.AnchorType);
         }
 
         var presentResidents = GetPresentResidentCount(anchor);
@@ -134,42 +137,28 @@ public partial class CountyTownMapViewSystem
         {
             if (presentResidents > 0)
             {
-                return "热闹中";
+                return SectMapSemanticRules.GetLeisureBusyStatusText();
             }
 
             if (inboundResidents > 0)
             {
-                return "有人前往";
+                return SectMapSemanticRules.GetLeisureInboundStatusText();
             }
 
-            return "清闲中";
+            return SectMapSemanticRules.GetLeisureIdleStatusText();
         }
 
         if (presentResidents > 0)
         {
-            return "开工中";
+            return SectMapSemanticRules.GetWorkBusyStatusText();
         }
 
         if (inboundResidents > 0)
         {
-            return "上工路上";
+            return SectMapSemanticRules.GetWorkInboundStatusText();
         }
 
-        return "已收工";
-    }
-
-    private static string GetAnchorTypeText(TownActivityAnchorType anchorType)
-    {
-        return anchorType switch
-        {
-            TownActivityAnchorType.Farmstead => "农田",
-            TownActivityAnchorType.Workshop => "工坊",
-            TownActivityAnchorType.Market => "市集",
-            TownActivityAnchorType.Academy => "学宫",
-            TownActivityAnchorType.Administration => "官署",
-            TownActivityAnchorType.Leisure => "茶肆",
-            _ => "场所"
-        };
+        return SectMapSemanticRules.GetWorkIdleStatusText();
     }
 
     private TownActivityAnchorData? PickActivityAnchorAt(Vector2 localPosition, Vector2 origin)
@@ -180,7 +169,8 @@ public partial class CountyTownMapViewSystem
         }
 
         TownActivityAnchorData? selectedAnchor = null;
-        var selectedDepth = int.MinValue;
+        var selectedDepth = float.MinValue;
+        var selectedDepthX = float.MinValue;
 
         foreach (var anchor in _mapData.ActivityAnchors)
         {
@@ -189,10 +179,12 @@ public partial class CountyTownMapViewSystem
                 continue;
             }
 
-            var depth = anchor.LotCell.X + anchor.LotCell.Y;
-            if (depth >= selectedDepth)
+            var center = GetTownCellCenter(anchor.LotCell, origin);
+            if (center.Y > selectedDepth ||
+                (Mathf.IsEqualApprox(center.Y, selectedDepth) && center.X >= selectedDepthX))
             {
-                selectedDepth = depth;
+                selectedDepth = center.Y;
+                selectedDepthX = center.X;
                 selectedAnchor = anchor;
             }
         }
@@ -202,11 +194,8 @@ public partial class CountyTownMapViewSystem
 
     private bool IsPointInsideActivityAnchor(TownActivityAnchorData anchor, Vector2 origin, Vector2 point)
     {
-        var center = GetIsoCellCenter(anchor.LotCell, origin) + new Vector2(0f, -ScaleValue(anchor.Floors == 1 ? 7f : 10f));
-        var hitbox = CreateDiamond(
-            center,
-            ScaleValue(TileHalfWidth * GetAnchorFootprintScale(anchor.AnchorType) * 1.12f),
-            ScaleValue(TileHalfHeight * 1.90f));
+        var center = GetTownCellCenter(anchor.LotCell, origin) + new Vector2(0f, -ScaleValue(anchor.Floors == 1 ? 7f : 10f));
+        var hitbox = CreateHex(center, GetScaledHexRadius() * Mathf.Clamp(GetAnchorFootprintScale(anchor.AnchorType) * 1.16f, 0.62f, 0.92f));
         return Geometry2D.IsPointInPolygon(point, hitbox);
     }
 

@@ -28,7 +28,6 @@
 | `han-courtyard-theme` | FC/BL（无 CP） | 历史 | 与 `han-courtyard-textured-theme` 合并 |
 | `han-courtyard-textured-theme` | FC/BL（无 CP） | 稳定 | 作为主题最终版 |
 | `lantern-hover-pulse` | FC/BL（无 CP） | 稳定 | 并入主题最终版附录 |
-| `chinese-seamless-tileset-atlas` | FC（无 CP/BL） | 资产交付 | 保持独立资产 topic |
 | `building-elements-pack` | FC（无 CP/BL） | 资产交付 | 保持独立资产 topic |
 | `client-settings-panel` | FC（无 CP/BL） | 已实现 | 下次涉及机制联动时补 CP/BL |
 | `prefecture-village-style-generator` | FC/CP/BL（本次新增） | 演进 | 并入战略地图史诗链路，后续扩展可复用同 topic |
