@@ -112,7 +112,7 @@ theme_override_styles/disabled = SubResource("StyleBoxFlat_tab")
 theme_override_styles/focus = SubResource("StyleBoxFlat_tab")
 toggle_mode = true
 button_pressed = true
-text = "宗门地图"
+text = "天衍峰山门"
 
 [node name="PrefectureMapButton" type="Button" parent="PanelContent/TopTabRow" unique_id=1374543731]
 layout_mode = 2
@@ -124,7 +124,7 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_tab")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_tab")
 theme_override_styles/focus = SubResource("StyleBoxFlat_tab")
 toggle_mode = true
-text = "外域态势"
+text = "江陵府外域"
 
 [node name="WorldMapButton" type="Button" parent="PanelContent/TopTabRow" unique_id=10507057]
 layout_mode = 2
@@ -170,6 +170,26 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_tab")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_tab")
 theme_override_styles/focus = SubResource("StyleBoxFlat_tab")
 text = "仓储弹窗"
+
+[node name="TaskPanelButton" type="Button" parent="PanelContent/TopTabRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_tab")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_tab")
+theme_override_styles/focus = SubResource("StyleBoxFlat_tab")
+text = "宗主中枢"
+
+[node name="DisciplePanelButton" type="Button" parent="PanelContent/TopTabRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_tab")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_tab")
+theme_override_styles/focus = SubResource("StyleBoxFlat_tab")
+text = "弟子谱"
 
 [node name="ExpeditionMapButton" type="Button" parent="PanelContent/TopTabRow" unique_id=1045661255]
 layout_mode = 2
@@ -306,7 +326,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.517647, 0.52549, 0.556863, 1)
-text = "外域态势（隐藏备用视图）"
+text = "江陵府外域（隐藏备用视图）"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -326,14 +346,14 @@ script = ExtResource("1_town_map")
 layout_mode = 2
 theme_override_colors/font_color = Color(0.94902, 0.909804, 0.788235, 1)
 theme_override_font_sizes/font_size = 14
-text = "宗门地图（hex 俯瞰）"
+text = "浮云宗·天衍峰（hex 俯瞰）"
 vertical_alignment = 1
 
 [node name="RegenerateButton" type="Button" parent="PanelContent/MapViewport/MapPages/CountyTownMapView" unique_id=1661132530]
 visible = false
 custom_minimum_size = Vector2(110, 28)
 layout_mode = 2
-text = "重建宗门"
+text = "重绘天衍峰"
 
 [node name="EventPanelView" type="PanelContainer" parent="PanelContent/MapViewport/MapPages" unique_id=1804476821]
 visible = false
@@ -429,7 +449,7 @@ text = "● 运转正常"
 layout_mode = 2
 theme_override_colors/font_color = Color(0.517647, 0.52549, 0.556863, 1)
 theme_override_font_sizes/font_size = 12
-text = "满载产出：+5 木材/s
+text = "满载产出：+5 灵木料/s
 劳工：20 / 20"
 autowrap_mode = 3
 

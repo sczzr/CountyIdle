@@ -72,11 +72,14 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
     private bool _isInitialized;
     private MapViewStyle _operationalStyle = new();
     private TownActivityAnchorData? _selectedActivityAnchor;
+    private int? _selectedResidentDiscipleId;
 
     public float Zoom => _zoom;
     public float MinZoom => 0.6f;
     public float MaxZoom => 2.2f;
     public float DefaultZoom => 1.0f;
+
+    public event Action<int, JobType?>? DiscipleInspectionRequested;
 
     public override void _Ready()
     {
@@ -112,16 +115,17 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         }
         else if (mouseButton.ButtonIndex == MouseButton.Left)
         {
-            if (HandleAnchorSelection(mouseButton.Position))
+            if (HandleResidentSelection(mouseButton.Position) || HandleAnchorSelection(mouseButton.Position))
             {
                 GetViewport().SetInputAsHandled();
             }
         }
         else if (mouseButton.ButtonIndex == MouseButton.Right)
         {
-            if (_selectedActivityAnchor != null)
+            if (_selectedActivityAnchor != null || _selectedResidentDiscipleId.HasValue)
             {
                 _selectedActivityAnchor = null;
+                _selectedResidentDiscipleId = null;
                 UpdateMapHint();
                 QueueRedraw();
                 GetViewport().SetInputAsHandled();
@@ -231,10 +235,13 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         }
 
         var summaryLine =
-            $"宗门地图（hex 俯瞰） · {_operationalStyle.TitleSuffix} · 建筑 {_mapData.Buildings.Count} · 场所 {_mapData.ActivityAnchors.Count} · 缩放 {(int)Mathf.Round(_zoom * 100f)}%";
-        var interactionLine = _selectedActivityAnchor != null
-            ? BuildSelectedAnchorHint(_selectedActivityAnchor)
-            : SectMapSemanticRules.GetMapInteractionHint();
+            $"浮云宗·天衍峰（hex 俯瞰） · {_operationalStyle.TitleSuffix} · 建筑 {_mapData.Buildings.Count} · 场所 {_mapData.ActivityAnchors.Count} · 缩放 {(int)Mathf.Round(_zoom * 100f)}%";
+        var selectedResidentHint = TryBuildSelectedResidentHint();
+        var interactionLine = !string.IsNullOrWhiteSpace(selectedResidentHint)
+            ? selectedResidentHint!
+            : _selectedActivityAnchor != null
+                ? BuildSelectedAnchorHint(_selectedActivityAnchor)
+                : SectMapSemanticRules.GetMapInteractionHint();
         var operationalLine = string.IsNullOrWhiteSpace(_operationalStyle.HintText)
             ? interactionLine
             : $"{_operationalStyle.HintText}\n{interactionLine}";
@@ -271,6 +278,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         if (selectedAnchor != null)
         {
             _selectedActivityAnchor = selectedAnchor;
+            TryInspectAnchorResidents(selectedAnchor);
             UpdateMapHint();
             QueueRedraw();
             return true;
@@ -304,6 +312,11 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         }
 
         return null;
+    }
+
+    private void RequestDiscipleInspection(int discipleId, JobType? preferredJobType)
+    {
+        DiscipleInspectionRequested?.Invoke(discipleId, preferredJobType);
     }
 
     private Vector2 GetTownCellCenter(Vector2I cell, Vector2 origin)

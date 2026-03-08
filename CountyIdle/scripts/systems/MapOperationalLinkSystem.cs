@@ -11,7 +11,10 @@ public class MapOperationalLinkSystem
     private const int ReliefFoodCost = 70;
     private const int ReliefGoldCost = 6;
     private const int StreetRepairWoodCost = 24;
+    private const int StreetRepairGoldCost = 6;
+    private const int StreetRepairContributionCost = 8;
     private const int NightWatchGoldCost = 10;
+    private const int NightWatchContributionCost = 6;
     private const double MaximumCommuteReductionBonusKm = 0.80;
     private const double MaximumRoadMobilityBonus = 0.18;
 
@@ -34,7 +37,7 @@ public class MapOperationalLinkSystem
             case MapRegionScope.World:
                 snapshot.ActiveStatusText = $"{SectMapSemanticRules.GetWorldMapTitle()}：{worldStyle.HintText}";
                 snapshot.ActiveStatusColor = worldStyle.AccentColor;
-                snapshot.PrimaryChoice = CreateDisabledChoice("世界总览", "切换到宗门地图后可执行驻地调度。");
+                snapshot.PrimaryChoice = CreateDisabledChoice("世界总览", "切换到天衍峰山门图后可执行峰内调度。");
                 snapshot.SecondaryChoice = CreateDisabledChoice("暂无调度", "世界图当前只展示全局态势。");
                 break;
             case MapRegionScope.Prefecture:
@@ -44,7 +47,7 @@ public class MapOperationalLinkSystem
                 snapshot.SecondaryChoice = BuildReliefChoice(state);
                 break;
             case MapRegionScope.CountyTown:
-                snapshot.ActiveStatusText = $"宗门地图：{countyTownStyle.HintText}";
+                snapshot.ActiveStatusText = $"浮云宗·天衍峰：{countyTownStyle.HintText}";
                 snapshot.ActiveStatusColor = countyTownStyle.AccentColor;
                 snapshot.PrimaryChoice = BuildStreetRepairChoice(state);
                 snapshot.SecondaryChoice = BuildNightWatchChoice(state);
@@ -112,9 +115,11 @@ public class MapOperationalLinkSystem
                 return true;
 
             case MapDirectiveAction.RepairStreets:
-                if (state.Wood < StreetRepairWoodCost)
+                if (state.Wood < StreetRepairWoodCost ||
+                    state.Gold < StreetRepairGoldCost ||
+                    state.ContributionPoints < StreetRepairContributionCost)
                 {
-                    log = "修整街坊失败：木材不足。";
+                    log = "修整街坊失败：木材、灵石或贡献点不足。";
                     return false;
                 }
 
@@ -126,27 +131,31 @@ public class MapOperationalLinkSystem
                 }
 
                 var streetWoodDelta = InventoryRules.ApplyDelta(state, nameof(GameState.Wood), -StreetRepairWoodCost);
+                var streetGoldDelta = InventoryRules.ApplyDelta(state, nameof(GameState.Gold), -StreetRepairGoldCost);
+                var streetContributionDelta = InventoryRules.ApplyDelta(state, nameof(GameState.ContributionPoints), -StreetRepairContributionCost);
                 state.MapCommuteReductionBonusKm = Math.Min(state.MapCommuteReductionBonusKm + 0.08, MaximumCommuteReductionBonusKm);
                 state.MapRoadMobilityBonus = Math.Min(state.MapRoadMobilityBonus + 0.02, MaximumRoadMobilityBonus);
                 state.Happiness = Math.Min(state.Happiness + 2.0, 100.0);
                 PopulationRules.RefreshDynamicCommute(state);
                 log =
-                    $"修整坊路：木 {streetWoodDelta:+#;-#;0}，宗门通勤压缩到 {state.AverageCommuteDistanceKm:0.00}km，民心提升至 {state.Happiness:0.#}。";
+                    $"修整坊路：木 {streetWoodDelta:+#;-#;0}、灵石 {streetGoldDelta:+#;-#;0}、贡献 {streetContributionDelta:+#;-#;0}，宗门通勤压缩到 {state.AverageCommuteDistanceKm:0.00}km，民心提升至 {state.Happiness:0.#}。";
                 return true;
 
             case MapDirectiveAction.NightWatch:
-                if (state.Gold < NightWatchGoldCost)
+                if (state.Gold < NightWatchGoldCost ||
+                    state.ContributionPoints < NightWatchContributionCost)
                 {
-                    log = "夜巡清巷失败：金钱不足。";
+                    log = "夜巡清巷失败：灵石或贡献点不足。";
                     return false;
                 }
 
                 var nightWatchGoldDelta = InventoryRules.ApplyDelta(state, nameof(GameState.Gold), -NightWatchGoldCost);
+                var nightWatchContributionDelta = InventoryRules.ApplyDelta(state, nameof(GameState.ContributionPoints), -NightWatchContributionCost);
                 state.Threat = Math.Max(state.Threat - 4.0, 0.0);
                 state.Happiness = Math.Min(state.Happiness + 1.0, 100.0);
                 PopulationRules.RefreshDynamicCommute(state);
                 log =
-                    $"夜巡清巷：金 {nightWatchGoldDelta:+#;-#;0}，宗门威胁降至 {state.Threat:0.#}% ，民心回升至 {state.Happiness:0.#}。";
+                    $"夜巡清巷：灵石 {nightWatchGoldDelta:+#;-#;0}、贡献 {nightWatchContributionDelta:+#;-#;0}，宗门威胁降至 {state.Threat:0.#}% ，民心回升至 {state.Happiness:0.#}。";
                 return true;
 
             default:
@@ -213,9 +222,9 @@ public class MapOperationalLinkSystem
             level switch
             {
                 MapConditionLevel.Flourishing => $"坊区有序，住房与道路都较宽裕。住房 {state.HousingCapacity}/{state.Population}，威胁 {state.Threat:0.#}%。",
-                MapConditionLevel.Stable => $"宗门运转平稳，可视需要修整坊路或安排夜巡。住房 {state.HousingCapacity}/{state.Population}。",
-                MapConditionLevel.Strained => $"宗门开始拥挤或治安承压，建议修整坊路并加强夜巡。住房 {state.HousingCapacity}/{state.Population}。",
-                _ => $"宗门拥挤且治安偏紧，需优先夜巡清巷。住房 {state.HousingCapacity}/{state.Population}，威胁 {state.Threat:0.#}%。"
+                MapConditionLevel.Stable => $"天衍峰运转平稳，可视需要修整坊路或安排夜巡。住房 {state.HousingCapacity}/{state.Population}。",
+                MapConditionLevel.Strained => $"天衍峰开始拥挤或山门戒备承压，建议修整坊路并加强夜巡。住房 {state.HousingCapacity}/{state.Population}。",
+                _ => $"天衍峰拥挤且山门戒备偏紧，需优先夜巡清巷。住房 {state.HousingCapacity}/{state.Population}，威胁 {state.Threat:0.#}%。"
             });
     }
 
@@ -255,29 +264,31 @@ public class MapOperationalLinkSystem
     {
         var enabled =
             state.Wood >= StreetRepairWoodCost &&
+            state.Gold >= StreetRepairGoldCost &&
+            state.ContributionPoints >= StreetRepairContributionCost &&
             (state.MapCommuteReductionBonusKm < MaximumCommuteReductionBonusKm || state.MapRoadMobilityBonus < MaximumRoadMobilityBonus);
 
         return new MapDirectiveChoice
         {
             Action = MapDirectiveAction.RepairStreets,
-            Label = "修整坊路 (-24木)",
+            Label = $"修整坊路 (-24木 -{StreetRepairGoldCost}灵石 -{StreetRepairContributionCost}贡献)",
             HintText = enabled
-                ? "改善宗门道路并提升民心。"
-                : "木材不足，或宗门坊路已接近当前整修上限。",
+                ? "疏理天衍峰坊路并提升门人安稳度。"
+                : "木材、灵石、贡献不足，或天衍峰坊路已接近当前整修上限。",
             Enabled = enabled
         };
     }
 
     private MapDirectiveChoice BuildNightWatchChoice(GameState state)
     {
-        var enabled = state.Gold >= NightWatchGoldCost;
+        var enabled = state.Gold >= NightWatchGoldCost && state.ContributionPoints >= NightWatchContributionCost;
         return new MapDirectiveChoice
         {
             Action = MapDirectiveAction.NightWatch,
-            Label = "夜巡清巷 (-10金)",
+            Label = $"夜巡清巷 (-{NightWatchGoldCost}灵石 -{NightWatchContributionCost}贡献)",
             HintText = enabled
-                ? "压低宗门治安压力。"
-                : "金钱不足，无法组织夜巡。",
+                ? "压低天衍峰山门戒备压力。"
+                : "灵石或贡献不足，无法组织巡山夜值。",
             Enabled = enabled
         };
     }

@@ -192,14 +192,14 @@ public sealed class PrefectureMapGeneratorSystem
 
         var defaultLandmarks = new (string fallbackName, Vector2 offset, float radius, string color)[]
         {
-            ("外务殿", new Vector2(-0.01f, -0.04f), 4.4f, "#FFE6B8FF"),
-            ("云津坊市", new Vector2(0.08f, -0.01f), 4.1f, "#F1D4A7FF"),
+            ("外事别院", new Vector2(-0.01f, -0.04f), 4.4f, "#FFE6B8FF"),
+            ("青云外坊", new Vector2(0.08f, -0.01f), 4.1f, "#F1D4A7FF"),
             ("观星台", new Vector2(-0.08f, -0.01f), 4.0f, "#E7D9BFFF"),
             ("灵舟渡口", new Vector2(0.12f, 0.03f), 3.8f, "#DCC8AEFF"),
-            ("储灵库", new Vector2(0.00f, 0.09f), 3.9f, "#D8B88FFF"),
-            ("藏经别院", new Vector2(-0.10f, 0.06f), 3.7f, "#D8D8CCFF"),
+            ("贡储灵库", new Vector2(0.00f, 0.09f), 3.9f, "#D8B88FFF"),
+            ("传功别院", new Vector2(-0.10f, 0.06f), 3.7f, "#D8D8CCFF"),
             ("演武校场", new Vector2(-0.12f, -0.10f), 3.6f, "#D8C1A4FF"),
-            ("山门牌坊", new Vector2(0.00f, -0.12f), 3.7f, "#F2DBB5FF")
+            ("迎仙牌楼", new Vector2(0.00f, -0.12f), 3.7f, "#F2DBB5FF")
         };
 
         for (var landmarkIndex = 0; landmarkIndex < defaultLandmarks.Length; landmarkIndex++)
@@ -620,10 +620,10 @@ public sealed class PrefectureMapGeneratorSystem
         var labels = new List<StrategicLabelDefinition>
         {
             new() { X = countySeat.X - 0.04f, Y = countySeat.Y - 0.13f, Text = theme.CityTitle, Color = "#FFE8BDFF", FontSize = 14, MinZoom = 0.6f },
-            new() { X = anchors.Forest.X + 0.03f, Y = anchors.Forest.Y - 0.02f, Text = ComposeRawSourceLabel(theme.ForestName, "林木 / 药材 / 皮毛"), Color = "#DAECD0FF", FontSize = 12, MinZoom = 0.72f },
-            new() { X = anchors.Lake.X + 0.03f, Y = anchors.Lake.Y + 0.02f, Text = ComposeRawSourceLabel(theme.LakeName, "卤水 / 芦苇 / 黏土"), Color = "#D8ECFFFF", FontSize = 12, MinZoom = 0.72f },
-            new() { X = anchors.Mountain.X + 0.03f, Y = anchors.Mountain.Y - 0.02f, Text = ComposeRawSourceLabel(theme.MountainName, "原石 / 铜矿 / 铁矿"), Color = "#E1E3EAFF", FontSize = 12, MinZoom = 0.72f },
-            new() { X = anchors.Farmland.X + 0.03f, Y = anchors.Farmland.Y + 0.02f, Text = ComposeRawSourceLabel(theme.FarmlandName, "麻料"), Color = "#E9F1C8FF", FontSize = 12, MinZoom = 0.72f },
+            new() { X = anchors.Forest.X + 0.03f, Y = anchors.Forest.Y - 0.02f, Text = ComposeRawSourceLabel(theme.ForestName, "灵木 / 灵草 / 灵兽皮"), Color = "#DAECD0FF", FontSize = 12, MinZoom = 0.72f },
+            new() { X = anchors.Lake.X + 0.03f, Y = anchors.Lake.Y + 0.02f, Text = ComposeRawSourceLabel(theme.LakeName, "寒泉卤水 / 青芦 / 赤陶土"), Color = "#D8ECFFFF", FontSize = 12, MinZoom = 0.72f },
+            new() { X = anchors.Mountain.X + 0.03f, Y = anchors.Mountain.Y - 0.02f, Text = ComposeRawSourceLabel(theme.MountainName, "青罡原石 / 赤铜矿 / 玄铁矿"), Color = "#E1E3EAFF", FontSize = 12, MinZoom = 0.72f },
+            new() { X = anchors.Farmland.X + 0.03f, Y = anchors.Farmland.Y + 0.02f, Text = ComposeRawSourceLabel(theme.FarmlandName, "青麻"), Color = "#E9F1C8FF", FontSize = 12, MinZoom = 0.72f },
             new() { X = anchors.MainAvenue.X - 0.02f, Y = anchors.MainAvenue.Y, Text = theme.MainAvenueName, Color = "#F6DCAEFF", FontSize = 12, MinZoom = 0.85f },
             new() { X = anchors.RiverGate.X + 0.02f, Y = anchors.RiverGate.Y + 0.01f, Text = theme.RiverGateName, Color = "#CBE5FFFF", FontSize = 11, MinZoom = 0.9f },
             new() { X = cityBounds.MinX - 0.02f, Y = cityBounds.MinY - 0.02f, Text = theme.InnerCityName, Color = "#EBD2ADFF", FontSize = 11, MinZoom = 0.9f },

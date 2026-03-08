@@ -6,7 +6,7 @@ public static class SectMapSemanticRules
 {
     public static string GetSettlementName()
     {
-        return "宗门";
+        return "浮云宗";
     }
 
     public static string GetWorldMapTitle()
@@ -16,32 +16,32 @@ public static class SectMapSemanticRules
 
     public static string GetLegacyPrefectureMapTitle()
     {
-        return "外域态势";
+        return "江陵府外域";
     }
 
     public static string GetOuterRegionRoadName()
     {
-        return "灵道";
+        return "府域灵道";
     }
 
     public static string GetOuterRegionSettlementName()
     {
-        return "聚落";
+        return "附庸据点";
     }
 
     public static string GetOuterRegionReliefActionName()
     {
-        return "抚恤聚落";
+        return "抚恤附庸";
     }
 
     public static string GetWildernessGatheringLabel()
     {
-        return "山野采集";
+        return "峰外采办";
     }
 
     public static string GetTechnologyTrackName()
     {
-        return "藏经阁";
+        return "传法院";
     }
 
     public static string GetTechnologyLevelLabel(int techLevel)
@@ -54,11 +54,11 @@ public static class SectMapSemanticRules
     {
         return buildingType switch
         {
-            IndustryBuildingType.Agriculture => "灵田",
-            IndustryBuildingType.Workshop => "炼器坊",
+            IndustryBuildingType.Agriculture => "阵材圃",
+            IndustryBuildingType.Workshop => "傀儡工坊",
             IndustryBuildingType.Research => GetTechnologyTrackName(),
-            IndustryBuildingType.Trade => compact ? "坊市" : "山门坊市",
-            IndustryBuildingType.Administration => "宗务殿",
+            IndustryBuildingType.Trade => compact ? "总坊" : "青云总坊",
+            IndustryBuildingType.Administration => "庶务殿",
             _ => "建筑"
         };
     }
@@ -67,13 +67,13 @@ public static class SectMapSemanticRules
     {
         return anchorType switch
         {
-            TownActivityAnchorType.Farmstead => "灵田",
-            TownActivityAnchorType.Workshop => "炼器坊",
-            TownActivityAnchorType.Market => "山门坊市",
-            TownActivityAnchorType.Academy => "藏经阁",
-            TownActivityAnchorType.Administration => "宗务殿",
-            TownActivityAnchorType.Leisure => "论道亭",
-            _ => "宗门场所"
+            TownActivityAnchorType.Farmstead => "阵材圃",
+            TownActivityAnchorType.Workshop => "傀儡工坊",
+            TownActivityAnchorType.Market => "青云总坊",
+            TownActivityAnchorType.Academy => "传法院",
+            TownActivityAnchorType.Administration => "庶务殿",
+            TownActivityAnchorType.Leisure => "演阵台",
+            _ => "浮云宗场所"
         };
     }
 
@@ -81,29 +81,29 @@ public static class SectMapSemanticRules
     {
         return anchorType switch
         {
-            TownActivityAnchorType.Farmstead => "灵田",
-            TownActivityAnchorType.Workshop => "炼器坊",
-            TownActivityAnchorType.Market => "坊市",
-            TownActivityAnchorType.Academy => "藏经阁",
-            TownActivityAnchorType.Administration => "宗务殿",
-            TownActivityAnchorType.Leisure => "论道亭",
-            _ => "宗门场所"
+            TownActivityAnchorType.Farmstead => "阵材圃",
+            TownActivityAnchorType.Workshop => "傀儡工坊",
+            TownActivityAnchorType.Market => "总坊",
+            TownActivityAnchorType.Academy => "传法院",
+            TownActivityAnchorType.Administration => "庶务殿",
+            TownActivityAnchorType.Leisure => "演阵台",
+            _ => "浮云宗场所"
         };
     }
 
     public static string GetAdministrationStatusText()
     {
-        return "议事中";
+        return "核账中";
     }
 
     public static string GetLeisureIdleStatusText()
     {
-        return "静修中";
+        return "静悟中";
     }
 
     public static string GetLeisureBusyStatusText()
     {
-        return "论道中";
+        return "推演中";
     }
 
     public static string GetLeisureInboundStatusText()
@@ -113,7 +113,7 @@ public static class SectMapSemanticRules
 
     public static string GetWorkBusyStatusText()
     {
-        return "运转中";
+        return "阵务中";
     }
 
     public static string GetWorkInboundStatusText()
@@ -123,7 +123,7 @@ public static class SectMapSemanticRules
 
     public static string GetWorkIdleStatusText()
     {
-        return "暂歇中";
+        return "轮休中";
     }
 
     public static string GetEmptyResidentStatusText(TownActivityAnchorType anchorType)
@@ -133,6 +133,6 @@ public static class SectMapSemanticRules
 
     public static string GetMapInteractionHint()
     {
-        return "左键选中宗门场所查看状态 · 右键取消选中";
+        return "左键选中浮云宗场所查看状态 · 右键取消选中";
     }
 }

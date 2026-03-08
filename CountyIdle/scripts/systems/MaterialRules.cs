@@ -176,10 +176,10 @@ public static class MaterialRules
     {
         return chainType switch
         {
-            TierZeroMaterialChainType.Forestry => "林木链（林场/锯木坊）",
-            TierZeroMaterialChainType.Masonry => "石陶链（采石场/黏土坑/石作坊）",
-            TierZeroMaterialChainType.Medicinal => "盐药链（盐井/采药营/晒药棚）",
-            TierZeroMaterialChainType.Fiber => "纤皮链（麻田/芦苇荡/猎场/制皮棚）",
+            TierZeroMaterialChainType.Forestry => "灵木链（灵植园/伐木坊）",
+            TierZeroMaterialChainType.Masonry => "石陶链（采罡场/赤陶窑/石作坊）",
+            TierZeroMaterialChainType.Medicinal => "盐丹链（盐泉/采药圃/丹房）",
+            TierZeroMaterialChainType.Fiber => "织裘链（青麻圃/青芦泽/灵兽围/制裘坊）",
             _ => "T0 链路"
         };
     }
@@ -187,8 +187,8 @@ public static class MaterialRules
     public static string DescribeTierZeroChains(GameState state)
     {
         return
-            $"T0 链路：林木链 Lv.{state.ForestryChainLevel} · 石陶链 Lv.{state.MasonryChainLevel}\n" +
-            $"盐药链 Lv.{state.MedicinalChainLevel} · 纤皮链 Lv.{state.FiberChainLevel}";
+            $"T0 灵材链：灵木链 Lv.{state.ForestryChainLevel} · 石陶链 Lv.{state.MasonryChainLevel}\n" +
+            $"盐丹链 Lv.{state.MedicinalChainLevel} · 织裘链 Lv.{state.FiberChainLevel}";
     }
 
     private static double ResolveChainFactor(int chainLevel, double baseFactor, double perLevelFactor)

@@ -58,16 +58,16 @@ public sealed class PrefectureCityThemeConfigSystem
 
     private static void Normalize(PrefectureCityThemeConfig theme)
     {
-        theme.MapTitle = EnsureText(theme.MapTitle, "外域态势（云泽外域）");
-        theme.CityTitle = EnsureText(theme.CityTitle, "云泽外城");
+        theme.MapTitle = EnsureText(theme.MapTitle, "江陵府外域（附庸圈层）");
+        theme.CityTitle = EnsureText(theme.CityTitle, "云泽附庸坊城");
         theme.ForestName = EnsureText(theme.ForestName, "青岚灵林");
         theme.LakeName = EnsureText(theme.LakeName, "月魄湖");
         theme.MountainName = EnsureText(theme.MountainName, "东岭灵脉");
-        theme.FarmlandName = EnsureText(theme.FarmlandName, "云泽灵田");
+        theme.FarmlandName = EnsureText(theme.FarmlandName, "云泽阵材圃");
         theme.MainAvenueName = EnsureText(theme.MainAvenueName, "问道长街");
         theme.RiverGateName = EnsureText(theme.RiverGateName, "云津渡口");
         theme.InnerCityName = EnsureText(theme.InnerCityName, "内坊");
-        theme.OuterWardsName = EnsureText(theme.OuterWardsName, "山门坊市");
+        theme.OuterWardsName = EnsureText(theme.OuterWardsName, "附庸坊廓");
 
         theme.GateNames ??= new PrefectureGateNames();
         theme.GateNames.North = EnsureText(theme.GateNames.North, "北岚门");
@@ -94,7 +94,7 @@ public sealed class PrefectureCityThemeConfigSystem
 
         for (var i = 0; i < theme.WardNamePool.Count; i++)
         {
-            theme.WardNamePool[i] = EnsureText(theme.WardNamePool[i], $"坊市{i + 1}");
+            theme.WardNamePool[i] = EnsureText(theme.WardNamePool[i], $"外坊{i + 1}");
         }
     }
 
@@ -107,16 +107,16 @@ public sealed class PrefectureCityThemeConfigSystem
     {
         return new PrefectureCityThemeConfig
         {
-            MapTitle = "外域态势（云泽外域）",
-            CityTitle = "云泽外城",
+            MapTitle = "江陵府外域（附庸圈层）",
+            CityTitle = "云泽附庸坊城",
             ForestName = "青岚灵林",
             LakeName = "月魄湖",
             MountainName = "东岭灵脉",
-            FarmlandName = "云泽灵田",
+            FarmlandName = "云泽阵材圃",
             MainAvenueName = "问道长街",
             RiverGateName = "云津渡口",
             InnerCityName = "内坊",
-            OuterWardsName = "山门坊市",
+            OuterWardsName = "附庸坊廓",
             GateNames = new PrefectureGateNames
             {
                 North = "北岚门",
@@ -126,27 +126,27 @@ public sealed class PrefectureCityThemeConfigSystem
             },
             LandmarkNames =
             [
-                "外务殿",
-                "云津坊市",
+                "外事别院",
+                "青云外坊",
                 "观星台",
                 "灵舟渡口",
-                "储灵库",
-                "藏经别院",
+                "贡储灵库",
+                "传功别院",
                 "演武校场",
-                "山门牌坊"
+                "迎仙牌楼"
             ],
             WardNamePool =
             [
-                "外门居舍",
-                "炼器作坊",
-                "沿街商铺",
-                "论道茶寮",
+                "附庸驻舍",
+                "傀儡作坊",
+                "沿街坊肆",
+                "论阵茶寮",
                 "行商栈舍",
-                "储运库房",
+                "贡运库房",
                 "布帛行肆",
                 "药庐",
-                "书阁",
-                "酒楼"
+                "阵谱书阁",
+                "酒肆"
             ]
         };
     }

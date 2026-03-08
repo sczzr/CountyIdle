@@ -92,7 +92,7 @@ theme_override_constants/separation = 0
 layout_mode = 2
 theme_override_colors/font_color = Color(0.94902, 0.909804, 0.788235, 1)
 theme_override_font_sizes/font_size = 14
-text = "吏部 · 百工调度"
+text = "宗主治理摘要"
 
 [node name="IndustryEfficiency" type="PanelContainer" parent="PanelContent/JobsVBox"]
 layout_mode = 2
@@ -109,7 +109,7 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 11
-text = "🛠 产业工具覆盖率"
+text = "🛠 产业工器覆盖率"
 
 [node name="ToolCoverageValue" type="Label" parent="PanelContent/JobsVBox/IndustryEfficiency/EfficiencyVBox/ToolCoverageRow"]
 layout_mode = 2
@@ -137,7 +137,7 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 11
-text = "📜 宗务殿管理加成"
+text = "📜 庶务殿管理加成"
 
 [node name="BonusValue" type="Label" parent="PanelContent/JobsVBox/IndustryEfficiency/EfficiencyVBox/BonusRow"]
 layout_mode = 2
@@ -164,15 +164,15 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_farmer")
 
 [node name="JobLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/FarmerRow/RowVBox/HeaderRow" index="0"]
 layout_mode = 2
-text = "🌾 农工岗"
+text = "🌾 阵材法旨"
 
 [node name="PriorityLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/FarmerRow/RowVBox/HeaderRow" index="1"]
 layout_mode = 2
-text = "★ 优先保供"
+text = "阵材令"
 
 [node name="EliteLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/FarmerRow/RowVBox/ControlRow/EliteBox" index="0"]
 layout_mode = 2
-text = "领队: 张三 (+15%)"
+text = "等待法旨摘要刷新"
 
 [node name="WorkerRow" parent="PanelContent/JobsVBox/JobsPadding/JobsList" instance=ExtResource("1_3a8dq")]
 layout_mode = 2
@@ -180,15 +180,15 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_worker")
 
 [node name="JobLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/WorkerRow/RowVBox/HeaderRow" index="0"]
 layout_mode = 2
-text = "⛏ 匠役岗"
+text = "🛠 阵务法旨"
 
 [node name="PriorityLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/WorkerRow/RowVBox/HeaderRow" index="1"]
 layout_mode = 2
-text = "☆ 默认顺位"
+text = "阵务令"
 
 [node name="EliteLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/WorkerRow/RowVBox/ControlRow/EliteBox" index="0"]
 layout_mode = 2
-text = "无领队"
+text = "等待法旨摘要刷新"
 
 [node name="MerchantRow" parent="PanelContent/JobsVBox/JobsPadding/JobsList" instance=ExtResource("1_3a8dq")]
 layout_mode = 2
@@ -196,15 +196,15 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_worker")
 
 [node name="JobLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/MerchantRow/RowVBox/HeaderRow" index="0"]
 layout_mode = 2
-text = "💰 商贾岗"
+text = "💰 总坊外事法旨"
 
 [node name="PriorityLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/MerchantRow/RowVBox/HeaderRow" index="1"]
 layout_mode = 2
-text = "☆ 默认顺位"
+text = "总坊令"
 
 [node name="EliteLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/MerchantRow/RowVBox/ControlRow/EliteBox" index="0"]
 layout_mode = 2
-text = "无领队"
+text = "等待法旨摘要刷新"
 
 [node name="ScholarRow" parent="PanelContent/JobsVBox/JobsPadding/JobsList" instance=ExtResource("1_3a8dq")]
 layout_mode = 2
@@ -212,16 +212,128 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_worker")
 
 [node name="JobLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/ScholarRow/RowVBox/HeaderRow" index="0"]
 layout_mode = 2
-text = "📜 学士岗"
+text = "📜 推演法旨"
 
 [node name="PriorityLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/ScholarRow/RowVBox/HeaderRow" index="1"]
 layout_mode = 2
-text = "⏸ 停工"
+text = "推演令"
 
 [node name="EliteLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/ScholarRow/RowVBox/ControlRow/EliteBox" index="0"]
 layout_mode = 2
-text = "全员休沐中"
+text = "等待法旨摘要刷新"
 
-[node name="BottomSpacer" type="Control" parent="PanelContent/JobsVBox/JobsPadding/JobsList"]
+[node name="PeakOverviewPanel" type="PanelContainer" parent="PanelContent/JobsVBox/JobsPadding/JobsList"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_eff")
+
+[node name="PeakOverviewVBox" type="VBoxContainer" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakOverviewPanel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="PeakOverviewTitle" type="Label" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakOverviewPanel/PeakOverviewVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.94902, 0.909804, 0.788235, 1)
+theme_override_font_sizes/font_size = 12
+text = "九峰与附属部门"
+
+[node name="PeakOverviewText" type="RichTextLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakOverviewPanel/PeakOverviewVBox"]
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+bbcode_enabled = false
+scroll_active = true
+fit_content = false
+theme_override_font_sizes/normal_font_size = 11
+text = "等待宗门组织谱系刷新"
+
+[node name="PeakDetailPanel" type="PanelContainer" parent="PanelContent/JobsVBox/JobsPadding/JobsList"]
 layout_mode = 2
 size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_eff")
+
+[node name="PeakDetailVBox" type="VBoxContainer" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="PeakDetailHeaderRow" type="HBoxContainer" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox"]
+layout_mode = 2
+
+[node name="PeakDetailTitle" type="Label" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakDetailHeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.94902, 0.909804, 0.788235, 1)
+theme_override_font_sizes/font_size = 12
+text = "峰脉详情浏览"
+
+[node name="PeakDetailCounter" type="Label" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakDetailHeaderRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.690196, 0.717647, 0.776471, 1)
+theme_override_font_sizes/font_size = 11
+text = "1/9"
+
+[node name="PeakSwitchRow" type="HBoxContainer" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PeakPrevButton" type="Button" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakSwitchRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "◀ 上一峰"
+
+[node name="PeakCurrentTitle" type="Label" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakSwitchRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.94902, 0.909804, 0.788235, 1)
+theme_override_font_sizes/font_size = 12
+text = "等待峰脉刷新"
+horizontal_alignment = 1
+
+[node name="PeakNextButton" type="Button" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakSwitchRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "下一峰 ▶"
+
+[node name="PeakCurrentSummary" type="Label" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.690196, 0.717647, 0.776471, 1)
+theme_override_font_sizes/font_size = 11
+text = "等待峰脉摘要刷新"
+autowrap_mode = 3
+
+[node name="PeakSupportStatus" type="Label" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.831373, 0.662745, 0.32549, 1)
+theme_override_font_sizes/font_size = 11
+text = "等待协同法旨刷新"
+autowrap_mode = 3
+
+[node name="PeakSupportActionRow" type="HBoxContainer" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PeakSupportButton" type="Button" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakSupportActionRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 11
+text = "设为本季协同峰"
+
+[node name="PeakSupportResetButton" type="Button" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakSupportActionRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "恢复均衡"
+
+[node name="PeakCurrentDetail" type="RichTextLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox"]
+custom_minimum_size = Vector2(0, 190)
+layout_mode = 2
+bbcode_enabled = false
+scroll_active = true
+fit_content = false
+size_flags_vertical = 3
+theme_override_font_sizes/normal_font_size = 11
+text = "等待峰脉详情刷新"
+
+[node name="BottomSpacer" type="Control" parent="PanelContent/JobsVBox/JobsPadding/JobsList"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2

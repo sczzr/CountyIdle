@@ -137,7 +137,7 @@ public class CountyEventSystem
         state.Research += researchGain;
         state.Happiness = Math.Clamp(state.Happiness + happinessGain, MinHappiness, MaxHappiness);
 
-                    return $"藏经阁讲习：弟子论道，获得科研+{researchGain:0}，民心提升。";
+                    return $"传法院讲习：弟子推演阵图，获得科研+{researchGain:0}，民心提升。";
     }
 
     private static string ResolveBorderRaid(GameState state)

@@ -385,7 +385,7 @@ public class StrategicMapConfigSystem
     {
         return new StrategicMapDefinition
         {
-            Title = "外域态势",
+            Title = "江陵府外域",
             UnitScale = 0.42f,
             GridLines = 8,
             Outlines =

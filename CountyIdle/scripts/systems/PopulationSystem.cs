@@ -12,6 +12,9 @@ public class PopulationSystem
     {
         InventoryRules.EndTransaction(state);
         PopulationRules.EnsureDefaults(state);
+        SectGovernanceRules.EnsureDefaults(state);
+        SectRuleTreeRules.EnsureDefaults(state);
+        SectPeakSupportRules.EnsureDefaults(state);
         var logs = new List<string>();
         var previousCommuteMinutes = PopulationRules.GetCommuteMinutes(state);
 
@@ -64,7 +67,12 @@ public class PopulationSystem
 
         var birthHappinessFactor = Math.Clamp(state.Happiness / 100.0, 0.5, 1.2);
         var birthHousingFactor = Math.Clamp((double)state.HousingCapacity / Math.Max(state.Population, 1), 0.6, 1.1);
-        var growthMultiplier = Math.Max(state.PopulationGrowthMultiplier, 1.0);
+        var growthMultiplier =
+            Math.Max(state.PopulationGrowthMultiplier, 1.0) *
+            SectGovernanceRules.GetPopulationGrowthModifier(state) *
+            SectGovernanceRules.GetQuarterPopulationGrowthModifier(state) *
+            SectRuleTreeRules.GetPopulationGrowthModifier(state) *
+            SectPeakSupportRules.GetPopulationGrowthModifier(state);
         var births = (int)Math.Floor(state.AdultPopulation * 0.0032 * birthHappinessFactor * birthHousingFactor * growthMultiplier);
         births = Math.Max(births, 0);
         state.ChildPopulation += births;
@@ -121,6 +129,23 @@ public class PopulationSystem
             5,
             100);
 
+        state.Happiness = Math.Clamp(
+            state.Happiness +
+            SectGovernanceRules.GetHourlyHappinessDelta(state) +
+            SectGovernanceRules.GetQuarterHappinessDelta(state) +
+            SectRuleTreeRules.GetHourlyHappinessDelta(state) +
+            SectPeakSupportRules.GetHourlyHappinessDelta(state),
+            5,
+            100);
+        state.Threat = Math.Clamp(
+            state.Threat +
+            SectGovernanceRules.GetHourlyThreatDelta(state) +
+            SectGovernanceRules.GetQuarterThreatDelta(state) +
+            SectRuleTreeRules.GetHourlyThreatDelta(state) +
+            SectPeakSupportRules.GetHourlyThreatDelta(state),
+            0,
+            100);
+
         if (births > 0 || childToAdult > 0 || adultToElder > 0 || newSick > 0 || recover > 0 || actualNaturalDeaths > 0)
         {
             logs.Add($"人口循环：新生{births} 成长{childToAdult} 衰老{adultToElder} 患病+{newSick}/康复{recover} 死亡{actualNaturalDeaths}。");
@@ -148,12 +173,12 @@ public class PopulationSystem
 
         if (saltCoverage < 0.45)
         {
-            logs.Add($"精盐不足：民生覆盖率 {saltCoverage * 100:0}% 。");
+            logs.Add($"{MaterialSemanticRules.GetDisplayName(nameof(GameState.FineSalt))}不足：民生覆盖率 {saltCoverage * 100:0}% 。");
         }
 
         if (medicineCoverage < 0.35 && state.SickPopulation > 0)
         {
-            logs.Add($"药剂不足：康复覆盖率 {medicineCoverage * 100:0}% 。");
+            logs.Add($"{MaterialSemanticRules.GetDisplayName(nameof(GameState.HerbalMedicine))}不足：康复覆盖率 {medicineCoverage * 100:0}% 。");
         }
 
         var maxAssigned = Math.Min(state.GetAssignedPopulation(), state.Population);

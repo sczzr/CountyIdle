@@ -46,6 +46,7 @@ public class GameState
     public double HempCloth { get; set; } = 4;
     public double Leather { get; set; } = 3;
     public double Gold { get; set; } = 90;
+    public double ContributionPoints { get; set; } = 120;
     public double Research { get; set; } = 0;
     public double RareMaterial { get; set; } = 0;
     public double IronOre { get; set; } = 65;
@@ -87,6 +88,17 @@ public class GameState
     public int GameMinutes { get; set; } = 0;
     public int HourSettlements { get; set; } = 0;
     public Dictionary<string, double> DiscreteInventoryProgress { get; set; } = new();
+    public Dictionary<string, int> TaskOrderUnits { get; set; } = new();
+    public Dictionary<string, int> TaskResolvedWorkers { get; set; } = new();
+    public string ActiveDevelopmentDirection { get; set; } = string.Empty;
+    public string ActiveSectLaw { get; set; } = string.Empty;
+    public string ActiveTalentPlan { get; set; } = string.Empty;
+    public string ActiveQuarterDecree { get; set; } = string.Empty;
+    public int QuarterDecreeIssuedQuarterIndex { get; set; } = -1;
+    public string ActiveAffairsRule { get; set; } = string.Empty;
+    public string ActiveDoctrineRule { get; set; } = string.Empty;
+    public string ActiveDisciplineRule { get; set; } = string.Empty;
+    public string ActivePeakSupport { get; set; } = string.Empty;
 
     public int GetAssignedPopulation()
     {
@@ -131,7 +143,9 @@ public class GameState
     public GameState Clone()
     {
         var clone = (GameState)MemberwiseClone();
-        clone.DiscreteInventoryProgress = new Dictionary<string, double>(DiscreteInventoryProgress);
+        clone.DiscreteInventoryProgress = new Dictionary<string, double>(DiscreteInventoryProgress ?? new Dictionary<string, double>());
+        clone.TaskOrderUnits = new Dictionary<string, int>(TaskOrderUnits ?? new Dictionary<string, int>());
+        clone.TaskResolvedWorkers = new Dictionary<string, int>(TaskResolvedWorkers ?? new Dictionary<string, int>());
         return clone;
     }
 }

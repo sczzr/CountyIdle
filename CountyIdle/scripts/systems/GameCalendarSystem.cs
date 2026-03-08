@@ -165,6 +165,18 @@ public sealed class GameCalendarSystem
         };
     }
 
+    public int GetQuarterIndex(int gameMinutes)
+    {
+        var safeGameMinutes = Math.Max(gameMinutes, 0);
+        var minuteOfYear = safeGameMinutes % MinutesPerYear;
+        return Math.Clamp(minuteOfYear / MinutesPerQuarter, 0, QuarterNames.Length - 1);
+    }
+
+    public string GetQuarterLabel(int gameMinutes)
+    {
+        return QuarterNames[GetQuarterIndex(gameMinutes)];
+    }
+
     private static string FormatRegnalYear(int yearNumber)
     {
         return yearNumber <= 1 ? "元" : ToChineseNumber(yearNumber);

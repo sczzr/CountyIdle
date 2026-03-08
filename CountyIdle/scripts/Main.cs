@@ -48,7 +48,7 @@ public partial class Main : Control
     private const float MapZoomStep = 0.1f;
     private const int MineUnlockTechLevel = 1;
     private const string MineLockedText = "🔒 需科技 锻造术(T1)";
-    private const string MineUnlockedText = "↑ 扩建藏经阁 (木16 石22 金22)";
+    private const string MineUnlockedText = "↑ 扩建传法院 (木16 石22 金22)";
 
     private static readonly Color BaseButtonModulate = Colors.White;
     private static readonly Color LanternGlowModulate = new(1.0f, 0.86f, 0.64f, 1.0f);
@@ -103,6 +103,16 @@ public partial class Main : Control
     private Control? _reportPanelView;
     private Control? _expeditionMapView;
     private Button? _mineUpgradeButton;
+    private RichTextLabel? _peakOverviewLabel;
+    private Button? _peakPrevButton;
+    private Button? _peakNextButton;
+    private Label? _peakCurrentTitleLabel;
+    private Label? _peakDetailCounterLabel;
+    private Label? _peakCurrentSummaryLabel;
+    private Label? _peakSupportStatusLabel;
+    private Button? _peakSupportButton;
+    private Button? _peakSupportResetButton;
+    private RichTextLabel? _peakCurrentDetailLabel;
     private Control _legacyLayoutRoot = null!;
     private Control _figmaLayoutRoot = null!;
     private SectMapViewSystem? _sectMapRenderer;
@@ -120,7 +130,7 @@ public partial class Main : Control
     private int _timeScaleIndex;
     private MapTab _currentMapTab = MapTab.Sect;
     private JobType? _inspectedJobType;
-    private JobType? _priorityJobType = JobType.Farmer;
+    private int _selectedPeakIndex = SectOrganizationRules.GetDefaultPeakIndex();
     private int _lastCalendarGameMinute = -1;
     private int _lastObservedHourSettlements = -1;
 
@@ -131,6 +141,8 @@ public partial class Main : Control
         ConfigureDualMapMode();
         CreateSettingsPanel();
         CreateWarehousePanel();
+        CreateTaskPanel();
+        CreateDisciplePanel();
         CreateSaveSlotsPanel();
         BindUiEvents();
         BindLanternHoverEffects();
@@ -160,6 +172,8 @@ public partial class Main : Control
         _buttonPulseTweens.Clear();
         UnbindClientSettingEvents();
         UnbindWarehousePanelEvents();
+        UnbindTaskPanelEvents();
+        UnbindDisciplePanelEvents();
         UnbindSaveSlotsPanelEvents();
     }
 
@@ -187,29 +201,33 @@ public partial class Main : Control
 
     private void OnStateChanged(GameState state)
     {
-        _populationLabel.Text = $"👥 人口 {state.Population}";
+        _populationLabel.Text = $"👥 门人 {state.Population}";
         _happinessLabel.Text = $"💖 民心 {state.Happiness:0.#}";
 
+        var economyPreview = EconomySystem.BuildHourPreview(state);
         var toolCoverage = IndustryRules.GetToolCoverage(state);
         var managementBoost = IndustryRules.GetManagementBoost(state);
+        var activeDirection = SectGovernanceRules.GetActiveDevelopmentDefinition(state);
+        var activeLaw = SectGovernanceRules.GetActiveLawDefinition(state);
+        var activeTalentPlan = SectGovernanceRules.GetActiveTalentPlanDefinition(state);
         var gatheringEstimate = MaterialRules.EstimateGathering(state);
         var primaryProcessingEstimate = MaterialRules.EstimatePrimaryProcessing(
             state,
             gatheringEstimate.TimberGain,
             gatheringEstimate.RawStoneGain);
 
-        var foodDelta = (state.Farmers * 0.20 * state.FoodProductionMultiplier * managementBoost * toolCoverage) - (state.Population * 0.06);
         var woodDelta = InventoryRules.PredictDelta(state, nameof(GameState.Wood), primaryProcessingEstimate.WoodGain);
         var stoneDelta = InventoryRules.PredictDelta(state, nameof(GameState.Stone), primaryProcessingEstimate.StoneGain);
-        var goldDelta = (state.Merchants * 0.17 * state.TradeProductionMultiplier * managementBoost * toolCoverage) - (state.Population * 0.03);
-        var visibleFoodDelta = InventoryRules.PredictDelta(state, nameof(GameState.Food), foodDelta);
-        var visibleGoldDelta = InventoryRules.PredictDelta(state, nameof(GameState.Gold), goldDelta);
+        var visibleFoodDelta = InventoryRules.PredictDelta(state, nameof(GameState.Food), economyPreview.FoodDeltaRaw);
+        var visibleGoldDelta = InventoryRules.PredictDelta(state, nameof(GameState.Gold), economyPreview.GoldDeltaRaw);
+        var visibleContributionDelta = InventoryRules.PredictDelta(state, nameof(GameState.ContributionPoints), economyPreview.ContributionDeltaRaw);
 
-        _foodLabel.Text = $"🌾 粮 {state.Food:0} {FormatSigned(visibleFoodDelta)}/s";
-        _woodLabel.Text = $"🪵 木 {state.Wood:0} {FormatSigned(woodDelta)}/s";
+        _foodLabel.Text = $"🌾 {MaterialSemanticRules.GetDisplayName(nameof(GameState.Food))} {state.Food:0} {FormatSigned(visibleFoodDelta)}/s";
+        _woodLabel.Text = $"🪵 {MaterialSemanticRules.GetDisplayName(nameof(GameState.Wood))} {state.Wood:0} {FormatSigned(woodDelta)}/s";
         _woodLabel.TooltipText =
-            $"下一小时预计：木料{FormatSigned(woodDelta)}、石料{FormatSigned(stoneDelta)}、林木库存 {state.Timber:0}、原石库存 {state.RawStone:0}。";
-        _goldLabel.Text = $"💰 金 {state.Gold:0} {FormatSigned(visibleGoldDelta)}/s";
+            $"下一小时预计：{MaterialSemanticRules.GetDisplayName(nameof(GameState.Wood))}{FormatSigned(woodDelta)}、{MaterialSemanticRules.GetDisplayName(nameof(GameState.Stone))}{FormatSigned(stoneDelta)}、{MaterialSemanticRules.GetDisplayName(nameof(GameState.Timber))}库存 {state.Timber:0}、{MaterialSemanticRules.GetDisplayName(nameof(GameState.RawStone))}库存 {state.RawStone:0}。";
+        _goldLabel.Text =
+            $"💰 {MaterialSemanticRules.GetDisplayName(nameof(GameState.Gold))} {state.Gold:0} {FormatSigned(visibleGoldDelta)}/s · {MaterialSemanticRules.GetDisplayName(nameof(GameState.ContributionPoints))} {state.ContributionPoints:0} {FormatSigned(visibleContributionDelta)}/s";
         _threatLabel.Text = $"⚔ 威胁 {state.Threat:0}%";
         _techLabel.Text = $"📜 科技 T{Math.Max(state.TechLevel + 1, 1)}";
 
@@ -221,6 +239,8 @@ public partial class Main : Control
         _sectMapRenderer?.RefreshResidents(state);
         _sectMapRenderer?.SetResidentClock(state.GameMinutes, GetCurrentTimeScaleFloat());
         RefreshWarehousePanelPopup(state);
+        RefreshTaskPanelPopup(state);
+        RefreshDisciplePanelPopup(state);
         HandleAutoSaveFromState(state);
 
         RefreshJobPanels(state);
@@ -283,7 +303,7 @@ public partial class Main : Control
 
         foreach (var jobType in Enum.GetValues<JobType>())
         {
-            var panelInfo = JobProgressionRules.GetPanelInfo(state, jobType);
+            var panelInfo = SectTaskRules.GetJobPanelInfo(state, jobType);
             _jobCountLabels[jobType].Text = IndustryRules.GetAssigned(state, jobType).ToString();
             _jobTitleLabels[jobType].Text = panelInfo.TitleText;
             _jobTitleLabels[jobType].TooltipText = panelInfo.DetailText;
@@ -308,6 +328,13 @@ public partial class Main : Control
             }
         }
 
+        if (_peakOverviewLabel != null)
+        {
+            _peakOverviewLabel.Text = SectOrganizationRules.BuildPeakOverviewText();
+            _peakOverviewLabel.TooltipText = "按设定文档汇总当前可见九峰与附属部门结构。";
+        }
+
+        RefreshPeakDetailPanel(state);
         ApplyPriorityButtonTexts();
         ApplyJobRowSelectionStyles();
     }
@@ -321,7 +348,9 @@ public partial class Main : Control
 
         var toolCoverage = IndustryRules.GetToolCoverage(state);
         var managementBoost = IndustryRules.GetManagementBoost(state);
-        var unassigned = state.GetUnassignedPopulation();
+        var activeDirection = SectGovernanceRules.GetActiveDevelopmentDefinition(state);
+        var activeLaw = SectGovernanceRules.GetActiveLawDefinition(state);
+        var activeTalentPlan = SectGovernanceRules.GetActiveTalentPlanDefinition(state);
 
         if (_figmaBuildAgricultureButton != null)
         {
@@ -335,18 +364,19 @@ public partial class Main : Control
 
         if (_figmaCraftToolsButton != null)
         {
-            _figmaCraftToolsButton.Text = $"锻造工具 ({state.IndustryTools:0})";
+            _figmaCraftToolsButton.Text = $"锻制工器 ({state.IndustryTools:0})";
         }
 
         if (_figmaCenterTitleLabel != null)
         {
-            _figmaCenterTitleLabel.Text = "郡县营建中枢";
+            _figmaCenterTitleLabel.Text = "宗主中枢";
         }
 
         if (_figmaCenterDescriptionLabel != null)
         {
             _figmaCenterDescriptionLabel.Text =
-                $"空闲人口 {unassigned} · 管理加成 x{managementBoost:0.00} · 工具覆盖 {toolCoverage * 100:0}%";
+                $"方向 {activeDirection.DisplayName} · 法令 {activeLaw.DisplayName} · 育才 {activeTalentPlan.DisplayName}\n" +
+                $"治宗重心 {SectTaskRules.BuildGovernanceHeadline(state)} · {SectTaskRules.BuildGovernanceExecutionSummary(state)} · 管理加成 x{managementBoost:0.00} · 工器覆盖 {toolCoverage * 100:0}%";
         }
 
         if (_figmaEquipmentTitleLabel != null)
@@ -365,7 +395,7 @@ public partial class Main : Control
         {
             _figmaNotificationLabel.Text =
                 $"探险：{(state.ExplorationEnabled ? "进行中" : "暂停")}\n" +
-                $"空闲人口：{unassigned}\n" +
+                $"治理态势：{SectTaskRules.BuildGovernanceExecutionSummary(state)}\n" +
                 $"威胁等级：{state.Threat:0}%";
         }
     }
@@ -484,6 +514,17 @@ public partial class Main : Control
         _expeditionMapView = GetNode<Control>($"{CenterMapPagesPath}/ExpeditionMapView");
         _sectMapRenderer = GetNode<SectMapViewSystem>($"{CenterMapPagesPath}/CountyTownMapView");
         _mineUpgradeButton = GetNodeOrNull<Button>($"{CenterReportDetailPagesPath}/MineCard/CardVBox/UpgradeButton");
+        _peakOverviewLabel = GetNodeOrNull<RichTextLabel>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/PeakOverviewPanel/PeakOverviewVBox/PeakOverviewText");
+        _peakPrevButton = GetNodeOrNull<Button>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakSwitchRow/PeakPrevButton");
+        _peakNextButton = GetNodeOrNull<Button>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakSwitchRow/PeakNextButton");
+        _peakCurrentTitleLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakSwitchRow/PeakCurrentTitle");
+        _peakDetailCounterLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakDetailHeaderRow/PeakDetailCounter");
+        _peakCurrentSummaryLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakCurrentSummary");
+        _peakSupportStatusLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakSupportStatus");
+        _peakSupportButton = GetNodeOrNull<Button>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakSupportActionRow/PeakSupportButton");
+        _peakSupportResetButton = GetNodeOrNull<Button>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakSupportActionRow/PeakSupportResetButton");
+        _peakCurrentDetailLabel = GetNodeOrNull<RichTextLabel>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakCurrentDetail");
+        _selectedPeakIndex = SectOrganizationRules.NormalizePeakIndex(_selectedPeakIndex);
 
         _jobCountLabels.Clear();
         _jobTitleLabels.Clear();
@@ -533,6 +574,7 @@ public partial class Main : Control
         _jobPriorityButtons[JobType.Scholar] = GetNode<Button>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/ScholarRow/RowVBox/HeaderRow/PriorityLabel");
         ApplyPriorityButtonTexts();
         ApplyJobRowSelectionStyles();
+        RefreshPeakDetailPanel();
 
         _figmaBuildAgricultureButton = null;
         _figmaBuildWorkshopButton = null;
@@ -595,6 +637,16 @@ public partial class Main : Control
         _reportPanelView = null;
         _expeditionMapView = null;
         _mineUpgradeButton = null;
+        _peakOverviewLabel = null;
+        _peakPrevButton = null;
+        _peakNextButton = null;
+        _peakCurrentTitleLabel = null;
+        _peakDetailCounterLabel = null;
+        _peakCurrentSummaryLabel = null;
+        _peakSupportStatusLabel = null;
+        _peakSupportButton = null;
+        _peakSupportResetButton = null;
+        _peakCurrentDetailLabel = null;
         _sectMapRenderer = null;
         ClearMapOperationalNodes();
 
@@ -606,7 +658,6 @@ public partial class Main : Control
         _jobPriorityButtons.Clear();
         _jobRowBaseStyles.Clear();
         _inspectedJobType = null;
-        _priorityJobType = null;
     }
 
     private void ApplyLayoutSwitch()
@@ -620,6 +671,9 @@ public partial class Main : Control
         _exploreButton.Pressed += () => _gameLoop.ToggleExploration();
         BindSettingsButtonEvent();
         BindWarehouseButtonEvent();
+        BindTaskButtonEvent();
+        BindDiscipleButtonEvent();
+        BindDiscipleMapInspectionEvent();
 
         if (_speedX1Button != null)
         {
@@ -698,6 +752,7 @@ public partial class Main : Control
             $"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/ScholarRow/RowVBox/ControlRow/Stepper/StepperRow/PlusButton");
         BindJobRowInteractions();
         BindJobPriorityButtons();
+        BindPeakDetailButtons();
 
         BindLegacyIndustryButtons();
     }
@@ -887,8 +942,8 @@ public partial class Main : Control
     {
         if (_countyTownMapButton != null)
         {
-            _countyTownMapButton.Text = "宗门地图";
-            _countyTownMapButton.TooltipText = "查看宗门布局、弟子活动与场所状态";
+            _countyTownMapButton.Text = "天衍峰山门";
+            _countyTownMapButton.TooltipText = "查看天衍峰布局、门人活动与场所状态";
         }
 
         if (_worldMapButton != null)
@@ -940,8 +995,14 @@ public partial class Main : Control
 
     private void BindJobButtons(JobType jobType, string minusButtonPath, string plusButtonPath)
     {
-        GetNode<Button>(minusButtonPath).Pressed += () => _gameLoop.AdjustJob(jobType, -JobAdjustStep);
-        GetNode<Button>(plusButtonPath).Pressed += () => _gameLoop.AdjustJob(jobType, JobAdjustStep);
+        var minusButton = GetNode<Button>(minusButtonPath);
+        var plusButton = GetNode<Button>(plusButtonPath);
+        minusButton.Text = "法";
+        plusButton.Text = "旨";
+        minusButton.TooltipText = "岗位已改为宗主定调，点击打开宗主中枢。";
+        plusButton.TooltipText = "岗位已改为宗主定调，点击打开宗主中枢。";
+        minusButton.Pressed += () => OpenTaskPanelForJob(jobType);
+        plusButton.Pressed += () => OpenTaskPanelForJob(jobType);
     }
 
     private void BindJobPriorityButtons()
@@ -950,6 +1011,33 @@ public partial class Main : Control
         {
             var jobType = entry.Key;
             entry.Value.Pressed += () => OnJobPriorityPressed(jobType);
+        }
+    }
+
+    private void BindPeakDetailButtons()
+    {
+        if (_peakPrevButton != null)
+        {
+            _peakPrevButton.TooltipText = "浏览上一座主峰及其附属部门。";
+            _peakPrevButton.Pressed += () => CyclePeakDetail(-1);
+        }
+
+        if (_peakNextButton != null)
+        {
+            _peakNextButton.TooltipText = "浏览下一座主峰及其附属部门。";
+            _peakNextButton.Pressed += () => CyclePeakDetail(1);
+        }
+
+        if (_peakSupportButton != null)
+        {
+            _peakSupportButton.TooltipText = "将当前浏览峰脉设为本季协同峰。";
+            _peakSupportButton.Pressed += ApplySelectedPeakSupport;
+        }
+
+        if (_peakSupportResetButton != null)
+        {
+            _peakSupportResetButton.TooltipText = "撤销单峰协同，恢复诸峰均衡轮转。";
+            _peakSupportResetButton.Pressed += () => _gameLoop.ResetPeakSupport();
         }
     }
 
@@ -971,16 +1059,17 @@ public partial class Main : Control
             return;
         }
 
-        var panelInfo = JobProgressionRules.GetPanelInfo(_gameLoop.State, jobType);
+        var panelInfo = SectTaskRules.GetJobPanelInfo(_gameLoop.State, jobType);
         if (_inspectedJobType == jobType)
         {
             _inspectedJobType = null;
-            AppendLog($"收起 {panelInfo.ActiveRoleName} 岗位规则。");
+            AppendLog($"收起 {panelInfo.ActiveRoleName} 执行摘要。");
         }
         else
         {
             _inspectedJobType = jobType;
-            AppendLog($"展开 {panelInfo.ActiveRoleName} 岗位规则。");
+            _selectedPeakIndex = SectOrganizationRules.GetRecommendedPeakIndex(jobType);
+            AppendLog($"展开 {panelInfo.ActiveRoleName} 执行摘要，定位至 {SectOrganizationRules.GetPeakTitle(_selectedPeakIndex)}。");
         }
 
         RefreshJobPanels(_gameLoop.State);
@@ -988,19 +1077,8 @@ public partial class Main : Control
 
     private void OnJobPriorityPressed(JobType jobType)
     {
-        var roleName = JobProgressionRules.GetActiveRoleName(_gameLoop.State, jobType);
-        if (_priorityJobType == jobType)
-        {
-            _priorityJobType = null;
-            AppendLog($"{roleName}恢复默认顺位。");
-        }
-        else
-        {
-            _priorityJobType = jobType;
-            AppendLog($"{roleName}设为优先调配。");
-        }
-
-        ApplyPriorityButtonTexts();
+        OpenTaskPanelForJob(jobType);
+        AppendLog($"{SectTaskRules.GetJobButtonText(jobType)}已转到宗主中枢。");
     }
 
     private void ApplyPriorityButtonTexts()
@@ -1012,9 +1090,26 @@ public partial class Main : Control
 
         foreach (var entry in _jobPriorityButtons)
         {
-            var isPriority = _priorityJobType == entry.Key;
-            entry.Value.Text = isPriority ? "★ 优先调配" : JobProgressionRules.GetDefaultPriorityText(entry.Key);
+            entry.Value.Text = SectTaskRules.GetJobButtonText(entry.Key);
         }
+    }
+
+    private void CyclePeakDetail(int delta)
+    {
+        var peakCount = SectOrganizationRules.GetPeakCount();
+        if (peakCount <= 0)
+        {
+            return;
+        }
+
+        _selectedPeakIndex = ((_selectedPeakIndex + delta) % peakCount + peakCount) % peakCount;
+        RefreshPeakDetailPanel(_gameLoop?.State);
+    }
+
+    private void ApplySelectedPeakSupport()
+    {
+        var supportType = SectOrganizationRules.GetSupportTypeForPeakIndex(_selectedPeakIndex);
+        _gameLoop.SetPeakSupport(supportType);
     }
 
     private void RegisterJobRow(JobType jobType, string rowPath, string detailLabelPath)
@@ -1024,7 +1119,7 @@ public partial class Main : Control
         detailLabel.AutowrapMode = TextServer.AutowrapMode.WordSmart;
         detailLabel.Visible = false;
         row.MouseDefaultCursorShape = Control.CursorShape.PointingHand;
-        row.TooltipText = "点击查看岗位规则。";
+        row.TooltipText = "点击查看职司摘要并定位关联峰脉。";
         _jobRows[jobType] = row;
         _jobDetailLabels[jobType] = detailLabel;
 
@@ -1054,6 +1149,70 @@ public partial class Main : Control
                 ? new Color(0.831373f, 0.662745f, 0.32549f, 1.0f)
                 : baseStyle.BorderColor;
             entry.Value.AddThemeStyleboxOverride("panel", displayStyle);
+        }
+    }
+
+    private void RefreshPeakDetailPanel(GameState? state = null)
+    {
+        if (_peakCurrentTitleLabel == null ||
+            _peakDetailCounterLabel == null ||
+            _peakCurrentSummaryLabel == null ||
+            _peakCurrentDetailLabel == null)
+        {
+            return;
+        }
+
+        var peakCount = SectOrganizationRules.GetPeakCount();
+        if (peakCount <= 0)
+        {
+            return;
+        }
+
+        _selectedPeakIndex = SectOrganizationRules.NormalizePeakIndex(_selectedPeakIndex);
+        _peakCurrentTitleLabel.Text = SectOrganizationRules.GetPeakTitle(_selectedPeakIndex);
+        _peakCurrentTitleLabel.TooltipText = "点击四条职司摘要时会自动跳到推荐峰脉。";
+        _peakDetailCounterLabel.Text = $"{_selectedPeakIndex + 1}/{peakCount}";
+        _peakCurrentSummaryLabel.Text = SectOrganizationRules.GetPeakSummary(_selectedPeakIndex);
+        _peakCurrentSummaryLabel.TooltipText = SectOrganizationRules.BuildPeakDetailText(_selectedPeakIndex);
+        _peakCurrentDetailLabel.Text = SectOrganizationRules.BuildPeakDetailText(_selectedPeakIndex);
+        _peakCurrentDetailLabel.TooltipText = "峰脉详情来自《浮云宗-天衍峰》设定整理。";
+
+        var currentState = state ?? (_gameLoop != null ? _gameLoop.State : null);
+        var selectedSupportType = SectOrganizationRules.GetSupportTypeForPeakIndex(_selectedPeakIndex);
+        var selectedSupportDefinition = SectPeakSupportRules.GetDefinition(selectedSupportType);
+
+        if (_peakSupportStatusLabel != null)
+        {
+            var activeSupportText = currentState != null
+                ? SectPeakSupportRules.BuildActiveSupportStatus(currentState)
+                : SectPeakSupportRules.BuildSelectionPreview(SectPeakSupportType.Balanced);
+            _peakSupportStatusLabel.Text =
+                $"当前协同：{activeSupportText}\n候选峰令：{SectPeakSupportRules.BuildSelectionPreview(selectedSupportType)}";
+            _peakSupportStatusLabel.TooltipText = selectedSupportDefinition.Description;
+        }
+
+        if (_peakSupportButton != null)
+        {
+            var isCurrentSupport = currentState != null && SectPeakSupportRules.GetActiveSupport(currentState) == selectedSupportType;
+            _peakSupportButton.Text = isCurrentSupport ? "当前已协同" : $"立 {selectedSupportDefinition.DisplayName} 协同";
+            _peakSupportButton.Disabled = isCurrentSupport;
+            _peakSupportButton.TooltipText = selectedSupportDefinition.Description;
+        }
+
+        if (_peakSupportResetButton != null)
+        {
+            var isBalanced = currentState == null || SectPeakSupportRules.GetActiveSupport(currentState) == SectPeakSupportType.Balanced;
+            _peakSupportResetButton.Disabled = isBalanced;
+        }
+
+        if (_peakPrevButton != null)
+        {
+            _peakPrevButton.Disabled = peakCount <= 1;
+        }
+
+        if (_peakNextButton != null)
+        {
+            _peakNextButton.Disabled = peakCount <= 1;
         }
     }
 

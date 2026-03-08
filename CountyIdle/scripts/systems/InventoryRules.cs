@@ -27,6 +27,7 @@ public static class InventoryRules
         [nameof(GameState.HempCloth)] = new(static state => state.HempCloth, static (state, value) => state.HempCloth = value),
         [nameof(GameState.Leather)] = new(static state => state.Leather, static (state, value) => state.Leather = value),
         [nameof(GameState.Gold)] = new(static state => state.Gold, static (state, value) => state.Gold = value),
+        [nameof(GameState.ContributionPoints)] = new(static state => state.ContributionPoints, static (state, value) => state.ContributionPoints = value),
         [nameof(GameState.RareMaterial)] = new(static state => state.RareMaterial, static (state, value) => state.RareMaterial = value),
         [nameof(GameState.IronOre)] = new(static state => state.IronOre, static (state, value) => state.IronOre = value),
         [nameof(GameState.CopperOre)] = new(static state => state.CopperOre, static (state, value) => state.CopperOre = value),

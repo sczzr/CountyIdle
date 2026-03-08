@@ -9,42 +9,51 @@ public class IndustrySystem
     private const double AgricultureBuildWoodCost = 24;
     private const double AgricultureBuildStoneCost = 12;
     private const double AgricultureBuildGoldCost = 10;
+    private const double AgricultureBuildContributionCost = 10;
     private const double AgricultureBuildConstructionCost = 0;
 
     private const double WorkshopBuildWoodCost = 26;
     private const double WorkshopBuildStoneCost = 18;
     private const double WorkshopBuildGoldCost = 12;
+    private const double WorkshopBuildContributionCost = 12;
     private const double WorkshopBuildConstructionCost = 1;
 
     private const double ResearchBuildWoodCost = 16;
     private const double ResearchBuildStoneCost = 22;
     private const double ResearchBuildGoldCost = 22;
+    private const double ResearchBuildContributionCost = 18;
     private const double ResearchBuildConstructionCost = 2;
 
     private const double TradeBuildWoodCost = 18;
     private const double TradeBuildStoneCost = 14;
     private const double TradeBuildGoldCost = 24;
+    private const double TradeBuildContributionCost = 16;
     private const double TradeBuildConstructionCost = 2;
 
     private const double AdminBuildWoodCost = 20;
     private const double AdminBuildStoneCost = 20;
     private const double AdminBuildGoldCost = 20;
+    private const double AdminBuildContributionCost = 14;
     private const double AdminBuildConstructionCost = 2;
     private const double ForestryChainWoodCost = 12;
     private const double ForestryChainStoneCost = 10;
     private const double ForestryChainGoldCost = 8;
+    private const double ForestryChainContributionCost = 6;
     private const double ForestryChainConstructionCost = 0.5;
     private const double MasonryChainWoodCost = 10;
     private const double MasonryChainStoneCost = 12;
     private const double MasonryChainGoldCost = 8;
+    private const double MasonryChainContributionCost = 7;
     private const double MasonryChainConstructionCost = 0.6;
     private const double MedicinalChainWoodCost = 9;
     private const double MedicinalChainStoneCost = 8;
     private const double MedicinalChainGoldCost = 9;
+    private const double MedicinalChainContributionCost = 6;
     private const double MedicinalChainConstructionCost = 0.4;
     private const double FiberChainWoodCost = 11;
     private const double FiberChainStoneCost = 7;
     private const double FiberChainGoldCost = 8;
+    private const double FiberChainContributionCost = 6;
     private const double FiberChainConstructionCost = 0.4;
 
     public bool TickHour(GameState state, out string? log)
@@ -89,22 +98,30 @@ public class IndustrySystem
         InventoryRules.EndTransaction(state);
         IndustryRules.EnsureDefaults(state);
         MaterialRules.EnsureDefaults(state);
+        SectRuleTreeRules.EnsureDefaults(state);
+        SectPeakSupportRules.EnsureDefaults(state);
+
+        var ruleTreeToolModifier = SectRuleTreeRules.GetToolCraftModifier(state);
+        var supportToolModifier = SectPeakSupportRules.GetToolCraftModifier(state);
+        var quarterToolModifier = SectGovernanceRules.GetQuarterToolCraftModifier(state);
+        var supportDefinition = SectPeakSupportRules.GetActiveDefinition(state);
 
         if (state.Workers <= 0)
         {
-            log = "缺少管理人员，无法组织制工具。";
+            log = "缺少管理人员，无法组织锻制工器。";
             return false;
         }
 
         if (state.WorkshopBuildings <= 0)
         {
-            log = $"缺少{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Workshop)}，无法制造工具。";
+            log = $"缺少{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Workshop)}，无法锻制工器。";
             return false;
         }
 
         var woodCost = 8 + (state.WorkshopBuildings * 2);
         var stoneCost = 6 + (state.WorkshopBuildings * 1.5);
         var goldCost = 4 + (state.Workers * 0.25);
+        var contributionCost = 6 + (state.WorkshopBuildings * 0.5);
         var partCost = state.TechLevel >= 1 ? 1 + (state.WorkshopBuildings * 0.2) : 0;
 
         if (MaterialRules.HasTieredMetals(state))
@@ -116,11 +133,12 @@ public class IndustrySystem
                     woodCost,
                     stoneCost,
                     goldCost,
+                    contributionCost,
                     industrialParts: partCost,
                     wroughtIronCost: wroughtIronCost,
                     copperIngotCost: copperIngotCost))
             {
-                log = "制工具失败：木石金或材料不足。";
+                log = $"锻制工器失败：{MaterialSemanticRules.GetDisplayName(nameof(GameState.Wood))}、{MaterialSemanticRules.GetDisplayName(nameof(GameState.Stone))}、{MaterialSemanticRules.GetDisplayName(nameof(GameState.Gold))}、{MaterialSemanticRules.GetDisplayName(nameof(GameState.ContributionPoints))}或矿材不足。";
                 return false;
             }
 
@@ -129,30 +147,55 @@ public class IndustrySystem
                 woodCost,
                 stoneCost,
                 goldCost,
+                contributionCost,
                 industrialParts: partCost,
                 wroughtIronCost: wroughtIronCost,
                 copperIngotCost: copperIngotCost);
             var tieredAdvancedFactor = 1.03 + (partCost * 0.04);
-            var tieredToolGain = ((state.WorkshopBuildings * 18) + (state.Workers * 1.8)) * tieredAdvancedFactor;
+            var tieredToolGain = ((state.WorkshopBuildings * 18) + (state.Workers * 1.8)) * tieredAdvancedFactor * ruleTreeToolModifier * supportToolModifier * quarterToolModifier;
             var actualToolGain = InventoryRules.ApplyDelta(state, nameof(GameState.IndustryTools), tieredToolGain);
             log =
-                $"{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Workshop)}锻器：消耗木{InventoryRules.QuantizeCost(woodCost)}/石{InventoryRules.QuantizeCost(stoneCost)}/金{InventoryRules.QuantizeCost(goldCost)}/熟铁{InventoryRules.QuantizeCost(wroughtIronCost)}/铜锭{InventoryRules.QuantizeCost(copperIngotCost)}，工具+{actualToolGain}。";
+                $"{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Workshop)}锻器：消耗{MaterialSemanticRules.GetDisplayName(nameof(GameState.Wood))}{InventoryRules.QuantizeCost(woodCost)}/{MaterialSemanticRules.GetDisplayName(nameof(GameState.Stone))}{InventoryRules.QuantizeCost(stoneCost)}/{MaterialSemanticRules.GetDisplayName(nameof(GameState.Gold))}{InventoryRules.QuantizeCost(goldCost)}/{MaterialSemanticRules.GetDisplayName(nameof(GameState.ContributionPoints))}{InventoryRules.QuantizeCost(contributionCost)}/{MaterialSemanticRules.GetDisplayName(nameof(GameState.WroughtIron))}{InventoryRules.QuantizeCost(wroughtIronCost)}/{MaterialSemanticRules.GetDisplayName(nameof(GameState.CopperIngot))}{InventoryRules.QuantizeCost(copperIngotCost)}，{MaterialSemanticRules.FormatDelta(nameof(GameState.IndustryTools), actualToolGain)}。";
+            if (supportToolModifier > 1.0)
+            {
+                log += $" {supportDefinition.DisplayName}协同生效，工器产出提升 {(supportToolModifier - 1.0) * 100:0}% 。";
+            }
+            if (ruleTreeToolModifier > 1.0)
+            {
+                log += $" 门规验收加持，工器产出提升 {(ruleTreeToolModifier - 1.0) * 100:0}% 。";
+            }
+            if (quarterToolModifier > 1.0)
+            {
+                log += $" 季度法令加持，工器产出提升 {(quarterToolModifier - 1.0) * 100:0}% 。";
+            }
             return true;
         }
 
         var ironOreCost = 4 + (state.WorkshopBuildings * 1.2);
-        if (!CanAfford(state, woodCost, stoneCost, goldCost, ironOreCost: ironOreCost, industrialParts: partCost))
+        if (!CanAfford(state, woodCost, stoneCost, goldCost, contributionCost, ironOreCost: ironOreCost, industrialParts: partCost))
         {
-            log = "制工具失败：木石金或矿材不足。";
+            log = $"锻制工器失败：{MaterialSemanticRules.GetDisplayName(nameof(GameState.Wood))}、{MaterialSemanticRules.GetDisplayName(nameof(GameState.Stone))}、{MaterialSemanticRules.GetDisplayName(nameof(GameState.Gold))}、{MaterialSemanticRules.GetDisplayName(nameof(GameState.ContributionPoints))}或矿材不足。";
             return false;
         }
 
-        ConsumeBuildCost(state, woodCost, stoneCost, goldCost, ironOreCost: ironOreCost, industrialParts: partCost);
+        ConsumeBuildCost(state, woodCost, stoneCost, goldCost, contributionCost, ironOreCost: ironOreCost, industrialParts: partCost);
         var legacyAdvancedFactor = state.TechLevel >= 1 ? 1.0 + (partCost * 0.04) : 1.0;
-        var legacyToolGain = ((state.WorkshopBuildings * 18) + (state.Workers * 1.8)) * legacyAdvancedFactor;
+        var legacyToolGain = ((state.WorkshopBuildings * 18) + (state.Workers * 1.8)) * legacyAdvancedFactor * ruleTreeToolModifier * supportToolModifier * quarterToolModifier;
         var actualLegacyToolGain = InventoryRules.ApplyDelta(state, nameof(GameState.IndustryTools), legacyToolGain);
         log =
-            $"{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Workshop)}开炉：消耗木{InventoryRules.QuantizeCost(woodCost)}/石{InventoryRules.QuantizeCost(stoneCost)}/金{InventoryRules.QuantizeCost(goldCost)}/铁矿{InventoryRules.QuantizeCost(ironOreCost)}，工具+{actualLegacyToolGain}（旧链路兼容）。";
+            $"{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Workshop)}开炉：消耗{MaterialSemanticRules.GetDisplayName(nameof(GameState.Wood))}{InventoryRules.QuantizeCost(woodCost)}/{MaterialSemanticRules.GetDisplayName(nameof(GameState.Stone))}{InventoryRules.QuantizeCost(stoneCost)}/{MaterialSemanticRules.GetDisplayName(nameof(GameState.Gold))}{InventoryRules.QuantizeCost(goldCost)}/{MaterialSemanticRules.GetDisplayName(nameof(GameState.ContributionPoints))}{InventoryRules.QuantizeCost(contributionCost)}/{MaterialSemanticRules.GetDisplayName(nameof(GameState.IronOre))}{InventoryRules.QuantizeCost(ironOreCost)}，{MaterialSemanticRules.FormatDelta(nameof(GameState.IndustryTools), actualLegacyToolGain)}（旧链路兼容）。";
+        if (supportToolModifier > 1.0)
+        {
+            log += $" {supportDefinition.DisplayName}协同生效，工器产出提升 {(supportToolModifier - 1.0) * 100:0}% 。";
+        }
+        if (ruleTreeToolModifier > 1.0)
+        {
+            log += $" 门规验收加持，工器产出提升 {(ruleTreeToolModifier - 1.0) * 100:0}% 。";
+        }
+        if (quarterToolModifier > 1.0)
+        {
+            log += $" 季度法令加持，工器产出提升 {(quarterToolModifier - 1.0) * 100:0}% 。";
+        }
         return true;
     }
 
@@ -168,12 +211,13 @@ public class IndustrySystem
             return false;
         }
 
-        var (wood, stone, gold, construction, displayName, nextLevel) = chainType switch
+        var (wood, stone, gold, contribution, construction, displayName, nextLevel) = chainType switch
         {
             TierZeroMaterialChainType.Forestry => (
                 ForestryChainWoodCost + (state.ForestryChainLevel * 3),
                 ForestryChainStoneCost + (state.ForestryChainLevel * 2.5),
                 ForestryChainGoldCost + (state.ForestryChainLevel * 2.2),
+                ForestryChainContributionCost + (state.ForestryChainLevel * 1.5),
                 ForestryChainConstructionCost + (state.ForestryChainLevel * 0.25),
                 MaterialRules.GetTierZeroChainDisplayName(chainType),
                 state.ForestryChainLevel + 1),
@@ -181,6 +225,7 @@ public class IndustrySystem
                 MasonryChainWoodCost + (state.MasonryChainLevel * 2.6),
                 MasonryChainStoneCost + (state.MasonryChainLevel * 3),
                 MasonryChainGoldCost + (state.MasonryChainLevel * 2.1),
+                MasonryChainContributionCost + (state.MasonryChainLevel * 1.6),
                 MasonryChainConstructionCost + (state.MasonryChainLevel * 0.28),
                 MaterialRules.GetTierZeroChainDisplayName(chainType),
                 state.MasonryChainLevel + 1),
@@ -188,6 +233,7 @@ public class IndustrySystem
                 MedicinalChainWoodCost + (state.MedicinalChainLevel * 2.4),
                 MedicinalChainStoneCost + (state.MedicinalChainLevel * 2.0),
                 MedicinalChainGoldCost + (state.MedicinalChainLevel * 2.4),
+                MedicinalChainContributionCost + (state.MedicinalChainLevel * 1.5),
                 MedicinalChainConstructionCost + (state.MedicinalChainLevel * 0.18),
                 MaterialRules.GetTierZeroChainDisplayName(chainType),
                 state.MedicinalChainLevel + 1),
@@ -195,20 +241,21 @@ public class IndustrySystem
                 FiberChainWoodCost + (state.FiberChainLevel * 2.8),
                 FiberChainStoneCost + (state.FiberChainLevel * 1.8),
                 FiberChainGoldCost + (state.FiberChainLevel * 2.2),
+                FiberChainContributionCost + (state.FiberChainLevel * 1.5),
                 FiberChainConstructionCost + (state.FiberChainLevel * 0.18),
                 MaterialRules.GetTierZeroChainDisplayName(chainType),
                 state.FiberChainLevel + 1),
-            _ => (0.0, 0.0, 0.0, 0.0, "T0 链路", 0)
+            _ => (0.0, 0.0, 0.0, 0.0, 0.0, "T0 链路", 0)
         };
 
-        if (!CanAfford(state, wood, stone, gold, constructionMaterials: construction))
+        if (!CanAfford(state, wood, stone, gold, contribution, constructionMaterials: construction))
         {
             log =
-                $"{displayName}扩建失败：需木{InventoryRules.QuantizeCost(wood)}/石{InventoryRules.QuantizeCost(stone)}/金{InventoryRules.QuantizeCost(gold)}/建材{InventoryRules.QuantizeCost(construction)}。";
+                $"{displayName}扩建失败：需木{InventoryRules.QuantizeCost(wood)}/石{InventoryRules.QuantizeCost(stone)}/灵石{InventoryRules.QuantizeCost(gold)}/贡献{InventoryRules.QuantizeCost(contribution)}/建材{InventoryRules.QuantizeCost(construction)}。";
             return false;
         }
 
-        ConsumeBuildCost(state, wood, stone, gold, constructionMaterials: construction);
+        ConsumeBuildCost(state, wood, stone, gold, contribution, constructionMaterials: construction);
         switch (chainType)
         {
             case TierZeroMaterialChainType.Forestry:
@@ -226,7 +273,7 @@ public class IndustrySystem
         }
 
         log =
-            $"T0 链扩建：{displayName} 升至 Lv.{nextLevel}（木{InventoryRules.QuantizeCost(wood)}/石{InventoryRules.QuantizeCost(stone)}/金{InventoryRules.QuantizeCost(gold)}/建材{InventoryRules.QuantizeCost(construction)}）。";
+            $"T0 链扩建：{displayName} 升至 Lv.{nextLevel}（木{InventoryRules.QuantizeCost(wood)}/石{InventoryRules.QuantizeCost(stone)}/灵石{InventoryRules.QuantizeCost(gold)}/贡献{InventoryRules.QuantizeCost(contribution)}/建材{InventoryRules.QuantizeCost(construction)}）。";
         return true;
     }
 
@@ -244,21 +291,22 @@ public class IndustrySystem
         var woodCost = 18 + (state.MiningLevel * 4) + (state.WarehouseLevel * 5);
         var stoneCost = 22 + (state.MiningLevel * 6) + (state.WarehouseLevel * 6);
         var goldCost = 14 + (state.MiningLevel * 3) + (state.WarehouseLevel * 4);
+        var contributionCost = 18 + (state.MiningLevel * 2) + (state.WarehouseLevel * 2);
         var constructionCost = 3 + (state.MiningLevel * 1.5);
 
-        if (!CanAfford(state, woodCost, stoneCost, goldCost, constructionMaterials: constructionCost))
+        if (!CanAfford(state, woodCost, stoneCost, goldCost, contributionCost, constructionMaterials: constructionCost))
         {
             log =
-                $"矿仓联建失败：需木{InventoryRules.QuantizeCost(woodCost)}/石{InventoryRules.QuantizeCost(stoneCost)}/金{InventoryRules.QuantizeCost(goldCost)}/建材{InventoryRules.QuantizeCost(constructionCost)}。";
+                $"矿仓联建失败：需木{InventoryRules.QuantizeCost(woodCost)}/石{InventoryRules.QuantizeCost(stoneCost)}/灵石{InventoryRules.QuantizeCost(goldCost)}/贡献{InventoryRules.QuantizeCost(contributionCost)}/建材{InventoryRules.QuantizeCost(constructionCost)}。";
             return false;
         }
 
-        ConsumeBuildCost(state, woodCost, stoneCost, goldCost, constructionMaterials: constructionCost);
+        ConsumeBuildCost(state, woodCost, stoneCost, goldCost, contributionCost, constructionMaterials: constructionCost);
         state.MiningLevel += 1;
         state.WarehouseLevel += 1;
         state.WarehouseCapacity = IndustryRules.CalculateWarehouseCapacity(state);
 
-        log = $"矿仓联建：矿坑 Lv.{state.MiningLevel}，仓储 Lv.{state.WarehouseLevel}，容量 {state.WarehouseCapacity:0}。";
+        log = $"矿仓联建：矿坑 Lv.{state.MiningLevel}，仓储 Lv.{state.WarehouseLevel}，容量 {state.WarehouseCapacity:0}（消耗灵石{InventoryRules.QuantizeCost(goldCost)}/贡献{InventoryRules.QuantizeCost(contributionCost)}）。";
         return true;
     }
 
@@ -284,24 +332,24 @@ public class IndustrySystem
 
     private static bool TryBuildByType(GameState state, IndustryBuildingType buildingType, out string log)
     {
-        var (wood, stone, gold, construction, title) = buildingType switch
+        var (wood, stone, gold, contribution, construction, title) = buildingType switch
         {
-            IndustryBuildingType.Agriculture => (AgricultureBuildWoodCost, AgricultureBuildStoneCost, AgricultureBuildGoldCost, AgricultureBuildConstructionCost, SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Agriculture)),
-            IndustryBuildingType.Workshop => (WorkshopBuildWoodCost, WorkshopBuildStoneCost, WorkshopBuildGoldCost, WorkshopBuildConstructionCost, SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Workshop)),
-            IndustryBuildingType.Research => (ResearchBuildWoodCost, ResearchBuildStoneCost, ResearchBuildGoldCost, ResearchBuildConstructionCost, SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Research)),
-            IndustryBuildingType.Trade => (TradeBuildWoodCost, TradeBuildStoneCost, TradeBuildGoldCost, TradeBuildConstructionCost, SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Trade)),
-            IndustryBuildingType.Administration => (AdminBuildWoodCost, AdminBuildStoneCost, AdminBuildGoldCost, AdminBuildConstructionCost, SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Administration)),
-            _ => (0, 0, 0, 0, "建筑")
+            IndustryBuildingType.Agriculture => (AgricultureBuildWoodCost, AgricultureBuildStoneCost, AgricultureBuildGoldCost, AgricultureBuildContributionCost, AgricultureBuildConstructionCost, SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Agriculture)),
+            IndustryBuildingType.Workshop => (WorkshopBuildWoodCost, WorkshopBuildStoneCost, WorkshopBuildGoldCost, WorkshopBuildContributionCost, WorkshopBuildConstructionCost, SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Workshop)),
+            IndustryBuildingType.Research => (ResearchBuildWoodCost, ResearchBuildStoneCost, ResearchBuildGoldCost, ResearchBuildContributionCost, ResearchBuildConstructionCost, SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Research)),
+            IndustryBuildingType.Trade => (TradeBuildWoodCost, TradeBuildStoneCost, TradeBuildGoldCost, TradeBuildContributionCost, TradeBuildConstructionCost, SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Trade)),
+            IndustryBuildingType.Administration => (AdminBuildWoodCost, AdminBuildStoneCost, AdminBuildGoldCost, AdminBuildContributionCost, AdminBuildConstructionCost, SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Administration)),
+            _ => (0, 0, 0, 0, 0, "建筑")
         };
 
-        if (!CanAfford(state, wood, stone, gold, constructionMaterials: construction))
+        if (!CanAfford(state, wood, stone, gold, contribution, constructionMaterials: construction))
         {
             log =
-                $"{title}建造失败：木{InventoryRules.QuantizeCost(wood)}/石{InventoryRules.QuantizeCost(stone)}/金{InventoryRules.QuantizeCost(gold)}/建材{InventoryRules.QuantizeCost(construction)} 不足。";
+                $"{title}建造失败：木{InventoryRules.QuantizeCost(wood)}/石{InventoryRules.QuantizeCost(stone)}/灵石{InventoryRules.QuantizeCost(gold)}/贡献{InventoryRules.QuantizeCost(contribution)}/建材{InventoryRules.QuantizeCost(construction)} 不足。";
             return false;
         }
 
-        ConsumeBuildCost(state, wood, stone, gold, constructionMaterials: construction);
+        ConsumeBuildCost(state, wood, stone, gold, contribution, constructionMaterials: construction);
         switch (buildingType)
         {
             case IndustryBuildingType.Agriculture:
@@ -322,7 +370,7 @@ public class IndustrySystem
         }
 
         log =
-            $"产业扩建：新建{title} 1 座（木{InventoryRules.QuantizeCost(wood)}/石{InventoryRules.QuantizeCost(stone)}/金{InventoryRules.QuantizeCost(gold)}/建材{InventoryRules.QuantizeCost(construction)}）。";
+            $"产业扩建：新建{title} 1 座（木{InventoryRules.QuantizeCost(wood)}/石{InventoryRules.QuantizeCost(stone)}/灵石{InventoryRules.QuantizeCost(gold)}/贡献{InventoryRules.QuantizeCost(contribution)}/建材{InventoryRules.QuantizeCost(construction)}）。";
         return true;
     }
 
@@ -341,7 +389,7 @@ public class IndustrySystem
         var coverage = IndustryRules.GetToolCoverage(state);
         if (coverage < 0.55)
         {
-            logs.Add($"工具紧缺：当前工具覆盖率 {coverage * 100:0}% 。");
+            logs.Add($"工器紧缺：当前工器覆盖率 {coverage * 100:0}% 。");
         }
     }
 
@@ -350,6 +398,7 @@ public class IndustrySystem
         double wood,
         double stone,
         double gold,
+        double contributionCost = 0,
         double constructionMaterials = 0,
         double ironOreCost = 0,
         double industrialParts = 0,
@@ -360,6 +409,7 @@ public class IndustrySystem
         return state.Wood >= InventoryRules.QuantizeCost(wood) &&
                state.Stone >= InventoryRules.QuantizeCost(stone) &&
                state.Gold >= InventoryRules.QuantizeCost(gold) &&
+               state.ContributionPoints >= InventoryRules.QuantizeCost(contributionCost) &&
                state.ConstructionMaterials >= InventoryRules.QuantizeCost(constructionMaterials) &&
                state.IronOre >= InventoryRules.QuantizeCost(ironOreCost) &&
                state.IndustrialParts >= InventoryRules.QuantizeCost(industrialParts) &&
@@ -372,6 +422,7 @@ public class IndustrySystem
         double wood,
         double stone,
         double gold,
+        double contributionCost = 0,
         double constructionMaterials = 0,
         double ironOreCost = 0,
         double industrialParts = 0,
@@ -381,6 +432,7 @@ public class IndustrySystem
         state.Wood = Math.Max(state.Wood - InventoryRules.QuantizeCost(wood), 0);
         state.Stone = Math.Max(state.Stone - InventoryRules.QuantizeCost(stone), 0);
         state.Gold = Math.Max(state.Gold - InventoryRules.QuantizeCost(gold), 0);
+        state.ContributionPoints = Math.Max(state.ContributionPoints - InventoryRules.QuantizeCost(contributionCost), 0);
         state.ConstructionMaterials = Math.Max(state.ConstructionMaterials - InventoryRules.QuantizeCost(constructionMaterials), 0);
         state.IronOre = Math.Max(state.IronOre - InventoryRules.QuantizeCost(ironOreCost), 0);
         state.IndustrialParts = Math.Max(state.IndustrialParts - InventoryRules.QuantizeCost(industrialParts), 0);

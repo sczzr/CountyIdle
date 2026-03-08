@@ -57,7 +57,7 @@ public class ResourceSystem
         if (timberGain > 0 || rawStoneGain > 0 || clayGain > 0 || brineGain > 0 || herbsGain > 0 || hempGain > 0 || reedsGain > 0 || hidesGain > 0)
         {
             logs.Add(
-                $"{SectMapSemanticRules.GetWildernessGatheringLabel()}：林木+{timberGain}、原石+{rawStoneGain}、黏土+{clayGain}、卤水+{brineGain}、药材+{herbsGain}、麻料+{hempGain}、芦苇+{reedsGain}、皮毛+{hidesGain}。");
+                $"{SectMapSemanticRules.GetWildernessGatheringLabel()}：{MaterialSemanticRules.FormatDelta(nameof(GameState.Timber), timberGain)}、{MaterialSemanticRules.FormatDelta(nameof(GameState.RawStone), rawStoneGain)}、{MaterialSemanticRules.FormatDelta(nameof(GameState.Clay), clayGain)}、{MaterialSemanticRules.FormatDelta(nameof(GameState.Brine), brineGain)}、{MaterialSemanticRules.FormatDelta(nameof(GameState.Herbs), herbsGain)}、{MaterialSemanticRules.FormatDelta(nameof(GameState.HempFiber), hempGain)}、{MaterialSemanticRules.FormatDelta(nameof(GameState.Reeds), reedsGain)}、{MaterialSemanticRules.FormatDelta(nameof(GameState.Hides), hidesGain)}。");
         }
     }
 
@@ -67,8 +67,8 @@ public class ResourceSystem
         var woodBatch = processingEstimate.WoodGain;
         var stoneBatch = processingEstimate.StoneGain;
 
-        var producedWood = 0.0;
-        var producedStone = 0.0;
+        var producedWood = 0;
+        var producedStone = 0;
 
         if (woodBatch >= 0.25)
         {
@@ -84,7 +84,7 @@ public class ResourceSystem
 
         if (producedWood > 0 || producedStone > 0)
         {
-            logs.Add($"{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Workshop)}初加工：木料+{producedWood:0}、石料+{producedStone:0}。");
+            logs.Add($"{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Workshop)}初加工：{MaterialSemanticRules.FormatDelta(nameof(GameState.Wood), producedWood)}、{MaterialSemanticRules.FormatDelta(nameof(GameState.Stone), producedStone)}。");
         }
     }
 
@@ -104,7 +104,7 @@ public class ResourceSystem
 
         if (actualIronGain > 0 || actualCopperGain > 0 || actualCoalGain > 0)
         {
-            logs.Add($"矿坑开采：铁矿+{actualIronGain}、铜矿+{actualCopperGain}、煤矿+{actualCoalGain}。");
+            logs.Add($"矿坑开采：{MaterialSemanticRules.FormatDelta(nameof(GameState.IronOre), actualIronGain)}、{MaterialSemanticRules.FormatDelta(nameof(GameState.CopperOre), actualCopperGain)}、{MaterialSemanticRules.FormatDelta(nameof(GameState.Coal), actualCoalGain)}。");
         }
     }
 
@@ -130,8 +130,8 @@ public class ResourceSystem
             smeltQuota * 0.70,
             Math.Min(state.IronOre / 1.9, state.Coal / 1.15));
 
-        var copperGain = 0.0;
-        var wroughtGain = 0.0;
+        var copperGain = 0;
+        var wroughtGain = 0;
 
         if (copperBatch >= 0.2)
         {
@@ -149,7 +149,7 @@ public class ResourceSystem
 
         if (copperGain > 0 || wroughtGain > 0)
         {
-            logs.Add($"矿石冶炼：铜锭+{copperGain:0}、熟铁+{wroughtGain:0}。");
+            logs.Add($"矿石冶炼：{MaterialSemanticRules.FormatDelta(nameof(GameState.CopperIngot), copperGain)}、{MaterialSemanticRules.FormatDelta(nameof(GameState.WroughtIron), wroughtGain)}。");
         }
     }
 
@@ -160,10 +160,10 @@ public class ResourceSystem
         var clothBatch = Math.Min(state.HempFiber / 1.5, (state.WorkshopBuildings * 0.35) + (state.TradeBuildings * 0.16));
         var leatherBatch = Math.Min(state.Hides / 1.35, (state.Workers * 0.10) + (state.WorkshopBuildings * 0.18));
 
-        var saltGain = 0.0;
-        var medicineGain = 0.0;
-        var clothGain = 0.0;
-        var leatherGain = 0.0;
+        var saltGain = 0;
+        var medicineGain = 0;
+        var clothGain = 0;
+        var leatherGain = 0;
 
         if (saltBatch >= 0.2)
         {
@@ -191,7 +191,7 @@ public class ResourceSystem
 
         if (saltGain > 0 || medicineGain > 0 || clothGain > 0 || leatherGain > 0)
         {
-            logs.Add($"民生产线：精盐+{saltGain:0}、药剂+{medicineGain:0}、麻布+{clothGain:0}、皮革+{leatherGain:0}。");
+            logs.Add($"民生产线：{MaterialSemanticRules.FormatDelta(nameof(GameState.FineSalt), saltGain)}、{MaterialSemanticRules.FormatDelta(nameof(GameState.HerbalMedicine), medicineGain)}、{MaterialSemanticRules.FormatDelta(nameof(GameState.HempCloth), clothGain)}、{MaterialSemanticRules.FormatDelta(nameof(GameState.Leather), leatherGain)}。");
         }
     }
 
@@ -218,7 +218,7 @@ public class ResourceSystem
         var compositeGain = InventoryRules.ApplyDelta(state, nameof(GameState.CompositeMaterial), synthesisBatch * 0.9);
         if (compositeGain > 0)
         {
-            logs.Add($"{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Research)}研发：复合材料+{compositeGain:0}。");
+            logs.Add($"{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Research)}研发：{MaterialSemanticRules.FormatDelta(nameof(GameState.CompositeMaterial), compositeGain)}。");
         }
     }
 
@@ -237,7 +237,7 @@ public class ResourceSystem
             var toolGain = InventoryRules.ApplyDelta(state, nameof(GameState.IndustryTools), partBatch * 1.1 * 0.55);
             if (partGain > 0 || toolGain > 0)
             {
-                logs.Add($"{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Workshop)}制造：工业部件+{partGain:0}、工具+{toolGain:0}。");
+                logs.Add($"{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Workshop)}制造：{MaterialSemanticRules.FormatDelta(nameof(GameState.IndustrialParts), partGain)}、{MaterialSemanticRules.FormatDelta(nameof(GameState.IndustryTools), toolGain)}。");
             }
         }
 
@@ -265,7 +265,7 @@ public class ResourceSystem
         var actualConstructionGain = InventoryRules.ApplyDelta(state, nameof(GameState.ConstructionMaterials), constructionGain);
         if (actualConstructionGain > 0)
         {
-            logs.Add($"营造司加工：建造构件+{actualConstructionGain:0}。");
+            logs.Add($"营造司加工：{MaterialSemanticRules.FormatDelta(nameof(GameState.ConstructionMaterials), actualConstructionGain)}。");
         }
     }
 

@@ -12,10 +12,15 @@ public partial class GameLoop : Node
     private const double MaxTimeScale = 4.0;
     private const int MinutesPerSettlement = 60;
 
+    private readonly GameCalendarSystem _gameCalendarSystem = new();
     private readonly PopulationSystem _populationSystem = new();
     private readonly IndustrySystem _industrySystem = new();
     private readonly ResourceSystem _resourceSystem = new();
     private readonly EconomySystem _economySystem = new();
+    private readonly SectTaskSystem _sectTaskSystem = new();
+    private readonly SectGovernanceSystem _sectGovernanceSystem = new();
+    private readonly SectRuleTreeSystem _sectRuleTreeSystem = new();
+    private readonly SectPeakSupportSystem _sectPeakSupportSystem = new();
     private readonly MapOperationalLinkSystem _mapOperationalLinkSystem = new();
     private readonly ResearchSystem _researchSystem = new();
     private readonly BreedingSystem _breedingSystem = new();
@@ -55,9 +60,13 @@ public partial class GameLoop : Node
         IndustryRules.EnsureDefaults(_state);
         PopulationRules.EnsureDefaults(_state);
         MaterialRules.EnsureDefaults(_state);
+        _sectGovernanceSystem.EnsureDefaults(_state);
+        _sectRuleTreeSystem.EnsureDefaults(_state);
+        _sectPeakSupportSystem.EnsureDefaults(_state);
+        ValidateQuarterDecree(false);
         _minuteAccumulator = Math.Max(_state.GameMinutes % MinutesPerSettlement, 0);
         _secondAccumulator = 0;
-        ClampJobsToIndustryCapacity(publishLogs: false);
+        SyncTaskOrders();
         _eventBus.PublishState(_state.Clone());
     }
 
@@ -67,8 +76,13 @@ public partial class GameLoop : Node
         InventoryRules.EndTransaction(_state);
         PopulationRules.EnsureDefaults(_state);
         MaterialRules.EnsureDefaults(_state);
+        _sectGovernanceSystem.EnsureDefaults(_state);
+        _sectRuleTreeSystem.EnsureDefaults(_state);
+        _sectPeakSupportSystem.EnsureDefaults(_state);
+        ValidateQuarterDecree(false);
         _minuteAccumulator = 0;
         _secondAccumulator = 0;
+        SyncTaskOrders();
         _eventBus.PublishLog("已重置到初始状态。");
         _eventBus.PublishState(_state.Clone());
     }
@@ -84,7 +98,7 @@ public partial class GameLoop : Node
     {
         if (_industrySystem.TryConstructBuilding(_state, buildingType, out var log))
         {
-            ClampJobsToIndustryCapacity(publishLogs: false);
+            SyncTaskOrders();
             _eventBus.PublishLog(log);
             _eventBus.PublishState(_state.Clone());
             return;
@@ -97,6 +111,7 @@ public partial class GameLoop : Node
     {
         if (_industrySystem.TryCraftTools(_state, out var log))
         {
+            SyncTaskOrders();
             _eventBus.PublishLog(log);
             _eventBus.PublishState(_state.Clone());
             return;
@@ -109,6 +124,7 @@ public partial class GameLoop : Node
     {
         if (_industrySystem.TryUpgradeMineAndWarehouse(_state, out var log))
         {
+            SyncTaskOrders();
             _eventBus.PublishLog(log);
             _eventBus.PublishState(_state.Clone());
             return;
@@ -121,6 +137,7 @@ public partial class GameLoop : Node
     {
         if (_industrySystem.TryBuildTierZeroChain(_state, chainType, out var log))
         {
+            SyncTaskOrders();
             _eventBus.PublishLog(log);
             _eventBus.PublishState(_state.Clone());
             return;
@@ -134,6 +151,7 @@ public partial class GameLoop : Node
         if (_mapOperationalLinkSystem.TryExecuteDirective(_state, directiveAction, out var log))
         {
             PopulationRules.EnsureDefaults(_state);
+            SyncTaskOrders();
             _eventBus.PublishLog(log);
             _eventBus.PublishState(_state.Clone());
             return;
@@ -144,50 +162,158 @@ public partial class GameLoop : Node
 
     public void AdjustJob(JobType jobType, int delta)
     {
-        if (delta == 0)
+        AdjustTaskOrder(SectTaskRules.GetPrimaryTaskForJob(jobType), delta);
+    }
+
+    public void AdjustTaskOrder(SectTaskType taskType, int delta)
+    {
+        if (!_sectTaskSystem.AdjustOrder(_state, taskType, delta, out var log))
         {
+            _eventBus.PublishLog(log);
             return;
         }
 
-        IndustryRules.EnsureDefaults(_state);
+        SyncTaskOrders();
+        _eventBus.PublishLog(log);
+        _eventBus.PublishState(_state.Clone());
+    }
 
-        var currentAssigned = IndustryRules.GetAssigned(_state, jobType);
-        var targetAssigned = currentAssigned;
-
-        if (delta > 0)
+    public void ResetTaskOrders()
+    {
+        if (!_sectTaskSystem.ResetOrders(_state, out var log))
         {
-            var availablePopulation = _state.GetUnassignedPopulation();
-            if (availablePopulation <= 0)
-            {
-                _eventBus.PublishLog("空闲人口不足，无法继续分配。");
-                return;
-            }
-
-            var capacity = IndustryRules.GetCapacity(_state, jobType);
-            var allowedByCapacity = Math.Max(capacity - currentAssigned, 0);
-            var actualIncrease = Math.Min(delta, Math.Min(availablePopulation, allowedByCapacity));
-
-            if (actualIncrease <= 0)
-            {
-                _eventBus.PublishLog($"{GetJobDisplayName(jobType)}受岗位容量限制，请先扩建相关建筑或补充工具。");
-                return;
-            }
-
-            targetAssigned += actualIncrease;
-        }
-        else
-        {
-            targetAssigned = Math.Max(currentAssigned + delta, 0);
+            _eventBus.PublishLog(log);
+            return;
         }
 
-        IndustryRules.SetAssigned(_state, jobType, targetAssigned);
+        SyncTaskOrders();
+        _eventBus.PublishLog(log);
+        _eventBus.PublishState(_state.Clone());
+    }
 
-        var overAssigned = _state.GetAssignedPopulation() - _state.Population;
-        if (overAssigned > 0)
+    public void ShiftDevelopmentDirection(int delta)
+    {
+        if (!_sectGovernanceSystem.ShiftDevelopmentDirection(_state, delta, out var log))
         {
-            RemoveFromJob(jobType, overAssigned);
+            _eventBus.PublishLog(log);
+            return;
         }
 
+        SyncTaskOrders();
+        _eventBus.PublishLog(log);
+        _eventBus.PublishState(_state.Clone());
+    }
+
+    public void ShiftSectLaw(int delta)
+    {
+        if (!_sectGovernanceSystem.ShiftLaw(_state, delta, out var log))
+        {
+            _eventBus.PublishLog(log);
+            return;
+        }
+
+        SyncTaskOrders();
+        _eventBus.PublishLog(log);
+        _eventBus.PublishState(_state.Clone());
+    }
+
+    public void ShiftTalentPlan(int delta)
+    {
+        if (!_sectGovernanceSystem.ShiftTalentPlan(_state, delta, out var log))
+        {
+            _eventBus.PublishLog(log);
+            return;
+        }
+
+        SyncTaskOrders();
+        _eventBus.PublishLog(log);
+        _eventBus.PublishState(_state.Clone());
+    }
+
+    public void ResetGovernance()
+    {
+        if (!_sectGovernanceSystem.ResetGovernance(_state, out var log))
+        {
+            _eventBus.PublishLog(log);
+            return;
+        }
+
+        _sectRuleTreeSystem.ResetRules(_state);
+        SyncTaskOrders();
+        _eventBus.PublishLog($"{log} 门规纲目已恢复常制。");
+        _eventBus.PublishState(_state.Clone());
+    }
+
+    public void ShiftQuarterDecree(int delta)
+    {
+        var currentQuarterIndex = _gameCalendarSystem.GetQuarterIndex(_state.GameMinutes);
+        if (!_sectGovernanceSystem.ShiftQuarterDecree(_state, currentQuarterIndex, out var log, delta))
+        {
+            _eventBus.PublishLog(log);
+            return;
+        }
+
+        _eventBus.PublishLog(log);
+        _eventBus.PublishState(_state.Clone());
+    }
+
+    public void ShiftAffairsRule(int delta)
+    {
+        if (!_sectRuleTreeSystem.ShiftAffairsRule(_state, delta, out var log))
+        {
+            _eventBus.PublishLog(log);
+            return;
+        }
+
+        _eventBus.PublishLog(log);
+        _eventBus.PublishState(_state.Clone());
+    }
+
+    public void ShiftDoctrineRule(int delta)
+    {
+        if (!_sectRuleTreeSystem.ShiftDoctrineRule(_state, delta, out var log))
+        {
+            _eventBus.PublishLog(log);
+            return;
+        }
+
+        _eventBus.PublishLog(log);
+        _eventBus.PublishState(_state.Clone());
+    }
+
+    public void ShiftDisciplineRule(int delta)
+    {
+        if (!_sectRuleTreeSystem.ShiftDisciplineRule(_state, delta, out var log))
+        {
+            _eventBus.PublishLog(log);
+            return;
+        }
+
+        _eventBus.PublishLog(log);
+        _eventBus.PublishState(_state.Clone());
+    }
+
+    public void SetPeakSupport(SectPeakSupportType supportType)
+    {
+        if (!_sectPeakSupportSystem.SetPeakSupport(_state, supportType, out var log))
+        {
+            _eventBus.PublishLog(log);
+            return;
+        }
+
+        _eventBus.PublishLog(log);
+        _eventBus.PublishState(_state.Clone());
+    }
+
+    public void ResetPeakSupport()
+    {
+        if (!_sectPeakSupportSystem.ResetPeakSupport(_state, out var log))
+        {
+            _eventBus.PublishLog(log);
+            return;
+        }
+
+        _eventBus.PublishLog(log);
         _eventBus.PublishState(_state.Clone());
     }
 
@@ -228,7 +354,14 @@ public partial class GameLoop : Node
 
     private void AdvanceOneGameMinute()
     {
+        var previousQuarterIndex = _gameCalendarSystem.GetQuarterIndex(_state.GameMinutes);
         _state.GameMinutes += 1;
+        var currentQuarterIndex = _gameCalendarSystem.GetQuarterIndex(_state.GameMinutes);
+        if (currentQuarterIndex != previousQuarterIndex)
+        {
+            ValidateQuarterDecree(true);
+        }
+
         _minuteAccumulator += 1;
 
         if (_minuteAccumulator < MinutesPerSettlement)
@@ -238,6 +371,7 @@ public partial class GameLoop : Node
 
         _minuteAccumulator = 0;
         _state.HourSettlements += 1;
+        SyncTaskOrders();
 
         if (_industrySystem.TickHour(_state, out var industryLog) && !string.IsNullOrWhiteSpace(industryLog))
         {
@@ -276,6 +410,28 @@ public partial class GameLoop : Node
             _eventBus.PublishLog(eventLog);
         }
 
+        SyncTaskOrders();
         _eventBus.PublishState(_state.Clone());
+    }
+
+    private void SyncTaskOrders()
+    {
+        _sectGovernanceSystem.EnsureDefaults(_state);
+        _sectRuleTreeSystem.EnsureDefaults(_state);
+        _sectTaskSystem.EnsureDefaults(_state);
+    }
+
+    private void ValidateQuarterDecree(bool publishLog)
+    {
+        var currentQuarterIndex = _gameCalendarSystem.GetQuarterIndex(_state.GameMinutes);
+        if (!_sectGovernanceSystem.HandleQuarterTransition(_state, currentQuarterIndex, out var log))
+        {
+            return;
+        }
+
+        if (publishLog && !string.IsNullOrWhiteSpace(log))
+        {
+            _eventBus.PublishLog(log);
+        }
     }
 }

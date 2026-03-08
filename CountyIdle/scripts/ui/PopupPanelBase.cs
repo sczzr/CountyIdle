@@ -19,6 +19,12 @@ public abstract partial class PopupPanelBase : Control
         RefreshPopupHint();
     }
 
+    protected void InitializePopupHint(Label hintLabel)
+    {
+        _popupHintLabel = hintLabel;
+        RefreshPopupHint();
+    }
+
     protected void OpenPopup()
     {
         ClearPopupStatusMessage(refreshHint: false);

@@ -1061,7 +1061,7 @@ public sealed partial class XianxiaWorldGeneratorSystem
                 Role = XianxiaSiteRoleType.Settlement,
                 Coord = CloneCoord(settlementPool[index].Cell.Coord),
                 Structure = structure,
-                Label = index % 2 == 0 ? $"聚落 {index + 1}" : $"坊市 {index + 1}",
+                Label = index % 2 == 0 ? $"附庸据点 {index + 1}" : $"坊市 {index + 1}",
                 Importance = 2
             });
         }

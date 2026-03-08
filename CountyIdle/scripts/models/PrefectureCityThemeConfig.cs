@@ -6,10 +6,10 @@ namespace CountyIdle.Models;
 public sealed class PrefectureCityThemeConfig
 {
     [JsonPropertyName("map_title")]
-    public string MapTitle { get; set; } = "外域态势（云泽外域）";
+    public string MapTitle { get; set; } = "江陵府外域（附庸圈层）";
 
     [JsonPropertyName("city_title")]
-    public string CityTitle { get; set; } = "云泽外城";
+    public string CityTitle { get; set; } = "云泽附庸坊城";
 
     [JsonPropertyName("forest_name")]
     public string ForestName { get; set; } = "青岚灵林";
@@ -21,7 +21,7 @@ public sealed class PrefectureCityThemeConfig
     public string MountainName { get; set; } = "东岭灵脉";
 
     [JsonPropertyName("farmland_name")]
-    public string FarmlandName { get; set; } = "云泽灵田";
+    public string FarmlandName { get; set; } = "云泽阵材圃";
 
     [JsonPropertyName("main_avenue_name")]
     public string MainAvenueName { get; set; } = "问道长街";
@@ -33,7 +33,7 @@ public sealed class PrefectureCityThemeConfig
     public string InnerCityName { get; set; } = "内坊";
 
     [JsonPropertyName("outer_wards_name")]
-    public string OuterWardsName { get; set; } = "山门坊市";
+    public string OuterWardsName { get; set; } = "附庸坊廓";
 
     [JsonPropertyName("landmark_names")]
     public List<string> LandmarkNames { get; set; } = [];

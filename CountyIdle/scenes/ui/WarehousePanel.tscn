@@ -43,7 +43,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Dialog" type="PanelContainer" parent="CenterLayer"]
-custom_minimum_size = Vector2(700, 0)
+custom_minimum_size = Vector2(980, 0)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_dialog")
 
@@ -76,7 +76,7 @@ text = "×"
 layout_mode = 2
 modulate = Color(0.760784, 0.780392, 0.831373, 1)
 autowrap_mode = 3
-text = "分类查看仓储库存，并直接执行矿仓联建、工具制造与产能扩建。"
+text = "按分类查看灵材卡槽与库存，并直接执行矿仓联建、工器炼制与产能扩建。"
 
 [node name="StatusSection" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn"]
 layout_mode = 2
@@ -85,7 +85,7 @@ theme_override_constants/separation = 8
 [node name="WarehouseStatusValue" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/StatusSection"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.94902, 0.909804, 0.788235, 1)
-text = "仓储Lv.1 · 矿坑Lv.1 · 占用 0/1200 (0%)"
+text = "仓储 Lv.1 · 矿坑 Lv.1 · 已占 0/1200 · 剩余 1200"
 
 [node name="WarehouseLoadBar" type="ProgressBar" parent="CenterLayer/Dialog/Margin/MainColumn/StatusSection"]
 custom_minimum_size = Vector2(0, 14)
@@ -94,39 +94,26 @@ max_value = 1200.0
 value = 0.0
 show_percentage = false
 
-[node name="CategorySection" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn"]
+[node name="InventoryFrame" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn"]
 layout_mode = 2
-theme_override_constants/separation = 8
+size_flags_vertical = 3
 
-[node name="BaseTitle" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/CategorySection"]
+[node name="InventorySection" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/InventoryFrame"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 13
-text = "基础资源"
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
 
-[node name="BaseResourcesValue" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/CategorySection"]
+[node name="InventoryScroll" type="ScrollContainer" parent="CenterLayer/Dialog/Margin/MainColumn/InventoryFrame/InventorySection"]
+custom_minimum_size = Vector2(0, 380)
 layout_mode = 2
-text = "粮 0 · 木 0 · 石 0 · 金 0"
-autowrap_mode = 3
+size_flags_vertical = 3
 
-[node name="OreTitle" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/CategorySection"]
+[node name="InventoryColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/InventoryFrame/InventorySection/InventoryScroll"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 13
-text = "矿石资源"
-
-[node name="OreResourcesValue" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/CategorySection"]
-layout_mode = 2
-text = "铁矿 0 · 铜矿 0 · 煤矿 0 · 稀材 0"
-autowrap_mode = 3
-
-[node name="MaterialTitle" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/CategorySection"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 13
-text = "材料与产成品"
-
-[node name="MaterialResourcesValue" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/CategorySection"]
-layout_mode = 2
-text = "金属锭 0 · 复合材料 0 · 工业部件 0 · 建造构件 0"
-autowrap_mode = 3
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
 
 [node name="ActionSection" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn"]
 layout_mode = 2
@@ -144,7 +131,7 @@ text = "矿仓联建"
 [node name="CraftToolsButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/PrimaryActionRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "制工具"
+text = "锻制工器"
 
 [node name="BuildActionRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection"]
 layout_mode = 2
@@ -153,12 +140,12 @@ theme_override_constants/separation = 8
 [node name="BuildWorkshopButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/BuildActionRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "扩建炼器坊"
+text = "扩建傀儡工坊"
 
 [node name="BuildAdministrationButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/BuildActionRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "扩建宗务殿"
+text = "扩建庶务殿"
 
 [node name="TierZeroTitle" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection"]
 layout_mode = 2

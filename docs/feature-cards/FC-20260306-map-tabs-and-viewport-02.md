@@ -1,5 +1,8 @@
 # 功能卡（Feature Card）
 
+> 历史兼容说明（2026-03-08）：本文保留旧阶段的“县城 / 郡图 / 郡县 / 州府”等表述以便追溯；在当前项目语义中，请分别按“天衍峰驻地 / 江陵府外域 / 天衍峰经营 / 世界地图”理解。
+
+
 ## 功能信息
 
 - 功能名：中心 MapViewport 填充布局与 TopTabRow 内容切换
@@ -41,3 +44,5 @@
 
 - 风险：节点路径迁移后按钮绑定失效，导致运行时报错
 - 回滚方式：回退 `CountyIdle/scenes/ui/WorldPanel.tscn` 与 `CountyIdle/scripts/Main.cs`
+
+

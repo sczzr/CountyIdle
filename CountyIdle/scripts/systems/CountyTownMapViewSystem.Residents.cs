@@ -39,6 +39,7 @@ public partial class CountyTownMapViewSystem
     private sealed class ResidentWalker
     {
         public JobType JobType { get; init; }
+        public DiscipleProfile Profile { get; init; } = null!;
         public Vector2I HomeCell { get; init; }
         public Vector2I HomeRoadCell { get; init; }
         public TownActivityAnchorType WorkAnchorType { get; init; }
@@ -66,6 +67,7 @@ public partial class CountyTownMapViewSystem
     private int _lastResidentClockMinute = -1;
     private float _currentMinuteInterpolation;
     private float _residentTimeScale = 1.0f;
+    private GameState _residentSourceState = new();
 
     public override void _Process(double delta)
     {
@@ -94,6 +96,7 @@ public partial class CountyTownMapViewSystem
 
     public void RefreshResidents(GameState state)
     {
+        _residentSourceState = state.Clone();
         var farmerHint = Math.Max(state.Farmers, 0);
         var workerHint = Math.Max(state.Workers, 0);
         var merchantHint = Math.Max(state.Merchants, 0);
@@ -142,6 +145,7 @@ public partial class CountyTownMapViewSystem
 
         var workAnchorsByType = BuildActivityAnchorLookup();
         var leisureAnchors = new List<TownActivityAnchorData>(_mapData.EnumerateActivityAnchors(TownActivityAnchorType.Leisure));
+        var profileQueues = BuildResidentProfileQueues();
 
         EnsureResidentTextures();
 
@@ -159,10 +163,12 @@ public partial class CountyTownMapViewSystem
                 var workAnchorType = GetWorkAnchorType(allocation.Key);
                 var workRoadCell = PickWorkRoadCell(allocation.Key, roadCells, workAnchorsByType, walkerIndex);
                 var leisureRoadCell = PickLeisureRoadCell(roadCells, leisureAnchors, walkerIndex);
+                var profile = DequeueResidentProfile(profileQueues, allocation.Key, walkerIndex);
 
                 _residentWalkers.Add(new ResidentWalker
                 {
                     JobType = allocation.Key,
+                    Profile = profile,
                     HomeCell = building.Cell,
                     HomeRoadCell = homeRoadCell,
                     WorkAnchorType = workAnchorType,
@@ -180,6 +186,12 @@ public partial class CountyTownMapViewSystem
                 residenceCursor++;
                 walkerIndex++;
             }
+        }
+
+        if (_selectedResidentDiscipleId.HasValue &&
+            _residentWalkers.TrueForAll(walker => walker.Profile.Id != _selectedResidentDiscipleId.Value))
+        {
+            _selectedResidentDiscipleId = null;
         }
     }
 
@@ -298,7 +310,67 @@ public partial class CountyTownMapViewSystem
                 entry.Pose.Position + new Vector2(ScaleValue(4f), -ScaleValue(10f)),
                 Math.Max(1.0f, ScaleValue(1.3f)),
                 entry.Walker.BadgeColor * entry.Pose.Modulate.A);
+
+            if (_selectedResidentDiscipleId.HasValue && entry.Walker.Profile.Id == _selectedResidentDiscipleId.Value)
+            {
+                DrawArc(
+                    entry.Pose.Position + new Vector2(0f, -ScaleValue(9f)),
+                    Math.Max(ScaleValue(9.5f), 7.0f),
+                    0f,
+                    Mathf.Tau,
+                    24,
+                    new Color(0.95f, 0.84f, 0.46f, 0.92f),
+                    Math.Max(1.3f, ScaleValue(1.6f)),
+                    true);
+            }
         }
+    }
+
+    private bool HandleResidentSelection(Vector2 localPosition)
+    {
+        if (_mapData == null || _residentWalkers.Count == 0)
+        {
+            return false;
+        }
+
+        var origin = CalculateMapOrigin(_mapData);
+        var selectedWalker = PickResidentAt(localPosition, origin);
+        if (selectedWalker == null)
+        {
+            return false;
+        }
+
+        _selectedResidentDiscipleId = selectedWalker.Profile.Id;
+        _selectedActivityAnchor = FindAnchorForResident(selectedWalker);
+        UpdateMapHint();
+        QueueRedraw();
+        RequestDiscipleInspection(selectedWalker.Profile.Id, selectedWalker.JobType);
+        return true;
+    }
+
+    private string? TryBuildSelectedResidentHint()
+    {
+        var walker = GetSelectedResidentWalker();
+        if (walker == null)
+        {
+            return null;
+        }
+
+        var phaseText = GetResidentActivityPhaseText(walker);
+        return $"{walker.Profile.Name} · {walker.Profile.RankName} · {walker.Profile.DutyDisplayName} · {walker.Profile.RealmName}\n当前{phaseText}，已联动弟子谱定位该弟子。";
+    }
+
+    private void TryInspectAnchorResidents(TownActivityAnchorData anchor)
+    {
+        var representativeWalker = ResolveRepresentativeWalkerForAnchor(anchor);
+        if (representativeWalker == null)
+        {
+            _selectedResidentDiscipleId = null;
+            return;
+        }
+
+        _selectedResidentDiscipleId = representativeWalker.Profile.Id;
+        RequestDiscipleInspection(representativeWalker.Profile.Id, representativeWalker.JobType);
     }
 
     private ResidentPose GetResidentPose(ResidentWalker walker, Vector2 origin)
@@ -465,6 +537,20 @@ public partial class CountyTownMapViewSystem
         };
     }
 
+    private string GetResidentActivityPhaseText(ResidentWalker walker)
+    {
+        return GetResidentActivityPhase(walker) switch
+        {
+            ResidentActivityPhase.AtHome => "在舍中静修",
+            ResidentActivityPhase.CommuteToWork => "正前往当值场所",
+            ResidentActivityPhase.AtWork => "正值守本职差事",
+            ResidentActivityPhase.CommuteToLeisure => "正在转往晚间论道点",
+            ResidentActivityPhase.AtLeisure => "正在歇息论道",
+            ResidentActivityPhase.CommuteHome => "正在归舍收束",
+            _ => "状态稳定"
+        };
+    }
+
     private static float GetPhaseProgress(float minuteOfDay, int phaseStartMinute, int phaseEndMinute)
     {
         var duration = Math.Max(phaseEndMinute - phaseStartMinute, 1);
@@ -490,6 +576,43 @@ public partial class CountyTownMapViewSystem
         var from = GetTownCellCenter(routeCells[segmentIndex], origin);
         var to = GetTownCellCenter(routeCells[segmentIndex + 1], origin);
         return from.Lerp(to, localProgress);
+    }
+
+    private ResidentWalker? PickResidentAt(Vector2 localPosition, Vector2 origin)
+    {
+        ResidentWalker? selectedWalker = null;
+        var selectedDepth = float.MinValue;
+        var selectedDepthX = float.MinValue;
+
+        foreach (var walker in _residentWalkers)
+        {
+            var pose = GetResidentPose(walker, origin);
+            var residentRect = BuildResidentHitRect(walker, pose);
+            if (!residentRect.HasPoint(localPosition))
+            {
+                continue;
+            }
+
+            if (pose.Position.Y > selectedDepth ||
+                (Mathf.IsEqualApprox(pose.Position.Y, selectedDepth) && pose.Position.X >= selectedDepthX))
+            {
+                selectedDepth = pose.Position.Y;
+                selectedDepthX = pose.Position.X;
+                selectedWalker = walker;
+            }
+        }
+
+        return selectedWalker;
+    }
+
+    private Rect2 BuildResidentHitRect(ResidentWalker walker, ResidentPose pose)
+    {
+        var residentSize = new Vector2(
+            ScaleValue(walker.Texture.GetWidth() * 0.72f),
+            ScaleValue(walker.Texture.GetHeight() * 0.72f));
+        return new Rect2(
+            pose.Position - new Vector2(residentSize.X * 0.5f, residentSize.Y),
+            residentSize).Grow(Math.Max(2.0f, ScaleValue(2.4f)));
     }
 
     private Vector2I GetEntranceRoadCell(TownBuildingData building, List<Vector2I> roadCells)
@@ -614,6 +737,171 @@ public partial class CountyTownMapViewSystem
             JobType.Merchant => new Color(0.84f, 0.52f, 0.30f, 1.0f),
             JobType.Scholar => new Color(0.48f, 0.62f, 0.90f, 1.0f),
             _ => Colors.White
+        };
+    }
+
+    private Dictionary<JobType, Queue<DiscipleProfile>> BuildResidentProfileQueues()
+    {
+        var lookup = new Dictionary<JobType, Queue<DiscipleProfile>>
+        {
+            [JobType.Farmer] = new Queue<DiscipleProfile>(),
+            [JobType.Worker] = new Queue<DiscipleProfile>(),
+            [JobType.Merchant] = new Queue<DiscipleProfile>(),
+            [JobType.Scholar] = new Queue<DiscipleProfile>()
+        };
+
+        foreach (var profile in DiscipleRosterSystem.BuildRoster(_residentSourceState))
+        {
+            if (!profile.JobType.HasValue || !lookup.TryGetValue(profile.JobType.Value, out var queue))
+            {
+                continue;
+            }
+
+            queue.Enqueue(profile);
+        }
+
+        return lookup;
+    }
+
+    private DiscipleProfile DequeueResidentProfile(Dictionary<JobType, Queue<DiscipleProfile>> profileQueues, JobType jobType, int walkerIndex)
+    {
+        if (profileQueues.TryGetValue(jobType, out var queue) && queue.Count > 0)
+        {
+            return queue.Dequeue();
+        }
+
+        return new DiscipleProfile(
+            100000 + walkerIndex,
+            $"{GetFallbackSurname(walkerIndex)}巡值弟子",
+            "外门",
+            jobType,
+            GetFallbackDutyDisplayName(jobType),
+            "炼气二层",
+            1,
+            DiscipleAgeBand.Young,
+            18 + (walkerIndex % 12),
+            false,
+            60,
+            60,
+            50,
+            50,
+            50,
+            50,
+            50,
+            40,
+            "待命轮值",
+            "外门居舍",
+            SectOrganizationRules.GetLinkedPeakSummary(jobType),
+            "状态平稳 / 服从调度",
+            "当前为地图占位弟子。");
+    }
+
+    private ResidentWalker? GetSelectedResidentWalker()
+    {
+        if (!_selectedResidentDiscipleId.HasValue)
+        {
+            return null;
+        }
+
+        foreach (var walker in _residentWalkers)
+        {
+            if (walker.Profile.Id == _selectedResidentDiscipleId.Value)
+            {
+                return walker;
+            }
+        }
+
+        return null;
+    }
+
+    private ResidentWalker? ResolveRepresentativeWalkerForAnchor(TownActivityAnchorData anchor)
+    {
+        ResidentWalker? inboundWalker = null;
+        ResidentWalker? assignedWalker = null;
+
+        foreach (var walker in _residentWalkers)
+        {
+            if (!IsResidentAssignedToAnchor(walker, anchor))
+            {
+                continue;
+            }
+
+            assignedWalker ??= walker;
+            var phase = GetResidentActivityPhase(walker);
+            if ((anchor.AnchorType == TownActivityAnchorType.Leisure && phase == ResidentActivityPhase.AtLeisure) ||
+                (anchor.AnchorType != TownActivityAnchorType.Leisure && phase == ResidentActivityPhase.AtWork))
+            {
+                return walker;
+            }
+
+            if (inboundWalker == null &&
+                ((anchor.AnchorType == TownActivityAnchorType.Leisure && phase == ResidentActivityPhase.CommuteToLeisure) ||
+                 (anchor.AnchorType != TownActivityAnchorType.Leisure && phase == ResidentActivityPhase.CommuteToWork)))
+            {
+                inboundWalker = walker;
+            }
+        }
+
+        return inboundWalker ?? assignedWalker;
+    }
+
+    private TownActivityAnchorData? FindAnchorForResident(ResidentWalker walker)
+    {
+        if (_mapData == null)
+        {
+            return null;
+        }
+
+        var phase = GetResidentActivityPhase(walker);
+        var wantsLeisureAnchor = phase is ResidentActivityPhase.AtLeisure or ResidentActivityPhase.CommuteToLeisure;
+        var roadCell = wantsLeisureAnchor ? walker.LeisureRoadCell : walker.WorkRoadCell;
+
+        foreach (var anchor in _mapData.ActivityAnchors)
+        {
+            if (anchor.RoadCell != roadCell)
+            {
+                continue;
+            }
+
+            if (wantsLeisureAnchor)
+            {
+                if (anchor.AnchorType == TownActivityAnchorType.Leisure)
+                {
+                    return anchor;
+                }
+
+                continue;
+            }
+
+            if (anchor.AnchorType == walker.WorkAnchorType)
+            {
+                return anchor;
+            }
+        }
+
+        return null;
+    }
+
+    private static string GetFallbackSurname(int walkerIndex)
+    {
+        return (walkerIndex % 4) switch
+        {
+            0 => "云",
+            1 => "陆",
+            2 => "沈",
+            _ => "苏"
+        };
+    }
+
+    private static string GetFallbackDutyDisplayName(JobType jobType)
+    {
+        return jobType switch
+        {
+            JobType.Farmer => "阵材职司",
+            JobType.Worker => "阵务职司",
+            JobType.Merchant => "外事职司",
+            JobType.Scholar => "推演职司",
+            _ => "待命轮值"
         };
     }
 

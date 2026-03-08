@@ -1,4 +1,7 @@
-# 改动提案：外域备用视图修仙语义化（V1）
+# 改动提案：江陵府外域备用视图修仙语义化（V1）
+
+> 历史兼容说明（2026-03-08）：本文保留旧阶段的“县城 / 郡图 / 郡县 / 州府”等表述以便追溯；在当前项目语义中，请分别按“天衍峰驻地 / 江陵府外域 / 天衍峰经营 / 世界地图”理解。
+
 
 ## 提案信息
 
@@ -9,18 +12,18 @@
 
 ## 改动背景
 
-- 当前问题：主界面已只保留 `宗门地图 / 世界地图`，但隐藏备用 Prefecture 视图的 JSON、fallback 标题与地标命名仍残留 `周边郡图 / 开封郡城 / 天下州域` 等旧语义。
+- 当前问题：主界面已只保留 `天衍峰山门图 / 世界地图`，但隐藏备用 Prefecture 视图的 JSON、fallback 标题与地标命名仍残留 `周边郡图 / 开封郡城 / 天下州域` 等旧语义。
 - 证据（数据/玩家反馈）：上一轮全局语义复扫后，剩余旧词已集中在 `prefecture_city_theme.json`、`strategic_maps.json` 与 Prefecture fallback 代码中，属于典型“未来可能漏出”的主题残留。
 
 ## 改动内容
 
 - 改什么：
   - 将隐藏备用外域视图的标题、城名、地标、街区名统一切到修仙外域术语；
-  - 将 `strategic_maps.json` 中 `world / prefecture` 标题统一改为 `世界地图 / 外域态势`；
+  - 将 `strategic_maps.json` 中 `world / prefecture` 标题统一改为 `世界地图 / 江陵府外域`；
   - 将 Prefecture 相关 fallback 默认值同步改掉，避免配置缺失时回漏旧词。
 - 不改什么：
   - 不重新启用第三张地图入口；
-  - 不改外域备用视图的生成算法、道路/河流布局与缩放规则。
+  - 不改江陵府外域备用视图的生成算法、道路/河流布局与缩放规则。
 - 影响系统：
   - `CountyIdle/data/prefecture_city_theme.json`
   - `CountyIdle/data/strategic_maps.json`
@@ -52,8 +55,10 @@
 
 ## 回滚条件
 
-- 触发条件：外域备用视图配置缺失、fallback 文案异常或未来恢复旧主题需求明确。
+- 触发条件：江陵府外域备用视图配置缺失、fallback 文案异常或未来恢复旧主题需求明确。
 - 回滚步骤：
   1. 恢复 `prefecture_city_theme.json` 与 Prefecture fallback 字符串；
   2. 恢复 `strategic_maps.json` 中旧标题；
   3. 保持主界面双地图结构不变。
+
+
