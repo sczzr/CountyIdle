@@ -632,6 +632,26 @@
   - `BottomBar.tscn` 与 `WorldPanel.tscn` 的底栏控制条、地图页签和缩放按钮补齐 `normal / hover / pressed` 三态，卷尾法令与卷中页签不再停留在“同一描边”状态；
   - `JobsPanel.tscn` 与 `MainSectTileInspector.cs` 统一去除左侧动作按钮中的 emoji，改成 `扩建阵材圃 / 调度堂口法旨 / 查阅门人谱` 等墨线批令语义；
   - `WorldPanel.tscn` 的备用报表卡、状态警示卡与新建卡底色统一回宣纸系，为后续恢复这些备用页签预留一致风格。
+- 2026-03-10 十九轮补强：
+  - `Main.tscn` 根背景改为 `CountyIdle/assets/ui/background/background_1.png`，统一主界面卷轴山水底图；
+  - 旧 `PaperSheet / LeftRoller / RightRoller / HeaderRule / FooterRule / LeftGuide / RightGuide` 装饰底稿默认停用，避免与新背景卷轴边框重复叠加；
+  - 本轮仅处理表现层，不改 `GameLoop`、`GameState`、地图页签、tile 检视联动与存档结构；新增 `FC-20260310-main-background-image.md`。
+- 2026-03-10 二十轮补强：
+  - `Main.cs` 为根背景节点补齐显式窗口缩放适配：监听主界面与 viewport 尺寸变化，实时重排背景 `TextureRect`；
+  - `background_1.png` 统一按 cover 方式铺满整个游戏窗口，窗口放大/缩小时始终保持全屏填充；
+  - 本轮仅强化表现层适配，不改 `GameLoop`、`GameState`、地图联动与存档结构。
+- 2026-03-10 二十一轮补强：
+  - `Main.cs` 将 `background_1.png` 改为先裁切卷轴中间画幅，再作为根背景源图使用，避免把卷轴木轴与外围留白一起拉进游戏背景；
+  - 裁切后的画幅继续按 cover 方式铺满整个游戏窗口，窗口变化时保持居中与全屏填充；
+  - 继续微调裁切框，使背景更贴近参考图中的内框长画幅构图；本轮仅调整表现层背景取样，不改 `GameLoop`、`GameState`、地图联动与存档结构。
+- 2026-03-10 二十二轮补强：
+  - 根背景资源正式切换为 `CountyIdle/assets/ui/background/background_2.png`；
+  - 由于 `background_2.png` 本身已经对齐目标画幅构图，`Main.cs` 取消额外裁切，直接整图作为背景源；
+  - 背景继续监听窗口与 viewport 尺寸变化，并以 cover 方式持续铺满整个游戏窗口；本轮不改 `GameLoop`、`GameState`、地图联动与存档结构。
+- 2026-03-10 二十三轮补强：
+  - 为 `Main.tscn` 根背景节点新增 `background_blur.gdshader`，对 `background_2.png` 应用高斯模糊；
+  - 模糊仅作用于背景 `TextureRect`，不影响前景 UI、地图交互与弹窗层级；
+  - 本轮仅处理表现层材质，不改 `GameLoop`、`GameState`、地图联动与存档结构。
 
 ## 4) 执行与回写规则
 

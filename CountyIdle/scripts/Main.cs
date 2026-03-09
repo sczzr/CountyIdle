@@ -23,6 +23,7 @@ public partial class Main : Control
     }
 
     private const string MainLayoutPath = "RootMargin/MainLayout";
+    private const string BackgroundPath = "Background";
     private const string TopBarPath = $"{MainLayoutPath}/TopBar";
     private const string BodyRowPath = $"{MainLayoutPath}/BodyRow";
     private const string LeftPanelPath = $"{BodyRowPath}/LeftPanel";
@@ -41,6 +42,7 @@ public partial class Main : Control
     private const string FigmaCenterPath = $"{FigmaRootPath}/BodyRow/CenterView/PanelPadding/MainColumn";
     private const string FigmaTimelinePath = $"{FigmaRootPath}/BodyRow/TimelinePanel/PanelPadding/MainColumn";
     private const string FigmaEquipmentPath = $"{FigmaRootPath}/BodyRow/EquipmentPanel/PanelPadding/MainColumn";
+    private const string LegacyBackgroundTexturePath = "res://assets/ui/background/background_2.png";
 
     private const int JobAdjustStep = 1;
     private const double LanternPulseDurationSeconds = 0.42;
@@ -116,6 +118,7 @@ public partial class Main : Control
     private RichTextLabel? _peakCurrentDetailLabel;
     private Control _legacyLayoutRoot = null!;
     private Control _figmaLayoutRoot = null!;
+    private TextureRect? _backgroundTextureRect;
     private SectMapViewSystem? _sectMapRenderer;
 
     private Button? _figmaBuildAgricultureButton;
@@ -139,6 +142,7 @@ public partial class Main : Control
     {
         InitializeClientSettings();
         BindUiNodes();
+        BindBackgroundResizeEvents();
         ConfigureDualMapMode();
         CreateSettingsPanel();
         CreateWarehousePanel();
@@ -172,6 +176,7 @@ public partial class Main : Control
         }
 
         _buttonPulseTweens.Clear();
+        UnbindBackgroundResizeEvents();
         UnbindClientSettingEvents();
         UnbindWarehousePanelEvents();
         UnbindTaskPanelEvents();
@@ -461,6 +466,8 @@ public partial class Main : Control
 
     private void BindUiNodes()
     {
+        _backgroundTextureRect = GetNodeOrNull<TextureRect>(BackgroundPath);
+        ConfigureLegacyBackground();
         _legacyLayoutRoot = GetNode<Control>(LegacyLayoutPath);
         _figmaLayoutRoot = GetNode<Control>(FigmaLayoutPath);
         _isUsingFigmaLayout = _useFigmaLayout;
@@ -479,6 +486,82 @@ public partial class Main : Control
         {
             SetMapTab(MapTab.Sect);
         }
+    }
+
+    private void ConfigureLegacyBackground()
+    {
+        if (_backgroundTextureRect == null)
+        {
+            return;
+        }
+
+        _backgroundTextureRect.Visible = true;
+        _backgroundTextureRect.MouseFilter = MouseFilterEnum.Ignore;
+        _backgroundTextureRect.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
+        _backgroundTextureRect.StretchMode = TextureRect.StretchModeEnum.KeepAspectCovered;
+        _backgroundTextureRect.ZIndex = -100;
+        _backgroundTextureRect.SelfModulate = Colors.White;
+
+        var absolutePath = ProjectSettings.GlobalizePath(LegacyBackgroundTexturePath);
+        if (FileAccess.FileExists(absolutePath))
+        {
+            var image = Image.LoadFromFile(absolutePath);
+            if (image != null && !image.IsEmpty())
+            {
+                _backgroundTextureRect.Texture = ImageTexture.CreateFromImage(image);
+                return;
+            }
+        }
+
+        var texture = GD.Load<Texture2D>(LegacyBackgroundTexturePath);
+        if (texture != null)
+        {
+            _backgroundTextureRect.Texture = texture;
+            return;
+        }
+
+        GD.PushWarning($"主界面背景图加载失败：{LegacyBackgroundTexturePath}");
+    }
+
+    private void BindBackgroundResizeEvents()
+    {
+        if (_backgroundTextureRect == null)
+        {
+            return;
+        }
+
+        Resized += RefreshLegacyBackgroundLayout;
+        GetViewport().SizeChanged += RefreshLegacyBackgroundLayout;
+        RefreshLegacyBackgroundLayout();
+    }
+
+    private void UnbindBackgroundResizeEvents()
+    {
+        if (_backgroundTextureRect == null)
+        {
+            return;
+        }
+
+        Resized -= RefreshLegacyBackgroundLayout;
+
+        var viewport = GetViewport();
+        if (viewport != null)
+        {
+            viewport.SizeChanged -= RefreshLegacyBackgroundLayout;
+        }
+    }
+
+    private void RefreshLegacyBackgroundLayout()
+    {
+        if (_backgroundTextureRect == null)
+        {
+            return;
+        }
+
+        _backgroundTextureRect.SetAnchorsPreset(LayoutPreset.FullRect);
+        _backgroundTextureRect.SetOffsetsPreset(LayoutPreset.FullRect);
+        _backgroundTextureRect.Position = Vector2.Zero;
+        _backgroundTextureRect.Size = GetViewportRect().Size;
     }
 
     private void BindLegacyUiNodes()
