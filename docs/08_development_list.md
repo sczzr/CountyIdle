@@ -652,6 +652,10 @@
   - 为 `Main.tscn` 根背景节点新增 `background_blur.gdshader`，对 `background_2.png` 应用高斯模糊；
   - 模糊仅作用于背景 `TextureRect`，不影响前景 UI、地图交互与弹窗层级；
   - 本轮仅处理表现层材质，不改 `GameLoop`、`GameState`、地图联动与存档结构。
+- 2026-03-10 二十四轮补强：
+  - 按最新表现要求，将根背景材质从高斯模糊改为 `background_frosted_glass.gdshader` 毛玻璃效果；
+  - 毛玻璃 shader 通过轻微散射采样、乳白 tint、对比度压低与细颗粒噪声，让背景保持卷轴气质但不过分抢前景；
+  - 效果仅作用于背景 `TextureRect`，不影响前景 UI、地图交互与弹窗层级；本轮不改 `GameLoop`、`GameState`、地图联动与存档结构。
 
 ## 4) 执行与回写规则
 
