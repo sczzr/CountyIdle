@@ -692,23 +692,34 @@ public partial class DisciplePanel : PopupPanelBase
                 hallItem.SetSelectable(0, false);
                 hallItem.Collapsed = false;
 
-                foreach (var rankGroup in hallGroup
+                foreach (var branchGroup in hallGroup
+                             .GroupBy(ResolveRosterBranchTitle)
+                             .OrderBy(group => ResolveRosterBranchOrder(group.Key))
+                             .ThenBy(group => group.Key))
+                {
+                    var branchItem = _rosterTree.CreateItem(hallItem);
+                    branchItem.SetText(0, branchGroup.Key);
+                    branchItem.SetSelectable(0, false);
+                    branchItem.Collapsed = false;
+
+                    foreach (var rankGroup in branchGroup
                              .GroupBy(ResolveRosterRankTitle)
                              .OrderBy(group => ResolveRosterRankOrder(group.Key))
                              .ThenBy(group => group.Key))
-                {
-                    var rankItem = _rosterTree.CreateItem(hallItem);
-                    rankItem.SetText(0, $"{rankGroup.Key} ({rankGroup.Count()})");
-                    rankItem.SetSelectable(0, false);
-                    rankItem.Collapsed = false;
-
-                    foreach (var profile in rankGroup)
                     {
-                        var discipleItem = _rosterTree.CreateItem(rankItem);
-                        discipleItem.SetText(0, BuildListText(profile));
-                        discipleItem.SetMetadata(0, profile.Id);
-                        discipleItem.SetTooltipText(0, $"{profile.DutyDisplayName} · {profile.RealmName} · {profile.LinkedPeakSummary}");
-                        _rosterItems[profile.Id] = discipleItem;
+                        var rankItem = _rosterTree.CreateItem(branchItem);
+                        rankItem.SetText(0, $"{rankGroup.Key} ({rankGroup.Count()})");
+                        rankItem.SetSelectable(0, false);
+                        rankItem.Collapsed = false;
+
+                        foreach (var profile in rankGroup)
+                        {
+                            var discipleItem = _rosterTree.CreateItem(rankItem);
+                            discipleItem.SetText(0, BuildListText(profile));
+                            discipleItem.SetMetadata(0, profile.Id);
+                            discipleItem.SetTooltipText(0, $"{profile.DutyDisplayName} · {profile.RealmName} · {profile.LinkedPeakSummary}");
+                            _rosterItems[profile.Id] = discipleItem;
+                        }
                     }
                 }
             }
@@ -1066,52 +1077,59 @@ public partial class DisciplePanel : PopupPanelBase
 
     private static string ResolveRosterPeakTitle(DiscipleProfile profile)
     {
-        var primaryNode = profile.LinkedPeakSummary
-            .Split('/', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
-            .FirstOrDefault();
-
-        if (string.IsNullOrWhiteSpace(primaryNode))
+        if (profile.AgeBand == DiscipleAgeBand.Seedling)
         {
-            return "外峰别册";
+            return "启蒙院";
         }
 
-        var peakIndex = primaryNode.IndexOf('峰');
-        if (peakIndex >= 0)
+        if (profile.IsElite)
         {
-            return primaryNode[..(peakIndex + 1)];
+            return profile.JobType switch
+            {
+                JobType.Worker => "天衍峰",
+                JobType.Merchant => "青云峰",
+                JobType.Scholar => "青云峰",
+                JobType.Farmer => "天元峰",
+                _ => "天衍峰"
+            };
         }
 
-        return primaryNode switch
+        return profile.JobType switch
         {
-            var node when node.Contains("殿", StringComparison.Ordinal) => "庶务殿",
-            var node when node.Contains("院", StringComparison.Ordinal) => "启蒙院",
-            _ => primaryNode
+            JobType.Farmer => "天元峰",
+            JobType.Worker => profile.CurrentAssignment.Contains("检修", StringComparison.Ordinal) ? "天权峰" : "天工峰",
+            JobType.Merchant => profile.CurrentAssignment.Contains("商路", StringComparison.Ordinal) ? "天枢峰" : "青云峰",
+            JobType.Scholar => "天机峰",
+            _ => "庶务殿"
         };
     }
 
     private static string ResolveRosterHallTitle(DiscipleProfile profile)
     {
-        var primaryNode = profile.LinkedPeakSummary
-            .Split('/', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
-            .FirstOrDefault() ?? profile.DutyDisplayName;
-
-        var peakTitle = ResolveRosterPeakTitle(profile);
-        if (primaryNode.StartsWith(peakTitle, StringComparison.Ordinal))
+        if (profile.AgeBand == DiscipleAgeBand.Seedling)
         {
-            var remainder = primaryNode[peakTitle.Length..].Trim();
-            if (!string.IsNullOrWhiteSpace(remainder))
+            return "传功总院";
+        }
+
+        if (profile.IsElite)
+        {
+            return profile.JobType switch
             {
-                return remainder;
-            }
+                JobType.Worker => "总枢殿",
+                JobType.Merchant => "外事总殿",
+                JobType.Scholar => "传功总殿",
+                JobType.Farmer => "济世堂",
+                _ => "总枢殿"
+            };
         }
 
         return profile.JobType switch
         {
-            JobType.Farmer => "阵材堂",
-            JobType.Worker => "庶务司",
-            JobType.Merchant => "总坊录",
-            JobType.Scholar => "传法院",
-            _ => primaryNode
+            JobType.Farmer => "济世堂",
+            JobType.Worker => profile.CurrentAssignment.Contains("检修", StringComparison.Ordinal) ? "承山堂" : "铸机阁",
+            JobType.Merchant => profile.CurrentAssignment.Contains("商路", StringComparison.Ordinal) ? "鸿胪司" : "外事总殿",
+            JobType.Scholar => profile.CurrentAssignment.Contains("讲法", StringComparison.Ordinal) ? "传功总院" : "衍法阁",
+            _ => "外门轮值司"
         };
     }
 
@@ -1120,11 +1138,15 @@ public partial class DisciplePanel : PopupPanelBase
         return hallTitle switch
         {
             "总枢殿" => 0,
-            "教习轮值" => 1,
-            "传功总院" => 2,
-            "传法院" => 3,
-            "庶务司" => 4,
-            "外门轮值司" => 5,
+            "外事总殿" => 1,
+            "传功总殿" => 2,
+            "传功总院" => 3,
+            "衍法阁" => 4,
+            "铸机阁" => 5,
+            "承山堂" => 6,
+            "鸿胪司" => 7,
+            "济世堂" => 8,
+            "外门轮值司" => 9,
             _ => 9
         };
     }
@@ -1132,6 +1154,58 @@ public partial class DisciplePanel : PopupPanelBase
     private static string ResolveRosterRankTitle(DiscipleProfile profile)
     {
         return profile.RankName;
+    }
+
+    private static string ResolveRosterBranchTitle(DiscipleProfile profile)
+    {
+        if (profile.AgeBand == DiscipleAgeBand.Seedling)
+        {
+            return "启蒙课业线";
+        }
+
+        if (profile.IsElite)
+        {
+            return profile.JobType switch
+            {
+                JobType.Worker => "总枢亲传线",
+                JobType.Merchant => "外务真传线",
+                JobType.Scholar => "真传研修线",
+                JobType.Farmer => "灵植亲传线",
+                _ => "真传嫡录线"
+            };
+        }
+
+        return profile.JobType switch
+        {
+            JobType.Farmer => profile.CurrentAssignment.Contains("巡视", StringComparison.Ordinal) ? "药圃巡看线" : "阵材轮值线",
+            JobType.Worker => profile.CurrentAssignment.Contains("检修", StringComparison.Ordinal) ? "护山检修线" : "阵枢营造线",
+            JobType.Merchant => profile.CurrentAssignment.Contains("商路", StringComparison.Ordinal) ? "商路采办线" : "总坊对牌线",
+            JobType.Scholar => profile.CurrentAssignment.Contains("讲法", StringComparison.Ordinal) ? "讲法校勘线" : "推演研修线",
+            _ => profile.CurrentAssignment.Contains("巡舍", StringComparison.Ordinal) ? "巡舍备勤线" : "待命补位线"
+        };
+    }
+
+    private static int ResolveRosterBranchOrder(string branchTitle)
+    {
+        return branchTitle switch
+        {
+            "总枢亲传线" => 0,
+            "真传研修线" => 1,
+            "外务真传线" => 2,
+            "灵植亲传线" => 3,
+            "启蒙课业线" => 4,
+            "推演研修线" => 5,
+            "讲法校勘线" => 6,
+            "阵枢营造线" => 7,
+            "护山检修线" => 8,
+            "总坊对牌线" => 9,
+            "商路采办线" => 10,
+            "药圃巡看线" => 11,
+            "阵材轮值线" => 12,
+            "巡舍备勤线" => 13,
+            "待命补位线" => 14,
+            _ => 20
+        };
     }
 
     private static int ResolveRosterRankOrder(string rankTitle)

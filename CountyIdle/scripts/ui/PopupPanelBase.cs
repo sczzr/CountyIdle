@@ -6,12 +6,19 @@ namespace CountyIdle.UI;
 public abstract partial class PopupPanelBase : Control
 {
     private const double DefaultStatusMessageDurationSeconds = 2.4;
+    private const int PopupOverlayZIndex = 200;
 
     private Label? _popupHintLabel;
     private string? _popupStatusMessage;
     private double _popupStatusMessageRemainingSeconds;
 
     protected string? PopupStatusMessage => _popupStatusMessage;
+
+    public override void _EnterTree()
+    {
+        ZAsRelative = false;
+        ZIndex = PopupOverlayZIndex;
+    }
 
     protected void InitializePopupHint(string hintLabelPath)
     {
@@ -28,6 +35,7 @@ public abstract partial class PopupPanelBase : Control
     protected void OpenPopup()
     {
         ClearPopupStatusMessage(refreshHint: false);
+        MoveToFront();
         Show();
         RefreshPopupHint();
     }

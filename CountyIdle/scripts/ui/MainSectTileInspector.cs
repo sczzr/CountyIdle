@@ -160,17 +160,17 @@ public partial class Main
         {
             ApplyPrimaryTileInspectorBinding(new TileInspectorActionBinding(
                 TileInspectorAction.None,
-                "🔍 选择地块后可用",
+                "点选地块后可用",
                 "请先在中央六边形沙盘上点选一个可交互 tile。",
                 false));
             ApplySecondaryTileInspectorBinding(new TileInspectorActionBinding(
                 TileInspectorAction.None,
-                "👥 选择地块后可用",
+                "点选地块后可阅",
                 "选中 tile 后，这里会出现该地块的辅助操作。",
                 false));
             ApplyTertiaryTileInspectorBinding(new TileInspectorActionBinding(
                 TileInspectorAction.None,
-                "📦 选择地块后可用",
+                "点选地块后可查",
                 "选中 tile 后，这里会出现与该地块相关的补充入口。",
                 false));
             ApplyTileInspectorActionHint("可执行项：请先点选中央 hex tile，左侧才会显示该地块的具体可操作项。");
@@ -183,37 +183,37 @@ public partial class Main
         {
             TownActivityAnchorType.Farmstead => new TileInspectorActionBinding(
                 TileInspectorAction.BuildAgriculture,
-                "🔨 扩建阵材圃",
+                "扩建阵材圃",
                 $"对【{tileName}】追加灵植 / 灵田产能，强化阵材与供养链路。",
                 true),
             TownActivityAnchorType.Workshop => new TileInspectorActionBinding(
                 TileInspectorAction.BuildWorkshop,
-                "🔨 扩建傀儡工坊",
+                "扩建傀儡工坊",
                 $"对【{tileName}】追加营造与工器位，强化阵务与建设链路。",
                 true),
             TownActivityAnchorType.Market => new TileInspectorActionBinding(
                 TileInspectorAction.BuildTrade,
-                "🔨 扩建青云总坊",
+                "扩建青云总坊",
                 $"对【{tileName}】追加流转与外事务位，提升总坊回流。",
                 true),
             TownActivityAnchorType.Academy => new TileInspectorActionBinding(
                 TileInspectorAction.BuildResearch,
-                "🔨 扩建传法院",
+                "扩建传法院",
                 $"对【{tileName}】追加讲法与推演位，强化研修与突破链路。",
                 true),
             TownActivityAnchorType.Administration => new TileInspectorActionBinding(
                 TileInspectorAction.BuildAdministration,
-                "🔨 扩建庶务殿",
+                "扩建庶务殿",
                 $"对【{tileName}】追加庶务与执事位，提升治理执行容量。",
                 true),
             TownActivityAnchorType.Leisure => new TileInspectorActionBinding(
                 TileInspectorAction.OpenDisciplePanel,
-                "👥 查看驻留弟子",
+                "查阅驻留弟子",
                 $"打开弟子谱，查看【{tileName}】附近的休憩 / 论道门人。",
                 true),
             _ => new TileInspectorActionBinding(
                 TileInspectorAction.OpenTaskPanel,
-                "📜 前往宗主中枢",
+                "前往宗主中枢",
                 $"打开宗主中枢，为【{tileName}】相关堂口调整治理侧重。",
                 true)
         };
@@ -222,37 +222,37 @@ public partial class Main
         {
             TownActivityAnchorType.Farmstead => new TileInspectorActionBinding(
                 TileInspectorAction.OpenTaskPanel,
-                "📜 调度阵材法旨",
+                "调度阵材法旨",
                 $"跳转到宗主中枢，为【{tileName}】调度阵材 / 供养相关法旨。",
                 true),
             TownActivityAnchorType.Workshop => new TileInspectorActionBinding(
                 TileInspectorAction.OpenTaskPanel,
-                "📜 调度阵务法旨",
+                "调度阵务法旨",
                 $"跳转到宗主中枢，为【{tileName}】调度阵务 / 工坊执行侧重。",
                 true),
             TownActivityAnchorType.Market => new TileInspectorActionBinding(
                 TileInspectorAction.OpenTaskPanel,
-                "📜 调度外事法旨",
+                "调度外事法旨",
                 $"跳转到宗主中枢，为【{tileName}】调度总坊 / 外事务令。",
                 true),
             TownActivityAnchorType.Academy => new TileInspectorActionBinding(
                 TileInspectorAction.OpenTaskPanel,
-                "📜 调度推演法旨",
+                "调度推演法旨",
                 $"跳转到宗主中枢，为【{tileName}】调度传法院与推演任务。",
                 true),
             TownActivityAnchorType.Administration => new TileInspectorActionBinding(
                 TileInspectorAction.OpenTaskPanel,
-                "📜 打开宗主中枢",
+                "打开宗主中枢",
                 $"从【{tileName}】直接进入宗主中枢，查看治理与法令。",
                 true),
             TownActivityAnchorType.Leisure => new TileInspectorActionBinding(
                 TileInspectorAction.OpenTaskPanel,
-                "📜 调整门规法令",
+                "调整门规法令",
                 $"从【{tileName}】联动到宗主中枢，调整门规、法令与育才方向。",
                 true),
             _ => new TileInspectorActionBinding(
                 TileInspectorAction.OpenDisciplePanel,
-                "👥 查看弟子谱",
+                "查阅弟子谱",
                 $"打开弟子谱，查看与【{tileName}】相关的门人构成。",
                 true)
         };
@@ -261,37 +261,37 @@ public partial class Main
         {
             TownActivityAnchorType.Farmstead => new TileInspectorActionBinding(
                 TileInspectorAction.OpenWarehousePanel,
-                "📦 查看粮仓",
+                "查阅粮仓",
                 $"打开仓储，检查【{tileName}】相关的灵谷与基础供养存量。",
                 true),
             TownActivityAnchorType.Workshop => new TileInspectorActionBinding(
                 TileInspectorAction.OpenWarehousePanel,
-                "📦 查看工料仓",
+                "查阅工料仓",
                 $"打开仓储，检查【{tileName}】相关的工料、构件与器材储量。",
                 true),
             TownActivityAnchorType.Market => new TileInspectorActionBinding(
                 TileInspectorAction.OpenWarehousePanel,
-                "📦 查看流转仓",
+                "查阅流转仓",
                 $"打开仓储，检查【{tileName}】相关的交易与流转物资储量。",
                 true),
             TownActivityAnchorType.Academy => new TileInspectorActionBinding(
                 TileInspectorAction.OpenDisciplePanel,
-                "👥 查看研修弟子",
+                "查阅研修弟子",
                 $"打开弟子谱，查看【{tileName}】周边的研修与讲法门人。",
                 true),
             TownActivityAnchorType.Administration => new TileInspectorActionBinding(
                 TileInspectorAction.OpenWarehousePanel,
-                "📦 查看宗门内库",
+                "查阅宗门内库",
                 $"打开仓储，检查【{tileName}】对应的内库与公共储备。",
                 true),
             TownActivityAnchorType.Leisure => new TileInspectorActionBinding(
                 TileInspectorAction.OpenWarehousePanel,
-                "📦 查看供养储备",
+                "查阅供养储备",
                 $"打开仓储，确认【{tileName}】休憩与论道所需的供养储备是否充足。",
                 true),
             _ => new TileInspectorActionBinding(
                 TileInspectorAction.OpenWarehousePanel,
-                "📦 打开仓储",
+                "打开仓储",
                 $"打开仓储，检查【{tileName}】所依赖的供给与材料储量。",
                 true)
         };

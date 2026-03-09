@@ -34,10 +34,10 @@ border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.752941, 0.701961, 0.607843, 0.62)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_primary"]
 content_margin_left = 12.0
@@ -50,10 +50,10 @@ border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.619608, 0.164706, 0.133333, 0.78)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_primary_disabled"]
 content_margin_left = 12.0
@@ -66,10 +66,10 @@ border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.619608, 0.164706, 0.133333, 0.32)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action"]
 content_margin_left = 12.0
@@ -82,10 +82,10 @@ border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.694118, 0.635294, 0.541176, 0.78)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_disabled"]
 content_margin_left = 12.0
@@ -98,10 +98,10 @@ border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.694118, 0.635294, 0.541176, 0.46)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_note"]
 content_margin_left = 12.0
@@ -126,10 +126,10 @@ border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.694118, 0.635294, 0.541176, 0.66)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_richtext"]
 
@@ -342,7 +342,7 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_action_primary")
 theme_override_styles/hover = SubResource("StyleBoxFlat_action_primary")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_action_primary_disabled")
 theme_override_styles/focus = SubResource("StyleBoxFlat_action_primary")
-text = "🔨 扩建灵田"
+text = "扩建阵材圃"
 alignment = 0
 
 [node name="SecondaryActionButton" type="Button" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/ActionList" unique_id=2044720917]
@@ -358,7 +358,7 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_action")
 theme_override_styles/hover = SubResource("StyleBoxFlat_action")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_action_disabled")
 theme_override_styles/focus = SubResource("StyleBoxFlat_action")
-text = "📜 调度堂口"
+text = "调度堂口法旨"
 alignment = 0
 
 [node name="TertiaryActionButton" type="Button" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/ActionList" unique_id=286730514]
@@ -374,7 +374,7 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_action")
 theme_override_styles/hover = SubResource("StyleBoxFlat_action")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_action_disabled")
 theme_override_styles/focus = SubResource("StyleBoxFlat_action")
-text = "👥 查看门人"
+text = "查阅门人谱"
 alignment = 0
 
 [node name="ActionHintPanel" type="PanelContainer" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox" unique_id=61450187]

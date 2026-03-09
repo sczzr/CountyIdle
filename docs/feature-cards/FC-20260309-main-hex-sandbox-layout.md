@@ -117,3 +117,19 @@
 - 从主界面左栏移除 `JobsPadding` 常驻区，左侧彻底收口为 `Tile Inspector + 批注` 结构，避免“地块检视”与“宗门组织谱系”混在同一栏位。
 - `Main.cs` 不再在 Legacy 主界面绑定 `JobsPadding` 的行项、峰脉详批和协同峰节点，防止场景裁剪后仍继续刷新旧节点。
 - `SectOrganizationRules / SectPeakSupportRules / GameLoop.SetPeakSupport()` 等底层治理规则暂不删除，后续如要恢复入口，应迁入独立治理页而不是塞回主界面。
+
+## 十六轮补强
+
+- 将组织谱系与协同峰入口彻底迁入底部 `【峰令】谱系` 快捷按钮对应的独立卷册弹窗。
+- 主界面继续保持“tile 检视优先”，组织治理退为二级入口，不再回流左栏常驻块。
+
+## 十七轮补强
+
+- 将右侧日志题头正式收口为 `山门近闻 / 天衍峰札记`，继续压低右栏的视觉重量。
+- 保持 `LogLabel / AlertItem1 / AlertItem2` 等绑定路径兼容，不影响 `Main.cs` 与 `MainSectChroniclePanel.cs`。
+
+## 十八轮补强
+
+- 将底部控制台、中央地图页签与缩放按钮补齐 `normal / hover / pressed` 三态，让卷尾法令与卷中页签在选中时真正有“落墨批定”的反馈。
+- 左侧 `Tile Inspector` 的三个动作按钮去掉 emoji 与残留现代按钮语汇，统一收口为墨线批令式文案，例如 `扩建阵材圃 / 调度堂口法旨 / 查阅门人谱`。
+- `WorldPanel` 里备用报表卡与状态卡的深色底板一并回收为宣纸底，避免未来启用备用页时重新露出旧黑卡。
