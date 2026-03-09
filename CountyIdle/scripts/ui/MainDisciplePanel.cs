@@ -80,6 +80,12 @@ public partial class Main
             return null;
         }
 
+        var bottomQuickButton = GetNodeOrNull<Button>($"{BottomBarPath}/BarPadding/MainRow/QuickActionRow/DiscipleQuickButton");
+        if (bottomQuickButton != null)
+        {
+            return bottomQuickButton;
+        }
+
         return GetNodeOrNull<Button>($"{CenterTopTabRowPath}/DisciplePanelButton");
     }
 }

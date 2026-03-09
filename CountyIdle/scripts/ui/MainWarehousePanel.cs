@@ -127,6 +127,12 @@ public partial class Main
             return null;
         }
 
+        var bottomQuickButton = GetNodeOrNull<Button>($"{BottomBarPath}/BarPadding/MainRow/QuickActionRow/WarehouseQuickButton");
+        if (bottomQuickButton != null)
+        {
+            return bottomQuickButton;
+        }
+
         return GetNodeOrNull<Button>($"{CenterTopTabRowPath}/WarehousePanelButton");
     }
 }

@@ -32,7 +32,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.58)
+color = Color(0.101961, 0.0862745, 0.0745098, 0.9)
 
 [node name="CenterLayer" type="CenterContainer" parent="."]
 layout_mode = 1
@@ -42,17 +42,79 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="DecorLayer" type="Control" parent="CenterLayer"]
+custom_minimum_size = Vector2(968, 640)
+layout_mode = 2
+
+[node name="TopTrim" type="ColorRect" parent="CenterLayer/DecorLayer"]
+offset_left = 10.0
+offset_top = 12.0
+offset_right = 958.0
+offset_bottom = 22.0
+color = Color(0.831373, 0.686275, 0.215686, 1)
+
+[node name="BottomTrim" type="ColorRect" parent="CenterLayer/DecorLayer"]
+offset_left = 10.0
+offset_top = 618.0
+offset_right = 958.0
+offset_bottom = 628.0
+color = Color(0.831373, 0.686275, 0.215686, 1)
+
+[node name="LeftRoller" type="PanelContainer" parent="CenterLayer/DecorLayer"]
+offset_left = 10.0
+offset_top = 24.0
+offset_right = 34.0
+offset_bottom = 616.0
+
+[node name="LeftTopCap" type="ColorRect" parent="CenterLayer/DecorLayer/LeftRoller"]
+layout_mode = 0
+offset_left = -3.0
+offset_top = -6.0
+offset_right = 27.0
+offset_bottom = 6.0
+color = Color(0.831373, 0.686275, 0.215686, 1)
+
+[node name="LeftBottomCap" type="ColorRect" parent="CenterLayer/DecorLayer/LeftRoller"]
+layout_mode = 0
+offset_left = -3.0
+offset_top = 580.0
+offset_right = 27.0
+offset_bottom = 592.0
+color = Color(0.831373, 0.686275, 0.215686, 1)
+
+[node name="RightRoller" type="PanelContainer" parent="CenterLayer/DecorLayer"]
+offset_left = 934.0
+offset_top = 24.0
+offset_right = 958.0
+offset_bottom = 616.0
+
+[node name="RightTopCap" type="ColorRect" parent="CenterLayer/DecorLayer/RightRoller"]
+layout_mode = 0
+offset_left = -3.0
+offset_top = -6.0
+offset_right = 27.0
+offset_bottom = 6.0
+color = Color(0.831373, 0.686275, 0.215686, 1)
+
+[node name="RightBottomCap" type="ColorRect" parent="CenterLayer/DecorLayer/RightRoller"]
+layout_mode = 0
+offset_left = -3.0
+offset_top = 580.0
+offset_right = 27.0
+offset_bottom = 592.0
+color = Color(0.831373, 0.686275, 0.215686, 1)
+
 [node name="Dialog" type="PanelContainer" parent="CenterLayer"]
-custom_minimum_size = Vector2(920, 0)
+custom_minimum_size = Vector2(920, 592)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_dialog")
 
 [node name="Margin" type="MarginContainer" parent="CenterLayer/Dialog"]
 layout_mode = 2
-theme_override_constants/margin_left = 16
-theme_override_constants/margin_top = 16
-theme_override_constants/margin_right = 16
-theme_override_constants/margin_bottom = 16
+theme_override_constants/margin_left = 26
+theme_override_constants/margin_top = 26
+theme_override_constants/margin_right = 26
+theme_override_constants/margin_bottom = 24
 
 [node name="MainColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin"]
 layout_mode = 2
@@ -65,23 +127,28 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
-text = "多存档管理"
+text = "天衍峰留影录"
 
 [node name="CloseButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/HeaderRow"]
 custom_minimum_size = Vector2(44, 28)
 layout_mode = 2
-text = "×"
+text = "✖"
 
 [node name="HintLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn"]
 layout_mode = 2
 modulate = Color(0.760784, 0.780392, 0.831373, 1)
 autowrap_mode = 3
-text = "选择已有槽位可覆盖或读取，也可以输入新名称另存为新槽。"
+text = "翻检卷册，可择旧档覆写、启读，亦可别录新卷。"
 
 [node name="ModeLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.94902, 0.909804, 0.788235, 1)
-text = "当前入口：存档。"
+text = "当前案由：存档。"
+
+[node name="HeaderDivider" type="ColorRect" parent="CenterLayer/Dialog/Margin/MainColumn"]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+color = Color(0.294118, 0.247059, 0.207843, 1)
 
 [node name="ContentRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn"]
 layout_mode = 2
@@ -96,7 +163,7 @@ theme_override_constants/separation = 8
 [node name="SlotListTitle" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/SlotColumn"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "存档槽列表"
+text = "卷册目录"
 
 [node name="FilterRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/SlotColumn"]
 layout_mode = 2
@@ -128,7 +195,7 @@ theme_override_constants/separation = 10
 [node name="DetailTitle" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "槽位详情"
+text = "卷页详录"
 
 [node name="PreviewFrame" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn"]
 custom_minimum_size = Vector2(0, 176)
@@ -156,13 +223,13 @@ layout_mode = 2
 modulate = Color(0.760784, 0.780392, 0.831373, 1)
 horizontal_alignment = 1
 autowrap_mode = 3
-text = "暂无截图预览。保存一次该槽位后会在此显示当前画面。"
+text = "暂无线索留影。待卷册写成后，会在此显出当时景象。"
 
 [node name="SlotDetailLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn"]
 custom_minimum_size = Vector2(0, 92)
 layout_mode = 2
 autowrap_mode = 3
-text = "暂无存档槽。输入名称后可直接新建一个槽位并写入当前进度。"
+text = "暂未立卷。可先题写卷名，再将当前宗门进度收录成卷。"
 
 [node name="NameRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn"]
 layout_mode = 2
@@ -171,12 +238,12 @@ theme_override_constants/separation = 10
 [node name="SlotNameLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/NameRow"]
 custom_minimum_size = Vector2(72, 0)
 layout_mode = 2
-text = "槽位名"
+text = "卷名"
 
 [node name="SlotNameEdit" type="LineEdit" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/NameRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-placeholder_text = "输入新槽位名，或修改所选槽名称"
+placeholder_text = "题写新卷名，或改写所选卷题"
 
 [node name="ActionRowPrimary" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn"]
 layout_mode = 2
@@ -185,12 +252,12 @@ theme_override_constants/separation = 8
 [node name="SaveSelectedButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ActionRowPrimary"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "覆盖所选槽"
+text = "覆写所选卷"
 
 [node name="LoadSelectedButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ActionRowPrimary"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "读取所选槽"
+text = "启读所选卷"
 
 [node name="ActionRowSecondary" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn"]
 layout_mode = 2
@@ -199,17 +266,17 @@ theme_override_constants/separation = 8
 [node name="CreateSlotButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ActionRowSecondary"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "新建槽并存档"
+text = "另录新卷"
 
 [node name="RenameSlotButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ActionRowSecondary"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "重命名所选槽"
+text = "更题卷名"
 
 [node name="CopySlotButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ActionRowSecondary"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "复制所选槽"
+text = "誊录副卷"
 
 [node name="ActionRowTertiary" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn"]
 layout_mode = 2
@@ -218,12 +285,12 @@ theme_override_constants/separation = 8
 [node name="DeleteSlotButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ActionRowTertiary"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "删除所选槽"
+text = "焚毁所选卷"
 
 [node name="RefreshButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ActionRowTertiary"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "刷新列表"
+text = "重整卷录"
 
 [node name="FooterRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn"]
 layout_mode = 2
@@ -232,4 +299,4 @@ alignment = 2
 [node name="CloseFooterButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/FooterRow"]
 custom_minimum_size = Vector2(110, 34)
 layout_mode = 2
-text = "关闭"
+text = "合卷"

@@ -47,7 +47,7 @@ public class MapOperationalLinkSystem
                 snapshot.SecondaryChoice = BuildReliefChoice(state);
                 break;
             case MapRegionScope.CountyTown:
-                snapshot.ActiveStatusText = $"浮云宗·天衍峰：{countyTownStyle.HintText}";
+                snapshot.ActiveStatusText = $"天衍峰：{countyTownStyle.HintText}";
                 snapshot.ActiveStatusColor = countyTownStyle.AccentColor;
                 snapshot.PrimaryChoice = BuildStreetRepairChoice(state);
                 snapshot.SecondaryChoice = BuildNightWatchChoice(state);
@@ -221,10 +221,10 @@ public class MapOperationalLinkSystem
             score,
             level switch
             {
-                MapConditionLevel.Flourishing => $"坊区有序，住房与道路都较宽裕。住房 {state.HousingCapacity}/{state.Population}，威胁 {state.Threat:0.#}%。",
-                MapConditionLevel.Stable => $"天衍峰运转平稳，可视需要修整坊路或安排夜巡。住房 {state.HousingCapacity}/{state.Population}。",
-                MapConditionLevel.Strained => $"天衍峰开始拥挤或山门戒备承压，建议修整坊路并加强夜巡。住房 {state.HousingCapacity}/{state.Population}。",
-                _ => $"天衍峰拥挤且山门戒备偏紧，需优先夜巡清巷。住房 {state.HousingCapacity}/{state.Population}，威胁 {state.Threat:0.#}%。"
+                MapConditionLevel.Flourishing => $"坊区有序，住房 {state.HousingCapacity}/{state.Population}，威胁 {state.Threat:0.#}%。",
+                MapConditionLevel.Stable => $"运转平稳，住房 {state.HousingCapacity}/{state.Population}，可修坊路或夜巡。",
+                MapConditionLevel.Strained => $"坊区承压，住房 {state.HousingCapacity}/{state.Population}，宜修坊路并夜巡。",
+                _ => $"山门吃紧，住房 {state.HousingCapacity}/{state.Population}，威胁 {state.Threat:0.#}%。"
             });
     }
 

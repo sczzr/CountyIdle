@@ -20,3 +20,9 @@
 - [x] 当前协同峰状态能在玩家界面直接看到；
 - [x] `docs/02_system_specs.md`、`docs/05_feature_inventory.md`、`docs/08_development_list.md` 已同步；
 - [x] `dotnet build .\Finally.sln` 通过。
+
+## 2026-03-09 迁移补记
+
+- 协同峰令已随组织谱系一起迁入独立 `SectOrganizationPanel` 卷册，不再占用主界面左栏空间；
+- 新卷册继续提供“立协同峰令 / 复均衡轮转 / 转宗主中枢”三类动作，底层仍复用既有 `SectPeakSupportRules` 与 `GameLoop` 接口；
+- 本轮目标是入口重构与视觉收口，不改协同峰的数值挂点和结算效果。

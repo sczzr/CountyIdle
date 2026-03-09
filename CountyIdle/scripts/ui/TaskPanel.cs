@@ -7,6 +7,14 @@ namespace CountyIdle.UI;
 
 public partial class TaskPanel : PopupPanelBase
 {
+    private static readonly Color PaperMainColor = new(0.95f, 0.92f, 0.84f, 1f);
+    private static readonly Color PaperDarkColor = new(0.89f, 0.85f, 0.76f, 1f);
+    private static readonly Color InkMainColor = new(0.17f, 0.15f, 0.13f, 1f);
+    private static readonly Color InkMutedColor = new(0.42f, 0.37f, 0.33f, 1f);
+    private static readonly Color SealRedColor = new(0.65f, 0.16f, 0.16f, 1f);
+    private static readonly Color BorderInkColor = new(0.29f, 0.25f, 0.21f, 1f);
+    private static readonly Color AccentGoldColor = new(0.72f, 0.53f, 0.04f, 1f);
+
     private readonly GameCalendarSystem _calendarSystem = new();
 
     private Label _spiritStoneLabel = null!;
@@ -99,8 +107,8 @@ public partial class TaskPanel : PopupPanelBase
 
         var definition = SectTaskRules.GetDefinition(_selectedTaskType);
         return definition.IsInternalTask
-            ? "宗主只定峰内方向与法令力度，执事层会自动协调人手与资源。"
-            : "宗主只定外务倾向，对外贸易仍只使用灵石结算。";
+            ? "宗主只定治宗法旨，执事层会依卷落实人手与资源。"
+            : "宗主只定外务倾向，对外往来仍只认灵石结算。";
     }
 
     private void BuildUi()
@@ -110,7 +118,7 @@ public partial class TaskPanel : PopupPanelBase
 
         var overlay = new ColorRect
         {
-            Color = new Color(0f, 0f, 0f, 0.74f),
+            Color = new Color(0.10f, 0.09f, 0.08f, 0.92f),
             MouseFilter = Control.MouseFilterEnum.Stop
         };
         overlay.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
@@ -123,24 +131,76 @@ public partial class TaskPanel : PopupPanelBase
         center.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
         overlay.AddChild(center);
 
-        var dialog = new PanelContainer
+        var wrapper = new Control
         {
-            CustomMinimumSize = new Vector2(920, 560),
-            SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter,
-            SizeFlagsVertical = Control.SizeFlags.ShrinkCenter
+            CustomMinimumSize = new Vector2(1000, 690)
         };
-        dialog.AddThemeStyleboxOverride("panel", CreatePanelStyle(new Color(0.10f, 0.11f, 0.14f, 0.98f)));
-        center.AddChild(dialog);
+        center.AddChild(wrapper);
+
+        var topTrim = new ColorRect
+        {
+            Color = new Color(0.83f, 0.69f, 0.21f, 1f)
+        };
+        topTrim.SetAnchorsPreset(LayoutPreset.TopWide);
+        topTrim.OffsetLeft = 12;
+        topTrim.OffsetTop = 12;
+        topTrim.OffsetRight = -12;
+        topTrim.OffsetBottom = 22;
+        wrapper.AddChild(topTrim);
+
+        var bottomTrim = new ColorRect
+        {
+            Color = new Color(0.83f, 0.69f, 0.21f, 1f)
+        };
+        bottomTrim.SetAnchorsPreset(LayoutPreset.BottomWide);
+        bottomTrim.OffsetLeft = 12;
+        bottomTrim.OffsetTop = -22;
+        bottomTrim.OffsetRight = -12;
+        bottomTrim.OffsetBottom = -12;
+        wrapper.AddChild(bottomTrim);
+
+        var frameRow = new HBoxContainer();
+        frameRow.SetAnchorsPreset(LayoutPreset.FullRect);
+        frameRow.OffsetLeft = 12;
+        frameRow.OffsetTop = 24;
+        frameRow.OffsetRight = -12;
+        frameRow.OffsetBottom = -24;
+        frameRow.AddThemeConstantOverride("separation", 0);
+        wrapper.AddChild(frameRow);
+
+        var leftRoller = new PanelContainer
+        {
+            CustomMinimumSize = new Vector2(24, 0),
+            SizeFlagsVertical = Control.SizeFlags.ExpandFill
+        };
+        leftRoller.AddThemeStyleboxOverride("panel", CreateRollerStyle());
+        frameRow.AddChild(leftRoller);
+
+        var paperPanel = new PanelContainer
+        {
+            SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+            SizeFlagsVertical = Control.SizeFlags.ExpandFill
+        };
+        paperPanel.AddThemeStyleboxOverride("panel", CreatePaperStyle());
+        frameRow.AddChild(paperPanel);
+
+        var rightRoller = new PanelContainer
+        {
+            CustomMinimumSize = new Vector2(24, 0),
+            SizeFlagsVertical = Control.SizeFlags.ExpandFill
+        };
+        rightRoller.AddThemeStyleboxOverride("panel", CreateRollerStyle());
+        frameRow.AddChild(rightRoller);
 
         var margin = new MarginContainer();
-        margin.AddThemeConstantOverride("margin_left", 18);
-        margin.AddThemeConstantOverride("margin_top", 18);
-        margin.AddThemeConstantOverride("margin_right", 18);
-        margin.AddThemeConstantOverride("margin_bottom", 18);
-        dialog.AddChild(margin);
+        margin.AddThemeConstantOverride("margin_left", 24);
+        margin.AddThemeConstantOverride("margin_top", 24);
+        margin.AddThemeConstantOverride("margin_right", 24);
+        margin.AddThemeConstantOverride("margin_bottom", 22);
+        paperPanel.AddChild(margin);
 
         var rootColumn = new VBoxContainer();
-        rootColumn.AddThemeConstantOverride("separation", 12);
+        rootColumn.AddThemeConstantOverride("separation", 14);
         margin.AddChild(rootColumn);
 
         var headerRow = new HBoxContainer();
@@ -149,31 +209,43 @@ public partial class TaskPanel : PopupPanelBase
 
         var titleLabel = new Label
         {
-            Text = "浮云宗·宗主中枢"
+            Text = "浮云宗·治宗册"
         };
         titleLabel.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-        titleLabel.AddThemeFontSizeOverride("font_size", 20);
-        titleLabel.AddThemeColorOverride("font_color", new Color(0.95f, 0.91f, 0.79f));
+        titleLabel.AddThemeFontSizeOverride("font_size", 26);
+        titleLabel.AddThemeColorOverride("font_color", InkMainColor);
         headerRow.AddChild(titleLabel);
 
-        _closeButton = CreateActionButton("关闭");
+        _closeButton = CreateActionButton("✖", compact: true, inkOnly: true);
         _closeButton.Pressed += ClosePopup;
         headerRow.AddChild(_closeButton);
 
+        var divider = new ColorRect
+        {
+            CustomMinimumSize = new Vector2(0, 1),
+            Color = BorderInkColor
+        };
+        rootColumn.AddChild(divider);
+
         var summaryPanel = new PanelContainer();
-        summaryPanel.AddThemeStyleboxOverride("panel", CreatePanelStyle(new Color(0.06f, 0.07f, 0.09f, 0.92f)));
+        summaryPanel.AddThemeStyleboxOverride("panel", CreateNoteStyle(PaperDarkColor));
         rootColumn.AddChild(summaryPanel);
 
         var summaryMargin = new MarginContainer();
         summaryMargin.AddThemeConstantOverride("margin_left", 12);
-        summaryMargin.AddThemeConstantOverride("margin_top", 12);
+        summaryMargin.AddThemeConstantOverride("margin_top", 10);
         summaryMargin.AddThemeConstantOverride("margin_right", 12);
-        summaryMargin.AddThemeConstantOverride("margin_bottom", 12);
+        summaryMargin.AddThemeConstantOverride("margin_bottom", 10);
         summaryPanel.AddChild(summaryMargin);
 
         var summaryColumn = new VBoxContainer();
         summaryColumn.AddThemeConstantOverride("separation", 6);
         summaryMargin.AddChild(summaryColumn);
+
+        var summaryTitle = CreateSummaryLabel("卷首批注");
+        summaryTitle.AddThemeFontSizeOverride("font_size", 15);
+        summaryTitle.AddThemeColorOverride("font_color", InkMainColor);
+        summaryColumn.AddChild(summaryTitle);
 
         _spiritStoneLabel = CreateSummaryLabel();
         _contributionLabel = CreateSummaryLabel();
@@ -185,21 +257,24 @@ public partial class TaskPanel : PopupPanelBase
         summaryColumn.AddChild(_tradeRuleLabel);
 
         var governancePanel = new PanelContainer();
-        governancePanel.AddThemeStyleboxOverride("panel", CreatePanelStyle(new Color(0.07f, 0.08f, 0.10f, 0.94f)));
+        governancePanel.AddThemeStyleboxOverride("panel", CreateNoteStyle(new Color(PaperMainColor.R, PaperMainColor.G, PaperMainColor.B, 0.92f)));
         rootColumn.AddChild(governancePanel);
 
         var governanceMargin = new MarginContainer();
         governanceMargin.AddThemeConstantOverride("margin_left", 12);
-        governanceMargin.AddThemeConstantOverride("margin_top", 12);
+        governanceMargin.AddThemeConstantOverride("margin_top", 10);
         governanceMargin.AddThemeConstantOverride("margin_right", 12);
-        governanceMargin.AddThemeConstantOverride("margin_bottom", 12);
+        governanceMargin.AddThemeConstantOverride("margin_bottom", 10);
         governancePanel.AddChild(governanceMargin);
 
         var governanceColumn = new VBoxContainer();
         governanceColumn.AddThemeConstantOverride("separation", 10);
         governanceMargin.AddChild(governanceColumn);
 
-        governanceColumn.AddChild(CreateSummaryLabel("宗主决策"));
+        var governanceTitle = CreateSummaryLabel("治宗法旨");
+        governanceTitle.AddThemeFontSizeOverride("font_size", 15);
+        governanceTitle.AddThemeColorOverride("font_color", InkMainColor);
+        governanceColumn.AddChild(governanceTitle);
         BuildGovernanceRow(
             governanceColumn,
             "发展方向",
@@ -253,13 +328,13 @@ public partial class TaskPanel : PopupPanelBase
         var contentSplit = new HSplitContainer();
         contentSplit.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
         contentSplit.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
-        contentSplit.SplitOffsets = new[] { 320 };
+        contentSplit.SplitOffsets = new[] { 338 };
         rootColumn.AddChild(contentSplit);
 
         var listPanel = new PanelContainer();
         listPanel.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
         listPanel.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
-        listPanel.AddThemeStyleboxOverride("panel", CreatePanelStyle(new Color(0.08f, 0.09f, 0.11f, 0.94f)));
+        listPanel.AddThemeStyleboxOverride("panel", CreateNoteStyle());
         contentSplit.AddChild(listPanel);
 
         var listMargin = new MarginContainer();
@@ -273,7 +348,7 @@ public partial class TaskPanel : PopupPanelBase
         listColumn.AddThemeConstantOverride("separation", 8);
         listMargin.AddChild(listColumn);
 
-        var listTitle = CreateSummaryLabel("治理条目");
+        var listTitle = CreateSummaryLabel("治务条目");
         listTitle.AddThemeFontSizeOverride("font_size", 14);
         listColumn.AddChild(listTitle);
 
@@ -284,13 +359,20 @@ public partial class TaskPanel : PopupPanelBase
             AllowReselect = true,
             SelectMode = ItemList.SelectModeEnum.Single
         };
+        _taskList.AddThemeStyleboxOverride("panel", CreateTransparentStyle());
+        _taskList.AddThemeStyleboxOverride("cursor", CreateSelectionStyle());
+        _taskList.AddThemeStyleboxOverride("cursor_unfocused", CreateSelectionStyle());
+        _taskList.AddThemeColorOverride("font_color", InkMainColor);
+        _taskList.AddThemeColorOverride("font_selected_color", PaperMainColor);
+        _taskList.AddThemeConstantOverride("h_separation", 6);
+        _taskList.AddThemeConstantOverride("v_separation", 5);
         _taskList.ItemSelected += index => OnTaskSelected((int)index);
         listColumn.AddChild(_taskList);
 
         var detailPanel = new PanelContainer();
         detailPanel.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
         detailPanel.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
-        detailPanel.AddThemeStyleboxOverride("panel", CreatePanelStyle(new Color(0.08f, 0.09f, 0.11f, 0.94f)));
+        detailPanel.AddThemeStyleboxOverride("panel", CreateNoteStyle());
         contentSplit.AddChild(detailPanel);
 
         var detailMargin = new MarginContainer();
@@ -307,7 +389,7 @@ public partial class TaskPanel : PopupPanelBase
             SizeFlagsVertical = Control.SizeFlags.ExpandFill
         };
         _detailLabel.AddThemeFontSizeOverride("font_size", 13);
-        _detailLabel.AddThemeColorOverride("font_color", new Color(0.85f, 0.88f, 0.92f));
+        _detailLabel.AddThemeColorOverride("font_color", InkMainColor);
         detailMargin.AddChild(_detailLabel);
 
         var actionRow = new HBoxContainer();
@@ -332,17 +414,17 @@ public partial class TaskPanel : PopupPanelBase
         };
         actionRow.AddChild(spacer);
 
-        _resetButton = CreateActionButton("恢复均衡");
+        _resetButton = CreateActionButton("复归常制");
         _resetButton.Pressed += OnResetPressed;
         actionRow.AddChild(_resetButton);
 
-        var footerCloseButton = CreateActionButton("返回");
+        var footerCloseButton = CreateActionButton("收卷");
         footerCloseButton.Pressed += ClosePopup;
         actionRow.AddChild(footerCloseButton);
 
         _hintLabel = CreateSummaryLabel();
         _hintLabel.AutowrapMode = TextServer.AutowrapMode.WordSmart;
-        _hintLabel.AddThemeColorOverride("font_color", new Color(0.71f, 0.76f, 0.86f));
+        _hintLabel.AddThemeColorOverride("font_color", InkMutedColor);
         rootColumn.AddChild(_hintLabel);
     }
 
@@ -360,10 +442,10 @@ public partial class TaskPanel : PopupPanelBase
         var disciplineRule = SectRuleTreeRules.GetActiveDisciplineDefinition(_state);
         var quarterLabel = _calendarSystem.GetQuarterLabel(_state.GameMinutes);
 
-        _spiritStoneLabel.Text = $"灵石：{spiritStone}";
-        _contributionLabel.Text = $"贡献点：{contribution}";
-        _assignmentLabel.Text = $"治宗重心：{SectTaskRules.BuildGovernanceHeadline(_state)}";
-        _tradeRuleLabel.Text = $"执行态势：{SectTaskRules.BuildGovernanceExecutionSummary(_state)} · 当前{quarterLabel}法令：{quarterDecree.DisplayName} · {SectRuleTreeRules.BuildActiveRuleSummary(_state)} · 内务走贡献点 + 灵石，外事只认灵石。";
+        _spiritStoneLabel.Text = $"灵石：{spiritStone:N0}";
+        _contributionLabel.Text = $"宗门贡献：{contribution:N0}";
+        _assignmentLabel.Text = $"当前治宗重心：{SectTaskRules.BuildGovernanceHeadline(_state)}";
+        _tradeRuleLabel.Text = $"执事落实：{SectTaskRules.BuildGovernanceExecutionSummary(_state)} · 当前{quarterLabel}法令：{quarterDecree.DisplayName} · {SectRuleTreeRules.BuildActiveRuleSummary(_state)} · 峰内内务走贡献点与灵石双轨，峰外往来只认灵石。";
         _developmentValueLabel.Text = development.DisplayName;
         _developmentHintLabel.Text = development.ShortEffect;
         _lawValueLabel.Text = law.DisplayName;
@@ -433,22 +515,25 @@ public partial class TaskPanel : PopupPanelBase
     {
         OrderAdjustmentRequested?.Invoke(_selectedTaskType, delta);
         var definition = SectTaskRules.GetDefinition(_selectedTaskType);
-        ShowPopupStatusMessage($"已向执事层下达“{definition.DisplayName}”的治理调整。");
+        ShowPopupStatusMessage($"已向执事层批复“{definition.DisplayName}”的治宗调整。");
     }
 
     private void OnResetPressed()
     {
         ResetRequested?.Invoke();
-        ShowPopupStatusMessage("已请求恢复均衡治宗方略。");
+        ShowPopupStatusMessage("已请执事层复归常制治宗方略。");
     }
 
     private static Label CreateSummaryLabel(string text = "")
     {
-        return new Label
+        var label = new Label
         {
             Text = text,
             AutowrapMode = TextServer.AutowrapMode.WordSmart
         };
+        label.AddThemeFontSizeOverride("font_size", 13);
+        label.AddThemeColorOverride("font_color", InkMainColor);
+        return label;
     }
 
     private static void BuildGovernanceRow(
@@ -460,7 +545,7 @@ public partial class TaskPanel : PopupPanelBase
         Action onNext)
     {
         var rowPanel = new PanelContainer();
-        rowPanel.AddThemeStyleboxOverride("panel", CreatePanelStyle(new Color(0.09f, 0.10f, 0.13f, 0.92f)));
+        rowPanel.AddThemeStyleboxOverride("panel", CreateNoteStyle(new Color(PaperDarkColor.R, PaperDarkColor.G, PaperDarkColor.B, 0.82f)));
         parent.AddChild(rowPanel);
 
         var rowMargin = new MarginContainer();
@@ -480,74 +565,160 @@ public partial class TaskPanel : PopupPanelBase
 
         var titleLabel = CreateSummaryLabel(title);
         titleLabel.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+        titleLabel.AddThemeColorOverride("font_color", InkMainColor);
         titleRow.AddChild(titleLabel);
 
-        var previousButton = CreateActionButton("◀");
-        previousButton.CustomMinimumSize = new Vector2(48, 30);
+        var previousButton = CreateActionButton("前令", compact: true);
+        previousButton.CustomMinimumSize = new Vector2(58, 30);
         previousButton.Pressed += onPrevious;
         titleRow.AddChild(previousButton);
 
-        var nextButton = CreateActionButton("▶");
-        nextButton.CustomMinimumSize = new Vector2(48, 30);
+        var nextButton = CreateActionButton("后令", compact: true);
+        nextButton.CustomMinimumSize = new Vector2(58, 30);
         nextButton.Pressed += onNext;
         titleRow.AddChild(nextButton);
 
         valueLabel = CreateSummaryLabel();
         valueLabel.AddThemeFontSizeOverride("font_size", 14);
-        valueLabel.AddThemeColorOverride("font_color", new Color(0.95f, 0.91f, 0.79f));
+        valueLabel.AddThemeColorOverride("font_color", SealRedColor);
         rowColumn.AddChild(valueLabel);
 
         hintLabel = CreateSummaryLabel();
-        hintLabel.AddThemeColorOverride("font_color", new Color(0.71f, 0.76f, 0.86f));
+        hintLabel.AddThemeColorOverride("font_color", InkMutedColor);
         rowColumn.AddChild(hintLabel);
     }
 
-    private static Button CreateActionButton(string text)
+    private static Button CreateActionButton(string text, bool compact = false, bool inkOnly = false)
     {
         var button = new Button
         {
             Text = text,
-            CustomMinimumSize = new Vector2(88, 36)
+            CustomMinimumSize = compact ? new Vector2(64, 32) : new Vector2(96, 36)
         };
-        button.AddThemeStyleboxOverride("normal", CreateButtonStyle());
-        button.AddThemeStyleboxOverride("hover", CreateButtonStyle(new Color(0.15f, 0.17f, 0.22f, 1f)));
-        button.AddThemeStyleboxOverride("pressed", CreateButtonStyle(new Color(0.12f, 0.14f, 0.18f, 1f)));
-        button.AddThemeStyleboxOverride("focus", CreateButtonStyle(new Color(0.15f, 0.17f, 0.22f, 1f)));
-        button.AddThemeStyleboxOverride("disabled", CreateButtonStyle(new Color(0.09f, 0.10f, 0.13f, 0.85f)));
+        button.Flat = true;
+        button.Alignment = HorizontalAlignment.Left;
+        button.AddThemeFontSizeOverride("font_size", compact ? 12 : 14);
+        if (inkOnly)
+        {
+            button.Alignment = HorizontalAlignment.Center;
+            button.AddThemeStyleboxOverride("normal", CreateTransparentStyle());
+            button.AddThemeStyleboxOverride("hover", CreateTransparentStyle());
+            button.AddThemeStyleboxOverride("pressed", CreateTransparentStyle());
+            button.AddThemeStyleboxOverride("focus", CreateTransparentStyle());
+            button.AddThemeColorOverride("font_color", InkMainColor);
+            button.AddThemeColorOverride("font_hover_color", SealRedColor);
+            button.AddThemeColorOverride("font_pressed_color", SealRedColor);
+            return button;
+        }
+
+        button.AddThemeStyleboxOverride("normal", CreateOrderButtonStyle(false));
+        button.AddThemeStyleboxOverride("hover", CreateOrderButtonHoverStyle(false));
+        button.AddThemeStyleboxOverride("pressed", CreateOrderButtonHoverStyle(false));
+        button.AddThemeStyleboxOverride("focus", CreateOrderButtonHoverStyle(false));
+        button.AddThemeStyleboxOverride("disabled", CreateOrderButtonStyle(true));
+        button.AddThemeColorOverride("font_color", InkMainColor);
+        button.AddThemeColorOverride("font_hover_color", PaperMainColor);
+        button.AddThemeColorOverride("font_pressed_color", PaperMainColor);
+        button.AddThemeColorOverride("font_disabled_color", InkMutedColor);
         return button;
     }
 
-    private static StyleBoxFlat CreatePanelStyle(Color? backgroundColor = null)
+    private static StyleBoxFlat CreatePaperStyle()
     {
         return new StyleBoxFlat
         {
-            BgColor = backgroundColor ?? new Color(0.10f, 0.11f, 0.14f, 1f),
-            BorderColor = new Color(0.20f, 0.22f, 0.28f, 1f),
+            BgColor = PaperMainColor,
+            BorderColor = new Color(0.48f, 0.42f, 0.35f, 0.45f),
             BorderWidthLeft = 1,
             BorderWidthTop = 1,
             BorderWidthRight = 1,
             BorderWidthBottom = 1,
-            CornerRadiusTopLeft = 6,
-            CornerRadiusTopRight = 6,
-            CornerRadiusBottomRight = 6,
-            CornerRadiusBottomLeft = 6
+            ShadowColor = new Color(0f, 0f, 0f, 0.35f),
+            ShadowSize = 10
         };
     }
 
-    private static StyleBoxFlat CreateButtonStyle(Color? backgroundColor = null)
+    private static StyleBoxFlat CreateRollerStyle()
     {
         return new StyleBoxFlat
         {
-            BgColor = backgroundColor ?? new Color(0.11f, 0.12f, 0.16f, 1f),
-            BorderColor = new Color(0.20f, 0.22f, 0.28f, 1f),
+            BgColor = new Color(0.29f, 0.19f, 0.13f, 1f),
+            BorderColor = new Color(0.14f, 0.09f, 0.05f, 1f),
+            BorderWidthLeft = 1,
+            BorderWidthTop = 1,
+            BorderWidthRight = 1,
+            BorderWidthBottom = 1
+        };
+    }
+
+    private static StyleBoxFlat CreateNoteStyle(Color? backgroundColor = null)
+    {
+        return new StyleBoxFlat
+        {
+            BgColor = backgroundColor ?? PaperDarkColor,
+            BorderColor = new Color(0.64f, 0.58f, 0.50f, 1f),
+            BorderWidthLeft = 1,
+            BorderWidthTop = 1,
+            BorderWidthRight = 1,
+            BorderWidthBottom = 1
+        };
+    }
+
+    private static StyleBoxFlat CreateOrderButtonStyle(bool disabled)
+    {
+        return new StyleBoxFlat
+        {
+            BgColor = new Color(PaperMainColor.R, PaperMainColor.G, PaperMainColor.B, 0f),
+            BorderColor = disabled ? InkMutedColor : BorderInkColor,
             BorderWidthLeft = 1,
             BorderWidthTop = 1,
             BorderWidthRight = 1,
             BorderWidthBottom = 1,
-            CornerRadiusTopLeft = 4,
-            CornerRadiusTopRight = 4,
-            CornerRadiusBottomRight = 4,
-            CornerRadiusBottomLeft = 4
+            ContentMarginLeft = 12,
+            ContentMarginTop = 10,
+            ContentMarginRight = 12,
+            ContentMarginBottom = 10
+        };
+    }
+
+    private static StyleBoxFlat CreateOrderButtonHoverStyle(bool disabled)
+    {
+        if (disabled)
+        {
+            return CreateOrderButtonStyle(true);
+        }
+
+        return new StyleBoxFlat
+        {
+            BgColor = InkMainColor,
+            BorderColor = InkMainColor,
+            BorderWidthLeft = 1,
+            BorderWidthTop = 1,
+            BorderWidthRight = 1,
+            BorderWidthBottom = 1,
+            ContentMarginLeft = 12,
+            ContentMarginTop = 10,
+            ContentMarginRight = 12,
+            ContentMarginBottom = 10
+        };
+    }
+
+    private static StyleBoxFlat CreateSelectionStyle()
+    {
+        return new StyleBoxFlat
+        {
+            BgColor = InkMainColor,
+            BorderWidthLeft = 0,
+            BorderWidthTop = 0,
+            BorderWidthRight = 0,
+            BorderWidthBottom = 0
+        };
+    }
+
+    private static StyleBoxEmpty CreateTransparentStyle()
+    {
+        return new StyleBoxEmpty
+        {
         };
     }
 }

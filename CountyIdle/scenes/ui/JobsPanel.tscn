@@ -1,81 +1,158 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene format=3 uid="uid://d0yegsystt6dx"]
 
 [ext_resource type="PackedScene" path="res://scenes/ui/JobRow.tscn" id="1_3a8dq"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
-bg_color = Color(0.101961, 0.105882, 0.12549, 1)
+bg_color = Color(0.94902, 0.92549, 0.862745, 0.86)
+border_color = Color(0.415686, 0.529412, 0.454902, 0.4)
+shadow_color = Color(0, 0, 0, 0.36)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_badge"]
+content_margin_left = 10.0
+content_margin_top = 5.0
+content_margin_right = 10.0
+content_margin_bottom = 5.0
+bg_color = Color(0.901961, 0.866667, 0.784314, 0.55)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.2, 0.207843, 0.243137, 1)
+border_color = Color(0.619608, 0.164706, 0.133333, 0.72)
+corner_radius_top_left = 999
+corner_radius_top_right = 999
+corner_radius_bottom_right = 999
+corner_radius_bottom_left = 999
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_attr"]
+content_margin_left = 10.0
+content_margin_top = 9.0
+content_margin_right = 10.0
+content_margin_bottom = 9.0
+bg_color = Color(0.901961, 0.866667, 0.784314, 0.32)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.752941, 0.701961, 0.607843, 0.62)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_primary"]
+content_margin_left = 12.0
+content_margin_top = 9.0
+content_margin_right = 12.0
+content_margin_bottom = 9.0
+bg_color = Color(0.898039, 0.839216, 0.729412, 0.92)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.619608, 0.164706, 0.133333, 0.78)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eff"]
-bg_color = Color(0.0509804, 0.054902, 0.0666667, 0.6)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_primary_disabled"]
+content_margin_left = 12.0
+content_margin_top = 9.0
+content_margin_right = 12.0
+content_margin_bottom = 9.0
+bg_color = Color(0.913725, 0.882353, 0.815686, 0.66)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.2, 0.207843, 0.243137, 1)
+border_color = Color(0.619608, 0.164706, 0.133333, 0.32)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action"]
+content_margin_left = 12.0
+content_margin_top = 9.0
+content_margin_right = 12.0
+content_margin_bottom = 9.0
+bg_color = Color(0.929412, 0.894118, 0.819608, 0.82)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.694118, 0.635294, 0.541176, 0.78)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_disabled"]
+content_margin_left = 12.0
+content_margin_top = 9.0
+content_margin_right = 12.0
+content_margin_bottom = 9.0
+bg_color = Color(0.929412, 0.894118, 0.819608, 0.62)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.694118, 0.635294, 0.541176, 0.46)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_note"]
 content_margin_left = 12.0
 content_margin_top = 12.0
 content_margin_right = 12.0
-content_margin_bottom = 10.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eff_bar"]
-bg_color = Color(0.0352941, 0.0392157, 0.0470588, 1)
-corner_radius_top_left = 2
-corner_radius_top_right = 2
-corner_radius_bottom_right = 2
-corner_radius_bottom_left = 2
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eff_fill"]
-bg_color = Color(0.321569, 0.607843, 0.486275, 1)
-corner_radius_top_left = 2
-corner_radius_top_right = 2
-corner_radius_bottom_right = 2
-corner_radius_bottom_left = 2
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_farmer"]
-bg_color = Color(0.137255, 0.145098, 0.168627, 1)
+content_margin_bottom = 12.0
+bg_color = Color(0.878431, 0.831373, 0.733333, 0.72)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.2, 0.207843, 0.243137, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
-content_margin_left = 10.0
-content_margin_top = 10.0
-content_margin_right = 10.0
-content_margin_bottom = 10.0
+border_color = Color(0.694118, 0.635294, 0.541176, 0.7)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_worker"]
-bg_color = Color(0.137255, 0.145098, 0.168627, 1)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_summary"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(0.894118, 0.85098, 0.756863, 0.58)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.2, 0.207843, 0.243137, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
-content_margin_left = 10.0
-content_margin_top = 10.0
-content_margin_right = 10.0
-content_margin_bottom = 10.0
+border_color = Color(0.694118, 0.635294, 0.541176, 0.66)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
 
-[node name="JobsPanel" type="PanelContainer"]
-layout_mode = 2
-size_flags_vertical = 3
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_richtext"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_peak_button"]
+content_margin_left = 10.0
+content_margin_top = 6.0
+content_margin_right = 10.0
+content_margin_bottom = 6.0
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.270588, 0.231373, 0.192157, 0.82)
+
+[node name="JobsPanel" type="PanelContainer" unique_id=56893873]
 clip_contents = true
+offset_right = 311.0
+offset_bottom = 532.0
+size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
-[node name="PanelContent" type="MarginContainer" parent="."]
+[node name="PanelContent" type="MarginContainer" parent="." unique_id=231230871]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/margin_left = 0
@@ -83,257 +160,230 @@ theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 0
 theme_override_constants/margin_bottom = 0
 
-[node name="JobsVBox" type="VBoxContainer" parent="PanelContent"]
+[node name="JobsVBox" type="VBoxContainer" parent="PanelContent" unique_id=481169393]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 0
+theme_override_constants/separation = 16
 
-[node name="TitleLabel" type="Label" parent="PanelContent/JobsVBox"]
+[node name="IndustryEfficiency" type="HBoxContainer" parent="PanelContent/JobsVBox" unique_id=401753582]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.94902, 0.909804, 0.788235, 1)
-theme_override_font_sizes/font_size = 14
-text = "宗主治理摘要"
+theme_override_constants/separation = 16
 
-[node name="IndustryEfficiency" type="PanelContainer" parent="PanelContent/JobsVBox"]
+[node name="TitleLabel" type="Label" parent="PanelContent/JobsVBox/IndustryEfficiency" unique_id=1552253608]
+custom_minimum_size = Vector2(46, 0)
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_eff")
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 22
+text = "浮
+云
+宗
+地
+志"
+vertical_alignment = 1
 
-[node name="EfficiencyVBox" type="VBoxContainer" parent="PanelContent/JobsVBox/IndustryEfficiency"]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="ToolCoverageRow" type="HBoxContainer" parent="PanelContent/JobsVBox/IndustryEfficiency/EfficiencyVBox"]
-layout_mode = 2
-
-[node name="ToolCoverageTitle" type="Label" parent="PanelContent/JobsVBox/IndustryEfficiency/EfficiencyVBox/ToolCoverageRow"]
+[node name="InspectorVBox" type="VBoxContainer" parent="PanelContent/JobsVBox/IndustryEfficiency" unique_id=526761580]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 11
-text = "🛠 产业工器覆盖率"
+theme_override_constants/separation = 12
 
-[node name="ToolCoverageValue" type="Label" parent="PanelContent/JobsVBox/IndustryEfficiency/EfficiencyVBox/ToolCoverageRow"]
+[node name="InspectorHeader" type="Control" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox" unique_id=1255455130]
+custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.321569, 0.607843, 0.486275, 1)
-theme_override_font_sizes/font_size = 11
-text = "100%"
+size_flags_horizontal = 3
 
-[node name="ToolCoverageBarBg" type="PanelContainer" parent="PanelContent/JobsVBox/IndustryEfficiency/EfficiencyVBox"]
-custom_minimum_size = Vector2(0, 4)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_eff_bar")
-
-[node name="ToolCoverageBarFill" type="PanelContainer" parent="PanelContent/JobsVBox/IndustryEfficiency/EfficiencyVBox/ToolCoverageBarBg"]
+[node name="TileTitle" type="Label" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/InspectorHeader" unique_id=1663580665]
 layout_mode = 1
-anchors_preset = 10
+offset_top = 6.0
+offset_right = 250.0
+offset_bottom = 42.0
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 34
+text = "甲级灵田"
+
+[node name="TileSubtitle" type="Label" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/InspectorHeader" unique_id=1417234987]
+layout_mode = 1
+offset_left = 2.0
+offset_top = 52.0
+offset_right = 264.0
+offset_bottom = 92.0
+theme_override_colors/font_color = Color(0.403922, 0.352941, 0.301961, 0.92)
+theme_override_font_sizes/font_size = 12
+text = "坐标：Hex [2,-1] · 归属：天衍峰"
+autowrap_mode = 3
+
+[node name="TileBadgeBox" type="PanelContainer" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/InspectorHeader" unique_id=643891092]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
 anchor_right = 1.0
-offset_bottom = 4.0
-grow_horizontal = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_eff_fill")
+offset_left = -78.0
+offset_top = 8.0
+offset_bottom = 64.0
+grow_horizontal = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_badge")
 
-[node name="BonusRow" type="HBoxContainer" parent="PanelContent/JobsVBox/IndustryEfficiency/EfficiencyVBox"]
+[node name="TileBadgeLabel" type="Label" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/InspectorHeader/TileBadgeBox" unique_id=2050301213]
 layout_mode = 2
-
-[node name="BonusTitle" type="Label" parent="PanelContent/JobsVBox/IndustryEfficiency/EfficiencyVBox/BonusRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 11
-text = "📜 庶务殿管理加成"
-
-[node name="BonusValue" type="Label" parent="PanelContent/JobsVBox/IndustryEfficiency/EfficiencyVBox/BonusRow"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.831373, 0.662745, 0.32549, 1)
-theme_override_font_sizes/font_size = 11
-text = "+12%"
-
-[node name="JobsPadding" type="MarginContainer" parent="PanelContent/JobsVBox"]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 10
-
-[node name="JobsList" type="VBoxContainer" parent="PanelContent/JobsVBox/JobsPadding"]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 8
-
-[node name="FarmerRow" parent="PanelContent/JobsVBox/JobsPadding/JobsList" instance=ExtResource("1_3a8dq")]
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_farmer")
-
-[node name="JobLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/FarmerRow/RowVBox/HeaderRow" index="0"]
-layout_mode = 2
-text = "🌾 阵材法旨"
-
-[node name="PriorityLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/FarmerRow/RowVBox/HeaderRow" index="1"]
-layout_mode = 2
-text = "阵材令"
-
-[node name="EliteLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/FarmerRow/RowVBox/ControlRow/EliteBox" index="0"]
-layout_mode = 2
-text = "等待法旨摘要刷新"
-
-[node name="WorkerRow" parent="PanelContent/JobsVBox/JobsPadding/JobsList" instance=ExtResource("1_3a8dq")]
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_worker")
-
-[node name="JobLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/WorkerRow/RowVBox/HeaderRow" index="0"]
-layout_mode = 2
-text = "🛠 阵务法旨"
-
-[node name="PriorityLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/WorkerRow/RowVBox/HeaderRow" index="1"]
-layout_mode = 2
-text = "阵务令"
-
-[node name="EliteLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/WorkerRow/RowVBox/ControlRow/EliteBox" index="0"]
-layout_mode = 2
-text = "等待法旨摘要刷新"
-
-[node name="MerchantRow" parent="PanelContent/JobsVBox/JobsPadding/JobsList" instance=ExtResource("1_3a8dq")]
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_worker")
-
-[node name="JobLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/MerchantRow/RowVBox/HeaderRow" index="0"]
-layout_mode = 2
-text = "💰 总坊外事法旨"
-
-[node name="PriorityLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/MerchantRow/RowVBox/HeaderRow" index="1"]
-layout_mode = 2
-text = "总坊令"
-
-[node name="EliteLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/MerchantRow/RowVBox/ControlRow/EliteBox" index="0"]
-layout_mode = 2
-text = "等待法旨摘要刷新"
-
-[node name="ScholarRow" parent="PanelContent/JobsVBox/JobsPadding/JobsList" instance=ExtResource("1_3a8dq")]
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_worker")
-
-[node name="JobLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/ScholarRow/RowVBox/HeaderRow" index="0"]
-layout_mode = 2
-text = "📜 推演法旨"
-
-[node name="PriorityLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/ScholarRow/RowVBox/HeaderRow" index="1"]
-layout_mode = 2
-text = "推演令"
-
-[node name="EliteLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/ScholarRow/RowVBox/ControlRow/EliteBox" index="0"]
-layout_mode = 2
-text = "等待法旨摘要刷新"
-
-[node name="PeakOverviewPanel" type="PanelContainer" parent="PanelContent/JobsVBox/JobsPadding/JobsList"]
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_eff")
-
-[node name="PeakOverviewVBox" type="VBoxContainer" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakOverviewPanel"]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="PeakOverviewTitle" type="Label" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakOverviewPanel/PeakOverviewVBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.94902, 0.909804, 0.788235, 1)
+theme_override_colors/font_color = Color(0.619608, 0.164706, 0.133333, 0.92)
 theme_override_font_sizes/font_size = 12
-text = "九峰与附属部门"
-
-[node name="PeakOverviewText" type="RichTextLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakOverviewPanel/PeakOverviewVBox"]
-custom_minimum_size = Vector2(0, 120)
-layout_mode = 2
-bbcode_enabled = false
-scroll_active = true
-fit_content = false
-theme_override_font_sizes/normal_font_size = 11
-text = "等待宗门组织谱系刷新"
-
-[node name="PeakDetailPanel" type="PanelContainer" parent="PanelContent/JobsVBox/JobsPadding/JobsList"]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_eff")
-
-[node name="PeakDetailVBox" type="VBoxContainer" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel"]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 6
-
-[node name="PeakDetailHeaderRow" type="HBoxContainer" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox"]
-layout_mode = 2
-
-[node name="PeakDetailTitle" type="Label" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakDetailHeaderRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.94902, 0.909804, 0.788235, 1)
-theme_override_font_sizes/font_size = 12
-text = "峰脉详情浏览"
-
-[node name="PeakDetailCounter" type="Label" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakDetailHeaderRow"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.690196, 0.717647, 0.776471, 1)
-theme_override_font_sizes/font_size = 11
-text = "1/9"
-
-[node name="PeakSwitchRow" type="HBoxContainer" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="PeakPrevButton" type="Button" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakSwitchRow"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 11
-text = "◀ 上一峰"
-
-[node name="PeakCurrentTitle" type="Label" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakSwitchRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.94902, 0.909804, 0.788235, 1)
-theme_override_font_sizes/font_size = 12
-text = "等待峰脉刷新"
+text = "木水土
+三灵"
 horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="PeakNextButton" type="Button" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakSwitchRow"]
+[node name="AttrGrid" type="GridContainer" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox" unique_id=1668285343]
 layout_mode = 2
-theme_override_font_sizes/font_size = 11
-text = "下一峰 ▶"
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+columns = 2
 
-[node name="PeakCurrentSummary" type="Label" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox"]
+[node name="StatusBox" type="PanelContainer" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/AttrGrid" unique_id=238503936]
 layout_mode = 2
-size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.690196, 0.717647, 0.776471, 1)
+theme_override_styles/panel = SubResource("StyleBoxFlat_attr")
+
+[node name="AttrVBox" type="VBoxContainer" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/AttrGrid/StatusBox" unique_id=343031478]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="AttrLabel" type="Label" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/AttrGrid/StatusBox/AttrVBox" unique_id=1527733676]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.403922, 0.352941, 0.301961, 0.82)
 theme_override_font_sizes/font_size = 11
-text = "等待峰脉摘要刷新"
+text = "当前态势"
+
+[node name="AttrValue" type="Label" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/AttrGrid/StatusBox/AttrVBox" unique_id=1213539679]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 13
+text = "未选中"
+
+[node name="ResidentBox" type="PanelContainer" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/AttrGrid" unique_id=697329407]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_attr")
+
+[node name="AttrVBox" type="VBoxContainer" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/AttrGrid/ResidentBox" unique_id=1961432811]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="AttrLabel" type="Label" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/AttrGrid/ResidentBox/AttrVBox" unique_id=1760196296]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.403922, 0.352941, 0.301961, 0.82)
+theme_override_font_sizes/font_size = 11
+text = "驻守门人"
+
+[node name="AttrValue" type="Label" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/AttrGrid/ResidentBox/AttrVBox" unique_id=1807879356]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 13
+text = "等待选中"
+
+[node name="TransitBox" type="PanelContainer" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/AttrGrid" unique_id=1246366524]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_attr")
+
+[node name="AttrVBox" type="VBoxContainer" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/AttrGrid/TransitBox" unique_id=278502586]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="AttrLabel" type="Label" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/AttrGrid/TransitBox/AttrVBox" unique_id=1241240518]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.403922, 0.352941, 0.301961, 0.82)
+theme_override_font_sizes/font_size = 11
+text = "前往中"
+
+[node name="AttrValue" type="Label" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/AttrGrid/TransitBox/AttrVBox" unique_id=1544934116]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 13
+text = "等待选中"
+
+[node name="LocationBox" type="PanelContainer" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/AttrGrid" unique_id=1819296205]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_attr")
+
+[node name="AttrVBox" type="VBoxContainer" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/AttrGrid/LocationBox" unique_id=676629250]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="AttrLabel" type="Label" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/AttrGrid/LocationBox/AttrVBox" unique_id=20113352]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.403922, 0.352941, 0.301961, 0.82)
+theme_override_font_sizes/font_size = 11
+text = "Hex 坐标"
+
+[node name="AttrValue" type="Label" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/AttrGrid/LocationBox/AttrVBox" unique_id=1020155829]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 13
+text = "等待选中"
+
+[node name="InspectorDescription" type="Label" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox" unique_id=429685041]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.403922, 0.352941, 0.301961, 0.95)
+theme_override_font_sizes/font_size = 13
+text = "描述：请选择中央六边形地块，左侧会展开当前场所的状态、Hex 坐标与可执行项。"
 autowrap_mode = 3
 
-[node name="PeakSupportStatus" type="Label" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.831373, 0.662745, 0.32549, 1)
-theme_override_font_sizes/font_size = 11
-text = "等待协同法旨刷新"
-autowrap_mode = 3
-
-[node name="PeakSupportActionRow" type="HBoxContainer" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox"]
+[node name="ActionList" type="VBoxContainer" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox" unique_id=703946970]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="PeakSupportButton" type="Button" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakSupportActionRow"]
+[node name="PrimaryActionButton" type="Button" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/ActionList" unique_id=1602813084]
+custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 11
-text = "设为本季协同峰"
+theme_override_colors/font_color = Color(0.478431, 0.184314, 0.14902, 1)
+theme_override_colors/font_pressed_color = Color(0.478431, 0.184314, 0.14902, 1)
+theme_override_colors/font_hover_color = Color(0.478431, 0.184314, 0.14902, 1)
+theme_override_colors/font_disabled_color = Color(0.478431, 0.184314, 0.14902, 0.52)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_action_primary")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_action_primary")
+theme_override_styles/hover = SubResource("StyleBoxFlat_action_primary")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_action_primary_disabled")
+theme_override_styles/focus = SubResource("StyleBoxFlat_action_primary")
+text = "🔨 扩建灵田"
+alignment = 0
 
-[node name="PeakSupportResetButton" type="Button" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakSupportActionRow"]
+[node name="SecondaryActionButton" type="Button" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/ActionList" unique_id=2044720917]
+custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
-theme_override_font_sizes/font_size = 11
-text = "恢复均衡"
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_colors/font_pressed_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_colors/font_hover_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_colors/font_disabled_color = Color(0.176471, 0.145098, 0.12549, 0.5)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_action")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_action")
+theme_override_styles/hover = SubResource("StyleBoxFlat_action")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_action_disabled")
+theme_override_styles/focus = SubResource("StyleBoxFlat_action")
+text = "📜 调度堂口"
+alignment = 0
 
-[node name="PeakCurrentDetail" type="RichTextLabel" parent="PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox"]
-custom_minimum_size = Vector2(0, 190)
+[node name="TertiaryActionButton" type="Button" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/ActionList" unique_id=286730514]
+custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
-bbcode_enabled = false
-scroll_active = true
-fit_content = false
-size_flags_vertical = 3
-theme_override_font_sizes/normal_font_size = 11
-text = "等待峰脉详情刷新"
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_colors/font_pressed_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_colors/font_hover_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_colors/font_disabled_color = Color(0.176471, 0.145098, 0.12549, 0.5)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_action")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_action")
+theme_override_styles/hover = SubResource("StyleBoxFlat_action")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_action_disabled")
+theme_override_styles/focus = SubResource("StyleBoxFlat_action")
+text = "👥 查看门人"
+alignment = 0
 
-[node name="BottomSpacer" type="Control" parent="PanelContent/JobsVBox/JobsPadding/JobsList"]
-custom_minimum_size = Vector2(0, 8)
+[node name="ActionHintPanel" type="PanelContainer" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox" unique_id=61450187]
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_note")
+
+[node name="ActionHintLabel" type="Label" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/ActionHintPanel" unique_id=1341164090]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.294118, 0.247059, 0.2, 0.96)
+theme_override_font_sizes/font_size = 13
+text = "【户部朱批】此处将展示当前地块的批注与治理提醒，选中不同 tile 后会联动更新。"
+autowrap_mode = 3

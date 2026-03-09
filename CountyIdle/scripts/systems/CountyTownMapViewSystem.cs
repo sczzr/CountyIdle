@@ -68,7 +68,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
     private int _populationHint = 120;
     private int _housingHint = 180;
     private int _eliteHint = 8;
-    private float _zoom = 1.0f;
+    private float _zoom = 1.12f;
     private bool _isInitialized;
     private MapViewStyle _operationalStyle = new();
     private TownActivityAnchorData? _selectedActivityAnchor;
@@ -77,9 +77,10 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
     public float Zoom => _zoom;
     public float MinZoom => 0.6f;
     public float MaxZoom => 2.2f;
-    public float DefaultZoom => 1.0f;
+    public float DefaultZoom => 1.12f;
 
     public event Action<int, JobType?>? DiscipleInspectionRequested;
+    public event Action<TownMapSelectionSummary>? SelectionSummaryChanged;
 
     public override void _Ready()
     {
@@ -248,6 +249,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
 
         _mapHintLabel.Text = $"{summaryLine}\n{operationalLine}";
         _mapHintLabel.Modulate = _operationalStyle.AccentColor;
+        NotifySelectionSummaryChanged();
     }
 
     private Vector2 CalculateMapOrigin(TownMapData mapData)

@@ -1,16 +1,19 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bottom"]
-bg_color = Color(0.101961, 0.105882, 0.12549, 1)
+bg_color = Color(0, 0, 0, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_quick"]
+bg_color = Color(0, 0, 0, 0)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.2, 0.207843, 0.243137, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
+border_color = Color(0.270588, 0.231373, 0.192157, 0.82)
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_danger"]
 bg_color = Color(0, 0, 0, 0)
@@ -18,14 +21,10 @@ border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.768627, 0.329412, 0.329412, 1)
-corner_radius_top_left = 2
-corner_radius_top_right = 2
-corner_radius_bottom_right = 2
-corner_radius_bottom_left = 2
-content_margin_left = 10.0
+border_color = Color(0.619608, 0.164706, 0.133333, 0.88)
+content_margin_left = 12.0
 content_margin_top = 6.0
-content_margin_right = 10.0
+content_margin_right = 12.0
 content_margin_bottom = 6.0
 
 [node name="BottomBar" type="PanelContainer"]
@@ -36,72 +35,163 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_bottom")
 
 [node name="BarPadding" type="MarginContainer" parent="."]
 layout_mode = 2
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 8
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 4
 
 [node name="MainRow" type="HBoxContainer" parent="BarPadding"]
 layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="QuickActionRow" type="HBoxContainer" parent="BarPadding/MainRow"]
+layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/separation = 12
+
+[node name="WarehouseQuickButton" type="Button" parent="BarPadding/MainRow/QuickActionRow"]
+custom_minimum_size = Vector2(92, 28)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_quick")
+theme_override_styles/hover = SubResource("StyleBoxFlat_quick")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_quick")
+theme_override_styles/focus = SubResource("StyleBoxFlat_quick")
+text = "【库令】仓储"
+
+[node name="TaskQuickButton" type="Button" parent="BarPadding/MainRow/QuickActionRow"]
+custom_minimum_size = Vector2(112, 28)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_quick")
+theme_override_styles/hover = SubResource("StyleBoxFlat_quick")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_quick")
+theme_override_styles/focus = SubResource("StyleBoxFlat_quick")
+text = "【宗令】中枢"
+
+[node name="OrganizationQuickButton" type="Button" parent="BarPadding/MainRow/QuickActionRow"]
+custom_minimum_size = Vector2(108, 28)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_quick")
+theme_override_styles/hover = SubResource("StyleBoxFlat_quick")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_quick")
+theme_override_styles/focus = SubResource("StyleBoxFlat_quick")
+text = "【峰令】谱系"
+
+[node name="DiscipleQuickButton" type="Button" parent="BarPadding/MainRow/QuickActionRow"]
+custom_minimum_size = Vector2(98, 28)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_quick")
+theme_override_styles/hover = SubResource("StyleBoxFlat_quick")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_quick")
+theme_override_styles/focus = SubResource("StyleBoxFlat_quick")
+text = "【谱令】弟子"
 
 [node name="SpeedRow" type="HBoxContainer" parent="BarPadding/MainRow"]
 layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 0
+theme_override_constants/separation = 8
 
 [node name="ExploreButton" type="Button" parent="BarPadding/MainRow/SpeedRow"]
-custom_minimum_size = Vector2(34, 26)
+custom_minimum_size = Vector2(90, 28)
 layout_mode = 2
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_quick")
+theme_override_styles/hover = SubResource("StyleBoxFlat_quick")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_quick")
+theme_override_styles/focus = SubResource("StyleBoxFlat_quick")
 toggle_mode = true
-text = "⏸"
+text = "历练"
 
 [node name="SpeedX1Button" type="Button" parent="BarPadding/MainRow/SpeedRow"]
-custom_minimum_size = Vector2(54, 26)
+custom_minimum_size = Vector2(66, 28)
 layout_mode = 2
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_quick")
+theme_override_styles/hover = SubResource("StyleBoxFlat_quick")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_quick")
+theme_override_styles/focus = SubResource("StyleBoxFlat_quick")
 toggle_mode = true
 button_pressed = true
-text = "▶ x1"
+text = "壹倍"
 
 [node name="SpeedX2Button" type="Button" parent="BarPadding/MainRow/SpeedRow"]
-custom_minimum_size = Vector2(54, 26)
+custom_minimum_size = Vector2(66, 28)
 layout_mode = 2
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_quick")
+theme_override_styles/hover = SubResource("StyleBoxFlat_quick")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_quick")
+theme_override_styles/focus = SubResource("StyleBoxFlat_quick")
 toggle_mode = true
-text = "x2"
+text = "贰倍"
 
 [node name="SpeedX4Button" type="Button" parent="BarPadding/MainRow/SpeedRow"]
-custom_minimum_size = Vector2(54, 26)
+custom_minimum_size = Vector2(66, 28)
 layout_mode = 2
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_quick")
+theme_override_styles/hover = SubResource("StyleBoxFlat_quick")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_quick")
+theme_override_styles/focus = SubResource("StyleBoxFlat_quick")
 toggle_mode = true
-text = "x4"
+text = "肆倍"
 
 [node name="ActionRow" type="HBoxContainer" parent="BarPadding/MainRow"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 6
 
 [node name="SaveButton" type="Button" parent="BarPadding/MainRow/ActionRow"]
-custom_minimum_size = Vector2(110, 26)
+custom_minimum_size = Vector2(58, 28)
 layout_mode = 2
-text = "💾 封存档案"
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_quick")
+theme_override_styles/hover = SubResource("StyleBoxFlat_quick")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_quick")
+theme_override_styles/focus = SubResource("StyleBoxFlat_quick")
+text = "【存】"
 
 [node name="LoadButton" type="Button" parent="BarPadding/MainRow/ActionRow"]
-custom_minimum_size = Vector2(100, 26)
+custom_minimum_size = Vector2(58, 28)
 layout_mode = 2
-text = "📂 载入档案"
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_quick")
+theme_override_styles/hover = SubResource("StyleBoxFlat_quick")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_quick")
+theme_override_styles/focus = SubResource("StyleBoxFlat_quick")
+text = "【读】"
 
 [node name="SettingsButton" type="Button" parent="BarPadding/MainRow/ActionRow"]
-custom_minimum_size = Vector2(100, 26)
+custom_minimum_size = Vector2(58, 28)
 layout_mode = 2
-text = "⚙ 基础设置"
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_quick")
+theme_override_styles/hover = SubResource("StyleBoxFlat_quick")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_quick")
+theme_override_styles/focus = SubResource("StyleBoxFlat_quick")
+text = "【设】"
 
 [node name="ResetButton" type="Button" parent="BarPadding/MainRow/ActionRow"]
-custom_minimum_size = Vector2(110, 26)
+custom_minimum_size = Vector2(58, 28)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.768627, 0.329412, 0.329412, 1)
-theme_override_colors/font_hover_color = Color(0.831373, 0.396078, 0.396078, 1)
-theme_override_colors/font_pressed_color = Color(0.698039, 0.286275, 0.286275, 1)
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.619608, 0.164706, 0.133333, 1)
+theme_override_colors/font_hover_color = Color(0.698039, 0.286275, 0.286275, 1)
+theme_override_colors/font_pressed_color = Color(0.619608, 0.164706, 0.133333, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_danger")
 theme_override_styles/hover = SubResource("StyleBoxFlat_danger")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_danger")
 theme_override_styles/focus = SubResource("StyleBoxFlat_danger")
-text = "🔥 弃官归隐"
+text = "【重】"

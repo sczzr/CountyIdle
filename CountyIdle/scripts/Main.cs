@@ -53,6 +53,7 @@ public partial class Main : Control
     private static readonly Color BaseButtonModulate = Colors.White;
     private static readonly Color LanternGlowModulate = new(1.0f, 0.86f, 0.64f, 1.0f);
     private static readonly double[] SupportedTimeScales = { 1.0, 2.0, 4.0 };
+    private static readonly string[] ChronicleTimeLabels = { "子时", "丑时", "寅时", "卯时", "辰时", "巳时", "午时", "未时", "申时", "酉时", "戌时", "亥时" };
 
     private readonly Queue<string> _logs = new();
     private readonly Dictionary<Button, Tween> _buttonPulseTweens = new();
@@ -143,6 +144,7 @@ public partial class Main : Control
         CreateWarehousePanel();
         CreateTaskPanel();
         CreateDisciplePanel();
+        CreateSectOrganizationPanel();
         CreateSaveSlotsPanel();
         BindUiEvents();
         BindLanternHoverEffects();
@@ -174,7 +176,9 @@ public partial class Main : Control
         UnbindWarehousePanelEvents();
         UnbindTaskPanelEvents();
         UnbindDisciplePanelEvents();
+        UnbindSectOrganizationPanelEvents();
         UnbindSaveSlotsPanelEvents();
+        UnbindSectTileInspectorEvents();
     }
 
     private void SetupGameLoop()
@@ -201,8 +205,8 @@ public partial class Main : Control
 
     private void OnStateChanged(GameState state)
     {
-        _populationLabel.Text = $"👥 门人 {state.Population}";
-        _happinessLabel.Text = $"💖 民心 {state.Happiness:0.#}";
+        _populationLabel.Text = $"【人丁】{state.Population}";
+        _happinessLabel.Text = $"【民心】{state.Happiness:0.#}";
 
         var economyPreview = EconomySystem.BuildHourPreview(state);
         var toolCoverage = IndustryRules.GetToolCoverage(state);
@@ -222,18 +226,21 @@ public partial class Main : Control
         var visibleGoldDelta = InventoryRules.PredictDelta(state, nameof(GameState.Gold), economyPreview.GoldDeltaRaw);
         var visibleContributionDelta = InventoryRules.PredictDelta(state, nameof(GameState.ContributionPoints), economyPreview.ContributionDeltaRaw);
 
-        _foodLabel.Text = $"🌾 {MaterialSemanticRules.GetDisplayName(nameof(GameState.Food))} {state.Food:0} {FormatSigned(visibleFoodDelta)}/s";
-        _woodLabel.Text = $"🪵 {MaterialSemanticRules.GetDisplayName(nameof(GameState.Wood))} {state.Wood:0} {FormatSigned(woodDelta)}/s";
+        _foodLabel.Text = $"【{MaterialSemanticRules.GetDisplayName(nameof(GameState.Food))}】{state.Food:0}";
+        _foodLabel.TooltipText =
+            $"下一时辰预计：{MaterialSemanticRules.GetDisplayName(nameof(GameState.Food))}{FormatSigned(visibleFoodDelta)}，当前库存 {state.Food:0}。";
+        _woodLabel.Text = $"【木石】{state.Wood:0}";
         _woodLabel.TooltipText =
-            $"下一小时预计：{MaterialSemanticRules.GetDisplayName(nameof(GameState.Wood))}{FormatSigned(woodDelta)}、{MaterialSemanticRules.GetDisplayName(nameof(GameState.Stone))}{FormatSigned(stoneDelta)}、{MaterialSemanticRules.GetDisplayName(nameof(GameState.Timber))}库存 {state.Timber:0}、{MaterialSemanticRules.GetDisplayName(nameof(GameState.RawStone))}库存 {state.RawStone:0}。";
-        _goldLabel.Text =
-            $"💰 {MaterialSemanticRules.GetDisplayName(nameof(GameState.Gold))} {state.Gold:0} {FormatSigned(visibleGoldDelta)}/s · {MaterialSemanticRules.GetDisplayName(nameof(GameState.ContributionPoints))} {state.ContributionPoints:0} {FormatSigned(visibleContributionDelta)}/s";
-        _threatLabel.Text = $"⚔ 威胁 {state.Threat:0}%";
-        _techLabel.Text = $"📜 科技 T{Math.Max(state.TechLevel + 1, 1)}";
+            $"下一时辰预计：{MaterialSemanticRules.GetDisplayName(nameof(GameState.Wood))}{FormatSigned(woodDelta)}、{MaterialSemanticRules.GetDisplayName(nameof(GameState.Stone))}{FormatSigned(stoneDelta)}、{MaterialSemanticRules.GetDisplayName(nameof(GameState.Timber))}库存 {state.Timber:0}、{MaterialSemanticRules.GetDisplayName(nameof(GameState.RawStone))}库存 {state.RawStone:0}。";
+        _goldLabel.Text = $"【灵石】{state.Gold:0}";
+        _goldLabel.TooltipText =
+            $"功绩 {state.ContributionPoints:0}（{FormatSigned(visibleContributionDelta)}/时），灵石流转 {FormatSigned(visibleGoldDelta)}/时。";
+        _threatLabel.Text = $"【危】威慑 {state.Threat:0}%";
+        _techLabel.Text = $"【研】T{Math.Max(state.TechLevel + 1, 1)}";
 
         _exploreButton.Text = _isUsingFigmaLayout
             ? (state.ExplorationEnabled ? "⏸ 探险中" : "▶ 探险")
-            : (state.ExplorationEnabled ? "⏸" : "▶");
+            : (state.ExplorationEnabled ? "历练中" : "启 历练");
 
         _sectMapRenderer?.RefreshMap(state.Population, state.HousingCapacity, state.ElitePopulation);
         _sectMapRenderer?.RefreshResidents(state);
@@ -241,10 +248,12 @@ public partial class Main : Control
         RefreshWarehousePanelPopup(state);
         RefreshTaskPanelPopup(state);
         RefreshDisciplePanelPopup(state);
+        RefreshSectOrganizationPanelPopup(state);
         HandleAutoSaveFromState(state);
 
         RefreshJobPanels(state);
         RefreshMineButtonState(state);
+        RefreshSectChroniclePanel(state);
         UpdateFigmaPanels(state);
         UpdateCalendarUi(force: true);
         RefreshMapOperationalLinkUi(state);
@@ -408,10 +417,8 @@ public partial class Main : Control
         }
 
         var totalMinutes = _gameLoop?.State.GameMinutes ?? 0;
-        var hours = totalMinutes / 60;
-        var minutes = totalMinutes % 60;
         var coloredMessage = ColorizeLogMessage(message);
-        _logs.Enqueue($"[{hours:00}:{minutes:00}] {coloredMessage}");
+        _logs.Enqueue($"[{GetChronicleTimeText(totalMinutes)}] {coloredMessage}");
 
         while (_logs.Count > 14)
         {
@@ -427,23 +434,29 @@ public partial class Main : Control
             message.Contains("不足", StringComparison.Ordinal) ||
             message.Contains("失败", StringComparison.Ordinal))
         {
-            return $"[color=#df6f6f]{message}[/color]";
+            return $"[color=#9e2a22]{message}[/color]";
         }
 
         if (message.Contains("获得", StringComparison.Ordinal) ||
             message.Contains("胜利", StringComparison.Ordinal) ||
             message.Contains("成功", StringComparison.Ordinal))
         {
-            return $"[color=#59c995]{message}[/color]";
+            return $"[color=#8a6a3b]{message}[/color]";
         }
 
         if (message.Contains("存档", StringComparison.Ordinal) ||
             message.Contains("读档", StringComparison.Ordinal))
         {
-            return $"[color=#7c9dff]{message}[/color]";
+            return $"[color=#6b5f54]{message}[/color]";
         }
 
-        return $"[color=#6f82b8]{message}[/color]";
+        return $"[color=#4a3f35]{message}[/color]";
+    }
+
+    private static string GetChronicleTimeText(int totalMinutes)
+    {
+        var normalizedHours = ((totalMinutes / 60) % 24 + 24) % 24;
+        return ChronicleTimeLabels[(normalizedHours / 2) % ChronicleTimeLabels.Length];
     }
 
     private void BindUiNodes()
@@ -475,9 +488,9 @@ public partial class Main : Control
         _foodLabel = GetNode<Label>($"{TopBarPath}/BarContent/MainRow/StatsRow/FoodLabel");
         _woodLabel = GetNode<Label>($"{TopBarPath}/BarContent/MainRow/StatsRow/WoodLabel");
         _goldLabel = GetNode<Label>($"{TopBarPath}/BarContent/MainRow/StatsRow/GoldLabel");
-        _threatLabel = GetNode<Label>($"{TopBarPath}/BarContent/MainRow/StatsRow/ThreatLabel");
-        _techLabel = GetNode<Label>($"{TopBarPath}/BarContent/MainRow/StatsRow/TechLabel");
-        _calendarLabel = GetNode<Label>($"{TopBarPath}/BarContent/MainRow/CycleBox/CycleLabel");
+        _threatLabel = GetNode<Label>($"{TopBarPath}/BarContent/MainRow/CycleBox/InfoRow/ThreatLabel");
+        _techLabel = GetNode<Label>($"{TopBarPath}/BarContent/MainRow/CycleBox/InfoRow/TechLabel");
+        _calendarLabel = GetNode<Label>($"{TopBarPath}/BarContent/MainRow/CycleBox/InfoRow/CycleLabel");
         _calendarDetailLabel = GetNode<Label>($"{TopBarPath}/BarContent/MainRow/CycleBox/CountdownLabel");
         _calendarQuarterProgress = GetNode<ProgressBar>($"{TopBarPath}/BarContent/MainRow/CycleBox/QuarterProgressRow/QuarterProgress");
         _calendarDayProgress = GetNode<ProgressBar>($"{TopBarPath}/BarContent/MainRow/CycleBox/DayProgressRow/DayProgress");
@@ -514,67 +527,9 @@ public partial class Main : Control
         _expeditionMapView = GetNode<Control>($"{CenterMapPagesPath}/ExpeditionMapView");
         _sectMapRenderer = GetNode<SectMapViewSystem>($"{CenterMapPagesPath}/CountyTownMapView");
         _mineUpgradeButton = GetNodeOrNull<Button>($"{CenterReportDetailPagesPath}/MineCard/CardVBox/UpgradeButton");
-        _peakOverviewLabel = GetNodeOrNull<RichTextLabel>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/PeakOverviewPanel/PeakOverviewVBox/PeakOverviewText");
-        _peakPrevButton = GetNodeOrNull<Button>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakSwitchRow/PeakPrevButton");
-        _peakNextButton = GetNodeOrNull<Button>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakSwitchRow/PeakNextButton");
-        _peakCurrentTitleLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakSwitchRow/PeakCurrentTitle");
-        _peakDetailCounterLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakDetailHeaderRow/PeakDetailCounter");
-        _peakCurrentSummaryLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakCurrentSummary");
-        _peakSupportStatusLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakSupportStatus");
-        _peakSupportButton = GetNodeOrNull<Button>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakSupportActionRow/PeakSupportButton");
-        _peakSupportResetButton = GetNodeOrNull<Button>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakSupportActionRow/PeakSupportResetButton");
-        _peakCurrentDetailLabel = GetNodeOrNull<RichTextLabel>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/PeakDetailPanel/PeakDetailVBox/PeakCurrentDetail");
-        _selectedPeakIndex = SectOrganizationRules.NormalizePeakIndex(_selectedPeakIndex);
-
-        _jobCountLabels.Clear();
-        _jobTitleLabels.Clear();
-        _jobStatusLabels.Clear();
-        _jobDetailLabels.Clear();
-        _jobRows.Clear();
-        _jobPriorityButtons.Clear();
-        _jobRowBaseStyles.Clear();
-
-        RegisterJobRow(
-            JobType.Farmer,
-            $"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/FarmerRow",
-            $"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/FarmerRow/RowVBox/DetailLabel");
-        RegisterJobRow(
-            JobType.Worker,
-            $"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/WorkerRow",
-            $"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/WorkerRow/RowVBox/DetailLabel");
-        RegisterJobRow(
-            JobType.Merchant,
-            $"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/MerchantRow",
-            $"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/MerchantRow/RowVBox/DetailLabel");
-        RegisterJobRow(
-            JobType.Scholar,
-            $"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/ScholarRow",
-            $"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/ScholarRow/RowVBox/DetailLabel");
-        _jobCountLabels[JobType.Farmer] = GetNode<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/FarmerRow/RowVBox/ControlRow/Stepper/StepperRow/CountPanel/CountLabel");
-        _jobCountLabels[JobType.Worker] = GetNode<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/WorkerRow/RowVBox/ControlRow/Stepper/StepperRow/CountPanel/CountLabel");
-        _jobCountLabels[JobType.Merchant] = GetNode<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/MerchantRow/RowVBox/ControlRow/Stepper/StepperRow/CountPanel/CountLabel");
-        _jobCountLabels[JobType.Scholar] = GetNode<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/ScholarRow/RowVBox/ControlRow/Stepper/StepperRow/CountPanel/CountLabel");
-
-        _jobTitleLabels[JobType.Farmer] = GetNode<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/FarmerRow/RowVBox/HeaderRow/JobLabel");
-        _jobTitleLabels[JobType.Worker] = GetNode<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/WorkerRow/RowVBox/HeaderRow/JobLabel");
-        _jobTitleLabels[JobType.Merchant] = GetNode<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/MerchantRow/RowVBox/HeaderRow/JobLabel");
-        _jobTitleLabels[JobType.Scholar] = GetNode<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/ScholarRow/RowVBox/HeaderRow/JobLabel");
-
-        _jobStatusLabels[JobType.Farmer] = GetNode<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/FarmerRow/RowVBox/ControlRow/EliteBox/EliteLabel");
-        _jobStatusLabels[JobType.Worker] = GetNode<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/WorkerRow/RowVBox/ControlRow/EliteBox/EliteLabel");
-        _jobStatusLabels[JobType.Merchant] = GetNode<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/MerchantRow/RowVBox/ControlRow/EliteBox/EliteLabel");
-        _jobStatusLabels[JobType.Scholar] = GetNode<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/ScholarRow/RowVBox/ControlRow/EliteBox/EliteLabel");
-        _jobDetailLabels[JobType.Farmer] = GetNode<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/FarmerRow/RowVBox/DetailLabel");
-        _jobDetailLabels[JobType.Worker] = GetNode<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/WorkerRow/RowVBox/DetailLabel");
-        _jobDetailLabels[JobType.Merchant] = GetNode<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/MerchantRow/RowVBox/DetailLabel");
-        _jobDetailLabels[JobType.Scholar] = GetNode<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/ScholarRow/RowVBox/DetailLabel");
-        _jobPriorityButtons[JobType.Farmer] = GetNode<Button>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/FarmerRow/RowVBox/HeaderRow/PriorityLabel");
-        _jobPriorityButtons[JobType.Worker] = GetNode<Button>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/WorkerRow/RowVBox/HeaderRow/PriorityLabel");
-        _jobPriorityButtons[JobType.Merchant] = GetNode<Button>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/MerchantRow/RowVBox/HeaderRow/PriorityLabel");
-        _jobPriorityButtons[JobType.Scholar] = GetNode<Button>($"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/ScholarRow/RowVBox/HeaderRow/PriorityLabel");
-        ApplyPriorityButtonTexts();
-        ApplyJobRowSelectionStyles();
-        RefreshPeakDetailPanel();
+        BindSectTileInspectorNodes();
+        BindSectChronicleNodes();
+        ClearLegacyJobsPaddingBindings();
 
         _figmaBuildAgricultureButton = null;
         _figmaBuildWorkshopButton = null;
@@ -637,27 +592,11 @@ public partial class Main : Control
         _reportPanelView = null;
         _expeditionMapView = null;
         _mineUpgradeButton = null;
-        _peakOverviewLabel = null;
-        _peakPrevButton = null;
-        _peakNextButton = null;
-        _peakCurrentTitleLabel = null;
-        _peakDetailCounterLabel = null;
-        _peakCurrentSummaryLabel = null;
-        _peakSupportStatusLabel = null;
-        _peakSupportButton = null;
-        _peakSupportResetButton = null;
-        _peakCurrentDetailLabel = null;
         _sectMapRenderer = null;
         ClearMapOperationalNodes();
-
-        _jobCountLabels.Clear();
-        _jobTitleLabels.Clear();
-        _jobStatusLabels.Clear();
-        _jobDetailLabels.Clear();
-        _jobRows.Clear();
-        _jobPriorityButtons.Clear();
-        _jobRowBaseStyles.Clear();
-        _inspectedJobType = null;
+        ClearLegacyJobsPaddingBindings();
+        ClearSectTileInspectorNodes();
+        ClearSectChronicleNodes();
     }
 
     private void ApplyLayoutSwitch()
@@ -673,7 +612,9 @@ public partial class Main : Control
         BindWarehouseButtonEvent();
         BindTaskButtonEvent();
         BindDiscipleButtonEvent();
+        BindSectOrganizationButtonEvent();
         BindDiscipleMapInspectionEvent();
+        BindSectTileInspectorEvents();
 
         if (_speedX1Button != null)
         {
@@ -734,27 +675,29 @@ public partial class Main : Control
             return;
         }
 
-        BindJobButtons(
-            JobType.Farmer,
-            $"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/FarmerRow/RowVBox/ControlRow/Stepper/StepperRow/MinusButton",
-            $"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/FarmerRow/RowVBox/ControlRow/Stepper/StepperRow/PlusButton");
-        BindJobButtons(
-            JobType.Worker,
-            $"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/WorkerRow/RowVBox/ControlRow/Stepper/StepperRow/MinusButton",
-            $"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/WorkerRow/RowVBox/ControlRow/Stepper/StepperRow/PlusButton");
-        BindJobButtons(
-            JobType.Merchant,
-            $"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/MerchantRow/RowVBox/ControlRow/Stepper/StepperRow/MinusButton",
-            $"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/MerchantRow/RowVBox/ControlRow/Stepper/StepperRow/PlusButton");
-        BindJobButtons(
-            JobType.Scholar,
-            $"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/ScholarRow/RowVBox/ControlRow/Stepper/StepperRow/MinusButton",
-            $"{LeftPanelPath}/PanelContent/JobsVBox/JobsPadding/JobsList/ScholarRow/RowVBox/ControlRow/Stepper/StepperRow/PlusButton");
-        BindJobRowInteractions();
-        BindJobPriorityButtons();
-        BindPeakDetailButtons();
-
         BindLegacyIndustryButtons();
+    }
+
+    private void ClearLegacyJobsPaddingBindings()
+    {
+        _peakOverviewLabel = null;
+        _peakPrevButton = null;
+        _peakNextButton = null;
+        _peakCurrentTitleLabel = null;
+        _peakDetailCounterLabel = null;
+        _peakCurrentSummaryLabel = null;
+        _peakSupportStatusLabel = null;
+        _peakSupportButton = null;
+        _peakSupportResetButton = null;
+        _peakCurrentDetailLabel = null;
+        _jobCountLabels.Clear();
+        _jobTitleLabels.Clear();
+        _jobStatusLabels.Clear();
+        _jobDetailLabels.Clear();
+        _jobRows.Clear();
+        _jobPriorityButtons.Clear();
+        _jobRowBaseStyles.Clear();
+        _inspectedJobType = null;
     }
 
     private void BindFigmaIndustryButtons()
@@ -774,10 +717,10 @@ public partial class Main : Control
             _figmaCraftToolsButton.Pressed += _gameLoop.CraftIndustryTools;
         }
 
-        _saveButton.Text = "💾 存档";
-        _loadButton.Text = "📂 读档";
-        _settingsButton.Text = "⚙ 设置";
-        _resetButton.Text = "↺ 重置";
+        _saveButton.Text = "【存】";
+        _loadButton.Text = "【读】";
+        _settingsButton.Text = "【设】";
+        _resetButton.Text = "【重】";
     }
 
     private void BindLegacyIndustryButtons()
@@ -804,14 +747,14 @@ public partial class Main : Control
     private void ApplySpeedScale(double scale)
     {
         SetSpeedScale(scale);
-        AppendLog($"时间倍率切换至 x{GetCurrentTimeScale():0}。");
+        AppendLog($"时辰刻度切换至 {GetTimeScaleText(GetCurrentTimeScale())}。");
     }
 
     private void CycleSpeedScale()
     {
         var nextIndex = (_timeScaleIndex + 1) % SupportedTimeScales.Length;
         SetSpeedScale(SupportedTimeScales[nextIndex]);
-        AppendLog($"时间倍率切换至 x{GetCurrentTimeScale():0}。");
+        AppendLog($"时辰刻度切换至 {GetTimeScaleText(GetCurrentTimeScale())}。");
     }
 
     private void SetSpeedScale(double scale)
@@ -836,20 +779,40 @@ public partial class Main : Control
         if (_speedX1Button != null)
         {
             _speedX1Button.ButtonPressed = Math.Abs(GetCurrentTimeScale() - 1.0) < 0.001;
-            _speedX1Button.Text = "x1";
+            _speedX1Button.Text = "壹倍";
         }
 
         if (_speedX2Button != null)
         {
             _speedX2Button.ButtonPressed = Math.Abs(GetCurrentTimeScale() - 2.0) < 0.001;
-            _speedX2Button.Text = "x2";
+            _speedX2Button.Text = "贰倍";
         }
 
         if (_speedX4Button != null)
         {
             _speedX4Button.ButtonPressed = Math.Abs(GetCurrentTimeScale() - 4.0) < 0.001;
-            _speedX4Button.Text = "x4";
+            _speedX4Button.Text = "肆倍";
         }
+    }
+
+    private static string GetTimeScaleText(double scale)
+    {
+        if (Math.Abs(scale - 1.0) < 0.001)
+        {
+            return "壹倍";
+        }
+
+        if (Math.Abs(scale - 2.0) < 0.001)
+        {
+            return "贰倍";
+        }
+
+        if (Math.Abs(scale - 4.0) < 0.001)
+        {
+            return "肆倍";
+        }
+
+        return $"x{scale:0}";
     }
 
     private double GetCurrentTimeScale()
@@ -942,14 +905,14 @@ public partial class Main : Control
     {
         if (_countyTownMapButton != null)
         {
-            _countyTownMapButton.Text = "天衍峰山门";
-            _countyTownMapButton.TooltipText = "查看天衍峰布局、门人活动与场所状态";
+            _countyTownMapButton.Text = "山门沙盘";
+            _countyTownMapButton.TooltipText = "查看天衍峰卷内六边形山门图、门人活动与场所状态";
         }
 
         if (_worldMapButton != null)
         {
-            _worldMapButton.Text = "世界地图";
-            _worldMapButton.TooltipText = "查看世界灵脉、奇观与外部形势";
+            _worldMapButton.Text = "展 全景舆图";
+            _worldMapButton.TooltipText = "展开卷外山河舆图，查看世界灵脉、奇观与外部形势";
         }
 
         HideMapEntry(_prefectureMapButton, _prefectureMapView);

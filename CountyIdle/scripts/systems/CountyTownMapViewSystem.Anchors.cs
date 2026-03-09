@@ -6,14 +6,7 @@ namespace CountyIdle.Systems;
 
 public partial class CountyTownMapViewSystem
 {
-    private static readonly Color FarmsteadAnchorColor = new(0.56f, 0.79f, 0.34f, 0.92f);
-    private static readonly Color WorkshopAnchorColor = new(0.79f, 0.62f, 0.33f, 0.92f);
-    private static readonly Color MarketAnchorColor = new(0.90f, 0.53f, 0.32f, 0.92f);
-    private static readonly Color AcademyAnchorColor = new(0.47f, 0.64f, 0.93f, 0.92f);
-    private static readonly Color AdministrationAnchorColor = new(0.72f, 0.52f, 0.86f, 0.92f);
-    private static readonly Color LeisureAnchorColor = new(0.33f, 0.78f, 0.76f, 0.92f);
     private static readonly Color AnchorShadowColor = new(0.04f, 0.05f, 0.05f, 0.18f);
-    private static readonly Color AnchorSelectionGlowColor = new(1.00f, 0.96f, 0.72f, 0.22f);
 
     private void DrawActivityAnchorBuilding(TownActivityAnchorData anchor, Vector2 origin)
     {
@@ -41,11 +34,22 @@ public partial class CountyTownMapViewSystem
 
         if (isSelected)
         {
+            var pulse = 1.0f + (Mathf.Sin(Time.GetTicksMsec() / 180.0f) * 0.045f);
+            var selectionHalo = CreateHex(
+                center + new Vector2(0f, -ScaleValue(1.6f)),
+                foundationRadius * 1.34f * pulse);
+            DrawColoredPolygon(selectionHalo, TownActivityAnchorVisualRules.GetSelectionHaloColor(anchor.AnchorType));
+
             var selectionFootprint = CreateHex(
                 center + new Vector2(0f, -ScaleValue(1.2f)),
-                foundationRadius * 1.18f);
-            DrawColoredPolygon(selectionFootprint, AnchorSelectionGlowColor);
-            DrawPolyline(selectionFootprint, baseColor.Lightened(0.28f), Math.Max(1.2f, ScaleValue(1.6f)), true);
+                foundationRadius * 1.18f * pulse);
+            DrawColoredPolygon(selectionFootprint, TownActivityAnchorVisualRules.GetSelectionGlowColor(anchor.AnchorType));
+            DrawPolyline(selectionFootprint, TownActivityAnchorVisualRules.GetSelectionOutlineColor(anchor.AnchorType), Math.Max(1.3f, ScaleValue(1.8f)), true);
+
+            var innerSelectionRing = CreateHex(
+                center + new Vector2(0f, -ScaleValue(2.4f)),
+                foundationRadius * 0.94f);
+            DrawPolyline(innerSelectionRing, TownActivityAnchorVisualRules.GetSelectionPathColor(anchor.AnchorType), Math.Max(0.8f, ScaleValue(1.0f)), true);
         }
 
         var shadow = CreateHex(center + new Vector2(ScaleValue(2.4f), ScaleValue(3.6f)), foundationRadius * 0.76f);
@@ -96,8 +100,21 @@ public partial class CountyTownMapViewSystem
     {
         var roadCenter = GetTownCellCenter(anchor.RoadCell, origin) + new Vector2(0f, ScaleValue(0.8f));
         var entrancePoint = GetAnchorEntrancePoint(anchor, baseBottom);
-        DrawLine(roadCenter, entrancePoint, baseColor * 0.50f, Math.Max(0.9f, ScaleValue(1.3f)));
-        DrawCircle(entrancePoint, Math.Max(0.9f, ScaleValue(1.6f)), baseColor * 0.78f);
+        var isSelected = IsSelectedActivityAnchor(anchor);
+        var pathColor = isSelected
+            ? TownActivityAnchorVisualRules.GetSelectionPathColor(anchor.AnchorType)
+            : baseColor * 0.50f;
+        var pathWidth = isSelected
+            ? Math.Max(1.2f, ScaleValue(1.8f))
+            : Math.Max(0.9f, ScaleValue(1.3f));
+
+        DrawLine(roadCenter, entrancePoint, pathColor, pathWidth);
+        DrawCircle(entrancePoint, Math.Max(0.9f, ScaleValue(isSelected ? 2.1f : 1.6f)), isSelected ? pathColor.Lightened(0.10f) : baseColor * 0.78f);
+
+        if (isSelected)
+        {
+            DrawCircle(roadCenter, Math.Max(0.9f, ScaleValue(1.6f)), TownActivityAnchorVisualRules.GetSelectionGlowColor(anchor.AnchorType));
+        }
     }
 
     private Vector2 GetAnchorEntrancePoint(TownActivityAnchorData anchor, Vector2 baseBottom)
@@ -304,15 +321,6 @@ public partial class CountyTownMapViewSystem
 
     private static Color GetAnchorColor(TownActivityAnchorType anchorType)
     {
-        return anchorType switch
-        {
-            TownActivityAnchorType.Farmstead => FarmsteadAnchorColor,
-            TownActivityAnchorType.Workshop => WorkshopAnchorColor,
-            TownActivityAnchorType.Market => MarketAnchorColor,
-            TownActivityAnchorType.Academy => AcademyAnchorColor,
-            TownActivityAnchorType.Administration => AdministrationAnchorColor,
-            TownActivityAnchorType.Leisure => LeisureAnchorColor,
-            _ => Colors.White
-        };
+        return TownActivityAnchorVisualRules.GetMapBaseColor(anchorType);
     }
 }

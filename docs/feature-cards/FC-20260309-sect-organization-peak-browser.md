@@ -20,3 +20,9 @@
 - [x] 天枢峰、天机峰、天工峰、天权峰、天元峰、天衡峰的处室级内容已在详情中体现；
 - [x] `docs/02_system_specs.md`、`docs/05_feature_inventory.md`、`docs/08_development_list.md` 已同步；
 - [x] `dotnet build .\Finally.sln` 通过。
+
+## 2026-03-09 迁移补记
+
+- 为适配主界面 `Tile Inspector` 单链路，峰脉详情浏览已从主界面左栏迁入独立 `SectOrganizationPanel` 卷册；
+- 打开入口改为底部 `【峰令】谱系` 快捷按钮，生命周期接线由 `Main.cs + MainSectOrganizationPanel.cs` 维护；
+- 浏览逻辑、推荐峰脉定位与峰系详情内容保持不变，只调整承载界面与入口位置。

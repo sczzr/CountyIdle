@@ -1,18 +1,6 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=2 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/WarehousePanel.cs" id="1_ware"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dialog"]
-bg_color = Color(0.0823529, 0.0862745, 0.101961, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.243137, 0.258824, 0.301961, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
 
 [node name="WarehousePanel" type="Control"]
 visible = false
@@ -32,7 +20,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.58)
+color = Color(0.101961, 0.0862745, 0.0745098, 0.94)
 
 [node name="CenterLayer" type="CenterContainer" parent="."]
 layout_mode = 1
@@ -42,154 +30,298 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Dialog" type="PanelContainer" parent="CenterLayer"]
-custom_minimum_size = Vector2(980, 0)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_dialog")
-
-[node name="Margin" type="MarginContainer" parent="CenterLayer/Dialog"]
-layout_mode = 2
-theme_override_constants/margin_left = 16
-theme_override_constants/margin_top = 16
-theme_override_constants/margin_right = 16
-theme_override_constants/margin_bottom = 16
-
-[node name="MainColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin"]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="HeaderRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn"]
+[node name="LedgerWrapper" type="Control" parent="CenterLayer"]
+custom_minimum_size = Vector2(948, 640)
 layout_mode = 2
 
-[node name="TitleLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/HeaderRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 18
-text = "仓储管理"
+[node name="TopTrim" type="ColorRect" parent="CenterLayer/LedgerWrapper"]
+offset_left = 10.0
+offset_top = 12.0
+offset_right = 938.0
+offset_bottom = 22.0
+color = Color(0.831373, 0.686275, 0.215686, 1)
 
-[node name="CloseButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/HeaderRow"]
-custom_minimum_size = Vector2(44, 28)
-layout_mode = 2
-text = "×"
+[node name="BottomTrim" type="ColorRect" parent="CenterLayer/LedgerWrapper"]
+offset_left = 10.0
+offset_top = 618.0
+offset_right = 938.0
+offset_bottom = 628.0
+color = Color(0.831373, 0.686275, 0.215686, 1)
 
-[node name="HintLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn"]
-layout_mode = 2
-modulate = Color(0.760784, 0.780392, 0.831373, 1)
-autowrap_mode = 3
-text = "按分类查看灵材卡槽与库存，并直接执行矿仓联建、工器炼制与产能扩建。"
+[node name="FrameRow" type="HBoxContainer" parent="CenterLayer/LedgerWrapper"]
+offset_left = 10.0
+offset_top = 24.0
+offset_right = 938.0
+offset_bottom = 616.0
+theme_override_constants/separation = 0
 
-[node name="StatusSection" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="WarehouseStatusValue" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/StatusSection"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.94902, 0.909804, 0.788235, 1)
-text = "仓储 Lv.1 · 矿坑 Lv.1 · 已占 0/1200 · 剩余 1200"
-
-[node name="WarehouseLoadBar" type="ProgressBar" parent="CenterLayer/Dialog/Margin/MainColumn/StatusSection"]
-custom_minimum_size = Vector2(0, 14)
-layout_mode = 2
-max_value = 1200.0
-value = 0.0
-show_percentage = false
-
-[node name="InventoryFrame" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn"]
+[node name="LeftRoller" type="PanelContainer" parent="CenterLayer/LedgerWrapper/FrameRow"]
+custom_minimum_size = Vector2(24, 0)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="InventorySection" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/InventoryFrame"]
+[node name="LeftTopCap" type="ColorRect" parent="CenterLayer/LedgerWrapper/FrameRow/LeftRoller"]
+layout_mode = 0
+offset_left = -3.0
+offset_top = -6.0
+offset_right = 27.0
+offset_bottom = 6.0
+color = Color(0.831373, 0.686275, 0.215686, 1)
+
+[node name="LeftBottomCap" type="ColorRect" parent="CenterLayer/LedgerWrapper/FrameRow/LeftRoller"]
+layout_mode = 0
+offset_left = -3.0
+offset_top = 574.0
+offset_right = 27.0
+offset_bottom = 586.0
+color = Color(0.831373, 0.686275, 0.215686, 1)
+
+[node name="Paper" type="PanelContainer" parent="CenterLayer/LedgerWrapper/FrameRow"]
+custom_minimum_size = Vector2(880, 0)
 layout_mode = 2
-theme_override_constants/margin_left = 10
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="PaperMargin" type="MarginContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper"]
+layout_mode = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 28
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 24
+
+[node name="MainColumn" type="VBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="HeaderRow" type="HBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn"]
+layout_mode = 2
+alignment = 1
+
+[node name="TitleGroup" type="HBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/HeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="TitleLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/HeaderRow/TitleGroup"]
+layout_mode = 2
+text = "天衍峰库藏卷"
+
+[node name="SubtitleLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/HeaderRow/TitleGroup"]
+layout_mode = 2
+text = "（总库）"
+
+[node name="CloseButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/HeaderRow"]
+custom_minimum_size = Vector2(36, 32)
+layout_mode = 2
+text = "✖"
+
+[node name="StatusSection" type="PanelContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn"]
+layout_mode = 2
+
+[node name="StatusMargin" type="MarginContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
 theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 10
+theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 10
 
-[node name="InventoryScroll" type="ScrollContainer" parent="CenterLayer/Dialog/Margin/MainColumn/InventoryFrame/InventorySection"]
-custom_minimum_size = Vector2(0, 380)
+[node name="StatusRow" type="HBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="WarningStampLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusRow"]
+layout_mode = 2
+text = "满溢"
+
+[node name="StatusTextColumn" type="VBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="HintLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusRow/StatusTextColumn"]
+layout_mode = 2
+autowrap_mode = 3
+text = "仓廪将满，亟需扩建或消耗度支。"
+
+[node name="WarehouseStatusValue" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusRow/StatusTextColumn"]
+layout_mode = 2
+text = "仓储壹级 · 矿坑壹级"
+
+[node name="CapacityValueLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusRow"]
+layout_mode = 2
+horizontal_alignment = 2
+text = "已占 0 / 1200"
+
+[node name="BodyRow" type="HBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="InventoryArea" type="VBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 14
+
+[node name="TabRow" type="HBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="AllTabButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/TabRow"]
+custom_minimum_size = Vector2(72, 54)
+layout_mode = 2
+text = "全览"
+
+[node name="BasicTabButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/TabRow"]
+custom_minimum_size = Vector2(106, 54)
+layout_mode = 2
+text = "农桑（基础）"
+
+[node name="MaterialsTabButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/TabRow"]
+custom_minimum_size = Vector2(106, 54)
+layout_mode = 2
+text = "金石（资材）"
+
+[node name="CraftedTabButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/TabRow"]
+custom_minimum_size = Vector2(106, 54)
+layout_mode = 2
+text = "百工（造物）"
+
+[node name="InventoryUnderline" type="ColorRect" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea"]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+color = Color(0.294118, 0.247059, 0.207843, 1)
+
+[node name="InventoryScroll" type="ScrollContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="InventoryColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/InventoryFrame/InventorySection/InventoryScroll"]
+[node name="InventoryGrid" type="GridContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/InventoryScroll"]
+layout_mode = 2
+columns = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 14
+
+[node name="BodyDivider" type="ColorRect" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow"]
+custom_minimum_size = Vector2(1, 0)
+layout_mode = 2
+size_flags_vertical = 3
+color = Color(0.639216, 0.584314, 0.505882, 0.85)
+
+[node name="ActionArea" type="ScrollContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow"]
+custom_minimum_size = Vector2(290, 0)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ActionColumn" type="VBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 12
+theme_override_constants/separation = 22
 
-[node name="ActionSection" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn"]
+[node name="ManufactureSection" type="VBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 10
 
-[node name="PrimaryActionRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection"]
+[node name="ManufactureTitle" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ManufactureSection"]
 layout_mode = 2
-theme_override_constants/separation = 8
+text = "◈ 天工造物（制造）"
 
-[node name="UpgradeButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/PrimaryActionRow"]
+[node name="LockedForgeButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ManufactureSection"]
+custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
-size_flags_horizontal = 3
-text = "矿仓联建"
+text = "锻制法器（未解锁）"
+disabled = true
 
-[node name="CraftToolsButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/PrimaryActionRow"]
+[node name="CraftToolsButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ManufactureSection"]
+custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
-size_flags_horizontal = 3
 text = "锻制工器"
 
-[node name="BuildActionRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection"]
+[node name="BuildSection" type="VBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 10
 
-[node name="BuildWorkshopButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/BuildActionRow"]
+[node name="BuildTitle" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/BuildSection"]
 layout_mode = 2
-size_flags_horizontal = 3
+text = "◈ 宗门土木（扩建）"
+
+[node name="UpgradeButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/BuildSection"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "矿仓联建"
+
+[node name="BuildWorkshopButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/BuildSection"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
 text = "扩建傀儡工坊"
 
-[node name="BuildAdministrationButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/BuildActionRow"]
+[node name="BuildAdministrationButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/BuildSection"]
+custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
-size_flags_horizontal = 3
 text = "扩建庶务殿"
 
-[node name="TierZeroTitle" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection"]
+[node name="ChainSection" type="VBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 13
-text = "T0 材料链"
+theme_override_constants/separation = 10
 
-[node name="TierZeroStatusValue" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection"]
+[node name="ChainTitle" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection"]
 layout_mode = 2
-text = "T0 链路：林木链 Lv.0 · 石陶链 Lv.0\n盐药链 Lv.0 · 纤皮链 Lv.0"
+text = "◈ 供养法旨（生产链）"
+
+[node name="ChainInfoFrame" type="PanelContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection"]
+layout_mode = 2
+
+[node name="ChainInfoMargin" type="MarginContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection/ChainInfoFrame"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="TierZeroStatusValue" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection/ChainInfoFrame/ChainInfoMargin"]
+layout_mode = 2
 autowrap_mode = 3
+text = "当前运作纲要：\n灵材：灵木链 贰阶 · 石陶链 壹阶\n丹鼎：盐丹链 壹阶 · 织裘链 壹阶"
 
-[node name="TierZeroActionRowTop" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection"]
+[node name="BuildForestryChainButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection"]
+custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
-theme_override_constants/separation = 8
+text = "配置 灵木链"
 
-[node name="BuildForestryChainButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/TierZeroActionRowTop"]
+[node name="BuildMasonryChainButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection"]
+custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
-size_flags_horizontal = 3
-text = "林木链"
+text = "配置 石陶链"
 
-[node name="BuildMasonryChainButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/TierZeroActionRowTop"]
+[node name="BuildMedicinalChainButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection"]
+custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
-size_flags_horizontal = 3
-text = "石陶链"
+text = "配置 盐丹链"
 
-[node name="TierZeroActionRowBottom" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection"]
+[node name="BuildFiberChainButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection"]
+custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
-theme_override_constants/separation = 8
+text = "配置 织裘链"
 
-[node name="BuildMedicinalChainButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/TierZeroActionRowBottom"]
+[node name="RightRoller" type="PanelContainer" parent="CenterLayer/LedgerWrapper/FrameRow"]
+custom_minimum_size = Vector2(24, 0)
 layout_mode = 2
-size_flags_horizontal = 3
-text = "盐药链"
+size_flags_vertical = 3
 
-[node name="BuildFiberChainButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/TierZeroActionRowBottom"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "纤皮链"
+[node name="RightTopCap" type="ColorRect" parent="CenterLayer/LedgerWrapper/FrameRow/RightRoller"]
+layout_mode = 0
+offset_left = -3.0
+offset_top = -6.0
+offset_right = 27.0
+offset_bottom = 6.0
+color = Color(0.831373, 0.686275, 0.215686, 1)
 
-[node name="FooterRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn"]
-layout_mode = 2
-alignment = 2
-
-[node name="CloseFooterButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/FooterRow"]
-custom_minimum_size = Vector2(110, 34)
-layout_mode = 2
-text = "关闭"
+[node name="RightBottomCap" type="ColorRect" parent="CenterLayer/LedgerWrapper/FrameRow/RightRoller"]
+layout_mode = 0
+offset_left = -3.0
+offset_top = 574.0
+offset_right = 27.0
+offset_bottom = 586.0
+color = Color(0.831373, 0.686275, 0.215686, 1)
