@@ -15,6 +15,8 @@ public partial class DisciplePanel : PopupPanelBase
 	private static readonly Color CinnabarColor = new(0.651f, 0.192f, 0.165f, 1f);
 	private static readonly Color CeladonColor = new(0.439f, 0.553f, 0.506f, 1f);
 	private static readonly Color BorderGoldColor = new(0.773f, 0.627f, 0.349f, 1f);
+	private const string MetricGridPath =
+		"Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid";
 
 	private enum FilterMode
 	{
@@ -58,6 +60,7 @@ public partial class DisciplePanel : PopupPanelBase
 	private Button _closeButton = null!;
 	private Label _hintLabel = null!;
 	private FlowContainer _traitFlow = null!;
+	private PanelContainer _traitTagTemplate = null!;
 	private Label _rootCircleLabel = null!;
 	private Label _realmStatusLabel = null!;
 	private ProgressBar _realmProgressBar = null!;
@@ -155,579 +158,6 @@ public partial class DisciplePanel : PopupPanelBase
 		return "弟子谱会按当前经营态势派生生成名册，用于查看门人属性、培养方向与当前差事；不直接改写小时结算。按 Esc 可收卷。";
 	}
 
-			private void BuildUi()
-	{
-		MouseFilter = Control.MouseFilterEnum.Stop;
-		SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
-
-		var overlay = new ColorRect
-		{
-			Color = new Color(0.08f, 0.08f, 0.08f, 0.68f),
-			MouseFilter = Control.MouseFilterEnum.Stop
-		};
-		overlay.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
-		AddChild(overlay);
-
-		var wrapper = new PanelContainer
-		{
-			MouseFilter = Control.MouseFilterEnum.Stop
-		};
-		wrapper.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
-		wrapper.OffsetLeft = 18;
-		wrapper.OffsetTop = 18;
-		wrapper.OffsetRight = -18;
-		wrapper.OffsetBottom = -18;
-		wrapper.AddThemeStyleboxOverride("panel", CreatePaperStyle());
-		overlay.AddChild(wrapper);
-
-		var rootColumn = new VBoxContainer
-		{
-			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-			SizeFlagsVertical = Control.SizeFlags.ExpandFill
-		};
-		rootColumn.AddThemeConstantOverride("separation", 0);
-		wrapper.AddChild(rootColumn);
-
-		rootColumn.AddChild(BuildHeader());
-
-		var divider = new ColorRect
-		{
-			Color = new Color(InkGrayColor, 0.55f),
-			CustomMinimumSize = new Vector2(0, 1)
-		};
-		rootColumn.AddChild(divider);
-
-		var bodyRow = new HBoxContainer
-		{
-			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-			SizeFlagsVertical = Control.SizeFlags.ExpandFill
-		};
-		bodyRow.AddThemeConstantOverride("separation", 0);
-		rootColumn.AddChild(bodyRow);
-
-		var leftPanel = new PanelContainer
-		{
-			CustomMinimumSize = new Vector2(360, 0),
-			SizeFlagsVertical = Control.SizeFlags.ExpandFill
-		};
-		leftPanel.AddThemeStyleboxOverride(
-			"panel",
-			CreateInsetPaperStyle(
-				new Color(PaperBackgroundColor.R, PaperBackgroundColor.G, PaperBackgroundColor.B, 0.32f),
-				new Color(InkGrayColor, 0.25f)));
-		bodyRow.AddChild(leftPanel);
-
-		var leftMargin = CreateMarginContainer(16, 16, 16, 16);
-		leftPanel.AddChild(leftMargin);
-		leftMargin.AddChild(BuildRosterTab());
-
-		var bodyDivider = new ColorRect
-		{
-			Color = new Color(InkGrayColor, 0.32f),
-			CustomMinimumSize = new Vector2(1, 0),
-			SizeFlagsVertical = Control.SizeFlags.ExpandFill
-		};
-		bodyRow.AddChild(bodyDivider);
-
-		var rightMargin = CreateMarginContainer(20, 16, 20, 16);
-		rightMargin.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-		rightMargin.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
-		bodyRow.AddChild(rightMargin);
-
-		var rightColumn = new VBoxContainer
-		{
-			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-			SizeFlagsVertical = Control.SizeFlags.ExpandFill
-		};
-		rightColumn.AddThemeConstantOverride("separation", 14);
-		rightMargin.AddChild(rightColumn);
-
-		rightColumn.AddChild(BuildProfileTab());
-		rightColumn.AddChild(BuildFoundationTab());
-
-		var footerDivider = new ColorRect
-		{
-			Color = new Color(InkGrayColor, 0.35f),
-			CustomMinimumSize = new Vector2(0, 1)
-		};
-		rootColumn.AddChild(footerDivider);
-
-		_hintLabel = CreateInfoLabel(InkGrayColor, 11);
-		_hintLabel.CustomMinimumSize = new Vector2(0, 30);
-		_hintLabel.VerticalAlignment = VerticalAlignment.Center;
-		rootColumn.AddChild(_hintLabel);
-
-		_filterOption.Select(0);
-		_sortOption.Select(0);
-	}
-
-	private PanelContainer BuildHeader()
-	{
-		var headerPanel = new PanelContainer
-		{
-			CustomMinimumSize = new Vector2(0, 64)
-		};
-		headerPanel.AddThemeStyleboxOverride(
-			"panel",
-			CreateInsetPaperStyle(
-				new Color(PaperBackgroundColor.R, PaperBackgroundColor.G, PaperBackgroundColor.B, 0.78f),
-				new Color(InkGrayColor, 0.45f)));
-
-		var headerMargin = CreateMarginContainer(24, 12, 24, 10);
-		headerPanel.AddChild(headerMargin);
-
-		var headerRow = new HBoxContainer();
-		headerRow.AddThemeConstantOverride("separation", 12);
-		headerMargin.AddChild(headerRow);
-
-		var titleColumn = new VBoxContainer
-		{
-			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
-		};
-		titleColumn.AddThemeConstantOverride("separation", 2);
-		headerRow.AddChild(titleColumn);
-
-		var titleLabel = new Label
-		{
-			Text = "浮云宗  ·  弟子谱",
-			VerticalAlignment = VerticalAlignment.Center
-		};
-		titleLabel.AddThemeFontSizeOverride("font_size", 22);
-		titleLabel.AddThemeColorOverride("font_color", InkBlackColor);
-		titleColumn.AddChild(titleLabel);
-
-		var subtitleLabel = new Label
-		{
-			Text = "卷中分峰录名，可按峰脉、职司和修为检索门人根基。",
-			VerticalAlignment = VerticalAlignment.Center
-		};
-		subtitleLabel.AddThemeFontSizeOverride("font_size", 12);
-		subtitleLabel.AddThemeColorOverride("font_color", InkGrayColor);
-		titleColumn.AddChild(subtitleLabel);
-
-		_closeButton = CreateCloseButton("×");
-		_closeButton.Pressed += ClosePopup;
-		headerRow.AddChild(_closeButton);
-
-		return headerPanel;
-	}
-
-	private Control BuildRosterTab()
-	{
-		var tab = CreateTabRoot();
-
-		var summaryPanel = new PanelContainer();
-		summaryPanel.AddThemeStyleboxOverride(
-			"panel",
-			CreateInsetPaperStyle(
-				new Color(PaperBackgroundColor, 0.58f),
-				new Color(InkGrayColor, 0.35f)));
-		tab.AddChild(summaryPanel);
-
-		var summaryMargin = CreateMarginContainer(12, 10, 12, 10);
-		summaryPanel.AddChild(summaryMargin);
-
-		var summaryColumn = new VBoxContainer();
-		summaryColumn.AddThemeConstantOverride("separation", 6);
-		summaryMargin.AddChild(summaryColumn);
-
-		var summaryTitle = new Label
-		{
-			Text = "卷首批注"
-		};
-		summaryTitle.AddThemeFontSizeOverride("font_size", 14);
-		summaryTitle.AddThemeColorOverride("font_color", InkBlackColor);
-		summaryColumn.AddChild(summaryTitle);
-
-		_summaryLabel = CreateInfoLabel(InkBlackColor, 12);
-		summaryColumn.AddChild(_summaryLabel);
-
-		_governanceLabel = CreateInfoLabel(InkGrayColor, 11);
-		summaryColumn.AddChild(_governanceLabel);
-
-		var filterPanel = new PanelContainer();
-		filterPanel.AddThemeStyleboxOverride(
-			"panel",
-			CreateInsetPaperStyle(
-				new Color(PaperBackgroundColor, 0.46f),
-				new Color(InkGrayColor, 0.32f)));
-		tab.AddChild(filterPanel);
-
-		var filterMargin = CreateMarginContainer(10, 8, 10, 8);
-		filterPanel.AddChild(filterMargin);
-
-		var filterRow = new VBoxContainer();
-		filterRow.AddThemeConstantOverride("separation", 8);
-		filterMargin.AddChild(filterRow);
-
-		_filterOption = new OptionButton();
-		_filterOption.AddItem("全部弟子");
-		_filterOption.AddItem("真传名册");
-		_filterOption.AddItem("阵材职司");
-		_filterOption.AddItem("阵务职司");
-		_filterOption.AddItem("外事职司");
-		_filterOption.AddItem("推演职司");
-		_filterOption.AddItem("待命轮值");
-		_filterOption.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-		StylePaperOptionButton(_filterOption);
-		_filterOption.ItemSelected += OnFilterSelected;
-		filterRow.AddChild(_filterOption);
-
-		_sortOption = new OptionButton();
-		_sortOption.AddItem("名册顺序");
-		_sortOption.AddItem("修为优先");
-		_sortOption.AddItem("潜力优先");
-		_sortOption.AddItem("心境优先");
-		_sortOption.AddItem("贡献优先");
-		_sortOption.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-		StylePaperOptionButton(_sortOption);
-		_sortOption.ItemSelected += OnSortSelected;
-		filterRow.AddChild(_sortOption);
-
-		var rosterFrame = new PanelContainer
-		{
-			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-			SizeFlagsVertical = Control.SizeFlags.ExpandFill
-		};
-		rosterFrame.AddThemeStyleboxOverride(
-			"panel",
-			CreateInsetPaperStyle(
-				new Color(PaperBackgroundColor, 0.62f),
-				new Color(InkGrayColor, 0.30f)));
-		tab.AddChild(rosterFrame);
-
-		var rosterMargin = CreateMarginContainer(6, 6, 6, 6);
-		rosterFrame.AddChild(rosterMargin);
-
-		_rosterTree = new Tree
-		{
-			Columns = 1,
-			HideRoot = true,
-			CustomMinimumSize = new Vector2(0, 300),
-			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-			SizeFlagsVertical = Control.SizeFlags.ExpandFill
-		};
-		StyleRosterTree(_rosterTree);
-		_rosterTree.ItemSelected += OnRosterTreeItemSelected;
-		rosterMargin.AddChild(_rosterTree);
-
-		return tab;
-	}
-
-	private static VBoxContainer CreateTabRoot()
-	{
-		var tab = new VBoxContainer
-		{
-			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-			SizeFlagsVertical = Control.SizeFlags.ExpandFill
-		};
-		tab.AddThemeConstantOverride("separation", 12);
-		return tab;
-	}
-
-	private Control BuildProfileTab()
-	{
-		var tab = CreateTabRoot();
-
-		var profilePanel = new PanelContainer();
-		profilePanel.AddThemeStyleboxOverride(
-			"panel",
-			CreateInsetPaperStyle(
-				new Color(PaperBackgroundColor, 0.62f),
-				new Color(InkGrayColor, 0.35f)));
-		tab.AddChild(profilePanel);
-
-		var profileMargin = CreateMarginContainer(16, 14, 16, 14);
-		profilePanel.AddChild(profileMargin);
-
-		var headerRow = new HBoxContainer();
-		headerRow.AddThemeConstantOverride("separation", 14);
-		profileMargin.AddChild(headerRow);
-
-		var nameColumn = new VBoxContainer
-		{
-			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
-		};
-		nameColumn.AddThemeConstantOverride("separation", 4);
-		headerRow.AddChild(nameColumn);
-
-		_profileNameLabel = new Label();
-		_profileNameLabel.AddThemeFontSizeOverride("font_size", 26);
-		_profileNameLabel.AddThemeColorOverride("font_color", InkBlackColor);
-		nameColumn.AddChild(_profileNameLabel);
-
-		_profileMetaLabel = CreateInfoLabel(InkGrayColor, 12);
-		nameColumn.AddChild(_profileMetaLabel);
-
-		_profileStatusLabel = CreateInfoLabel(InkBlackColor, 12);
-		nameColumn.AddChild(_profileStatusLabel);
-
-		var rootCircleFrame = new PanelContainer
-		{
-			CustomMinimumSize = new Vector2(96, 96)
-		};
-		rootCircleFrame.AddThemeStyleboxOverride(
-			"panel",
-			CreateCircleStyle(
-				new Color(1f, 1f, 1f, 0f),
-				CinnabarColor));
-		headerRow.AddChild(rootCircleFrame);
-
-		_rootCircleLabel = new Label
-		{
-			HorizontalAlignment = HorizontalAlignment.Center,
-			VerticalAlignment = VerticalAlignment.Center,
-			AutowrapMode = TextServer.AutowrapMode.WordSmart
-		};
-		_rootCircleLabel.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
-		_rootCircleLabel.AddThemeFontSizeOverride("font_size", 12);
-		_rootCircleLabel.AddThemeColorOverride("font_color", CinnabarColor);
-		rootCircleFrame.AddChild(_rootCircleLabel);
-
-		return tab;
-	}
-
-	private Control BuildFoundationTab()
-	{
-		var tab = CreateTabRoot();
-
-		var dashboardRow = new HBoxContainer
-		{
-			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-			SizeFlagsVertical = Control.SizeFlags.ExpandFill
-		};
-		dashboardRow.AddThemeConstantOverride("separation", 24);
-		tab.AddChild(dashboardRow);
-
-		var foundationPanel = new PanelContainer
-		{
-			CustomMinimumSize = new Vector2(420, 0),
-			SizeFlagsVertical = Control.SizeFlags.ExpandFill
-		};
-		foundationPanel.AddThemeStyleboxOverride(
-			"panel",
-			CreateInsetPaperStyle(
-				new Color(0f, 0f, 0f, 0.03f),
-				new Color(0.74f, 0.68f, 0.60f, 1f)));
-		dashboardRow.AddChild(foundationPanel);
-
-		var foundationMargin = CreateMarginContainer(20, 16, 20, 16);
-		foundationPanel.AddChild(foundationMargin);
-
-		var foundationColumn = new VBoxContainer();
-		foundationColumn.AddThemeConstantOverride("separation", 12);
-		foundationMargin.AddChild(foundationColumn);
-
-		var foundationTitle = new Label
-		{
-			Text = "先天根基评估"
-		};
-		foundationTitle.AddThemeFontSizeOverride("font_size", 14);
-		foundationTitle.AddThemeColorOverride("font_color", InkBlackColor);
-		foundationColumn.AddChild(foundationTitle);
-
-		var radarCenter = new CenterContainer
-		{
-			CustomMinimumSize = new Vector2(0, 220)
-		};
-		foundationColumn.AddChild(radarCenter);
-
-		_radarChart = new DiscipleRadarChart();
-		radarCenter.AddChild(_radarChart);
-
-		var statsCenter = new CenterContainer();
-		foundationColumn.AddChild(statsCenter);
-
-		var metricGrid = new GridContainer
-		{
-			Columns = 3,
-			CustomMinimumSize = new Vector2(330, 0),
-			SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter
-		};
-		metricGrid.AddThemeConstantOverride("h_separation", 12);
-		metricGrid.AddThemeConstantOverride("v_separation", 12);
-		statsCenter.AddChild(metricGrid);
-
-		AddMetricTile(metricGrid, "悟性", "Insight");
-		AddMetricTile(metricGrid, "潜力", "Potential");
-		AddMetricTile(metricGrid, "根骨", "Health");
-		AddMetricTile(metricGrid, "匠艺", "Craft");
-		AddMetricTile(metricGrid, "神魂", "Mood");
-		AddMetricTile(metricGrid, "心境", "HeartState");
-
-		var cultivationPanel = new PanelContainer
-		{
-			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-			SizeFlagsVertical = Control.SizeFlags.ExpandFill
-		};
-		cultivationPanel.AddThemeStyleboxOverride(
-			"panel",
-			CreateInsetPaperStyle(
-				new Color(0f, 0f, 0f, 0.02f),
-				new Color(0.78f, 0.71f, 0.61f, 1f)));
-		dashboardRow.AddChild(cultivationPanel);
-
-		var cultivationMargin = CreateMarginContainer(20, 16, 20, 16);
-		cultivationPanel.AddChild(cultivationMargin);
-
-		var cultivationColumn = new VBoxContainer();
-		cultivationColumn.AddThemeConstantOverride("separation", 16);
-		cultivationMargin.AddChild(cultivationColumn);
-
-		var cultivationTitle = new Label
-		{
-			Text = "修为与造化"
-		};
-		cultivationTitle.AddThemeFontSizeOverride("font_size", 14);
-		cultivationTitle.AddThemeColorOverride("font_color", InkBlackColor);
-		cultivationColumn.AddChild(cultivationTitle);
-
-		var realmBox = new VBoxContainer();
-		realmBox.AddThemeConstantOverride("separation", 6);
-		cultivationColumn.AddChild(realmBox);
-
-		var realmTitle = new Label
-		{
-			Text = "修为境界"
-		};
-		realmTitle.AddThemeFontSizeOverride("font_size", 13);
-		realmTitle.AddThemeColorOverride("font_color", InkBlackColor);
-		realmBox.AddChild(realmTitle);
-
-		_realmStatusLabel = new Label();
-		_realmStatusLabel.AddThemeFontSizeOverride("font_size", 13);
-		_realmStatusLabel.AddThemeColorOverride("font_color", InkBlackColor);
-		realmBox.AddChild(_realmStatusLabel);
-
-		_realmProgressBar = new ProgressBar
-		{
-			MinValue = 0,
-			MaxValue = 100,
-			ShowPercentage = false
-		};
-		StyleInkProgressBar(_realmProgressBar, InkBlackColor, new Color(0.91f, 0.89f, 0.84f, 1f));
-		realmBox.AddChild(_realmProgressBar);
-
-		_realmProgressHintLabel = CreateInfoLabel(InkGrayColor, 11);
-		_realmProgressHintLabel.HorizontalAlignment = HorizontalAlignment.Right;
-		realmBox.AddChild(_realmProgressHintLabel);
-
-		var qiSeaBox = new VBoxContainer();
-		qiSeaBox.AddThemeConstantOverride("separation", 6);
-		cultivationColumn.AddChild(qiSeaBox);
-
-		var qiSeaTitle = new Label
-		{
-			Text = "灵力储备（气海）"
-		};
-		qiSeaTitle.AddThemeFontSizeOverride("font_size", 13);
-		qiSeaTitle.AddThemeColorOverride("font_color", InkBlackColor);
-		qiSeaBox.AddChild(qiSeaTitle);
-
-		_qiSeaProgressBar = new ProgressBar
-		{
-			MinValue = 0,
-			MaxValue = 100,
-			ShowPercentage = false
-		};
-		StyleInkProgressBar(_qiSeaProgressBar, CeladonColor, new Color(0.91f, 0.89f, 0.84f, 1f));
-		qiSeaBox.AddChild(_qiSeaProgressBar);
-
-		_qiSeaHintLabel = CreateInfoLabel(InkGrayColor, 11);
-		_qiSeaHintLabel.HorizontalAlignment = HorizontalAlignment.Right;
-		qiSeaBox.AddChild(_qiSeaHintLabel);
-
-		var combatPanel = new PanelContainer();
-		combatPanel.AddThemeStyleboxOverride("panel", CreateCombatTagStyle());
-		cultivationColumn.AddChild(combatPanel);
-
-		var combatMargin = CreateMarginContainer(12, 10, 12, 10);
-		combatPanel.AddChild(combatMargin);
-
-		var combatColumn = new VBoxContainer();
-		combatColumn.AddThemeConstantOverride("separation", 4);
-		combatMargin.AddChild(combatColumn);
-
-		var combatTitle = new Label
-		{
-			Text = "综合战力评定",
-			HorizontalAlignment = HorizontalAlignment.Center
-		};
-		combatTitle.AddThemeFontSizeOverride("font_size", 12);
-		combatTitle.AddThemeColorOverride("font_color", CinnabarColor);
-		combatColumn.AddChild(combatTitle);
-
-		_combatSealLabel = new Label
-		{
-			HorizontalAlignment = HorizontalAlignment.Center
-		};
-		_combatSealLabel.AddThemeFontSizeOverride("font_size", 22);
-		_combatSealLabel.AddThemeColorOverride("font_color", CinnabarColor);
-		combatColumn.AddChild(_combatSealLabel);
-
-		_combatSealHintLabel = CreateInfoLabel(InkGrayColor, 12);
-		_combatSealHintLabel.HorizontalAlignment = HorizontalAlignment.Center;
-		combatColumn.AddChild(_combatSealHintLabel);
-
-		var traitPanel = new PanelContainer();
-		traitPanel.AddThemeStyleboxOverride(
-			"panel",
-			CreateInsetPaperStyle(
-				new Color(0f, 0f, 0f, 0.02f),
-				new Color(0.78f, 0.71f, 0.61f, 1f)));
-		cultivationColumn.AddChild(traitPanel);
-
-		var traitMargin = CreateMarginContainer(14, 12, 14, 12);
-		traitPanel.AddChild(traitMargin);
-
-		var traitColumn = new VBoxContainer();
-		traitColumn.AddThemeConstantOverride("separation", 8);
-		traitMargin.AddChild(traitColumn);
-
-		var traitTitle = new Label
-		{
-			Text = "性情印记"
-		};
-		traitTitle.AddThemeFontSizeOverride("font_size", 13);
-		traitTitle.AddThemeColorOverride("font_color", InkBlackColor);
-		traitColumn.AddChild(traitTitle);
-
-		_traitFlow = new FlowContainer();
-		_traitFlow.AddThemeConstantOverride("h_separation", 8);
-		_traitFlow.AddThemeConstantOverride("v_separation", 8);
-		traitColumn.AddChild(_traitFlow);
-
-		var annotationPanel = new PanelContainer();
-		annotationPanel.AddThemeStyleboxOverride(
-			"panel",
-			CreateInsetPaperStyle(
-				new Color(0.97f, 0.96f, 0.94f, 1f),
-				new Color(0.56f, 0.48f, 0.37f, 0.95f),
-				2));
-		cultivationColumn.AddChild(annotationPanel);
-
-		var annotationMargin = CreateMarginContainer(18, 14, 18, 14);
-		annotationPanel.AddChild(annotationMargin);
-
-		var annotationColumn = new VBoxContainer();
-		annotationColumn.AddThemeConstantOverride("separation", 8);
-		annotationMargin.AddChild(annotationColumn);
-
-		var annotationHeader = new Label
-		{
-			Text = "【衍天批注】"
-		};
-		annotationHeader.AddThemeFontSizeOverride("font_size", 13);
-		annotationHeader.AddThemeColorOverride("font_color", InkBlackColor);
-		annotationColumn.AddChild(annotationHeader);
-
-		_annotationLabel = CreateInfoLabel(new Color(0.25f, 0.25f, 0.25f, 1f), 13);
-		annotationColumn.AddChild(_annotationLabel);
-
-		return tab;
-	}
-
-	
 	private void BindUiNodes()
 	{
 		if (_uiBound)
@@ -753,16 +183,33 @@ public partial class DisciplePanel : PopupPanelBase
 		_combatSealLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/CombatTag/CombatMargin/CombatColumn/CombatMain");
 		_combatSealHintLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/CombatTag/CombatMargin/CombatColumn/CombatHint");
 		_traitFlow = GetNode<FlowContainer>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel/TraitMargin/TraitColumn/TraitFlow");
+		_traitTagTemplate = GetNode<PanelContainer>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel/TraitTagTemplate");
 		_annotationLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/AnnotationPanel/AnnotationMargin/AnnotationColumn/AnnotationText");
 		_hintLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/HintLabel");
 		_closeButton = GetNode<Button>("Overlay/Wrapper/RootColumn/HeaderPanel/HeaderMargin/HeaderRow/CloseButton");
+
+		_metrics.Clear();
+		BindMetric("Insight");
+		BindMetric("Potential");
+		BindMetric("Health");
+		BindMetric("Craft");
+		BindMetric("Mood");
+		BindMetric("HeartState");
 
 		_filterOption.ItemSelected += OnFilterSelected;
 		_sortOption.ItemSelected += OnSortSelected;
 		_rosterTree.ItemSelected += OnRosterTreeItemSelected;
 		_closeButton.Pressed += ClosePopup;
 
+		_traitTagTemplate.Visible = false;
+
 		_uiBound = true;
+	}
+
+	private void BindMetric(string key)
+	{
+		var valueLabel = GetNode<Label>($"{MetricGridPath}/{key}Tile/{key}Margin/{key}Column/{key}Value");
+		_metrics[key] = new MetricBinding(valueLabel);
 	}
 
 	private void InitializeFilterControls()
@@ -798,15 +245,6 @@ public partial class DisciplePanel : PopupPanelBase
 		{
 			radarParent.AddChild(_radarChart);
 		}
-
-		var metricGrid = GetNode<GridContainer>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid");
-		_metrics.Clear();
-		AddMetricTile(metricGrid, "悟性", "Insight");
-		AddMetricTile(metricGrid, "潜力", "Potential");
-		AddMetricTile(metricGrid, "根骨", "Health");
-		AddMetricTile(metricGrid, "匠艺", "Craft");
-		AddMetricTile(metricGrid, "神魂", "Mood");
-		AddMetricTile(metricGrid, "心境", "HeartState");
 	}
 
 	private void ApplyUiStyles()
@@ -879,6 +317,13 @@ public partial class DisciplePanel : PopupPanelBase
 				new Color(0f, 0f, 0f, 0.03f),
 				new Color(0.74f, 0.68f, 0.60f, 1f)));
 
+		ApplyMetricTileStyle("Insight");
+		ApplyMetricTileStyle("Potential");
+		ApplyMetricTileStyle("Health");
+		ApplyMetricTileStyle("Craft");
+		ApplyMetricTileStyle("Mood");
+		ApplyMetricTileStyle("HeartState");
+
 		var cultivationPanel = GetNode<PanelContainer>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel");
 		cultivationPanel.AddThemeStyleboxOverride(
 			"panel",
@@ -932,11 +377,41 @@ public partial class DisciplePanel : PopupPanelBase
 		_hintLabel.AddThemeFontSizeOverride("font_size", 11);
 		_hintLabel.AddThemeColorOverride("font_color", InkGrayColor);
 
+		_closeButton.AddThemeFontSizeOverride("font_size", 22);
+		_closeButton.AddThemeStyleboxOverride("normal", CreateTransparentStyle());
+		_closeButton.AddThemeStyleboxOverride("hover", CreateTransparentStyle());
+		_closeButton.AddThemeStyleboxOverride("pressed", CreateTransparentStyle());
+		_closeButton.AddThemeStyleboxOverride("focus", CreateTransparentStyle());
+		_closeButton.AddThemeColorOverride("font_color", InkBlackColor);
+		_closeButton.AddThemeColorOverride("font_hover_color", CinnabarColor);
+		_closeButton.AddThemeColorOverride("font_pressed_color", CinnabarColor);
+
 		StylePaperOptionButton(_filterOption);
 		StylePaperOptionButton(_sortOption);
 		StyleRosterTree(_rosterTree);
 		StyleInkProgressBar(_realmProgressBar, InkBlackColor, new Color(0.91f, 0.89f, 0.84f, 1f));
 		StyleInkProgressBar(_qiSeaProgressBar, CeladonColor, new Color(0.91f, 0.89f, 0.84f, 1f));
+	}
+
+	private void ApplyMetricTileStyle(string key)
+	{
+		var tilePath = $"{MetricGridPath}/{key}Tile";
+		var tile = GetNode<PanelContainer>(tilePath);
+		tile.AddThemeStyleboxOverride(
+			"panel",
+			CreateInsetPaperStyle(
+				new Color(0f, 0f, 0f, 0.03f),
+				new Color(InkGrayColor, 0.26f)));
+
+		var titleLabel = GetNode<Label>($"{tilePath}/{key}Margin/{key}Column/{key}Title");
+		titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
+		titleLabel.AddThemeFontSizeOverride("font_size", 12);
+		titleLabel.AddThemeColorOverride("font_color", InkGrayColor);
+
+		var valueLabel = GetNode<Label>($"{tilePath}/{key}Margin/{key}Column/{key}Value");
+		valueLabel.HorizontalAlignment = HorizontalAlignment.Center;
+		valueLabel.AddThemeFontSizeOverride("font_size", 20);
+		valueLabel.AddThemeColorOverride("font_color", InkBlackColor);
 	}
 
 	private void RefreshSummary()
@@ -1186,48 +661,6 @@ public partial class DisciplePanel : PopupPanelBase
 		return $"{profile.Name} [{entrySuffix}]";
 	}
 
-	private void AddMetricTile(GridContainer parent, string title, string key)
-	{
-		var tile = new PanelContainer
-		{
-			CustomMinimumSize = new Vector2(96, 78),
-			SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter
-		};
-		tile.AddThemeStyleboxOverride(
-			"panel",
-			CreateInsetPaperStyle(
-				new Color(0f, 0f, 0f, 0.03f),
-				new Color(InkGrayColor, 0.26f)));
-		parent.AddChild(tile);
-
-		var margin = CreateMarginContainer(8, 8, 8, 8);
-		tile.AddChild(margin);
-
-		var column = new VBoxContainer();
-		column.AddThemeConstantOverride("separation", 6);
-		margin.AddChild(column);
-
-		var titleLabel = new Label
-		{
-			Text = title
-		};
-		titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
-		titleLabel.AddThemeFontSizeOverride("font_size", 12);
-		titleLabel.AddThemeColorOverride("font_color", InkGrayColor);
-		column.AddChild(titleLabel);
-
-		var valueLabel = new Label
-		{
-			Text = "0"
-		};
-		valueLabel.HorizontalAlignment = HorizontalAlignment.Center;
-		valueLabel.AddThemeFontSizeOverride("font_size", 20);
-		valueLabel.AddThemeColorOverride("font_color", InkBlackColor);
-		column.AddChild(valueLabel);
-
-		_metrics[key] = new MetricBinding(valueLabel);
-	}
-
 	private void SetMetric(string key, int value)
 	{
 		if (!_metrics.TryGetValue(key, out var binding))
@@ -1246,57 +679,6 @@ public partial class DisciplePanel : PopupPanelBase
 			_ => InkGrayColor
 		};
 		binding.ValueLabel.AddThemeColorOverride("font_color", color);
-	}
-
-	private static MarginContainer CreateMarginContainer(int left, int top, int right, int bottom)
-	{
-		var margin = new MarginContainer();
-		margin.AddThemeConstantOverride("margin_left", left);
-		margin.AddThemeConstantOverride("margin_top", top);
-		margin.AddThemeConstantOverride("margin_right", right);
-		margin.AddThemeConstantOverride("margin_bottom", bottom);
-		return margin;
-	}
-
-	private static Label CreateSectionLabel(string text)
-	{
-		var label = new Label
-		{
-			Text = text
-		};
-		label.AddThemeFontSizeOverride("font_size", 12);
-		label.AddThemeColorOverride("font_color", InkBlackColor);
-		return label;
-	}
-
-	private static Label CreateInfoLabel(Color? color = null, int fontSize = 12)
-	{
-		var label = new Label
-		{
-			AutowrapMode = TextServer.AutowrapMode.WordSmart
-		};
-		label.AddThemeFontSizeOverride("font_size", fontSize);
-		label.AddThemeColorOverride("font_color", color ?? InkGrayColor);
-		return label;
-	}
-
-	private static Button CreateCloseButton(string text)
-	{
-		var button = new Button
-		{
-			Text = text,
-			CustomMinimumSize = new Vector2(40, 34),
-			Alignment = HorizontalAlignment.Center
-		};
-		button.AddThemeFontSizeOverride("font_size", 22);
-		button.AddThemeStyleboxOverride("normal", CreateTransparentStyle());
-		button.AddThemeStyleboxOverride("hover", CreateTransparentStyle());
-		button.AddThemeStyleboxOverride("pressed", CreateTransparentStyle());
-		button.AddThemeStyleboxOverride("focus", CreateTransparentStyle());
-		button.AddThemeColorOverride("font_color", InkBlackColor);
-		button.AddThemeColorOverride("font_hover_color", CinnabarColor);
-		button.AddThemeColorOverride("font_pressed_color", CinnabarColor);
-		return button;
 	}
 
 	private static void StylePaperOptionButton(OptionButton optionButton)
@@ -1521,82 +903,22 @@ public partial class DisciplePanel : PopupPanelBase
 				new Color(InkGrayColor, 0.18f)));
 	}
 
-	private static Control CreateSidebarSectionTitle(string text)
+	private PanelContainer CreateTraitTag(string text)
 	{
-		var column = new VBoxContainer();
-		column.AddThemeConstantOverride("separation", 4);
-
-		var label = new Label
-		{
-			Text = $"◈ {text}"
-		};
-		label.AddThemeFontSizeOverride("font_size", 15);
-		label.AddThemeColorOverride("font_color", CinnabarColor);
-		column.AddChild(label);
-
-		var line = new ColorRect
-		{
-			Color = new Color(InkGrayColor, 0.55f),
-			CustomMinimumSize = new Vector2(0, 1)
-		};
-		column.AddChild(line);
-
-		return column;
-	}
-
-	private static Label CreateSidebarControlTitle(string text)
-	{
-		var label = new Label
-		{
-			Text = text
-		};
-		label.AddThemeFontSizeOverride("font_size", 12);
-		label.AddThemeColorOverride("font_color", InkGrayColor);
-		return label;
-	}
-
-	private static PanelContainer CreateTraitTag(string text)
-	{
-		var panel = new PanelContainer();
+		var panel = (PanelContainer)_traitTagTemplate.Duplicate();
+		panel.Visible = true;
 		panel.AddThemeStyleboxOverride(
 			"panel",
 			CreateInsetPaperStyle(
 				new Color(CinnabarColor, 0.03f),
 				new Color(CinnabarColor, 0.75f)));
 
-		var margin = CreateMarginContainer(8, 4, 8, 4);
-		panel.AddChild(margin);
-
-		var label = new Label
-		{
-			Text = text
-		};
+		var label = panel.GetNode<Label>("TagMargin/TagLabel");
+		label.Text = text;
 		label.AddThemeFontSizeOverride("font_size", 12);
 		label.AddThemeColorOverride("font_color", CinnabarColor);
-		margin.AddChild(label);
 
 		return panel;
-	}
-
-	private static StyleBoxFlat CreateSidebarButtonStyle(bool selected, bool hover)
-	{
-		var background = selected
-			? new Color(CinnabarColor, hover ? 0.12f : 0.08f)
-			: new Color(1f, 1f, 1f, hover ? 0.10f : 0.01f);
-		var border = selected
-			? new Color(CinnabarColor, 0.55f)
-			: new Color(1f, 1f, 1f, 0f);
-
-		return new StyleBoxFlat
-		{
-			BgColor = background,
-			BorderWidthBottom = selected ? 1 : 0,
-			BorderColor = border,
-			ContentMarginLeft = 8,
-			ContentMarginTop = 6,
-			ContentMarginRight = 8,
-			ContentMarginBottom = 6
-		};
 	}
 
 	private static StyleBoxFlat CreateInsetPaperStyle(Color color, Color borderColor, int borderWidth = 1)

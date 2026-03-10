@@ -23,6 +23,8 @@ public partial class Main
         _sectOrganizationPanel.SupportRequested += OnSectOrganizationSupportRequested;
         _sectOrganizationPanel.SupportResetRequested += OnSectOrganizationSupportResetRequested;
         _sectOrganizationPanel.GovernanceRequested += OnSectOrganizationGovernanceRequested;
+        _sectOrganizationPanel.Opened += OnSectOrganizationPanelOpened;
+        _sectOrganizationPanel.Closed += OnSectOrganizationPanelClosed;
         AddChild(_sectOrganizationPanel);
         MoveChild(_sectOrganizationPanel, GetChildCount() - 1);
     }
@@ -69,6 +71,16 @@ public partial class Main
         AppendLog($"已从宗门组织谱系转入【{SectTaskRules.GetJobButtonText(jobType)}】。");
     }
 
+    private void OnSectOrganizationPanelOpened()
+    {
+        SetSectOrganizationQuickButtonState(true);
+    }
+
+    private void OnSectOrganizationPanelClosed()
+    {
+        SetSectOrganizationQuickButtonState(false);
+    }
+
     private void UnbindSectOrganizationPanelEvents()
     {
         var organizationPanelButton = GetSectOrganizationPanelButton();
@@ -85,6 +97,8 @@ public partial class Main
         _sectOrganizationPanel.SupportRequested -= OnSectOrganizationSupportRequested;
         _sectOrganizationPanel.SupportResetRequested -= OnSectOrganizationSupportResetRequested;
         _sectOrganizationPanel.GovernanceRequested -= OnSectOrganizationGovernanceRequested;
+        _sectOrganizationPanel.Opened -= OnSectOrganizationPanelOpened;
+        _sectOrganizationPanel.Closed -= OnSectOrganizationPanelClosed;
     }
 
     private Button? GetSectOrganizationPanelButton()
@@ -95,5 +109,17 @@ public partial class Main
         }
 
         return GetNodeOrNull<Button>($"{BottomBarPath}/BarPadding/MainRow/QuickActionRow/OrganizationQuickButton");
+    }
+
+    private void SetSectOrganizationQuickButtonState(bool pressed)
+    {
+        var bottomQuickButton = GetSectOrganizationPanelButton();
+        if (bottomQuickButton == null)
+        {
+            return;
+        }
+
+        bottomQuickButton.ToggleMode = true;
+        bottomQuickButton.ButtonPressed = pressed;
     }
 }

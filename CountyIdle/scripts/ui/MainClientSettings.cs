@@ -32,6 +32,7 @@ public partial class Main
         }
 
         _settingsPanel = panelScene.Instantiate<SettingsPanel>();
+        _settingsPanel.PreviewRequested += OnClientSettingsPreviewRequested;
         _settingsPanel.ApplyRequested += OnClientSettingsApplyRequested;
         AddChild(_settingsPanel);
         MoveChild(_settingsPanel, GetChildCount() - 1);
@@ -53,6 +54,12 @@ public partial class Main
         ApplyClientSettings(_clientSettings);
         _clientSettingsSystem.Save(_clientSettings, out var saveMessage);
         AppendLog(saveMessage);
+    }
+
+    private void OnClientSettingsPreviewRequested(ClientSettings nextSettings)
+    {
+        _clientSettings = _clientSettingsSystem.Normalize(nextSettings);
+        ApplyClientSettings(_clientSettings);
     }
 
     private void ApplyClientSettings(ClientSettings settings)
@@ -112,6 +119,7 @@ public partial class Main
             return;
         }
 
+        _settingsPanel.PreviewRequested -= OnClientSettingsPreviewRequested;
         _settingsPanel.ApplyRequested -= OnClientSettingsApplyRequested;
     }
 }

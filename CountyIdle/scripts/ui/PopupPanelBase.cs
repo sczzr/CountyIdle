@@ -14,6 +14,9 @@ public abstract partial class PopupPanelBase : Control
 
     protected string? PopupStatusMessage => _popupStatusMessage;
 
+    public event Action? Opened;
+    public event Action? Closed;
+
     public override void _EnterTree()
     {
         ZAsRelative = false;
@@ -38,6 +41,7 @@ public abstract partial class PopupPanelBase : Control
         MoveToFront();
         Show();
         RefreshPopupHint();
+        Opened?.Invoke();
     }
 
     protected void ClosePopup()
@@ -46,6 +50,7 @@ public abstract partial class PopupPanelBase : Control
         ClearPopupStatusMessage(refreshHint: false);
         Hide();
         RefreshPopupHint();
+        Closed?.Invoke();
     }
 
     protected virtual void OnPopupClosing()

@@ -25,7 +25,7 @@
 | 灵根苗子资质受父母影响 | ⭕ | 当前繁育未使用父母质量关联 |
 | 真传 / 英雄单位历练 | 🟡 | 当前以精英人口池参与探险，尚无英雄实体系统 |
 | 装备 / 法器打造系统 | ⭕ | 当前仅有探险掉落与工具制作，未有装备打造链路 |
-| 弟子与玩家共同建设宗门 | 🟡 | 已有建筑扩建、治理反馈与宗门弟子可视移动，一般弟子协作逻辑仍需深化 |
+| 弟子与玩家共同建设宗门 | 🟡 | 已有建筑扩建、治理反馈，一般弟子协作逻辑仍需深化 |
 | 宗门护持弟子与外域附庸据点并带来富足 | 🟡 | 有威胁 / 袭扰 / 经济反馈，但护山闭环尚未完成 |
 
 ## 2) 已实现功能（✅）
@@ -46,7 +46,7 @@
 | 装备 / 法器品质与词条掉落 | ✅ | `CountyIdle/scripts/systems/EquipmentSystem.cs` | `docs/02_system_specs.md` |
 | 宗门动态事件（坊市/讲法/袭扰） | ✅ | `CountyIdle/scripts/systems/CountyEventSystem.cs` | `docs/02_system_specs.md` |
 | 宗门 hex 驻地地图生成 + 缩放（纯绘制 + 道路/水域语义） | ✅ | `CountyIdle/scripts/systems/TownMapGeneratorSystem.cs`、`CountyIdle/scripts/systems/CountyTownMapViewSystem.cs`、`CountyIdle/scripts/systems/SectMapViewSystem.cs` | `docs/02_system_specs.md` |
-| 宗门弟子可视移动（正式 sprite + 作息驱动 + 实体场所 + 场所选中提示） | ✅ | `CountyIdle/scripts/systems/CountyTownMapViewSystem.cs`、`CountyTownMapViewSystem.Anchors.cs`、`CountyTownMapViewSystem.Residents.cs`、`TownMapGeneratorSystem.cs`、`CountyIdle/scripts/systems/SectMapSemanticRules.cs`、`CountyIdle/assets/characters/residents/*.png` | `docs/02_system_specs.md` |
+| 宗门弟子可视移动（当前停用） | ⭕ | `CountyIdle/scripts/systems/CountyTownMapViewSystem.cs`、`CountyTownMapViewSystem.Anchors.cs`、`CountyTownMapViewSystem.Residents.cs`、`TownMapGeneratorSystem.cs`、`CountyIdle/scripts/systems/SectMapSemanticRules.cs`、`CountyIdle/assets/characters/residents/*.png` | `docs/02_system_specs.md` |
 | 宗门弟子独立属性界面（弟子谱：固定宗门树 + 卷轴档案 UI） | ✅ | `CountyIdle/scripts/models/DiscipleProfile.cs`、`CountyIdle/scripts/systems/DiscipleRosterSystem.cs`、`CountyIdle/scripts/systems/CountyTownMapViewSystem.cs`、`CountyIdle/scripts/systems/CountyTownMapViewSystem.Residents.cs`、`CountyIdle/scripts/ui/DisciplePanel.cs`、`CountyIdle/scripts/ui/MainDisciplePanel.cs`、`CountyIdle/scripts/Main.cs`、`CountyIdle/scenes/ui/DisciplePanel.tscn`、`CountyIdle/scenes/ui/WorldPanel.tscn`（当前弹窗已继续补齐统一卷轴子面板外壳：左右木轴、上下绫边、卷首横题与“峰内名录 / 宣纸档案”分栏；左侧名册已继续收口到固定宗门组织树） | `docs/02_system_specs.md` |
 | 宗门组织谱系展示（卷册总览） | ✅ | `CountyIdle/scripts/systems/SectOrganizationRules.cs`、`CountyIdle/scripts/systems/SectTaskRules.cs`、`CountyIdle/scripts/Main.cs`、`CountyIdle/scripts/ui/SectOrganizationPanel.cs`、`CountyIdle/scripts/ui/MainSectOrganizationPanel.cs`、`CountyIdle/scenes/ui/SectOrganizationPanel.tscn`、`CountyIdle/scenes/ui/BottomBar.tscn`（当前卷册已进一步收口为“峰令谱”书卷子面板：左右木轴、上下绫边、卷首横题与墨线批令） | `docs/02_system_specs.md` |
 | 宗门组织谱系详情浏览（卷册详批） | ✅ | `CountyIdle/scripts/systems/SectOrganizationRules.cs`、`CountyIdle/scripts/Main.cs`、`CountyIdle/scripts/ui/SectOrganizationPanel.cs`、`CountyIdle/scripts/ui/MainSectOrganizationPanel.cs`、`CountyIdle/scenes/ui/SectOrganizationPanel.tscn`、`CountyIdle/scenes/ui/BottomBar.tscn`（峰令谱卷册改为三栏式全景布局：左侧九峰名录导航、中栏峰脉纪要+部门卡片、右侧职司导览+法旨批令；正文移除深色内嵌滚动框，统一宣纸直写） | `docs/02_system_specs.md` |
@@ -120,6 +120,8 @@
 - 2026-03-10 弟子谱同页全展开：弹窗扩展为近全屏画幅，右侧三段（人物档案 / 根基修为 / 印记批注）与左侧名录同屏呈现，不再分页切换；保留筛选、名册树与详情联动链路。
 - 2026-03-10 弟子谱宽屏仪表盘：右侧改为“先天根基 / 修为造化”双列，属性块改为 3x2 阵列，战力评定收敛为朱砂签样式；名录树降为两层分组，避免深层折叠。
 - 2026-03-10 库藏卷扩幅重构：`WarehousePanel.tscn` 扩宽画幅并移除右侧建造/生产菜单，库存区改为 4~6 列自适应；新增刻度进度条与朱红满载提示；物资卡片 token 化、数量优先级提升，零库存灰态降噪。
+- 2026-03-10 底部控制台选中态强化：快按入口（库房 / 中枢 / 谱系 / 弟子）改为靛青选中态，打开卷册时按钮高对比度高亮，悬停改为轻微放大并切换为靛青强调色并触发提示音，提升焦点辨识度。
+- 2026-03-11 机宜卷即时生效分组：音量与分辨率调整即时生效，设置项分为“即时生效/批复生效”，并修复下拉框放大闪烁、点击后保持放大态与对齐，统一下拉框配色。
 
 
 

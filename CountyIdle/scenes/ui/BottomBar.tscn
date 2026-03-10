@@ -28,12 +28,12 @@ content_margin_right = 10.0
 content_margin_bottom = 5.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_quick_pressed"]
-bg_color = Color(0.878431, 0.831373, 0.733333, 0.78)
+bg_color = Color(0.184314, 0.298039, 0.345098, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.270588, 0.231373, 0.192157, 0.96)
+border_color = Color(0.101961, 0.168627, 0.2, 1)
 content_margin_left = 10.0
 content_margin_top = 5.0
 content_margin_right = 10.0
@@ -105,10 +105,12 @@ custom_minimum_size = Vector2(64, 28)
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_colors/font_pressed_color = Color(0.968627, 0.952941, 0.909804, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_quick")
 theme_override_styles/hover = SubResource("StyleBoxFlat_quick_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_quick_pressed")
 theme_override_styles/focus = SubResource("StyleBoxFlat_quick_hover")
+toggle_mode = true
 text = "库房"
 
 [node name="TaskQuickButton" type="Button" parent="BarPadding/MainRow/QuickActionRow"]
@@ -116,10 +118,12 @@ custom_minimum_size = Vector2(64, 28)
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_colors/font_pressed_color = Color(0.968627, 0.952941, 0.909804, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_quick")
 theme_override_styles/hover = SubResource("StyleBoxFlat_quick_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_quick_pressed")
 theme_override_styles/focus = SubResource("StyleBoxFlat_quick_hover")
+toggle_mode = true
 text = "中枢"
 
 [node name="OrganizationQuickButton" type="Button" parent="BarPadding/MainRow/QuickActionRow"]
@@ -127,10 +131,12 @@ custom_minimum_size = Vector2(64, 28)
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_colors/font_pressed_color = Color(0.968627, 0.952941, 0.909804, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_quick")
 theme_override_styles/hover = SubResource("StyleBoxFlat_quick_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_quick_pressed")
 theme_override_styles/focus = SubResource("StyleBoxFlat_quick_hover")
+toggle_mode = true
 text = "谱系"
 
 [node name="DiscipleQuickButton" type="Button" parent="BarPadding/MainRow/QuickActionRow"]
@@ -138,10 +144,12 @@ custom_minimum_size = Vector2(64, 28)
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_colors/font_pressed_color = Color(0.968627, 0.952941, 0.909804, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_quick")
 theme_override_styles/hover = SubResource("StyleBoxFlat_quick_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_quick_pressed")
 theme_override_styles/focus = SubResource("StyleBoxFlat_quick_hover")
+toggle_mode = true
 text = "弟子"
 
 [node name="SpeedRow" type="HBoxContainer" parent="BarPadding/MainRow"]
@@ -153,6 +161,7 @@ custom_minimum_size = Vector2(74, 28)
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_colors/font_pressed_color = Color(0.968627, 0.952941, 0.909804, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_quick")
 theme_override_styles/hover = SubResource("StyleBoxFlat_quick_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_quick_pressed")
@@ -165,6 +174,7 @@ custom_minimum_size = Vector2(56, 28)
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_colors/font_pressed_color = Color(0.968627, 0.952941, 0.909804, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_quick")
 theme_override_styles/hover = SubResource("StyleBoxFlat_quick_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_quick_pressed")
@@ -179,6 +189,7 @@ custom_minimum_size = Vector2(56, 28)
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_colors/font_pressed_color = Color(0.968627, 0.952941, 0.909804, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_quick")
 theme_override_styles/hover = SubResource("StyleBoxFlat_quick_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_quick_pressed")
@@ -191,6 +202,7 @@ custom_minimum_size = Vector2(56, 28)
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_colors/font_pressed_color = Color(0.968627, 0.952941, 0.909804, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_quick")
 theme_override_styles/hover = SubResource("StyleBoxFlat_quick_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_quick_pressed")

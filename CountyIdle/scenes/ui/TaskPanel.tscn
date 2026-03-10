@@ -1,8 +1,9 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://wpn6dya5kch6"]
 
-[ext_resource type="Script" path="res://scripts/ui/TaskPanel.cs" id="1_task_panel"]
+[ext_resource type="Script" uid="uid://d24s551njtx85" path="res://scripts/ui/TaskPanel.cs" id="1_task_panel"]
 
-[node name="TaskPanel" type="Control"]
+[node name="TaskPanel" type="Control" unique_id=1414837021]
+visible = false
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,3 +12,802 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
 script = ExtResource("1_task_panel")
+
+[node name="Overlay" type="ColorRect" parent="." unique_id=914555613]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+color = Color(0.06, 0.06, 0.06, 0.68)
+
+[node name="Center" type="CenterContainer" parent="Overlay" unique_id=713804499]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Frame" type="PanelContainer" parent="Overlay/Center" unique_id=469531185]
+custom_minimum_size = Vector2(960, 680)
+layout_mode = 2
+mouse_filter = 1
+
+[node name="RootColumn" type="VBoxContainer" parent="Overlay/Center/Frame" unique_id=1102772156]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 0
+
+[node name="HeaderPanel" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn" unique_id=1264999919]
+custom_minimum_size = Vector2(0, 66)
+layout_mode = 2
+
+[node name="HeaderMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/HeaderPanel" unique_id=1338161083]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 8
+
+[node name="HeaderRow" type="HBoxContainer" parent="Overlay/Center/Frame/RootColumn/HeaderPanel/HeaderMargin" unique_id=2068231295]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="TitleLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/HeaderPanel/HeaderMargin/HeaderRow" unique_id=887545408]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "浮云宗  ·  治宗册"
+vertical_alignment = 1
+
+[node name="StatRow" type="HBoxContainer" parent="Overlay/Center/Frame/RootColumn/HeaderPanel/HeaderMargin/HeaderRow" unique_id=1949797147]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="ContributionRow" type="HBoxContainer" parent="Overlay/Center/Frame/RootColumn/HeaderPanel/HeaderMargin/HeaderRow/StatRow" unique_id=2004193245]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ContributionTitle" type="Label" parent="Overlay/Center/Frame/RootColumn/HeaderPanel/HeaderMargin/HeaderRow/StatRow/ContributionRow" unique_id=136267235]
+layout_mode = 2
+text = "宗门贡献:"
+
+[node name="ContributionValueLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/HeaderPanel/HeaderMargin/HeaderRow/StatRow/ContributionRow" unique_id=1557576845]
+layout_mode = 2
+text = "0"
+
+[node name="SpiritStoneRow" type="HBoxContainer" parent="Overlay/Center/Frame/RootColumn/HeaderPanel/HeaderMargin/HeaderRow/StatRow" unique_id=331782193]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="SpiritStoneTitle" type="Label" parent="Overlay/Center/Frame/RootColumn/HeaderPanel/HeaderMargin/HeaderRow/StatRow/SpiritStoneRow" unique_id=815147847]
+layout_mode = 2
+text = "灵石结余:"
+
+[node name="SpiritStoneValueLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/HeaderPanel/HeaderMargin/HeaderRow/StatRow/SpiritStoneRow" unique_id=609384571]
+layout_mode = 2
+text = "0"
+
+[node name="CloseButton" type="Button" parent="Overlay/Center/Frame/RootColumn/HeaderPanel/HeaderMargin/HeaderRow" unique_id=842947311]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+text = "×"
+flat = true
+
+[node name="HeaderDivider" type="ColorRect" parent="Overlay/Center/Frame/RootColumn" unique_id=835851480]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+color = Color(0.29, 0.25, 0.21, 1)
+
+[node name="BodyRow" type="HBoxContainer" parent="Overlay/Center/Frame/RootColumn" unique_id=791239216]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 0
+
+[node name="SidebarPanel" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow" unique_id=26540594]
+custom_minimum_size = Vector2(210, 0)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SidebarColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/SidebarPanel" unique_id=69699237]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 0
+
+[node name="PolicyTabButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyRow/SidebarPanel/SidebarColumn" unique_id=211661916]
+custom_minimum_size = Vector2(0, 74)
+layout_mode = 2
+mouse_filter = 1
+toggle_mode = true
+text = "大政方针"
+flat = true
+alignment = 0
+
+[node name="SeasonTabButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyRow/SidebarPanel/SidebarColumn" unique_id=402882047]
+custom_minimum_size = Vector2(0, 74)
+layout_mode = 2
+mouse_filter = 1
+toggle_mode = true
+text = "节气法旨"
+flat = true
+alignment = 0
+
+[node name="RulesTabButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyRow/SidebarPanel/SidebarColumn" unique_id=794214491]
+custom_minimum_size = Vector2(0, 74)
+layout_mode = 2
+mouse_filter = 1
+toggle_mode = true
+text = "门规戒律"
+flat = true
+alignment = 0
+
+[node name="AffairsTabButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyRow/SidebarPanel/SidebarColumn" unique_id=1501837255]
+custom_minimum_size = Vector2(0, 74)
+layout_mode = 2
+mouse_filter = 1
+toggle_mode = true
+text = "庶务调度"
+flat = true
+alignment = 0
+
+[node name="SidebarSpacer" type="Control" parent="Overlay/Center/Frame/RootColumn/BodyRow/SidebarPanel/SidebarColumn" unique_id=242280110]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="BodyDivider" type="ColorRect" parent="Overlay/Center/Frame/RootColumn/BodyRow" unique_id=208620863]
+custom_minimum_size = Vector2(1, 0)
+layout_mode = 2
+size_flags_vertical = 3
+color = Color(0.71, 0.64, 0.52, 0.72)
+
+[node name="ContentMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow" unique_id=366583368]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 14
+
+[node name="ContentScroll" type="ScrollContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin" unique_id=1812367752]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="ContentStack" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll" unique_id=770945533]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="PolicyTab" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack" unique_id=1517088945]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 14
+
+[node name="PolicySummaryPanel" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab" unique_id=1484744152]
+layout_mode = 2
+
+[node name="PolicySummaryMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/PolicySummaryPanel" unique_id=126316225]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 12
+
+[node name="PolicySummaryColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/PolicySummaryPanel/PolicySummaryMargin" unique_id=1939693715]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="PolicySummaryTitle" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/PolicySummaryPanel/PolicySummaryMargin/PolicySummaryColumn" unique_id=21361977]
+layout_mode = 2
+text = "卷首批注"
+
+[node name="PolicySummaryLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/PolicySummaryPanel/PolicySummaryMargin/PolicySummaryColumn" unique_id=720036747]
+layout_mode = 2
+autowrap_mode = 2
+
+[node name="DevelopmentCard" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab" unique_id=850984763]
+layout_mode = 2
+
+[node name="DevelopmentCardMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/DevelopmentCard" unique_id=1636178323]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 14
+
+[node name="DevelopmentCardRow" type="HBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/DevelopmentCard/DevelopmentCardMargin" unique_id=829590374]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="DevelopmentInfoColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/DevelopmentCard/DevelopmentCardMargin/DevelopmentCardRow" unique_id=238708457]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="DevelopmentTitle" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/DevelopmentCard/DevelopmentCardMargin/DevelopmentCardRow/DevelopmentInfoColumn" unique_id=1019003492]
+layout_mode = 2
+text = "发展方向"
+
+[node name="DevelopmentHintLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/DevelopmentCard/DevelopmentCardMargin/DevelopmentCardRow/DevelopmentInfoColumn" unique_id=119041171]
+layout_mode = 2
+autowrap_mode = 2
+
+[node name="DevelopmentCapsule" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/DevelopmentCard/DevelopmentCardMargin/DevelopmentCardRow" unique_id=477569847]
+custom_minimum_size = Vector2(260, 58)
+layout_mode = 2
+
+[node name="DevelopmentCapsuleRow" type="HBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/DevelopmentCard/DevelopmentCardMargin/DevelopmentCardRow/DevelopmentCapsule" unique_id=205273491]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="DevelopmentPrevButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/DevelopmentCard/DevelopmentCardMargin/DevelopmentCardRow/DevelopmentCapsule/DevelopmentCapsuleRow" unique_id=1711085300]
+custom_minimum_size = Vector2(42, 38)
+layout_mode = 2
+text = "◀"
+flat = true
+
+[node name="DevelopmentValueLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/DevelopmentCard/DevelopmentCardMargin/DevelopmentCardRow/DevelopmentCapsule/DevelopmentCapsuleRow" unique_id=1670601110]
+custom_minimum_size = Vector2(132, 0)
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DevelopmentNextButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/DevelopmentCard/DevelopmentCardMargin/DevelopmentCardRow/DevelopmentCapsule/DevelopmentCapsuleRow" unique_id=19992373]
+custom_minimum_size = Vector2(42, 38)
+layout_mode = 2
+text = "▶"
+flat = true
+
+[node name="LawCard" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab" unique_id=1442424450]
+layout_mode = 2
+
+[node name="LawCardMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/LawCard" unique_id=2020489510]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 14
+
+[node name="LawCardRow" type="HBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/LawCard/LawCardMargin" unique_id=438584364]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="LawInfoColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/LawCard/LawCardMargin/LawCardRow" unique_id=335734070]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="LawTitle" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/LawCard/LawCardMargin/LawCardRow/LawInfoColumn" unique_id=780124357]
+layout_mode = 2
+text = "宗门法令"
+
+[node name="LawHintLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/LawCard/LawCardMargin/LawCardRow/LawInfoColumn" unique_id=507683480]
+layout_mode = 2
+autowrap_mode = 2
+
+[node name="LawCapsule" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/LawCard/LawCardMargin/LawCardRow" unique_id=838478352]
+custom_minimum_size = Vector2(260, 58)
+layout_mode = 2
+
+[node name="LawCapsuleRow" type="HBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/LawCard/LawCardMargin/LawCardRow/LawCapsule" unique_id=1013449351]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="LawPrevButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/LawCard/LawCardMargin/LawCardRow/LawCapsule/LawCapsuleRow" unique_id=1738202126]
+custom_minimum_size = Vector2(42, 38)
+layout_mode = 2
+text = "◀"
+flat = true
+
+[node name="LawValueLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/LawCard/LawCardMargin/LawCardRow/LawCapsule/LawCapsuleRow" unique_id=1391236270]
+custom_minimum_size = Vector2(132, 0)
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LawNextButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/LawCard/LawCardMargin/LawCardRow/LawCapsule/LawCapsuleRow" unique_id=25650646]
+custom_minimum_size = Vector2(42, 38)
+layout_mode = 2
+text = "▶"
+flat = true
+
+[node name="TalentCard" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab" unique_id=268620830]
+layout_mode = 2
+
+[node name="TalentCardMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/TalentCard" unique_id=363657695]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 14
+
+[node name="TalentCardRow" type="HBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/TalentCard/TalentCardMargin" unique_id=881258155]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="TalentInfoColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/TalentCard/TalentCardMargin/TalentCardRow" unique_id=645518619]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="TalentTitle" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/TalentCard/TalentCardMargin/TalentCardRow/TalentInfoColumn" unique_id=275379179]
+layout_mode = 2
+text = "育才方略"
+
+[node name="TalentHintLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/TalentCard/TalentCardMargin/TalentCardRow/TalentInfoColumn" unique_id=551572622]
+layout_mode = 2
+autowrap_mode = 2
+
+[node name="TalentCapsule" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/TalentCard/TalentCardMargin/TalentCardRow" unique_id=2144313063]
+custom_minimum_size = Vector2(260, 58)
+layout_mode = 2
+
+[node name="TalentCapsuleRow" type="HBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/TalentCard/TalentCardMargin/TalentCardRow/TalentCapsule" unique_id=911287445]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="TalentPrevButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/TalentCard/TalentCardMargin/TalentCardRow/TalentCapsule/TalentCapsuleRow" unique_id=520273051]
+custom_minimum_size = Vector2(42, 38)
+layout_mode = 2
+text = "◀"
+flat = true
+
+[node name="TalentValueLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/TalentCard/TalentCardMargin/TalentCardRow/TalentCapsule/TalentCapsuleRow" unique_id=868129247]
+custom_minimum_size = Vector2(132, 0)
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TalentNextButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/TalentCard/TalentCardMargin/TalentCardRow/TalentCapsule/TalentCapsuleRow" unique_id=1500487915]
+custom_minimum_size = Vector2(42, 38)
+layout_mode = 2
+text = "▶"
+flat = true
+
+[node name="LockedCard" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab" unique_id=1684576474]
+layout_mode = 2
+
+[node name="LockedCardMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/LockedCard" unique_id=1385945254]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 14
+
+[node name="LockedCardRow" type="HBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/LockedCard/LockedCardMargin" unique_id=1330336617]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="LockedInfoColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/LockedCard/LockedCardMargin/LockedCardRow" unique_id=114038928]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="LockedTitle" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/LockedCard/LockedCardMargin/LockedCardRow/LockedInfoColumn" unique_id=457245600]
+layout_mode = 2
+text = "外门劳役"
+
+[node name="LockedDescription" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/LockedCard/LockedCardMargin/LockedCardRow/LockedInfoColumn" unique_id=144228139]
+layout_mode = 2
+text = "解锁后可调配外门弟子开荒。"
+autowrap_mode = 2
+
+[node name="LockedStateCapsule" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/LockedCard/LockedCardMargin/LockedCardRow" unique_id=383518904]
+custom_minimum_size = Vector2(170, 54)
+layout_mode = 2
+
+[node name="LockedStateLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/PolicyTab/LockedCard/LockedCardMargin/LockedCardRow/LockedStateCapsule" unique_id=396914995]
+layout_mode = 2
+text = "暂未参悟"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SeasonTab" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack" unique_id=81176552]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 14
+
+[node name="SeasonSummaryPanel" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/SeasonTab" unique_id=707556717]
+layout_mode = 2
+
+[node name="SeasonSummaryMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/SeasonTab/SeasonSummaryPanel" unique_id=393673287]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 12
+
+[node name="SeasonSummaryColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/SeasonTab/SeasonSummaryPanel/SeasonSummaryMargin" unique_id=1434037378]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="SeasonSummaryTitle" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/SeasonTab/SeasonSummaryPanel/SeasonSummaryMargin/SeasonSummaryColumn" unique_id=242203102]
+layout_mode = 2
+text = "季令批注"
+
+[node name="SeasonSummaryLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/SeasonTab/SeasonSummaryPanel/SeasonSummaryMargin/SeasonSummaryColumn" unique_id=1282380709]
+layout_mode = 2
+autowrap_mode = 2
+
+[node name="QuarterDecreeCard" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/SeasonTab" unique_id=597547267]
+layout_mode = 2
+
+[node name="QuarterDecreeCardMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/SeasonTab/QuarterDecreeCard" unique_id=845151612]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 14
+
+[node name="QuarterDecreeCardRow" type="HBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/SeasonTab/QuarterDecreeCard/QuarterDecreeCardMargin" unique_id=1241780706]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="QuarterDecreeInfoColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/SeasonTab/QuarterDecreeCard/QuarterDecreeCardMargin/QuarterDecreeCardRow" unique_id=842414963]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="QuarterDecreeTitle" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/SeasonTab/QuarterDecreeCard/QuarterDecreeCardMargin/QuarterDecreeCardRow/QuarterDecreeInfoColumn" unique_id=1211459613]
+layout_mode = 2
+text = "季度法令"
+
+[node name="QuarterDecreeHintLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/SeasonTab/QuarterDecreeCard/QuarterDecreeCardMargin/QuarterDecreeCardRow/QuarterDecreeInfoColumn" unique_id=748425791]
+layout_mode = 2
+autowrap_mode = 2
+
+[node name="QuarterDecreeCapsule" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/SeasonTab/QuarterDecreeCard/QuarterDecreeCardMargin/QuarterDecreeCardRow" unique_id=339086400]
+custom_minimum_size = Vector2(260, 58)
+layout_mode = 2
+
+[node name="QuarterDecreeCapsuleRow" type="HBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/SeasonTab/QuarterDecreeCard/QuarterDecreeCardMargin/QuarterDecreeCardRow/QuarterDecreeCapsule" unique_id=2035498872]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="QuarterDecreePrevButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/SeasonTab/QuarterDecreeCard/QuarterDecreeCardMargin/QuarterDecreeCardRow/QuarterDecreeCapsule/QuarterDecreeCapsuleRow" unique_id=1072285465]
+custom_minimum_size = Vector2(42, 38)
+layout_mode = 2
+text = "◀"
+flat = true
+
+[node name="QuarterDecreeValueLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/SeasonTab/QuarterDecreeCard/QuarterDecreeCardMargin/QuarterDecreeCardRow/QuarterDecreeCapsule/QuarterDecreeCapsuleRow" unique_id=789625841]
+custom_minimum_size = Vector2(132, 0)
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="QuarterDecreeNextButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/SeasonTab/QuarterDecreeCard/QuarterDecreeCardMargin/QuarterDecreeCardRow/QuarterDecreeCapsule/QuarterDecreeCapsuleRow" unique_id=1937472685]
+custom_minimum_size = Vector2(42, 38)
+layout_mode = 2
+text = "▶"
+flat = true
+
+[node name="RulesTab" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack" unique_id=1663213844]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 14
+
+[node name="RulesSummaryPanel" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab" unique_id=622713802]
+layout_mode = 2
+
+[node name="RulesSummaryMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/RulesSummaryPanel" unique_id=1897788650]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 12
+
+[node name="RulesSummaryColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/RulesSummaryPanel/RulesSummaryMargin" unique_id=1003315690]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="RulesSummaryTitle" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/RulesSummaryPanel/RulesSummaryMargin/RulesSummaryColumn" unique_id=279779794]
+layout_mode = 2
+text = "卷中批注"
+
+[node name="RulesSummaryLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/RulesSummaryPanel/RulesSummaryMargin/RulesSummaryColumn" unique_id=2007083916]
+layout_mode = 2
+autowrap_mode = 2
+
+[node name="AffairsRuleCard" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab" unique_id=2048904486]
+layout_mode = 2
+
+[node name="AffairsRuleCardMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/AffairsRuleCard" unique_id=1160833392]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 14
+
+[node name="AffairsRuleCardRow" type="HBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/AffairsRuleCard/AffairsRuleCardMargin" unique_id=1846765850]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="AffairsRuleInfoColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/AffairsRuleCard/AffairsRuleCardMargin/AffairsRuleCardRow" unique_id=1585734253]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="AffairsRuleTitle" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/AffairsRuleCard/AffairsRuleCardMargin/AffairsRuleCardRow/AffairsRuleInfoColumn" unique_id=991333236]
+layout_mode = 2
+text = "庶务门规"
+
+[node name="AffairsRuleHintLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/AffairsRuleCard/AffairsRuleCardMargin/AffairsRuleCardRow/AffairsRuleInfoColumn" unique_id=1687697069]
+layout_mode = 2
+autowrap_mode = 2
+
+[node name="AffairsRuleCapsule" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/AffairsRuleCard/AffairsRuleCardMargin/AffairsRuleCardRow" unique_id=1494801007]
+custom_minimum_size = Vector2(260, 58)
+layout_mode = 2
+
+[node name="AffairsRuleCapsuleRow" type="HBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/AffairsRuleCard/AffairsRuleCardMargin/AffairsRuleCardRow/AffairsRuleCapsule" unique_id=109078845]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="AffairsRulePrevButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/AffairsRuleCard/AffairsRuleCardMargin/AffairsRuleCardRow/AffairsRuleCapsule/AffairsRuleCapsuleRow" unique_id=933431028]
+custom_minimum_size = Vector2(42, 38)
+layout_mode = 2
+text = "◀"
+flat = true
+
+[node name="AffairsRuleValueLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/AffairsRuleCard/AffairsRuleCardMargin/AffairsRuleCardRow/AffairsRuleCapsule/AffairsRuleCapsuleRow" unique_id=1979832957]
+custom_minimum_size = Vector2(132, 0)
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AffairsRuleNextButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/AffairsRuleCard/AffairsRuleCardMargin/AffairsRuleCardRow/AffairsRuleCapsule/AffairsRuleCapsuleRow" unique_id=997630706]
+custom_minimum_size = Vector2(42, 38)
+layout_mode = 2
+text = "▶"
+flat = true
+
+[node name="DoctrineRuleCard" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab" unique_id=859405456]
+layout_mode = 2
+
+[node name="DoctrineRuleCardMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/DoctrineRuleCard" unique_id=885489974]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 14
+
+[node name="DoctrineRuleCardRow" type="HBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/DoctrineRuleCard/DoctrineRuleCardMargin" unique_id=184470688]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="DoctrineRuleInfoColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/DoctrineRuleCard/DoctrineRuleCardMargin/DoctrineRuleCardRow" unique_id=585819217]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="DoctrineRuleTitle" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/DoctrineRuleCard/DoctrineRuleCardMargin/DoctrineRuleCardRow/DoctrineRuleInfoColumn" unique_id=2054805653]
+layout_mode = 2
+text = "传功门规"
+
+[node name="DoctrineRuleHintLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/DoctrineRuleCard/DoctrineRuleCardMargin/DoctrineRuleCardRow/DoctrineRuleInfoColumn" unique_id=1166749105]
+layout_mode = 2
+autowrap_mode = 2
+
+[node name="DoctrineRuleCapsule" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/DoctrineRuleCard/DoctrineRuleCardMargin/DoctrineRuleCardRow" unique_id=1489973480]
+custom_minimum_size = Vector2(260, 58)
+layout_mode = 2
+
+[node name="DoctrineRuleCapsuleRow" type="HBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/DoctrineRuleCard/DoctrineRuleCardMargin/DoctrineRuleCardRow/DoctrineRuleCapsule" unique_id=1810295964]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="DoctrineRulePrevButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/DoctrineRuleCard/DoctrineRuleCardMargin/DoctrineRuleCardRow/DoctrineRuleCapsule/DoctrineRuleCapsuleRow" unique_id=1030687709]
+custom_minimum_size = Vector2(42, 38)
+layout_mode = 2
+text = "◀"
+flat = true
+
+[node name="DoctrineRuleValueLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/DoctrineRuleCard/DoctrineRuleCardMargin/DoctrineRuleCardRow/DoctrineRuleCapsule/DoctrineRuleCapsuleRow" unique_id=443849681]
+custom_minimum_size = Vector2(132, 0)
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DoctrineRuleNextButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/DoctrineRuleCard/DoctrineRuleCardMargin/DoctrineRuleCardRow/DoctrineRuleCapsule/DoctrineRuleCapsuleRow" unique_id=2069929261]
+custom_minimum_size = Vector2(42, 38)
+layout_mode = 2
+text = "▶"
+flat = true
+
+[node name="DisciplineRuleCard" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab" unique_id=1803674317]
+layout_mode = 2
+
+[node name="DisciplineRuleCardMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/DisciplineRuleCard" unique_id=101823854]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 14
+
+[node name="DisciplineRuleCardRow" type="HBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/DisciplineRuleCard/DisciplineRuleCardMargin" unique_id=758369744]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="DisciplineRuleInfoColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/DisciplineRuleCard/DisciplineRuleCardMargin/DisciplineRuleCardRow" unique_id=1363980282]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="DisciplineRuleTitle" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/DisciplineRuleCard/DisciplineRuleCardMargin/DisciplineRuleCardRow/DisciplineRuleInfoColumn" unique_id=47933266]
+layout_mode = 2
+text = "巡山门规"
+
+[node name="DisciplineRuleHintLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/DisciplineRuleCard/DisciplineRuleCardMargin/DisciplineRuleCardRow/DisciplineRuleInfoColumn" unique_id=892537206]
+layout_mode = 2
+autowrap_mode = 2
+
+[node name="DisciplineRuleCapsule" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/DisciplineRuleCard/DisciplineRuleCardMargin/DisciplineRuleCardRow" unique_id=2067350773]
+custom_minimum_size = Vector2(260, 58)
+layout_mode = 2
+
+[node name="DisciplineRuleCapsuleRow" type="HBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/DisciplineRuleCard/DisciplineRuleCardMargin/DisciplineRuleCardRow/DisciplineRuleCapsule" unique_id=1468910808]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="DisciplineRulePrevButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/DisciplineRuleCard/DisciplineRuleCardMargin/DisciplineRuleCardRow/DisciplineRuleCapsule/DisciplineRuleCapsuleRow" unique_id=2101794091]
+custom_minimum_size = Vector2(42, 38)
+layout_mode = 2
+text = "◀"
+flat = true
+
+[node name="DisciplineRuleValueLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/DisciplineRuleCard/DisciplineRuleCardMargin/DisciplineRuleCardRow/DisciplineRuleCapsule/DisciplineRuleCapsuleRow" unique_id=1528977829]
+custom_minimum_size = Vector2(132, 0)
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DisciplineRuleNextButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/RulesTab/DisciplineRuleCard/DisciplineRuleCardMargin/DisciplineRuleCardRow/DisciplineRuleCapsule/DisciplineRuleCapsuleRow" unique_id=436471544]
+custom_minimum_size = Vector2(42, 38)
+layout_mode = 2
+text = "▶"
+flat = true
+
+[node name="AffairsTab" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack" unique_id=866582220]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 14
+
+[node name="AffairsSummaryPanel" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/AffairsTab" unique_id=2089058492]
+layout_mode = 2
+
+[node name="AffairsSummaryMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/AffairsTab/AffairsSummaryPanel" unique_id=1199493088]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 12
+
+[node name="AffairsSummaryColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/AffairsTab/AffairsSummaryPanel/AffairsSummaryMargin" unique_id=1083153532]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="AffairsSummaryTitle" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/AffairsTab/AffairsSummaryPanel/AffairsSummaryMargin/AffairsSummaryColumn" unique_id=1992055252]
+layout_mode = 2
+text = "庶务总纲"
+
+[node name="AffairsSummaryLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/AffairsTab/AffairsSummaryPanel/AffairsSummaryMargin/AffairsSummaryColumn" unique_id=1680427555]
+layout_mode = 2
+autowrap_mode = 2
+
+[node name="AffairsListCard" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/AffairsTab" unique_id=1402804401]
+layout_mode = 2
+
+[node name="AffairsListMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/AffairsTab/AffairsListCard" unique_id=1654020629]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="AffairsListColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/AffairsTab/AffairsListCard/AffairsListMargin" unique_id=1445254237]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="AffairsListTitle" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/AffairsTab/AffairsListCard/AffairsListMargin/AffairsListColumn" unique_id=1596990850]
+layout_mode = 2
+text = "治务条目"
+vertical_alignment = 1
+
+[node name="AffairsSplit" type="HSplitContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/AffairsTab/AffairsListCard/AffairsListMargin/AffairsListColumn" unique_id=1835297383]
+custom_minimum_size = Vector2(0, 320)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="AffairsListPanel" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/AffairsTab/AffairsListCard/AffairsListMargin/AffairsListColumn/AffairsSplit" unique_id=25651627]
+layout_mode = 2
+
+[node name="AffairsListPanelMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/AffairsTab/AffairsListCard/AffairsListMargin/AffairsListColumn/AffairsSplit/AffairsListPanel" unique_id=22066293]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="TaskList" type="ItemList" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/AffairsTab/AffairsListCard/AffairsListMargin/AffairsListColumn/AffairsSplit/AffairsListPanel/AffairsListPanelMargin" unique_id=1141665920]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+allow_reselect = true
+
+[node name="AffairsDetailPanel" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/AffairsTab/AffairsListCard/AffairsListMargin/AffairsListColumn/AffairsSplit" unique_id=332373310]
+layout_mode = 2
+
+[node name="AffairsDetailMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/AffairsTab/AffairsListCard/AffairsListMargin/AffairsListColumn/AffairsSplit/AffairsDetailPanel" unique_id=795795594]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="DetailLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/AffairsTab/AffairsListCard/AffairsListMargin/AffairsListColumn/AffairsSplit/AffairsDetailPanel/AffairsDetailMargin" unique_id=104594667]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+autowrap_mode = 2
+
+[node name="AffairsActionRow" type="HBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/AffairsTab/AffairsListCard/AffairsListMargin/AffairsListColumn" unique_id=785071504]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="MinusOneButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/AffairsTab/AffairsListCard/AffairsListMargin/AffairsListColumn/AffairsActionRow" unique_id=558378508]
+custom_minimum_size = Vector2(136, 40)
+layout_mode = 2
+text = "收敛"
+flat = true
+
+[node name="PlusOneButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/AffairsTab/AffairsListCard/AffairsListMargin/AffairsListColumn/AffairsActionRow" unique_id=186169729]
+custom_minimum_size = Vector2(136, 40)
+layout_mode = 2
+text = "推进"
+flat = true
+
+[node name="PlusFiveButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/AffairsTab/AffairsListCard/AffairsListMargin/AffairsListColumn/AffairsActionRow" unique_id=1519729835]
+custom_minimum_size = Vector2(136, 40)
+layout_mode = 2
+text = "鼎力推进"
+flat = true
+
+[node name="ActionSpacer" type="Control" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/AffairsTab/AffairsListCard/AffairsListMargin/AffairsListColumn/AffairsActionRow" unique_id=1581767041]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ResetButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyRow/ContentMargin/ContentScroll/ContentStack/AffairsTab/AffairsListCard/AffairsListMargin/AffairsListColumn/AffairsActionRow" unique_id=617287803]
+custom_minimum_size = Vector2(136, 40)
+layout_mode = 2
+text = "复归常制"
+flat = true
+
+[node name="FooterDivider" type="ColorRect" parent="Overlay/Center/Frame/RootColumn" unique_id=1660722724]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+color = Color(0.71, 0.64, 0.52, 0.66)
+
+[node name="HintLabel" type="Label" parent="Overlay/Center/Frame/RootColumn" unique_id=563765295]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+vertical_alignment = 1
+autowrap_mode = 2

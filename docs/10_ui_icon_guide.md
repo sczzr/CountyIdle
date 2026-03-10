@@ -1,0 +1,148 @@
+# CountyIdle 交互 Icon 规范（v0.1）
+
+> 用途：统一交互 icon 语汇，便于 UI 落地、替换与一致维护。
+
+## 1) 适用范围
+
+- 底部控制台入口（库房 / 中枢 / 谱系 / 弟子 / 历练）
+- 地图页签与地图工具按钮
+- 常用面板入口与通用操作（设置 / 存档 / 关闭 / 返回 / 确认 / 取消）
+- 状态提示类小图标（警示 / 提示 / 成功）
+
+## 2) 视觉语言
+
+- 语义基调：书卷、印章、木轴、墨线、山水、朱印
+- 线条风格：单线为主，局部实心点缀；线宽统一，避免过细
+- 形状原则：几何化与纹样化并存，但不过度装饰
+- 避免事项：现代科技感扁平符号、表情化符号、细节过多
+
+## 3) 尺寸与对齐
+
+- 基准网格：`24x24`
+- 底栏按钮：容器 `28x28`，绘制区约 `20x20`
+- 页签/工具：`18~20` 视觉宽高
+- 线宽建议：`1.5px`（24 基准）或 `2px`（28 基准）
+- 对齐原则：像素对齐；圆角建议 `2px` 内
+
+## 4) 状态与颜色语义
+
+- 常态：墨色线条
+- 悬停：墨色加深，局部朱印点缀
+- 按下：靛青强调或压暗描边
+- 激活：靛青主色 + 朱印辅助
+- 禁用：淡墨低对比，降低不透明度
+- 危险/警示：朱砂强调
+
+## 5) 交互 Icon 清单
+
+### 5.1 底部控制台入口
+
+| 入口 | 建议图形 | 说明 |
+| --- | --- | --- |
+| 库房 | 仓印 / 木箱 | 对应“库藏大卷”与库存管理 |
+| 中枢 | 令牌 / 印章 / 卷轴 | 对应“治宗册”宗主中枢 |
+| 谱系 | 山峰 + 谱牒 | 对应“峰令谱”组织卷册 |
+| 弟子 | 竹简名册 | 对应“弟子谱” |
+| 历练 | 剑 / 行囊 | 对应历练入口 |
+
+### 5.2 地图页签入口（WorldPanel）
+
+| 入口 | 按钮节点 | 建议图形 | 备注 |
+| --- | --- | --- | --- |
+| 天衍峰山门图 | `CountyTownMapButton` | 山门 / 峰影 | 主视图入口 |
+| 江陵府外域图 | `PrefectureMapButton` | 城郭 / 府印 | 备用外域视图 |
+| 世界地图 | `WorldMapButton` | 罗盘 / 山海卷 | 世界总览 |
+| 宗门见闻 | `EventPanelButton` | 铃 / 札 | 事件面板 |
+| 宗务报表 | `ReportPanelButton` | 卷册 / 表格 | 统计面板 |
+| 库房 | `WarehousePanelButton` | 仓印 / 木箱 | 快捷进入库房 |
+| 中枢 | `TaskPanelButton` | 令牌 / 印章 | 快捷进入中枢 |
+| 弟子谱 | `DisciplePanelButton` | 竹简名册 | 快捷进入弟子谱 |
+| 外域历练 | `ExpeditionMapButton` | 路线 / 行囊 | 历练地图入口 |
+
+### 5.3 地图工具（WorldPanel）
+
+| 功能 | 按钮节点 | 建议图形 |
+| --- | --- | --- |
+| 缩小 | `MapZoomOutButton` | “-” / 缩小镜 |
+| 放大 | `MapZoomInButton` | “+” / 放大镜 |
+| 复位 | `MapZoomResetButton` | 靶心 / 归位印 |
+| 主令 | `MapPrimaryActionButton` | 令旗 / 主印 |
+| 副令 | `MapSecondaryActionButton` | 侧令 / 副印 |
+| 重绘 | `RegenerateButton` | 旋笔 / 重绘符 |
+
+### 5.4 常用面板与通用操作
+
+| 功能 | 建议图形 | 说明 |
+| --- | --- | --- |
+| 设置（机宜卷） | 符令 / 齿轮 | 设置面板入口 |
+| 存档（留影录） | 印记 / 卷轴 | 存档管理入口 |
+| 关闭 | 叉 / 收卷符 | 弹窗关闭 |
+| 返回 | 回箭 / 归卷符 | 返回上层 |
+| 确认 | 勾 | 确认操作 |
+| 取消 | 叉 | 取消操作 |
+| 筛选 | 漏斗 | 列表筛选 |
+| 排序 | 双箭 | 排序切换 |
+| 搜索 | 放大镜 | 搜索入口 |
+
+### 5.5 状态与提示
+
+| 状态 | 建议图形 | 说明 |
+| --- | --- | --- |
+| 警示 | 叹号 | 危险与异常提示 |
+| 提示 | 圆点 / 小铃 | 中性提示 |
+| 成功 | 勾 | 结果确认 |
+
+## 6) 命名与资源组织建议
+
+- 目录建议：`CountyIdle/assets/ui/icons/`
+- 命名约定：`icon_{key}_{size}`，例如 `icon_warehouse_24`
+- 建议 key 列表（分组写法）：
+- `warehouse` `task_hub` `organization` `disciple` `expedition`
+- `sect_map` `prefecture_map` `world_map` `event_log` `report`
+- `map_zoom_in` `map_zoom_out` `map_zoom_reset` `map_primary_action` `map_secondary_action` `map_regenerate`
+- `settings` `save` `close` `back` `confirm` `cancel` `filter` `sort` `search`
+- `warning` `info` `success`
+
+## 7) 图集存储规范（Atlas）
+
+- 推荐单图集路径：`CountyIdle/assets/ui/icons/icon_atlas_24.png`
+- 可选高清图集：`CountyIdle/assets/ui/icons/icon_atlas_48.png`（2x）
+- 图集要求：透明背景；若保留宣纸底，单独出“卡片类图集”，不要与小按钮混用
+- 网格建议：`cell_size=24`，`spacing=4`，`margin=4`
+- 坐标约定：左上角为原点，`row/col` 从 `0` 开始
+
+计算规则（用于切片）：
+
+```text
+x = margin + col * (cell_size + spacing)
+y = margin + row * (cell_size + spacing)
+width = cell_size
+height = cell_size
+```
+
+## 8) 映射表（CSV）
+
+- 映射表文件：`docs/icon_atlas_map.csv`
+- 字段约定：`key,label,atlas,row,col,width,height,notes`
+- 建议保持“key”与本规范的 key 列表一致
+
+推荐排序原则（从左上到右下）：
+
+| 顺序 | 分组 |
+| --- | --- |
+| 1 | 底栏入口（库房/中枢/谱系/弟子/历练） |
+| 2 | 地图页签（天衍峰/外域/世界/见闻/报表/库房/中枢/弟子/历练） |
+| 3 | 地图工具（缩小/放大/复位/主令/副令/重绘） |
+| 4 | 通用操作（设置/存档/关闭/返回/确认/取消/筛选/排序/搜索/警示/提示/成功） |
+
+## 9) Godot 接入建议
+
+- `Button` 使用 `theme_override_icons` 或设置 `TextureRect` + `region`
+- `AtlasTexture` 用法：`atlas` 指向图集，`region` 使用第 7 节计算规则
+- 若 icon 与文案并存：优先保留文本可读性，icon 做辅助识别
+
+## 10) 落地与替换策略
+
+- 先保持“文字 + icon 并存”，不以 icon 完全替代文案
+- 替换顺序建议：底栏入口 → 地图页签与工具 → 常用面板
+- 若 icon 与文案语义不一致，以文案为准并优先修正文案

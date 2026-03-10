@@ -11,3 +11,344 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
 script = ExtResource("1_sect_org_panel")
+
+[node name="Overlay" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+color = Color(0.10, 0.09, 0.08, 0.92)
+
+[node name="OuterMargin" type="MarginContainer" parent="Overlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 36
+theme_override_constants/margin_top = 28
+theme_override_constants/margin_right = 36
+theme_override_constants/margin_bottom = 28
+
+[node name="Wrapper" type="Control" parent="Overlay/OuterMargin"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="TopTrim" type="ColorRect" parent="Overlay/OuterMargin/Wrapper"]
+layout_mode = 1
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = 22.0
+
+[node name="BottomTrim" type="ColorRect" parent="Overlay/OuterMargin/Wrapper"]
+layout_mode = 1
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = -22.0
+offset_right = -12.0
+offset_bottom = -12.0
+
+[node name="FrameRow" type="HBoxContainer" parent="Overlay/OuterMargin/Wrapper"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+offset_left = 12.0
+offset_top = 24.0
+offset_right = -12.0
+offset_bottom = -24.0
+theme_override_constants/separation = 0
+
+[node name="LeftRoller" type="PanelContainer" parent="Overlay/OuterMargin/Wrapper/FrameRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(24, 0)
+size_flags_vertical = 3
+
+[node name="PaperFrame" type="PanelContainer" parent="Overlay/OuterMargin/Wrapper/FrameRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="RightRoller" type="PanelContainer" parent="Overlay/OuterMargin/Wrapper/FrameRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(24, 0)
+size_flags_vertical = 3
+
+[node name="PaperMargin" type="MarginContainer" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame"]
+layout_mode = 2
+theme_override_constants/margin_left = 26
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 26
+theme_override_constants/margin_bottom = 22
+
+[node name="RootColumn" type="VBoxContainer" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="HeaderRow" type="HBoxContainer" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="TitleColumn" type="VBoxContainer" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/HeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/HeaderRow/TitleColumn"]
+layout_mode = 2
+text = "浮云宗·峰令谱"
+
+[node name="SubtitleLabel" type="Label" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/HeaderRow/TitleColumn"]
+layout_mode = 2
+text = "九峰、总殿与支柱峰职责尽录于卷，并可在此批复协同峰令。"
+autowrap_mode = 2
+
+[node name="StatusColumn" type="VBoxContainer" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/HeaderRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(280, 0)
+theme_override_constants/separation = 4
+
+[node name="StatusTitle" type="Label" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/HeaderRow/StatusColumn"]
+layout_mode = 2
+text = "当前全局协同："
+horizontal_alignment = 2
+
+[node name="HeaderStatusLabel" type="Label" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/HeaderRow/StatusColumn"]
+layout_mode = 2
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="CloseButton" type="Button" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/HeaderRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(40, 34)
+text = "✖"
+alignment = 1
+
+[node name="HeaderDivider" type="ColorRect" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 1)
+color = Color(0.70, 0.65, 0.56, 0.48)
+
+[node name="BodyRow" type="HBoxContainer" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+
+[node name="LeftColumn" type="VBoxContainer" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(250, 0)
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="LeftSectionLabel" type="Label" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/LeftColumn"]
+layout_mode = 2
+text = "九峰总览"
+
+[node name="PeakListScroll" type="ScrollContainer" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/LeftColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PeakListColumn" type="VBoxContainer" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/LeftColumn/PeakListScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="MiddleColumn" type="VBoxContainer" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="MiddleScroll" type="ScrollContainer" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/MiddleColumn"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MiddleContent" type="VBoxContainer" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/MiddleColumn/MiddleScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+
+[node name="DetailHeaderRow" type="HBoxContainer" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/MiddleColumn/MiddleScroll/MiddleContent"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="PeakTitleLabel" type="Label" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/MiddleColumn/MiddleScroll/MiddleContent/DetailHeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PeakCounterLabel" type="Label" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/MiddleColumn/MiddleScroll/MiddleContent/DetailHeaderRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(64, 0)
+horizontal_alignment = 2
+
+[node name="MiddleDivider" type="ColorRect" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/MiddleColumn/MiddleScroll/MiddleContent"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 1)
+color = Color(0.45, 0.40, 0.33, 0.55)
+
+[node name="SummaryPanel" type="PanelContainer" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/MiddleColumn/MiddleScroll/MiddleContent"]
+layout_mode = 2
+
+[node name="SummaryMargin" type="MarginContainer" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/MiddleColumn/MiddleScroll/MiddleContent/SummaryPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 14
+
+[node name="SummaryColumn" type="VBoxContainer" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/MiddleColumn/MiddleScroll/MiddleContent/SummaryPanel/SummaryMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PeakPositionRow" type="HBoxContainer" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/MiddleColumn/MiddleScroll/MiddleContent/SummaryPanel/SummaryMargin/SummaryColumn"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PeakPositionTitle" type="Label" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/MiddleColumn/MiddleScroll/MiddleContent/SummaryPanel/SummaryMargin/SummaryColumn/PeakPositionRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(88, 0)
+text = "峰脉定位"
+
+[node name="PeakPositionValue" type="Label" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/MiddleColumn/MiddleScroll/MiddleContent/SummaryPanel/SummaryMargin/SummaryColumn/PeakPositionRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+autowrap_mode = 2
+
+[node name="PeakFocusRow" type="HBoxContainer" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/MiddleColumn/MiddleScroll/MiddleContent/SummaryPanel/SummaryMargin/SummaryColumn"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PeakFocusTitle" type="Label" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/MiddleColumn/MiddleScroll/MiddleContent/SummaryPanel/SummaryMargin/SummaryColumn/PeakFocusRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(88, 0)
+text = "经营焦点"
+
+[node name="PeakFocusValue" type="Label" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/MiddleColumn/MiddleScroll/MiddleContent/SummaryPanel/SummaryMargin/SummaryColumn/PeakFocusRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+autowrap_mode = 2
+
+[node name="PeakCoreUnitsRow" type="HBoxContainer" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/MiddleColumn/MiddleScroll/MiddleContent/SummaryPanel/SummaryMargin/SummaryColumn"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PeakCoreUnitsTitle" type="Label" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/MiddleColumn/MiddleScroll/MiddleContent/SummaryPanel/SummaryMargin/SummaryColumn/PeakCoreUnitsRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(88, 0)
+text = "核心机构"
+
+[node name="PeakCoreUnitsValue" type="Label" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/MiddleColumn/MiddleScroll/MiddleContent/SummaryPanel/SummaryMargin/SummaryColumn/PeakCoreUnitsRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+autowrap_mode = 2
+
+[node name="PeakSupportActiveRow" type="HBoxContainer" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/MiddleColumn/MiddleScroll/MiddleContent/SummaryPanel/SummaryMargin/SummaryColumn"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PeakSupportActiveTitle" type="Label" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/MiddleColumn/MiddleScroll/MiddleContent/SummaryPanel/SummaryMargin/SummaryColumn/PeakSupportActiveRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(88, 0)
+text = "法旨效力"
+
+[node name="PeakSupportActiveValue" type="Label" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/MiddleColumn/MiddleScroll/MiddleContent/SummaryPanel/SummaryMargin/SummaryColumn/PeakSupportActiveRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+autowrap_mode = 2
+
+[node name="PeakSupportCandidateRow" type="HBoxContainer" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/MiddleColumn/MiddleScroll/MiddleContent/SummaryPanel/SummaryMargin/SummaryColumn"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PeakSupportCandidateTitle" type="Label" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/MiddleColumn/MiddleScroll/MiddleContent/SummaryPanel/SummaryMargin/SummaryColumn/PeakSupportCandidateRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(88, 0)
+text = "候补加成"
+
+[node name="PeakSupportCandidateValue" type="Label" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/MiddleColumn/MiddleScroll/MiddleContent/SummaryPanel/SummaryMargin/SummaryColumn/PeakSupportCandidateRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+autowrap_mode = 2
+
+[node name="DepartmentSectionLabel" type="Label" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/MiddleColumn/MiddleScroll/MiddleContent"]
+layout_mode = 2
+text = "附属部门与处室"
+
+[node name="DepartmentGrid" type="GridContainer" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/MiddleColumn/MiddleScroll/MiddleContent"]
+layout_mode = 2
+columns = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
+
+[node name="RightColumn" type="VBoxContainer" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(320, 0)
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="RightSectionLabel" type="Label" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/RightColumn"]
+layout_mode = 2
+text = "职司导览"
+
+[node name="JobCardsContainer" type="VBoxContainer" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/RightColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="ActionDivider" type="ColorRect" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/RightColumn"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 1)
+color = Color(0.70, 0.65, 0.56, 0.48)
+
+[node name="ActionColumn" type="VBoxContainer" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/RightColumn"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SetSupportButton" type="Button" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/RightColumn/ActionColumn"]
+layout_mode = 2
+text = "立 协同峰令"
+custom_minimum_size = Vector2(0, 34)
+size_flags_horizontal = 3
+
+[node name="ActionRow" type="HBoxContainer" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/RightColumn/ActionColumn"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ResetSupportButton" type="Button" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/RightColumn/ActionColumn/ActionRow"]
+layout_mode = 2
+text = "复 均衡轮转"
+custom_minimum_size = Vector2(0, 34)
+size_flags_horizontal = 3
+
+[node name="OpenGovernanceButton" type="Button" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/RightColumn/ActionColumn/ActionRow"]
+layout_mode = 2
+text = "转 宗主中枢"
+custom_minimum_size = Vector2(0, 34)
+size_flags_horizontal = 3
+
+[node name="HintLabel" type="Label" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/RightColumn"]
+layout_mode = 2
+autowrap_mode = 2
+horizontal_alignment = 1

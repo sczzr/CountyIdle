@@ -24,6 +24,15 @@ public partial class TaskPanel : PopupPanelBase
     private static readonly Color BorderInkColor = new(0.29f, 0.25f, 0.21f, 1f);
     private static readonly Color SidebarActiveColor = new(0.63f, 0.19f, 0.14f, 1f);
 
+    private const string RootPath = "Overlay/Center/Frame/RootColumn";
+    private const string HeaderPath = RootPath + "/HeaderPanel/HeaderMargin/HeaderRow";
+    private const string BodyPath = RootPath + "/BodyRow";
+    private const string ContentStackPath = BodyPath + "/ContentMargin/ContentScroll/ContentStack";
+    private const string PolicyTabPath = ContentStackPath + "/PolicyTab";
+    private const string SeasonTabPath = ContentStackPath + "/SeasonTab";
+    private const string RulesTabPath = ContentStackPath + "/RulesTab";
+    private const string AffairsTabPath = ContentStackPath + "/AffairsTab";
+
     private readonly GameCalendarSystem _calendarSystem = new();
     private readonly Dictionary<GovernanceTab, Button> _tabButtons = new();
 
@@ -60,6 +69,25 @@ public partial class TaskPanel : PopupPanelBase
     private Control _seasonTabContent = null!;
     private Control _rulesTabContent = null!;
     private Control _affairsTabContent = null!;
+    private Button _policyTabButton = null!;
+    private Button _seasonTabButton = null!;
+    private Button _rulesTabButton = null!;
+    private Button _affairsTabButton = null!;
+    private Button _developmentPrevButton = null!;
+    private Button _developmentNextButton = null!;
+    private Button _lawPrevButton = null!;
+    private Button _lawNextButton = null!;
+    private Button _talentPrevButton = null!;
+    private Button _talentNextButton = null!;
+    private Button _quarterDecreePrevButton = null!;
+    private Button _quarterDecreeNextButton = null!;
+    private Button _affairsRulePrevButton = null!;
+    private Button _affairsRuleNextButton = null!;
+    private Button _doctrineRulePrevButton = null!;
+    private Button _doctrineRuleNextButton = null!;
+    private Button _disciplineRulePrevButton = null!;
+    private Button _disciplineRuleNextButton = null!;
+    private HSplitContainer _affairsSplit = null!;
 
     private GameState _state = new();
     private GovernanceTab _activeTab = GovernanceTab.Policy;
@@ -77,9 +105,389 @@ public partial class TaskPanel : PopupPanelBase
 
     public override void _Ready()
     {
-        BuildUi();
+        BindUiNodes();
+        ApplyUiStyles();
+        BindEvents();
+        SwitchTab(GovernanceTab.Policy);
         InitializePopupHint(_hintLabel);
         Hide();
+    }
+
+    private void BindUiNodes()
+    {
+        _spiritStoneValueLabel = GetNode<Label>($"{HeaderPath}/StatRow/SpiritStoneRow/SpiritStoneValueLabel");
+        _contributionValueLabel = GetNode<Label>($"{HeaderPath}/StatRow/ContributionRow/ContributionValueLabel");
+        _closeButton = GetNode<Button>($"{HeaderPath}/CloseButton");
+        _hintLabel = GetNode<Label>($"{RootPath}/HintLabel");
+        _contentScroll = GetNode<ScrollContainer>($"{BodyPath}/ContentMargin/ContentScroll");
+        _policyTabContent = GetNode<Control>(PolicyTabPath);
+        _seasonTabContent = GetNode<Control>(SeasonTabPath);
+        _rulesTabContent = GetNode<Control>(RulesTabPath);
+        _affairsTabContent = GetNode<Control>(AffairsTabPath);
+        _policyTabButton = GetNode<Button>($"{BodyPath}/SidebarPanel/SidebarColumn/PolicyTabButton");
+        _seasonTabButton = GetNode<Button>($"{BodyPath}/SidebarPanel/SidebarColumn/SeasonTabButton");
+        _rulesTabButton = GetNode<Button>($"{BodyPath}/SidebarPanel/SidebarColumn/RulesTabButton");
+        _affairsTabButton = GetNode<Button>($"{BodyPath}/SidebarPanel/SidebarColumn/AffairsTabButton");
+        _policySummaryLabel = GetNode<Label>(
+            $"{PolicyTabPath}/PolicySummaryPanel/PolicySummaryMargin/PolicySummaryColumn/PolicySummaryLabel");
+        _seasonSummaryLabel = GetNode<Label>(
+            $"{SeasonTabPath}/SeasonSummaryPanel/SeasonSummaryMargin/SeasonSummaryColumn/SeasonSummaryLabel");
+        _rulesSummaryLabel = GetNode<Label>(
+            $"{RulesTabPath}/RulesSummaryPanel/RulesSummaryMargin/RulesSummaryColumn/RulesSummaryLabel");
+        _affairsSummaryLabel = GetNode<Label>(
+            $"{AffairsTabPath}/AffairsSummaryPanel/AffairsSummaryMargin/AffairsSummaryColumn/AffairsSummaryLabel");
+        _developmentValueLabel = GetNode<Label>(
+            $"{PolicyTabPath}/DevelopmentCard/DevelopmentCardMargin/DevelopmentCardRow/DevelopmentCapsule/DevelopmentCapsuleRow/DevelopmentValueLabel");
+        _developmentHintLabel = GetNode<Label>(
+            $"{PolicyTabPath}/DevelopmentCard/DevelopmentCardMargin/DevelopmentCardRow/DevelopmentInfoColumn/DevelopmentHintLabel");
+        _developmentPrevButton = GetNode<Button>(
+            $"{PolicyTabPath}/DevelopmentCard/DevelopmentCardMargin/DevelopmentCardRow/DevelopmentCapsule/DevelopmentCapsuleRow/DevelopmentPrevButton");
+        _developmentNextButton = GetNode<Button>(
+            $"{PolicyTabPath}/DevelopmentCard/DevelopmentCardMargin/DevelopmentCardRow/DevelopmentCapsule/DevelopmentCapsuleRow/DevelopmentNextButton");
+        _lawValueLabel = GetNode<Label>(
+            $"{PolicyTabPath}/LawCard/LawCardMargin/LawCardRow/LawCapsule/LawCapsuleRow/LawValueLabel");
+        _lawHintLabel = GetNode<Label>(
+            $"{PolicyTabPath}/LawCard/LawCardMargin/LawCardRow/LawInfoColumn/LawHintLabel");
+        _lawPrevButton = GetNode<Button>(
+            $"{PolicyTabPath}/LawCard/LawCardMargin/LawCardRow/LawCapsule/LawCapsuleRow/LawPrevButton");
+        _lawNextButton = GetNode<Button>(
+            $"{PolicyTabPath}/LawCard/LawCardMargin/LawCardRow/LawCapsule/LawCapsuleRow/LawNextButton");
+        _talentValueLabel = GetNode<Label>(
+            $"{PolicyTabPath}/TalentCard/TalentCardMargin/TalentCardRow/TalentCapsule/TalentCapsuleRow/TalentValueLabel");
+        _talentHintLabel = GetNode<Label>(
+            $"{PolicyTabPath}/TalentCard/TalentCardMargin/TalentCardRow/TalentInfoColumn/TalentHintLabel");
+        _talentPrevButton = GetNode<Button>(
+            $"{PolicyTabPath}/TalentCard/TalentCardMargin/TalentCardRow/TalentCapsule/TalentCapsuleRow/TalentPrevButton");
+        _talentNextButton = GetNode<Button>(
+            $"{PolicyTabPath}/TalentCard/TalentCardMargin/TalentCardRow/TalentCapsule/TalentCapsuleRow/TalentNextButton");
+        _quarterDecreeValueLabel = GetNode<Label>(
+            $"{SeasonTabPath}/QuarterDecreeCard/QuarterDecreeCardMargin/QuarterDecreeCardRow/QuarterDecreeCapsule/QuarterDecreeCapsuleRow/QuarterDecreeValueLabel");
+        _quarterDecreeHintLabel = GetNode<Label>(
+            $"{SeasonTabPath}/QuarterDecreeCard/QuarterDecreeCardMargin/QuarterDecreeCardRow/QuarterDecreeInfoColumn/QuarterDecreeHintLabel");
+        _quarterDecreePrevButton = GetNode<Button>(
+            $"{SeasonTabPath}/QuarterDecreeCard/QuarterDecreeCardMargin/QuarterDecreeCardRow/QuarterDecreeCapsule/QuarterDecreeCapsuleRow/QuarterDecreePrevButton");
+        _quarterDecreeNextButton = GetNode<Button>(
+            $"{SeasonTabPath}/QuarterDecreeCard/QuarterDecreeCardMargin/QuarterDecreeCardRow/QuarterDecreeCapsule/QuarterDecreeCapsuleRow/QuarterDecreeNextButton");
+        _affairsRuleValueLabel = GetNode<Label>(
+            $"{RulesTabPath}/AffairsRuleCard/AffairsRuleCardMargin/AffairsRuleCardRow/AffairsRuleCapsule/AffairsRuleCapsuleRow/AffairsRuleValueLabel");
+        _affairsRuleHintLabel = GetNode<Label>(
+            $"{RulesTabPath}/AffairsRuleCard/AffairsRuleCardMargin/AffairsRuleCardRow/AffairsRuleInfoColumn/AffairsRuleHintLabel");
+        _affairsRulePrevButton = GetNode<Button>(
+            $"{RulesTabPath}/AffairsRuleCard/AffairsRuleCardMargin/AffairsRuleCardRow/AffairsRuleCapsule/AffairsRuleCapsuleRow/AffairsRulePrevButton");
+        _affairsRuleNextButton = GetNode<Button>(
+            $"{RulesTabPath}/AffairsRuleCard/AffairsRuleCardMargin/AffairsRuleCardRow/AffairsRuleCapsule/AffairsRuleCapsuleRow/AffairsRuleNextButton");
+        _doctrineRuleValueLabel = GetNode<Label>(
+            $"{RulesTabPath}/DoctrineRuleCard/DoctrineRuleCardMargin/DoctrineRuleCardRow/DoctrineRuleCapsule/DoctrineRuleCapsuleRow/DoctrineRuleValueLabel");
+        _doctrineRuleHintLabel = GetNode<Label>(
+            $"{RulesTabPath}/DoctrineRuleCard/DoctrineRuleCardMargin/DoctrineRuleCardRow/DoctrineRuleInfoColumn/DoctrineRuleHintLabel");
+        _doctrineRulePrevButton = GetNode<Button>(
+            $"{RulesTabPath}/DoctrineRuleCard/DoctrineRuleCardMargin/DoctrineRuleCardRow/DoctrineRuleCapsule/DoctrineRuleCapsuleRow/DoctrineRulePrevButton");
+        _doctrineRuleNextButton = GetNode<Button>(
+            $"{RulesTabPath}/DoctrineRuleCard/DoctrineRuleCardMargin/DoctrineRuleCardRow/DoctrineRuleCapsule/DoctrineRuleCapsuleRow/DoctrineRuleNextButton");
+        _disciplineRuleValueLabel = GetNode<Label>(
+            $"{RulesTabPath}/DisciplineRuleCard/DisciplineRuleCardMargin/DisciplineRuleCardRow/DisciplineRuleCapsule/DisciplineRuleCapsuleRow/DisciplineRuleValueLabel");
+        _disciplineRuleHintLabel = GetNode<Label>(
+            $"{RulesTabPath}/DisciplineRuleCard/DisciplineRuleCardMargin/DisciplineRuleCardRow/DisciplineRuleInfoColumn/DisciplineRuleHintLabel");
+        _disciplineRulePrevButton = GetNode<Button>(
+            $"{RulesTabPath}/DisciplineRuleCard/DisciplineRuleCardMargin/DisciplineRuleCardRow/DisciplineRuleCapsule/DisciplineRuleCapsuleRow/DisciplineRulePrevButton");
+        _disciplineRuleNextButton = GetNode<Button>(
+            $"{RulesTabPath}/DisciplineRuleCard/DisciplineRuleCardMargin/DisciplineRuleCardRow/DisciplineRuleCapsule/DisciplineRuleCapsuleRow/DisciplineRuleNextButton");
+        _affairsSplit = GetNode<HSplitContainer>(
+            $"{AffairsTabPath}/AffairsListCard/AffairsListMargin/AffairsListColumn/AffairsSplit");
+        _taskList = GetNode<ItemList>(
+            $"{AffairsTabPath}/AffairsListCard/AffairsListMargin/AffairsListColumn/AffairsSplit/AffairsListPanel/AffairsListPanelMargin/TaskList");
+        _detailLabel = GetNode<Label>(
+            $"{AffairsTabPath}/AffairsListCard/AffairsListMargin/AffairsListColumn/AffairsSplit/AffairsDetailPanel/AffairsDetailMargin/DetailLabel");
+        _minusOneButton = GetNode<Button>(
+            $"{AffairsTabPath}/AffairsListCard/AffairsListMargin/AffairsListColumn/AffairsActionRow/MinusOneButton");
+        _plusOneButton = GetNode<Button>(
+            $"{AffairsTabPath}/AffairsListCard/AffairsListMargin/AffairsListColumn/AffairsActionRow/PlusOneButton");
+        _plusFiveButton = GetNode<Button>(
+            $"{AffairsTabPath}/AffairsListCard/AffairsListMargin/AffairsListColumn/AffairsActionRow/PlusFiveButton");
+        _resetButton = GetNode<Button>(
+            $"{AffairsTabPath}/AffairsListCard/AffairsListMargin/AffairsListColumn/AffairsActionRow/ResetButton");
+
+        _tabButtons.Clear();
+        _tabButtons[GovernanceTab.Policy] = _policyTabButton;
+        _tabButtons[GovernanceTab.Season] = _seasonTabButton;
+        _tabButtons[GovernanceTab.Rules] = _rulesTabButton;
+        _tabButtons[GovernanceTab.Affairs] = _affairsTabButton;
+    }
+
+    private void ApplyUiStyles()
+    {
+        ApplyPanelStyle(GetNode<PanelContainer>("Overlay/Center/Frame"), CreateFrameStyle());
+        ApplyPanelStyle(GetNode<PanelContainer>($"{RootPath}/HeaderPanel"), CreateHeaderStyle());
+        ApplyPanelStyle(GetNode<PanelContainer>($"{BodyPath}/SidebarPanel"), CreateSidebarPanelStyle());
+        ApplyPanelStyle(GetNode<PanelContainer>($"{PolicyTabPath}/PolicySummaryPanel"), CreateSummaryStyle());
+        ApplyPanelStyle(GetNode<PanelContainer>($"{SeasonTabPath}/SeasonSummaryPanel"), CreateSummaryStyle());
+        ApplyPanelStyle(GetNode<PanelContainer>($"{RulesTabPath}/RulesSummaryPanel"), CreateSummaryStyle());
+        ApplyPanelStyle(GetNode<PanelContainer>($"{AffairsTabPath}/AffairsSummaryPanel"), CreateSummaryStyle());
+        ApplyPanelStyle(GetNode<PanelContainer>($"{PolicyTabPath}/DevelopmentCard"), CreateCardStyle());
+        ApplyPanelStyle(GetNode<PanelContainer>($"{PolicyTabPath}/LawCard"), CreateCardStyle());
+        ApplyPanelStyle(GetNode<PanelContainer>($"{PolicyTabPath}/TalentCard"), CreateCardStyle());
+        ApplyPanelStyle(GetNode<PanelContainer>($"{PolicyTabPath}/LockedCard"), CreateCardStyle());
+        ApplyPanelStyle(GetNode<PanelContainer>($"{SeasonTabPath}/QuarterDecreeCard"), CreateCardStyle());
+        ApplyPanelStyle(GetNode<PanelContainer>($"{RulesTabPath}/AffairsRuleCard"), CreateCardStyle());
+        ApplyPanelStyle(GetNode<PanelContainer>($"{RulesTabPath}/DoctrineRuleCard"), CreateCardStyle());
+        ApplyPanelStyle(GetNode<PanelContainer>($"{RulesTabPath}/DisciplineRuleCard"), CreateCardStyle());
+        ApplyPanelStyle(GetNode<PanelContainer>($"{AffairsTabPath}/AffairsListCard"), CreateCardStyle());
+        ApplyPanelStyle(
+            GetNode<PanelContainer>($"{AffairsTabPath}/AffairsListCard/AffairsListMargin/AffairsListColumn/AffairsSplit/AffairsListPanel"),
+            CreateInnerPaperStyle());
+        ApplyPanelStyle(
+            GetNode<PanelContainer>($"{AffairsTabPath}/AffairsListCard/AffairsListMargin/AffairsListColumn/AffairsSplit/AffairsDetailPanel"),
+            CreateInnerPaperStyle());
+        ApplyPanelStyle(
+            GetNode<PanelContainer>(
+                $"{PolicyTabPath}/DevelopmentCard/DevelopmentCardMargin/DevelopmentCardRow/DevelopmentCapsule"),
+            CreateControlCapsuleStyle());
+        ApplyPanelStyle(
+            GetNode<PanelContainer>($"{PolicyTabPath}/LawCard/LawCardMargin/LawCardRow/LawCapsule"),
+            CreateControlCapsuleStyle());
+        ApplyPanelStyle(
+            GetNode<PanelContainer>($"{PolicyTabPath}/TalentCard/TalentCardMargin/TalentCardRow/TalentCapsule"),
+            CreateControlCapsuleStyle());
+        ApplyPanelStyle(
+            GetNode<PanelContainer>($"{PolicyTabPath}/LockedCard/LockedCardMargin/LockedCardRow/LockedStateCapsule"),
+            CreateControlCapsuleStyle());
+        ApplyPanelStyle(
+            GetNode<PanelContainer>(
+                $"{SeasonTabPath}/QuarterDecreeCard/QuarterDecreeCardMargin/QuarterDecreeCardRow/QuarterDecreeCapsule"),
+            CreateControlCapsuleStyle());
+        ApplyPanelStyle(
+            GetNode<PanelContainer>(
+                $"{RulesTabPath}/AffairsRuleCard/AffairsRuleCardMargin/AffairsRuleCardRow/AffairsRuleCapsule"),
+            CreateControlCapsuleStyle());
+        ApplyPanelStyle(
+            GetNode<PanelContainer>(
+                $"{RulesTabPath}/DoctrineRuleCard/DoctrineRuleCardMargin/DoctrineRuleCardRow/DoctrineRuleCapsule"),
+            CreateControlCapsuleStyle());
+        ApplyPanelStyle(
+            GetNode<PanelContainer>(
+                $"{RulesTabPath}/DisciplineRuleCard/DisciplineRuleCardMargin/DisciplineRuleCardRow/DisciplineRuleCapsule"),
+            CreateControlCapsuleStyle());
+
+        ApplyLabelStyle(GetNode<Label>($"{HeaderPath}/TitleLabel"), 24, InkMainColor);
+        ApplyLabelStyle(GetNode<Label>($"{HeaderPath}/StatRow/ContributionRow/ContributionTitle"), 15, InkMainColor);
+        ApplyLabelStyle(GetNode<Label>($"{HeaderPath}/StatRow/SpiritStoneRow/SpiritStoneTitle"), 15, InkMainColor);
+        ApplyLabelStyle(_contributionValueLabel, 16, SealRedColor);
+        ApplyLabelStyle(_spiritStoneValueLabel, 16, SealRedColor);
+        ApplyLabelStyle(
+            GetNode<Label>(
+                $"{PolicyTabPath}/PolicySummaryPanel/PolicySummaryMargin/PolicySummaryColumn/PolicySummaryTitle"),
+            15,
+            InkMainColor);
+        ApplyLabelStyle(_policySummaryLabel, 13, InkMutedColor);
+        ApplyLabelStyle(
+            GetNode<Label>(
+                $"{SeasonTabPath}/SeasonSummaryPanel/SeasonSummaryMargin/SeasonSummaryColumn/SeasonSummaryTitle"),
+            15,
+            InkMainColor);
+        ApplyLabelStyle(_seasonSummaryLabel, 13, InkMutedColor);
+        ApplyLabelStyle(
+            GetNode<Label>(
+                $"{RulesTabPath}/RulesSummaryPanel/RulesSummaryMargin/RulesSummaryColumn/RulesSummaryTitle"),
+            15,
+            InkMainColor);
+        ApplyLabelStyle(_rulesSummaryLabel, 13, InkMutedColor);
+        ApplyLabelStyle(
+            GetNode<Label>(
+                $"{AffairsTabPath}/AffairsSummaryPanel/AffairsSummaryMargin/AffairsSummaryColumn/AffairsSummaryTitle"),
+            15,
+            InkMainColor);
+        ApplyLabelStyle(_affairsSummaryLabel, 13, InkMutedColor);
+        ApplyLabelStyle(
+            GetNode<Label>(
+                $"{PolicyTabPath}/DevelopmentCard/DevelopmentCardMargin/DevelopmentCardRow/DevelopmentInfoColumn/DevelopmentTitle"),
+            18,
+            InkMainColor);
+        ApplyLabelStyle(_developmentHintLabel, 13, InkMutedColor);
+        ApplyLabelStyle(_developmentValueLabel, 16, SealRedColor);
+        ApplyLabelStyle(
+            GetNode<Label>(
+                $"{PolicyTabPath}/LawCard/LawCardMargin/LawCardRow/LawInfoColumn/LawTitle"),
+            18,
+            InkMainColor);
+        ApplyLabelStyle(_lawHintLabel, 13, InkMutedColor);
+        ApplyLabelStyle(_lawValueLabel, 16, SealRedColor);
+        ApplyLabelStyle(
+            GetNode<Label>(
+                $"{PolicyTabPath}/TalentCard/TalentCardMargin/TalentCardRow/TalentInfoColumn/TalentTitle"),
+            18,
+            InkMainColor);
+        ApplyLabelStyle(_talentHintLabel, 13, InkMutedColor);
+        ApplyLabelStyle(_talentValueLabel, 16, SealRedColor);
+        ApplyLabelStyle(
+            GetNode<Label>(
+                $"{PolicyTabPath}/LockedCard/LockedCardMargin/LockedCardRow/LockedInfoColumn/LockedTitle"),
+            18,
+            InkMainColor);
+        ApplyLabelStyle(
+            GetNode<Label>(
+                $"{PolicyTabPath}/LockedCard/LockedCardMargin/LockedCardRow/LockedInfoColumn/LockedDescription"),
+            13,
+            InkMutedColor);
+        ApplyLabelStyle(
+            GetNode<Label>(
+                $"{PolicyTabPath}/LockedCard/LockedCardMargin/LockedCardRow/LockedStateCapsule/LockedStateLabel"),
+            14,
+            InkMutedColor);
+        ApplyLabelStyle(
+            GetNode<Label>(
+                $"{SeasonTabPath}/QuarterDecreeCard/QuarterDecreeCardMargin/QuarterDecreeCardRow/QuarterDecreeInfoColumn/QuarterDecreeTitle"),
+            18,
+            InkMainColor);
+        ApplyLabelStyle(_quarterDecreeHintLabel, 13, InkMutedColor);
+        ApplyLabelStyle(_quarterDecreeValueLabel, 16, SealRedColor);
+        ApplyLabelStyle(
+            GetNode<Label>(
+                $"{RulesTabPath}/AffairsRuleCard/AffairsRuleCardMargin/AffairsRuleCardRow/AffairsRuleInfoColumn/AffairsRuleTitle"),
+            18,
+            InkMainColor);
+        ApplyLabelStyle(_affairsRuleHintLabel, 13, InkMutedColor);
+        ApplyLabelStyle(_affairsRuleValueLabel, 16, SealRedColor);
+        ApplyLabelStyle(
+            GetNode<Label>(
+                $"{RulesTabPath}/DoctrineRuleCard/DoctrineRuleCardMargin/DoctrineRuleCardRow/DoctrineRuleInfoColumn/DoctrineRuleTitle"),
+            18,
+            InkMainColor);
+        ApplyLabelStyle(_doctrineRuleHintLabel, 13, InkMutedColor);
+        ApplyLabelStyle(_doctrineRuleValueLabel, 16, SealRedColor);
+        ApplyLabelStyle(
+            GetNode<Label>(
+                $"{RulesTabPath}/DisciplineRuleCard/DisciplineRuleCardMargin/DisciplineRuleCardRow/DisciplineRuleInfoColumn/DisciplineRuleTitle"),
+            18,
+            InkMainColor);
+        ApplyLabelStyle(_disciplineRuleHintLabel, 13, InkMutedColor);
+        ApplyLabelStyle(_disciplineRuleValueLabel, 16, SealRedColor);
+        ApplyLabelStyle(
+            GetNode<Label>(
+                $"{AffairsTabPath}/AffairsListCard/AffairsListMargin/AffairsListColumn/AffairsListTitle"),
+            15,
+            InkMainColor);
+        ApplyLabelStyle(_detailLabel, 13, InkMainColor);
+        ApplyLabelStyle(_hintLabel, 12, InkMutedColor);
+        _hintLabel.AddThemeConstantOverride("line_spacing", 1);
+
+        _closeButton.AddThemeFontSizeOverride("font_size", 24);
+        _closeButton.AddThemeColorOverride("font_color", InkMutedColor);
+        _closeButton.AddThemeColorOverride("font_hover_color", SealRedColor);
+        _closeButton.AddThemeColorOverride("font_pressed_color", SealRedColor);
+        _closeButton.AddThemeStyleboxOverride("normal", CreateTransparentStyle());
+        _closeButton.AddThemeStyleboxOverride("hover", CreateTransparentStyle());
+        _closeButton.AddThemeStyleboxOverride("pressed", CreateTransparentStyle());
+        _closeButton.AddThemeStyleboxOverride("focus", CreateTransparentStyle());
+
+        ApplySidebarButtonStyle(_policyTabButton);
+        ApplySidebarButtonStyle(_seasonTabButton);
+        ApplySidebarButtonStyle(_rulesTabButton);
+        ApplySidebarButtonStyle(_affairsTabButton);
+
+        ApplyArrowButtonStyle(_developmentPrevButton);
+        ApplyArrowButtonStyle(_developmentNextButton);
+        ApplyArrowButtonStyle(_lawPrevButton);
+        ApplyArrowButtonStyle(_lawNextButton);
+        ApplyArrowButtonStyle(_talentPrevButton);
+        ApplyArrowButtonStyle(_talentNextButton);
+        ApplyArrowButtonStyle(_quarterDecreePrevButton);
+        ApplyArrowButtonStyle(_quarterDecreeNextButton);
+        ApplyArrowButtonStyle(_affairsRulePrevButton);
+        ApplyArrowButtonStyle(_affairsRuleNextButton);
+        ApplyArrowButtonStyle(_doctrineRulePrevButton);
+        ApplyArrowButtonStyle(_doctrineRuleNextButton);
+        ApplyArrowButtonStyle(_disciplineRulePrevButton);
+        ApplyArrowButtonStyle(_disciplineRuleNextButton);
+
+        ApplyFooterActionButtonStyle(_minusOneButton, false);
+        ApplyFooterActionButtonStyle(_plusOneButton, false);
+        ApplyFooterActionButtonStyle(_plusFiveButton, false);
+        ApplyFooterActionButtonStyle(_resetButton, true);
+
+        _taskList.AddThemeStyleboxOverride("panel", CreateTransparentStyle());
+        _taskList.AddThemeStyleboxOverride("cursor", CreateSelectionStyle());
+        _taskList.AddThemeStyleboxOverride("cursor_unfocused", CreateSelectionStyle());
+        _taskList.AddThemeColorOverride("font_color", InkMainColor);
+        _taskList.AddThemeColorOverride("font_selected_color", PaperMainColor);
+        _taskList.AddThemeConstantOverride("h_separation", 6);
+        _taskList.AddThemeConstantOverride("v_separation", 5);
+
+        _affairsSplit.SplitOffsets = new[] { 280 };
+    }
+
+    private void BindEvents()
+    {
+        _closeButton.Pressed += OnClosePressed;
+        _policyTabButton.Pressed += () => SwitchTab(GovernanceTab.Policy);
+        _seasonTabButton.Pressed += () => SwitchTab(GovernanceTab.Season);
+        _rulesTabButton.Pressed += () => SwitchTab(GovernanceTab.Rules);
+        _affairsTabButton.Pressed += () => SwitchTab(GovernanceTab.Affairs);
+        _developmentPrevButton.Pressed += () => DevelopmentDirectionShiftRequested?.Invoke(-1);
+        _developmentNextButton.Pressed += () => DevelopmentDirectionShiftRequested?.Invoke(1);
+        _lawPrevButton.Pressed += () => SectLawShiftRequested?.Invoke(-1);
+        _lawNextButton.Pressed += () => SectLawShiftRequested?.Invoke(1);
+        _talentPrevButton.Pressed += () => TalentPlanShiftRequested?.Invoke(-1);
+        _talentNextButton.Pressed += () => TalentPlanShiftRequested?.Invoke(1);
+        _quarterDecreePrevButton.Pressed += () => QuarterDecreeShiftRequested?.Invoke(-1);
+        _quarterDecreeNextButton.Pressed += () => QuarterDecreeShiftRequested?.Invoke(1);
+        _affairsRulePrevButton.Pressed += () => AffairsRuleShiftRequested?.Invoke(-1);
+        _affairsRuleNextButton.Pressed += () => AffairsRuleShiftRequested?.Invoke(1);
+        _doctrineRulePrevButton.Pressed += () => DoctrineRuleShiftRequested?.Invoke(-1);
+        _doctrineRuleNextButton.Pressed += () => DoctrineRuleShiftRequested?.Invoke(1);
+        _disciplineRulePrevButton.Pressed += () => DisciplineRuleShiftRequested?.Invoke(-1);
+        _disciplineRuleNextButton.Pressed += () => DisciplineRuleShiftRequested?.Invoke(1);
+        _taskList.ItemSelected += index => OnTaskSelected((int)index);
+        _minusOneButton.Pressed += () => AdjustSelectedTaskOrder(-1);
+        _plusOneButton.Pressed += () => AdjustSelectedTaskOrder(1);
+        _plusFiveButton.Pressed += () => AdjustSelectedTaskOrder(5);
+        _resetButton.Pressed += OnResetPressed;
+    }
+
+    private static void ApplyPanelStyle(Control panel, StyleBox style)
+    {
+        panel.AddThemeStyleboxOverride("panel", style);
+    }
+
+    private static void ApplyLabelStyle(Label label, int fontSize, Color color)
+    {
+        label.AddThemeFontSizeOverride("font_size", fontSize);
+        label.AddThemeColorOverride("font_color", color);
+    }
+
+    private void ApplySidebarButtonStyle(Button button)
+    {
+        button.AddThemeFontSizeOverride("font_size", 18);
+        button.AddThemeColorOverride("font_color", InkMutedColor);
+        button.AddThemeColorOverride("font_hover_color", InkMainColor);
+        button.AddThemeColorOverride("font_pressed_color", InkMainColor);
+        button.AddThemeStyleboxOverride("normal", CreateSidebarItemStyle(false, false));
+        button.AddThemeStyleboxOverride("hover", CreateSidebarItemStyle(false, true));
+        button.AddThemeStyleboxOverride("pressed", CreateSidebarItemStyle(true, false));
+        button.AddThemeStyleboxOverride("focus", CreateSidebarItemStyle(false, true));
+    }
+
+    private void ApplyArrowButtonStyle(Button button)
+    {
+        button.AddThemeFontSizeOverride("font_size", 22);
+        button.AddThemeColorOverride("font_color", InkMutedColor);
+        button.AddThemeColorOverride("font_hover_color", SealRedColor);
+        button.AddThemeColorOverride("font_pressed_color", SealRedColor);
+        button.AddThemeStyleboxOverride("normal", CreateTransparentStyle());
+        button.AddThemeStyleboxOverride("hover", CreateTransparentStyle());
+        button.AddThemeStyleboxOverride("pressed", CreateTransparentStyle());
+        button.AddThemeStyleboxOverride("focus", CreateTransparentStyle());
+    }
+
+    private void ApplyFooterActionButtonStyle(Button button, bool accent)
+    {
+        button.AddThemeFontSizeOverride("font_size", 13);
+        button.AddThemeColorOverride("font_color", accent ? SealRedColor : InkMainColor);
+        button.AddThemeColorOverride("font_hover_color", PaperMainColor);
+        button.AddThemeColorOverride("font_pressed_color", PaperMainColor);
+        button.AddThemeStyleboxOverride("normal", CreateFooterButtonStyle(accent, false));
+        button.AddThemeStyleboxOverride("hover", CreateFooterButtonStyle(accent, true));
+        button.AddThemeStyleboxOverride("pressed", CreateFooterButtonStyle(accent, true));
+        button.AddThemeStyleboxOverride("focus", CreateFooterButtonStyle(accent, true));
     }
 
     public override void _Process(double delta)

@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://buftahoe0gh2l"]
+[gd_scene format=3 uid="uid://mauxggfyykyf"]
 
 [ext_resource type="Script" uid="uid://b4wfyy6kthib2" path="res://scripts/ui/SettingsPanel.cs" id="1_4af7x"]
 
@@ -125,7 +125,7 @@ text = "✖"
 [node name="HintLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn" unique_id=2068979100]
 modulate = Color(0.760784, 0.780392, 0.831373, 1)
 layout_mode = 2
-text = "校定言辞、窗格、字样、音律与符令。批复后即刻生效，并自动收录。"
+text = "窗格与音律即时生效；其余条目需批复后收录。符令录入后会在批复时落卷。"
 autowrap_mode = 3
 
 [node name="HeaderDivider" type="ColorRect" parent="CenterLayer/Dialog/Margin/MainColumn" unique_id=1936167359]
@@ -137,18 +137,9 @@ color = Color(0.294118, 0.247059, 0.207843, 1)
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="LanguageRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows" unique_id=430058772]
+[node name="InstantHeader" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows"]
 layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="LanguageLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/LanguageRow" unique_id=686323106]
-custom_minimum_size = Vector2(118, 0)
-layout_mode = 2
-text = "言辞"
-
-[node name="LanguageOption" type="OptionButton" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/LanguageRow" unique_id=1114681811]
-layout_mode = 2
-size_flags_horizontal = 3
+text = "即时生效"
 
 [node name="ResolutionRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows" unique_id=752429266]
 layout_mode = 2
@@ -160,19 +151,6 @@ layout_mode = 2
 text = "窗格"
 
 [node name="ResolutionOption" type="OptionButton" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ResolutionRow" unique_id=577053610]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="FontScaleRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows" unique_id=403584588]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="FontScaleLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/FontScaleRow" unique_id=3114838]
-custom_minimum_size = Vector2(118, 0)
-layout_mode = 2
-text = "字样"
-
-[node name="FontScaleOption" type="OptionButton" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/FontScaleRow" unique_id=1251875490]
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -194,6 +172,36 @@ custom_minimum_size = Vector2(56, 0)
 layout_mode = 2
 text = "80%"
 horizontal_alignment = 2
+
+[node name="SavedHeader" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows"]
+layout_mode = 2
+text = "批复生效"
+
+[node name="LanguageRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows" unique_id=430058772]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="LanguageLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/LanguageRow" unique_id=686323106]
+custom_minimum_size = Vector2(118, 0)
+layout_mode = 2
+text = "言辞"
+
+[node name="LanguageOption" type="OptionButton" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/LanguageRow" unique_id=1114681811]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FontScaleRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows" unique_id=403584588]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="FontScaleLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/FontScaleRow" unique_id=3114838]
+custom_minimum_size = Vector2(118, 0)
+layout_mode = 2
+text = "字样"
+
+[node name="FontScaleOption" type="OptionButton" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/FontScaleRow" unique_id=1251875490]
+layout_mode = 2
+size_flags_horizontal = 3
 
 [node name="ShortcutHeader" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows" unique_id=660895169]
 layout_mode = 2

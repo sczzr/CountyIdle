@@ -160,20 +160,20 @@ public partial class Main
         {
             ApplyPrimaryTileInspectorBinding(new TileInspectorActionBinding(
                 TileInspectorAction.None,
-                "点选地块后可用",
-                "请先在中央六边形沙盘上点选一个可交互 tile。",
+                "当前无可选场所",
+                "天衍峰山门图当前仅展示地貌，暂无可交互场所。",
                 false));
             ApplySecondaryTileInspectorBinding(new TileInspectorActionBinding(
                 TileInspectorAction.None,
-                "点选地块后可阅",
-                "选中 tile 后，这里会出现该地块的辅助操作。",
+                "暂无可选场所",
+                "场所与门人可视化已停用，暂不提供场所联动入口。",
                 false));
             ApplyTertiaryTileInspectorBinding(new TileInspectorActionBinding(
                 TileInspectorAction.None,
-                "点选地块后可查",
-                "选中 tile 后，这里会出现与该地块相关的补充入口。",
+                "暂无可选场所",
+                "需要恢复场所/门人可视化后才提供对应入口。",
                 false));
-            ApplyTileInspectorActionHint("可执行项：请先点选中央 hex tile，左侧才会显示该地块的具体可操作项。");
+            ApplyTileInspectorActionHint("可执行项：当前山门图仅展示地貌，暂无场所与门人可选。");
             return;
         }
 

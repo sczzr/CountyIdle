@@ -71,17 +71,50 @@ public partial class CountyTownMapViewSystem
 
     public override void _Process(double delta)
     {
+        var dt = (float)delta;
+        var needsUpdate = false;
+
+        if (_isInitialized)
+        {
+            if (Mathf.Abs(_zoomVelocity) > 0.001f)
+            {
+                _zoomTarget = Mathf.Clamp(_zoomTarget + (_zoomVelocity * dt), MinZoom, MaxZoom);
+                _zoomVelocity = Mathf.Lerp(_zoomVelocity, 0f, dt * ZoomVelocityDamping);
+                needsUpdate = true;
+            }
+
+            var nextZoom = Mathf.Lerp(_zoom, _zoomTarget, dt * ZoomLerpSpeed);
+            if (!Mathf.IsEqualApprox(nextZoom, _zoom))
+            {
+                _zoom = nextZoom;
+                needsUpdate = true;
+            }
+
+            if (needsUpdate)
+            {
+                UpdateMapHint();
+            }
+        }
+
+        if (_residentWalkers.Count > 0)
+        {
+            _currentMinuteInterpolation = Math.Clamp(_currentMinuteInterpolation + (dt * _residentTimeScale), 0f, 0.999f);
+            needsUpdate = true;
+        }
+
+        if (needsUpdate)
+        {
+            QueueRedraw();
+        }
+    }
+
+    public void SetResidentClock(int gameMinutes, float timeScale)
+    {
         if (_residentWalkers.Count == 0)
         {
             return;
         }
 
-        _currentMinuteInterpolation = Math.Clamp(_currentMinuteInterpolation + ((float)delta * _residentTimeScale), 0f, 0.999f);
-        QueueRedraw();
-    }
-
-    public void SetResidentClock(int gameMinutes, float timeScale)
-    {
         var safeGameMinutes = Math.Max(gameMinutes, 0);
         if (safeGameMinutes != _lastResidentClockMinute)
         {
@@ -97,33 +130,11 @@ public partial class CountyTownMapViewSystem
     public void RefreshResidents(GameState state)
     {
         _residentSourceState = state.Clone();
-        var farmerHint = Math.Max(state.Farmers, 0);
-        var workerHint = Math.Max(state.Workers, 0);
-        var merchantHint = Math.Max(state.Merchants, 0);
-        var scholarHint = Math.Max(state.Scholars, 0);
-        var populationBucket = Math.Max(state.Population / 8, 1);
-
-        var requiresRebuild = _residentWalkers.Count == 0 ||
-                              farmerHint != _residentFarmerHint ||
-                              workerHint != _residentWorkerHint ||
-                              merchantHint != _residentMerchantHint ||
-                              scholarHint != _residentScholarHint ||
-                              populationBucket != _residentPopulationBucket;
-
-        _residentFarmerHint = farmerHint;
-        _residentWorkerHint = workerHint;
-        _residentMerchantHint = merchantHint;
-        _residentScholarHint = scholarHint;
-        _residentPopulationBucket = populationBucket;
+        _residentWalkers.Clear();
+        _selectedResidentDiscipleId = null;
         _currentResidentGameMinutes = Math.Max(state.GameMinutes, 0);
         _lastResidentClockMinute = _currentResidentGameMinutes;
-
-        if (!requiresRebuild)
-        {
-            return;
-        }
-
-        RebuildResidents();
+        _currentMinuteInterpolation = 0f;
         UpdateMapHint();
         QueueRedraw();
     }

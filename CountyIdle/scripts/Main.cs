@@ -43,22 +43,29 @@ public partial class Main : Control
     private const string FigmaTimelinePath = $"{FigmaRootPath}/BodyRow/TimelinePanel/PanelPadding/MainColumn";
     private const string FigmaEquipmentPath = $"{FigmaRootPath}/BodyRow/EquipmentPanel/PanelPadding/MainColumn";
     private const string LegacyBackgroundTexturePath = "res://assets/ui/background/background_2.png";
+    private const string HoverSfxPath = "res://assets/audio/ui/hover_ink.wav";
 
     private const int JobAdjustStep = 1;
-    private const double LanternPulseDurationSeconds = 0.42;
-    private const double LanternResetDurationSeconds = 0.14;
-    private const float MapZoomStep = 0.1f;
+    private const double LanternPulseDurationSeconds = 0.18;
+    private const double LanternResetDurationSeconds = 0.12;
+    private const float LanternHoverScale = 1.05f;
     private const int MineUnlockTechLevel = 1;
     private const string MineLockedText = "🔒 需科技 锻造术(T1)";
     private const string MineUnlockedText = "↑ 扩建传法院 (木16 石22 金22)";
 
     private static readonly Color BaseButtonModulate = Colors.White;
-    private static readonly Color LanternGlowModulate = new(1.0f, 0.86f, 0.64f, 1.0f);
+    private static readonly Color LanternHoverModulate = new(0.184f, 0.298f, 0.345f, 1.0f);
+    private static readonly Color DropdownPaperColor = new(0.95f, 0.92f, 0.84f, 1f);
+    private static readonly Color DropdownInkColor = new(0.17f, 0.15f, 0.13f, 1f);
+    private static readonly Color DropdownBorderColor = new(0.29f, 0.25f, 0.21f, 0.95f);
+    private const ulong HoverSfxCooldownMs = 80;
     private static readonly double[] SupportedTimeScales = { 1.0, 2.0, 4.0 };
     private static readonly string[] ChronicleTimeLabels = { "子时", "丑时", "寅时", "卯时", "辰时", "巳时", "午时", "未时", "申时", "酉时", "戌时", "亥时" };
 
     private readonly Queue<string> _logs = new();
     private readonly Dictionary<Button, Tween> _buttonPulseTweens = new();
+    private readonly Dictionary<Button, Vector2> _buttonBaseScales = new();
+    private readonly HashSet<Button> _hoverLockedButtons = new();
     private readonly Dictionary<JobType, PanelContainer> _jobRows = new();
     private readonly Dictionary<JobType, Label> _jobCountLabels = new();
     private readonly Dictionary<JobType, Label> _jobTitleLabels = new();
@@ -95,10 +102,9 @@ public partial class Main : Control
     private Button? _eventPanelButton;
     private Button? _reportPanelButton;
     private Button? _expeditionMapButton;
-    private Button? _mapZoomOutButton;
-    private Button? _mapZoomInButton;
     private Button? _mapZoomResetButton;
-    private Label? _mapZoomLabel;
+    private HSlider? _mapZoomSlider;
+    private bool _isUpdatingMapZoomSlider;
     private Control? _worldMapView;
     private Control? _prefectureMapView;
     private Control? _countyTownMapView;
@@ -120,6 +126,8 @@ public partial class Main : Control
     private Control _figmaLayoutRoot = null!;
     private TextureRect? _backgroundTextureRect;
     private SectMapViewSystem? _sectMapRenderer;
+    private AudioStreamPlayer? _hoverSfxPlayer;
+    private ulong _lastHoverSfxTicks;
 
     private Button? _figmaBuildAgricultureButton;
     private Button? _figmaBuildWorkshopButton;
@@ -142,6 +150,7 @@ public partial class Main : Control
     {
         InitializeClientSettings();
         BindUiNodes();
+        InitializeHoverSfx();
         BindBackgroundResizeEvents();
         ConfigureDualMapMode();
         CreateSettingsPanel();
@@ -166,6 +175,7 @@ public partial class Main : Control
 
         _sectMapRenderer?.SetResidentClock(_gameLoop.State.GameMinutes, GetCurrentTimeScaleFloat());
         UpdateCalendarUi();
+        RefreshMapZoomUi();
     }
 
     public override void _ExitTree()
@@ -594,10 +604,8 @@ public partial class Main : Control
         _eventPanelButton = GetNode<Button>($"{CenterTopTabRowPath}/EventPanelButton");
         _reportPanelButton = GetNode<Button>($"{CenterTopTabRowPath}/ReportPanelButton");
         _expeditionMapButton = GetNode<Button>($"{CenterTopTabRowPath}/ExpeditionMapButton");
-        _mapZoomOutButton = GetNode<Button>($"{CenterTopTabRowPath}/MapZoomOutButton");
-        _mapZoomInButton = GetNode<Button>($"{CenterTopTabRowPath}/MapZoomInButton");
         _mapZoomResetButton = GetNode<Button>($"{CenterTopTabRowPath}/MapZoomResetButton");
-        _mapZoomLabel = GetNode<Label>($"{CenterTopTabRowPath}/MapZoomLabel");
+        _mapZoomSlider = GetNode<HSlider>($"{CenterTopTabRowPath}/MapZoomSlider");
         BindMapOperationalLegacyNodes();
 
         _worldMapView = GetNode<Control>($"{CenterMapPagesPath}/WorldMapView");
@@ -662,10 +670,8 @@ public partial class Main : Control
         _eventPanelButton = null;
         _reportPanelButton = null;
         _expeditionMapButton = null;
-        _mapZoomOutButton = null;
-        _mapZoomInButton = null;
         _mapZoomResetButton = null;
-        _mapZoomLabel = null;
+        _mapZoomSlider = null;
         _worldMapView = null;
         _prefectureMapView = null;
         _countyTownMapView = null;
@@ -736,11 +742,14 @@ public partial class Main : Control
             _expeditionMapButton.Pressed += () => SetMapTab(MapTab.Expedition);
         }
 
-        if (_mapZoomOutButton != null && _mapZoomInButton != null && _mapZoomResetButton != null)
+        if (_mapZoomResetButton != null)
         {
-            _mapZoomOutButton.Pressed += () => AdjustCurrentMapZoom(-MapZoomStep);
-            _mapZoomInButton.Pressed += () => AdjustCurrentMapZoom(MapZoomStep);
             _mapZoomResetButton.Pressed += ResetCurrentMapZoom;
+        }
+
+        if (_mapZoomSlider != null)
+        {
+            _mapZoomSlider.ValueChanged += OnMapZoomSliderChanged;
         }
 
         BindMapOperationalEvents();
@@ -1017,24 +1026,68 @@ public partial class Main : Control
 
     private void RefreshMapZoomUi()
     {
-        if (_mapZoomOutButton == null || _mapZoomInButton == null || _mapZoomResetButton == null || _mapZoomLabel == null)
+        if (_mapZoomResetButton == null || _mapZoomSlider == null)
         {
             return;
         }
 
         var mapView = GetActiveMapZoomView();
         var canZoom = mapView != null;
-        _mapZoomOutButton.Disabled = !canZoom;
-        _mapZoomInButton.Disabled = !canZoom;
         _mapZoomResetButton.Disabled = !canZoom;
+        _mapZoomSlider.Editable = canZoom;
 
         if (!canZoom || mapView == null)
         {
-            _mapZoomLabel.Text = "--";
+            SetMapZoomSliderValue(0.0);
             return;
         }
 
-        _mapZoomLabel.Text = $"{(int)Mathf.Round(mapView.Zoom * 100f)}%";
+        if (!Mathf.IsEqualApprox((float)_mapZoomSlider.MinValue, mapView.MinZoom))
+        {
+            _mapZoomSlider.MinValue = mapView.MinZoom;
+        }
+
+        if (!Mathf.IsEqualApprox((float)_mapZoomSlider.MaxValue, mapView.MaxZoom))
+        {
+            _mapZoomSlider.MaxValue = mapView.MaxZoom;
+        }
+
+        SetMapZoomSliderValue(mapView.Zoom);
+        _mapZoomSlider.TooltipText = $"{(int)Mathf.Round(mapView.Zoom * 100f)}%";
+    }
+
+    private void OnMapZoomSliderChanged(double value)
+    {
+        if (_isUpdatingMapZoomSlider)
+        {
+            return;
+        }
+
+        var mapView = GetActiveMapZoomView();
+        if (mapView == null)
+        {
+            return;
+        }
+
+        mapView.SetZoom((float)value);
+        RefreshMapZoomUi();
+    }
+
+    private void SetMapZoomSliderValue(double value)
+    {
+        if (_mapZoomSlider == null)
+        {
+            return;
+        }
+
+        if (Math.Abs(_mapZoomSlider.Value - value) < 0.0001)
+        {
+            return;
+        }
+
+        _isUpdatingMapZoomSlider = true;
+        _mapZoomSlider.Value = value;
+        _isUpdatingMapZoomSlider = false;
     }
 
     private void BindJobButtons(JobType jobType, string minusButtonPath, string plusButtonPath)
@@ -1290,6 +1343,17 @@ public partial class Main : Control
         foreach (var button in buttons)
         {
             button.SelfModulate = BaseButtonModulate;
+            UpdateButtonHoverPivot(button);
+            button.Resized += () => UpdateButtonHoverPivot(button);
+            if (!_buttonBaseScales.ContainsKey(button))
+            {
+                _buttonBaseScales[button] = button.Scale;
+            }
+            if (button is OptionButton optionButton)
+            {
+                StyleOptionPopup(optionButton);
+                RegisterOptionButtonHoverLock(optionButton);
+            }
             button.MouseEntered += () => StartLanternPulse(button);
             button.MouseExited += () => StopLanternPulse(button);
             button.FocusEntered += () => StartLanternPulse(button);
@@ -1313,27 +1377,46 @@ public partial class Main : Control
     private void StartLanternPulse(Button button)
     {
         StopLanternPulse(button, smoothReset: false);
+        UpdateButtonHoverPivot(button);
+        PlayHoverSfx();
+
+        if (!_buttonBaseScales.TryGetValue(button, out var baseScale))
+        {
+            baseScale = button.Scale;
+            _buttonBaseScales[button] = baseScale;
+        }
 
         var tween = CreateTween();
         tween.SetTrans(Tween.TransitionType.Sine);
         tween.SetEase(Tween.EaseType.InOut);
-        tween.SetLoops();
-        tween.TweenProperty(button, "self_modulate", LanternGlowModulate, LanternPulseDurationSeconds);
-        tween.TweenProperty(button, "self_modulate", BaseButtonModulate, LanternPulseDurationSeconds);
+        tween.TweenProperty(button, "scale", baseScale * LanternHoverScale, LanternPulseDurationSeconds);
+        tween.Parallel().TweenProperty(button, "self_modulate", LanternHoverModulate, LanternPulseDurationSeconds);
 
         _buttonPulseTweens[button] = tween;
     }
 
     private void StopLanternPulse(Button button, bool smoothReset = true)
     {
+        if (_hoverLockedButtons.Contains(button))
+        {
+            return;
+        }
+
         if (_buttonPulseTweens.TryGetValue(button, out var tween))
         {
             tween.Kill();
             _buttonPulseTweens.Remove(button);
         }
 
+        if (!_buttonBaseScales.TryGetValue(button, out var baseScale))
+        {
+            baseScale = Vector2.One;
+            _buttonBaseScales[button] = baseScale;
+        }
+
         if (!smoothReset)
         {
+            button.Scale = baseScale;
             button.SelfModulate = BaseButtonModulate;
             return;
         }
@@ -1341,7 +1424,160 @@ public partial class Main : Control
         var resetTween = CreateTween();
         resetTween.SetTrans(Tween.TransitionType.Sine);
         resetTween.SetEase(Tween.EaseType.Out);
-        resetTween.TweenProperty(button, "self_modulate", BaseButtonModulate, LanternResetDurationSeconds);
+        resetTween.TweenProperty(button, "scale", baseScale, LanternResetDurationSeconds);
+        resetTween.Parallel().TweenProperty(button, "self_modulate", BaseButtonModulate, LanternResetDurationSeconds);
+    }
+
+    private static void UpdateButtonHoverPivot(Button button)
+    {
+        if (button == null)
+        {
+            return;
+        }
+
+        button.PivotOffset = button.Size * 0.5f;
+    }
+
+    private void RegisterOptionButtonHoverLock(OptionButton optionButton)
+    {
+        var popup = optionButton.GetPopup();
+        optionButton.ButtonDown += () => LockOptionButtonHover(optionButton);
+        optionButton.Pressed += () => LockOptionButtonHover(optionButton);
+        popup.AboutToPopup += () =>
+        {
+            LockOptionButtonHover(optionButton);
+            AlignOptionPopup(optionButton, popup);
+        };
+        popup.PopupHide += () =>
+        {
+            _hoverLockedButtons.Remove(optionButton);
+            StopLanternPulse(optionButton);
+        };
+    }
+
+    private static void StyleOptionPopup(OptionButton optionButton)
+    {
+        var popup = optionButton.GetPopup();
+        popup.AddThemeStyleboxOverride("panel", CreateDropdownPanelStyle());
+        popup.AddThemeStyleboxOverride("hover", CreateDropdownHoverStyle());
+        popup.AddThemeStyleboxOverride("separator", CreateDropdownSeparatorStyle());
+        popup.AddThemeColorOverride("font_color", DropdownInkColor);
+        popup.AddThemeColorOverride("font_hover_color", DropdownPaperColor);
+        popup.AddThemeColorOverride("font_disabled_color", new Color(DropdownInkColor.R, DropdownInkColor.G, DropdownInkColor.B, 0.45f));
+    }
+
+    private void LockOptionButtonHover(OptionButton optionButton)
+    {
+        _hoverLockedButtons.Add(optionButton);
+        EnsureHoverVisual(optionButton);
+    }
+
+    private void EnsureHoverVisual(Button button)
+    {
+        UpdateButtonHoverPivot(button);
+
+        if (_buttonPulseTweens.TryGetValue(button, out var tween))
+        {
+            tween.Kill();
+            _buttonPulseTweens.Remove(button);
+        }
+
+        if (!_buttonBaseScales.TryGetValue(button, out var baseScale))
+        {
+            baseScale = button.Scale;
+            _buttonBaseScales[button] = baseScale;
+        }
+
+        button.Scale = baseScale * LanternHoverScale;
+        button.SelfModulate = LanternHoverModulate;
+    }
+
+    private static void AlignOptionPopup(OptionButton optionButton, PopupMenu popup)
+    {
+        var rect = optionButton.GetGlobalRect();
+        var targetPos = rect.Position + new Vector2(0f, rect.Size.Y);
+        var targetWidth = Mathf.RoundToInt(rect.Size.X);
+
+        popup.Position = new Vector2I(Mathf.RoundToInt(targetPos.X), Mathf.RoundToInt(targetPos.Y));
+        popup.MinSize = new Vector2I(targetWidth, Mathf.RoundToInt(popup.MinSize.Y));
+        popup.Size = new Vector2I(targetWidth, Mathf.RoundToInt(popup.Size.Y));
+    }
+
+    private static StyleBoxFlat CreateDropdownPanelStyle()
+    {
+        return new StyleBoxFlat
+        {
+            BgColor = DropdownPaperColor,
+            BorderWidthLeft = 1,
+            BorderWidthTop = 1,
+            BorderWidthRight = 1,
+            BorderWidthBottom = 1,
+            BorderColor = DropdownBorderColor,
+            ContentMarginLeft = 8,
+            ContentMarginTop = 6,
+            ContentMarginRight = 8,
+            ContentMarginBottom = 6
+        };
+    }
+
+    private static StyleBoxFlat CreateDropdownHoverStyle()
+    {
+        return new StyleBoxFlat
+        {
+            BgColor = new Color(LanternHoverModulate.R, LanternHoverModulate.G, LanternHoverModulate.B, 0.22f),
+            BorderWidthLeft = 0,
+            BorderWidthTop = 0,
+            BorderWidthRight = 0,
+            BorderWidthBottom = 0
+        };
+    }
+
+    private static StyleBoxFlat CreateDropdownSeparatorStyle()
+    {
+        return new StyleBoxFlat
+        {
+            BgColor = new Color(DropdownBorderColor.R, DropdownBorderColor.G, DropdownBorderColor.B, 0.45f),
+            BorderWidthLeft = 0,
+            BorderWidthTop = 0,
+            BorderWidthRight = 0,
+            BorderWidthBottom = 0
+        };
+    }
+
+    private void InitializeHoverSfx()
+    {
+        var stream = GD.Load<AudioStream>(HoverSfxPath);
+        if (stream == null)
+        {
+            return;
+        }
+
+        _hoverSfxPlayer = new AudioStreamPlayer
+        {
+            Name = "HoverSfxPlayer",
+            Stream = stream,
+            Bus = "Master",
+            VolumeDb = -8f
+        };
+        AddChild(_hoverSfxPlayer);
+    }
+
+    private void PlayHoverSfx()
+    {
+        if (_hoverSfxPlayer == null)
+        {
+            return;
+        }
+
+        var now = Time.GetTicksMsec();
+        if (now - _lastHoverSfxTicks < HoverSfxCooldownMs)
+        {
+            return;
+        }
+
+        _lastHoverSfxTicks = now;
+        _hoverSfxPlayer.Stop();
+        _hoverSfxPlayer.Play();
     }
 }
 

@@ -19,6 +19,8 @@ public partial class Main
         }
 
         _disciplePanel = panelScene.Instantiate<DisciplePanel>();
+        _disciplePanel.Opened += OnDisciplePanelOpened;
+        _disciplePanel.Closed += OnDisciplePanelClosed;
         AddChild(_disciplePanel);
         MoveChild(_disciplePanel, GetChildCount() - 1);
     }
@@ -59,6 +61,16 @@ public partial class Main
         _disciplePanel?.RefreshState(state);
     }
 
+    private void OnDisciplePanelOpened()
+    {
+        SetDiscipleQuickButtonState(true);
+    }
+
+    private void OnDisciplePanelClosed()
+    {
+        SetDiscipleQuickButtonState(false);
+    }
+
     private void UnbindDisciplePanelEvents()
     {
         var disciplePanelButton = GetDisciplePanelButton();
@@ -71,6 +83,14 @@ public partial class Main
         {
             _sectMapRenderer.DiscipleInspectionRequested -= OpenDisciplePanelForMapSelection;
         }
+
+        if (_disciplePanel == null)
+        {
+            return;
+        }
+
+        _disciplePanel.Opened -= OnDisciplePanelOpened;
+        _disciplePanel.Closed -= OnDisciplePanelClosed;
     }
 
     private Button? GetDisciplePanelButton()
@@ -87,5 +107,17 @@ public partial class Main
         }
 
         return GetNodeOrNull<Button>($"{CenterTopTabRowPath}/DisciplePanelButton");
+    }
+
+    private void SetDiscipleQuickButtonState(bool pressed)
+    {
+        var bottomQuickButton = GetDisciplePanelButton();
+        if (bottomQuickButton == null)
+        {
+            return;
+        }
+
+        bottomQuickButton.ToggleMode = true;
+        bottomQuickButton.ButtonPressed = pressed;
     }
 }

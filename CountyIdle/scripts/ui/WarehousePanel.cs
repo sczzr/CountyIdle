@@ -125,6 +125,7 @@ public partial class WarehousePanel : PopupPanelBase
 	private Label _capacityValueLabel = null!;
 	private ScrollContainer _inventoryScroll = null!;
 	private GridContainer _inventoryGrid = null!;
+	private PanelContainer _resourceSlotTemplate = null!;
 	private Label _tierZeroChainStatusValue = null!;
 	private Button _allTabButton = null!;
 	private Button _basicTabButton = null!;
@@ -172,6 +173,7 @@ public partial class WarehousePanel : PopupPanelBase
 		_capacityValueLabel = GetNode<Label>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/StatusRow/CapacityValueLabel");
 		_inventoryScroll = GetNode<ScrollContainer>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/InventoryScroll");
 		_inventoryGrid = GetNode<GridContainer>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/InventoryScroll/InventoryGrid");
+		_resourceSlotTemplate = GetNode<PanelContainer>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/ResourceSlotTemplate");
 		_tierZeroChainStatusValue = GetNode<Label>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection/ChainInfoFrame/ChainInfoMargin/TierZeroStatusValue");
 		_allTabButton = GetNode<Button>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/TabRow/AllTabButton");
 		_basicTabButton = GetNode<Button>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/TabRow/BasicTabButton");
@@ -192,6 +194,8 @@ public partial class WarehousePanel : PopupPanelBase
 		_tabButtons[InventoryTab.Basic] = _basicTabButton;
 		_tabButtons[InventoryTab.Materials] = _materialsTabButton;
 		_tabButtons[InventoryTab.Crafted] = _craftedTabButton;
+
+		_resourceSlotTemplate.Visible = false;
 
 		ApplyStaticStyles();
 		BuildInventoryGrid();
@@ -454,84 +458,36 @@ public partial class WarehousePanel : PopupPanelBase
 
 	private Control CreateResourceSlot(ResourceSlotDefinition slot)
 	{
-		var card = new PanelContainer
-		{
-			CustomMinimumSize = new Vector2(0, 72),
-			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
-		};
+		var card = (PanelContainer)_resourceSlotTemplate.Duplicate();
+		card.Visible = true;
 		card.AddThemeStyleboxOverride("panel", CreateSlotStyle());
 
-		var margin = new MarginContainer();
-		margin.AddThemeConstantOverride("margin_left", 12);
-		margin.AddThemeConstantOverride("margin_top", 10);
-		margin.AddThemeConstantOverride("margin_right", 12);
-		margin.AddThemeConstantOverride("margin_bottom", 10);
-		card.AddChild(margin);
+		var token = card.GetNode<PanelContainer>("SlotMargin/SlotRow/Token");
+		var tokenCenter = card.GetNode<CenterContainer>("SlotMargin/SlotRow/Token/TokenCenter");
+		var tokenGlyph = card.GetNode<Label>("SlotMargin/SlotRow/Token/TokenCenter/TokenGlyph");
+		var nameLabel = card.GetNode<Label>("SlotMargin/SlotRow/InfoColumn/NameLabel");
+		var typeLabel = card.GetNode<Label>("SlotMargin/SlotRow/InfoColumn/TypeLabel");
+		var amountLabel = card.GetNode<Label>("SlotMargin/SlotRow/AmountLabel");
 
-		var row = new HBoxContainer
-		{
-			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
-		};
-		row.AddThemeConstantOverride("separation", 12);
-		margin.AddChild(row);
-
-		var token = new PanelContainer
-		{
-			CustomMinimumSize = new Vector2(48, 48)
-		};
 		token.AddThemeStyleboxOverride("panel", CreateTokenStyle(slot.AccentColor));
-		row.AddChild(token);
 
-		var tokenCenter = new CenterContainer();
-		tokenCenter.SetAnchorsPreset(LayoutPreset.FullRect);
 		tokenCenter.MouseFilter = MouseFilterEnum.Ignore;
-		token.AddChild(tokenCenter);
-
-		var tokenGlyph = new Label
-		{
-			Text = GetTokenGlyph(slot),
-			HorizontalAlignment = HorizontalAlignment.Center,
-			VerticalAlignment = VerticalAlignment.Center,
-			MouseFilter = MouseFilterEnum.Ignore
-		};
+		tokenGlyph.MouseFilter = MouseFilterEnum.Ignore;
+		tokenGlyph.Text = GetTokenGlyph(slot);
 		tokenGlyph.AddThemeFontSizeOverride("font_size", 20);
 		tokenGlyph.AddThemeColorOverride("font_color", PaperMainColor);
-		tokenCenter.AddChild(tokenGlyph);
 
-		var infoColumn = new VBoxContainer
-		{
-			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
-		};
-		infoColumn.AddThemeConstantOverride("separation", 2);
-		row.AddChild(infoColumn);
-
-		var nameLabel = new Label
-		{
-			Text = slot.DisplayName,
-			AutowrapMode = TextServer.AutowrapMode.WordSmart
-		};
+		nameLabel.Text = slot.DisplayName;
 		nameLabel.AddThemeFontSizeOverride("font_size", 17);
 		nameLabel.AddThemeColorOverride("font_color", InkMainColor);
-		infoColumn.AddChild(nameLabel);
 
-		var typeLabel = new Label
-		{
-			Text = GetGroupLabel(slot.Group),
-			AutowrapMode = TextServer.AutowrapMode.WordSmart
-		};
+		typeLabel.Text = GetGroupLabel(slot.Group);
 		typeLabel.AddThemeFontSizeOverride("font_size", 11);
 		typeLabel.AddThemeColorOverride("font_color", InkMutedColor);
-		infoColumn.AddChild(typeLabel);
 
-		var amountLabel = new Label
-		{
-			Text = "0",
-			HorizontalAlignment = HorizontalAlignment.Right,
-			VerticalAlignment = VerticalAlignment.Center
-		};
+		amountLabel.Text = "0";
 		amountLabel.AddThemeFontSizeOverride("font_size", 24);
 		amountLabel.AddThemeColorOverride("font_color", InkMainColor);
-		row.AddChild(amountLabel);
 
 		_slotBindings.Add(new ResourceSlotBinding(slot, card, token, tokenGlyph, nameLabel, typeLabel, amountLabel));
 		return card;

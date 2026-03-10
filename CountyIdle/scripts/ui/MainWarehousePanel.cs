@@ -27,6 +27,8 @@ public partial class Main
         _warehousePanel.BuildMasonryChainRequested += OnWarehouseBuildMasonryChainRequested;
         _warehousePanel.BuildMedicinalChainRequested += OnWarehouseBuildMedicinalChainRequested;
         _warehousePanel.BuildFiberChainRequested += OnWarehouseBuildFiberChainRequested;
+        _warehousePanel.Opened += OnWarehousePanelOpened;
+        _warehousePanel.Closed += OnWarehousePanelClosed;
         AddChild(_warehousePanel);
         MoveChild(_warehousePanel, GetChildCount() - 1);
     }
@@ -97,6 +99,16 @@ public partial class Main
         _gameLoop.BuildTierZeroChain(TierZeroMaterialChainType.Fiber);
     }
 
+    private void OnWarehousePanelOpened()
+    {
+        SetWarehouseQuickButtonState(true);
+    }
+
+    private void OnWarehousePanelClosed()
+    {
+        SetWarehouseQuickButtonState(false);
+    }
+
     private void UnbindWarehousePanelEvents()
     {
         var warehousePanelButton = GetWarehousePanelButton();
@@ -118,6 +130,8 @@ public partial class Main
         _warehousePanel.BuildMasonryChainRequested -= OnWarehouseBuildMasonryChainRequested;
         _warehousePanel.BuildMedicinalChainRequested -= OnWarehouseBuildMedicinalChainRequested;
         _warehousePanel.BuildFiberChainRequested -= OnWarehouseBuildFiberChainRequested;
+        _warehousePanel.Opened -= OnWarehousePanelOpened;
+        _warehousePanel.Closed -= OnWarehousePanelClosed;
     }
 
     private Button? GetWarehousePanelButton()
@@ -134,5 +148,17 @@ public partial class Main
         }
 
         return GetNodeOrNull<Button>($"{CenterTopTabRowPath}/WarehousePanelButton");
+    }
+
+    private void SetWarehouseQuickButtonState(bool pressed)
+    {
+        var bottomQuickButton = GetWarehousePanelButton();
+        if (bottomQuickButton == null)
+        {
+            return;
+        }
+
+        bottomQuickButton.ToggleMode = true;
+        bottomQuickButton.ButtonPressed = pressed;
     }
 }

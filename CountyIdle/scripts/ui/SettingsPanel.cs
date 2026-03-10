@@ -70,6 +70,7 @@ public partial class SettingsPanel : PopupPanelBase
     private ClientSettings _editingSettings = new();
     private ShortcutAction _pendingShortcutAction = ShortcutAction.None;
 
+    public event Action<ClientSettings>? PreviewRequested;
     public event Action<ClientSettings>? ApplyRequested;
 
     public override void _Ready()
@@ -198,7 +199,8 @@ public partial class SettingsPanel : PopupPanelBase
         _closeButton.Pressed += OnCloseRequested;
         _cancelButton.Pressed += OnCloseRequested;
         _applyButton.Pressed += OnApplyPressed;
-        _volumeSlider.ValueChanged += value => _volumeValueLabel.Text = $"{value:0}%";
+        _volumeSlider.ValueChanged += OnVolumeSliderChanged;
+        _resolutionOption.ItemSelected += OnResolutionSelected;
 
         _openSettingsKeyButton.Pressed += () => BeginShortcutCapture(ShortcutAction.OpenSettings);
         _openWarehouseKeyButton.Pressed += () => BeginShortcutCapture(ShortcutAction.OpenWarehouse);
@@ -228,6 +230,8 @@ public partial class SettingsPanel : PopupPanelBase
 
         foreach (var label in new[]
                  {
+                     GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/InstantHeader"),
+                     GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/SavedHeader"),
                      GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/LanguageRow/LanguageLabel"),
                      GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ResolutionRow/ResolutionLabel"),
                      GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/FontScaleRow/FontScaleLabel"),
@@ -243,7 +247,8 @@ public partial class SettingsPanel : PopupPanelBase
                  })
         {
             label.AddThemeColorOverride("font_color", InkMainColor);
-            label.AddThemeFontSizeOverride("font_size", label.Name == "ShortcutHeader" ? 16 : 14);
+            var labelName = label.Name.ToString();
+            label.AddThemeFontSizeOverride("font_size", labelName.EndsWith("Header", StringComparison.Ordinal) ? 16 : 14);
         }
 
         _volumeValueLabel.AddThemeColorOverride("font_color", InkMainColor);
@@ -404,7 +409,7 @@ public partial class SettingsPanel : PopupPanelBase
             return PopupStatusMessage!;
         }
 
-        return "校定言辞、窗格、字样、音律与符令。点选符令后可录入新键，批复后即刻生效并收录。";
+        return "窗格与音律即时生效；其余条目需批复后收录。点选符令可录入新键。";
     }
 
     private string GetShortcutActionLabel(ShortcutAction shortcutAction)
@@ -487,6 +492,34 @@ public partial class SettingsPanel : PopupPanelBase
 
         ApplyRequested?.Invoke(_editingSettings.Clone());
         ClosePopup();
+    }
+
+    private void OnVolumeSliderChanged(double value)
+    {
+        _volumeValueLabel.Text = $"{value:0}%";
+        var nextVolume = Mathf.Clamp((float)value / 100.0f, 0.0f, 1.0f);
+        if (Mathf.Abs(_editingSettings.MasterVolume - nextVolume) < 0.0001f)
+        {
+            return;
+        }
+
+        _editingSettings.MasterVolume = nextVolume;
+        PreviewRequested?.Invoke(_editingSettings.Clone());
+    }
+
+    private void OnResolutionSelected(long index)
+    {
+        var selectedIndex = Mathf.Clamp((int)index, 0, ResolutionOptions.Length - 1);
+        var selectedResolution = ResolutionOptions[selectedIndex];
+        if (_editingSettings.ResolutionWidth == selectedResolution.X &&
+            _editingSettings.ResolutionHeight == selectedResolution.Y)
+        {
+            return;
+        }
+
+        _editingSettings.ResolutionWidth = selectedResolution.X;
+        _editingSettings.ResolutionHeight = selectedResolution.Y;
+        PreviewRequested?.Invoke(_editingSettings.Clone());
     }
 
     private static void ApplyActionButtonStyle(Button button, bool destructive)

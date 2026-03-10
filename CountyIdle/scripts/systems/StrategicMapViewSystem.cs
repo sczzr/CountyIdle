@@ -14,17 +14,21 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     }
 
     private const float ZoomStep = 0.1f;
-    private const float DefaultMinZoom = 0.6f;
-    private const float DefaultMaxZoom = 2.2f;
-    private const float PrefectureMaxZoom = 5.6f;
+    private const float DefaultMinZoom = 1f;
+    private const float DefaultMaxZoom = 15.0f;
+    private const float PrefectureMaxZoom = 5.0f;
     private const float PrefectureUrbanTextureZoom = 4.0f;
-    private const double ZoomTweenDurationSeconds = 0.18;
+    private const float ZoomWheelImpulse = 0.8f;
+    private const float ZoomVelocityDamping = 8.0f;
+    private const float ZoomLerpSpeed = 10.0f;
     private const int PopulationBucketSize = 24;
     private const int HousingBucketSize = 30;
     private const int ThreatBucketSize = 8;
     private const int SettlementBucketSize = 6;
     private const float HexGridFillAlphaEven = 0.08f;
     private const float HexGridFillAlphaOdd = 0.12f;
+    private const string GeographyAtlasPath = "res://assets/ui/tilemap/tileset_geography.png";
+    private const string MountainsAtlasPath = "res://assets/ui/tilemap/tileset_mountains.png";
     private static readonly Color MapBackdropColor = new(0.09f, 0.11f, 0.16f, 0.92f);
     private static readonly Color GridColor = new(0.16f, 0.20f, 0.28f, 0.55f);
     private static readonly Color DefaultOutlineColor = new(0.82f, 0.86f, 0.96f, 0.35f);
@@ -48,15 +52,18 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     private readonly StrategicMapConfigSystem _configSystem = new();
     private readonly PrefectureMapGeneratorSystem _prefectureGenerator = new();
     private readonly XianxiaWorldGeneratorSystem _xianxiaWorldGenerator = new();
+    private readonly Color[] _hexTintColors = new Color[6];
     private StrategicMapDefinition _mapDefinition = new();
     private XianxiaWorldMapData? _xianxiaWorldMap;
     private Dictionary<(int Q, int R), XianxiaHexCellData> _xianxiaWorldCellLookup = [];
     private Dictionary<(int Q, int R), Vector2> _xianxiaWorldCenters = [];
     private float _xianxiaWorldHexRadius = 0.01f;
+    private HexAtlas5x4? _geographyAtlas;
+    private HexAtlas5x4? _mountainsAtlas;
     private Label? _titleLabel;
     private float _zoom = 1.0f;
     private float _targetZoom = 1.0f;
-    private Tween? _zoomTween;
+    private float _zoomVelocity;
     private int? _populationBucket;
     private int? _housingBucket;
     private int? _threatBucket;
@@ -72,6 +79,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     {
         ClipContents = true;
         _titleLabel = GetNodeOrNull<Label>("Label");
+        LoadAtlases();
         if (_mode == StrategicMapMode.World)
         {
             try
@@ -112,6 +120,32 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         }
     }
 
+    public override void _Process(double delta)
+    {
+        var dt = (float)delta;
+        var needsUpdate = false;
+
+        if (Mathf.Abs(_zoomVelocity) > 0.001f)
+        {
+            _targetZoom = Mathf.Clamp(_targetZoom + (_zoomVelocity * dt), MinZoom, MaxZoom);
+            _zoomVelocity = Mathf.Lerp(_zoomVelocity, 0f, dt * ZoomVelocityDamping);
+            needsUpdate = true;
+        }
+
+        var nextZoom = Mathf.Lerp(_zoom, _targetZoom, dt * ZoomLerpSpeed);
+        if (!Mathf.IsEqualApprox(nextZoom, _zoom))
+        {
+            _zoom = nextZoom;
+            needsUpdate = true;
+        }
+
+        if (needsUpdate)
+        {
+            UpdateTitle();
+            QueueRedraw();
+        }
+    }
+
     public override void _GuiInput(InputEvent @event)
     {
         if (@event is not InputEventMouseButton mouseButton || !mouseButton.Pressed)
@@ -121,12 +155,12 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
 
         if (mouseButton.ButtonIndex == MouseButton.WheelUp)
         {
-            AdjustZoom(ZoomStep);
+            AddZoomImpulse(1f);
             GetViewport().SetInputAsHandled();
         }
         else if (mouseButton.ButtonIndex == MouseButton.WheelDown)
         {
-            AdjustZoom(-ZoomStep);
+            AddZoomImpulse(-1f);
             GetViewport().SetInputAsHandled();
         }
     }
@@ -150,7 +184,14 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
             return;
         }
 
-        DrawRegions(center, unit);
+        if (_mode == StrategicMapMode.World && _xianxiaWorldMap != null && _geographyAtlas != null)
+        {
+            DrawWorldTextureCells(center, unit);
+        }
+        else
+        {
+            DrawRegions(center, unit);
+        }
         if (_mode == StrategicMapMode.Prefecture && _zoom >= PrefectureUrbanTextureZoom)
         {
             DrawPrefectureUrbanFabric(center, unit);
@@ -188,6 +229,12 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         DrawRect(mapRect, _operationalStyle.BackdropColor, true);
     }
 
+    private void LoadAtlases()
+    {
+        _geographyAtlas = HexAtlas5x4.TryLoad(GeographyAtlasPath);
+        _mountainsAtlas = HexAtlas5x4.TryLoad(MountainsAtlasPath);
+    }
+
     public void SetZoom(float zoom)
     {
         var clampedZoom = Mathf.Clamp(zoom, MinZoom, MaxZoom);
@@ -197,17 +244,19 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         }
 
         _targetZoom = clampedZoom;
-        _zoomTween?.Kill();
-        _zoomTween = CreateTween();
-        _zoomTween.SetTrans(Tween.TransitionType.Cubic);
-        _zoomTween.SetEase(Tween.EaseType.Out);
-        _zoomTween.TweenMethod(Callable.From<float>(SetAnimatedZoom), _zoom, _targetZoom, ZoomTweenDurationSeconds);
+        _zoomVelocity = 0f;
         UpdateTitle();
+        QueueRedraw();
     }
 
     public void AdjustZoom(float delta)
     {
-        SetZoom(_zoom + delta);
+        SetZoom(_targetZoom + delta);
+    }
+
+    private void AddZoomImpulse(float direction)
+    {
+        _zoomVelocity += direction * ZoomWheelImpulse;
     }
 
     public void RefreshPrefectureMap(int populationHint, int housingHint, double threatHint, int hourSettlements)
@@ -379,6 +428,139 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         }
     }
 
+    private void DrawWorldTextureCells(Vector2 center, float unit)
+    {
+        if (_xianxiaWorldMap == null || _xianxiaWorldCenters.Count == 0 || _geographyAtlas == null)
+        {
+            return;
+        }
+
+        var hexRadius = Math.Max(_xianxiaWorldHexRadius * unit, 2f);
+        var tint = _operationalStyle.TerrainTint;
+        foreach (var cell in _xianxiaWorldMap.Cells)
+        {
+            if (!_xianxiaWorldCenters.TryGetValue((cell.Coord.Q, cell.Coord.R), out var normalizedCenter))
+            {
+                continue;
+            }
+
+            var atlas = ResolveWorldAtlas(cell);
+            if (atlas == null)
+            {
+                continue;
+            }
+
+            var row = atlas == _mountainsAtlas ? ResolveMountainRow(cell) : ResolveGeographyRow(cell);
+            var col = ResolveVariantColumn(cell, 137);
+            var canvasCenter = ToCanvas(center, unit, normalizedCenter.X, normalizedCenter.Y);
+            var hex = BuildHexPolygon(canvasCenter, hexRadius);
+            DrawAtlasHex(hex, atlas, row, col, tint);
+        }
+    }
+
+    private HexAtlas5x4? ResolveWorldAtlas(XianxiaHexCellData cell)
+    {
+        if (IsMountainCell(cell))
+        {
+            return _mountainsAtlas ?? _geographyAtlas;
+        }
+
+        return _geographyAtlas;
+    }
+
+    private static bool IsMountainCell(XianxiaHexCellData cell)
+    {
+        return IsMountainTerrain(cell.Terrain) ||
+               IsMountainBiome(cell.Biome);
+    }
+
+    private static bool IsMountainTerrain(XianxiaTerrainType terrain)
+    {
+        return terrain is XianxiaTerrainType.MountainRock or
+            XianxiaTerrainType.MountainMoss or
+            XianxiaTerrainType.MountainPlateau or
+            XianxiaTerrainType.SnowPlain or
+            XianxiaTerrainType.SnowRock;
+    }
+
+    private static bool IsSnowTerrain(XianxiaTerrainType terrain)
+    {
+        return terrain is XianxiaTerrainType.SnowPlain or XianxiaTerrainType.SnowRock;
+    }
+
+    private static bool IsMountainBiome(XianxiaBiomeType biome)
+    {
+        return biome is XianxiaBiomeType.MistyMountains or
+            XianxiaBiomeType.JadeHighlands or
+            XianxiaBiomeType.SnowPeaks;
+    }
+
+    private static int ResolveMountainRow(XianxiaHexCellData cell)
+    {
+        if (IsSnowTerrain(cell.Terrain) || cell.Biome == XianxiaBiomeType.SnowPeaks)
+        {
+            return 0;
+        }
+
+        if (cell.Biome == XianxiaBiomeType.MistyMountains)
+        {
+            return 1;
+        }
+
+        if (cell.Biome == XianxiaBiomeType.JadeHighlands || cell.Terrain == XianxiaTerrainType.MountainMoss)
+        {
+            return 2;
+        }
+
+        return 3;
+    }
+
+    private static int ResolveGeographyRow(XianxiaHexCellData cell)
+    {
+        if (cell.RiverMask != HexDirectionMask.None)
+        {
+            return 1;
+        }
+
+        if (cell.Water != XianxiaWaterType.None)
+        {
+            return 2;
+        }
+
+        if (IsSnowTerrain(cell.Terrain) || cell.Biome == XianxiaBiomeType.SnowPeaks)
+        {
+            return 3;
+        }
+
+        return 0;
+    }
+
+    private static int ResolveVariantColumn(XianxiaHexCellData cell, int salt)
+    {
+        var hash = HashCell(cell.Coord.Q, cell.Coord.R, salt);
+        var variant = cell.Render?.VariantIndex ?? 0;
+        return (variant + hash) % HexAtlas5x4.Columns;
+    }
+
+    private static int HashCell(int q, int r, int salt)
+    {
+        unchecked
+        {
+            var hash = (q * 73856093) ^ (r * 19349663) ^ (salt * 83492791);
+            return hash & int.MaxValue;
+        }
+    }
+
+    private void DrawAtlasHex(Vector2[] hex, HexAtlas5x4 atlas, int row, int col, Color tint)
+    {
+        for (var index = 0; index < _hexTintColors.Length; index++)
+        {
+            _hexTintColors[index] = tint;
+        }
+
+        DrawPolygon(hex, _hexTintColors, atlas.GetUv(col, row), atlas.Texture);
+    }
+
     private float ResolveNodeRadius(StrategicNodeDefinition node)
     {
         var baseRadius = Math.Max(node.Radius, 1.8f);
@@ -485,13 +667,6 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         DrawFilledPolygon(hex, color);
         DrawPath(hex, color.Darkened(0.28f), Math.Max(radius * 0.16f, 1.0f), true);
         DrawCircle(canvasPoint, Math.Max(1.2f, radius * 0.24f), new Color(0.97f, 0.95f, 0.88f, 0.92f));
-    }
-
-    private void SetAnimatedZoom(float value)
-    {
-        _zoom = value;
-        UpdateTitle();
-        QueueRedraw();
     }
 
     private void DrawWardStreetBlock(Vector2 canvasPoint, float radius, Color color, bool verticalMainStreet, bool isMarketWard, int patternSeed)

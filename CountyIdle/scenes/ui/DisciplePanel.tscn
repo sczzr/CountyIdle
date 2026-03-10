@@ -1,10 +1,10 @@
-[gd_scene format=3 uid="uid://rqjosnanrvs7"]
+[gd_scene format=3 uid="uid://cn60pdpci5qpb"]
 
 [ext_resource type="Script" uid="uid://dis2ijq6cro48" path="res://scripts/ui/DisciplePanel.cs" id="1_disciple_panel"]
 
-[node name="DisciplePanel" type="Control"]
+[node name="DisciplePanel" type="Control" unique_id=360497384]
 visible = false
-layout_mode = 1
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -13,7 +13,7 @@ grow_vertical = 2
 mouse_filter = 1
 script = ExtResource("1_disciple_panel")
 
-[node name="Overlay" type="ColorRect" parent="."]
+[node name="Overlay" type="ColorRect" parent="." unique_id=1232459106]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -23,167 +23,166 @@ grow_vertical = 2
 mouse_filter = 1
 color = Color(0.08, 0.08, 0.08, 0.68)
 
-[node name="Wrapper" type="PanelContainer" parent="Overlay"]
+[node name="Wrapper" type="PanelContainer" parent="Overlay" unique_id=1984379057]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
 offset_left = 18.0
 offset_top = 18.0
 offset_right = -18.0
 offset_bottom = -18.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="RootColumn" type="VBoxContainer" parent="Overlay/Wrapper"]
+[node name="RootColumn" type="VBoxContainer" parent="Overlay/Wrapper" unique_id=770684674]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 0
 
-[node name="HeaderPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn"]
+[node name="HeaderPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn" unique_id=1832277387]
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 
-[node name="HeaderMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/HeaderPanel"]
+[node name="HeaderMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/HeaderPanel" unique_id=837025754]
 layout_mode = 2
 theme_override_constants/margin_left = 24
 theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 24
 theme_override_constants/margin_bottom = 10
 
-[node name="HeaderRow" type="HBoxContainer" parent="Overlay/Wrapper/RootColumn/HeaderPanel/HeaderMargin"]
+[node name="HeaderRow" type="HBoxContainer" parent="Overlay/Wrapper/RootColumn/HeaderPanel/HeaderMargin" unique_id=1988357451]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="TitleColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/HeaderPanel/HeaderMargin/HeaderRow"]
+[node name="TitleColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/HeaderPanel/HeaderMargin/HeaderRow" unique_id=171679307]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 2
 
-[node name="TitleLabel" type="Label" parent="Overlay/Wrapper/RootColumn/HeaderPanel/HeaderMargin/HeaderRow/TitleColumn"]
+[node name="TitleLabel" type="Label" parent="Overlay/Wrapper/RootColumn/HeaderPanel/HeaderMargin/HeaderRow/TitleColumn" unique_id=567569251]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "浮云宗 · 弟子谱"
 
-[node name="SubtitleLabel" type="Label" parent="Overlay/Wrapper/RootColumn/HeaderPanel/HeaderMargin/HeaderRow/TitleColumn"]
+[node name="SubtitleLabel" type="Label" parent="Overlay/Wrapper/RootColumn/HeaderPanel/HeaderMargin/HeaderRow/TitleColumn" unique_id=1748855171]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "卷中分峰录名，可按峰脉、职司和修为检索门人根基。"
 
-[node name="CloseButton" type="Button" parent="Overlay/Wrapper/RootColumn/HeaderPanel/HeaderMargin/HeaderRow"]
+[node name="CloseButton" type="Button" parent="Overlay/Wrapper/RootColumn/HeaderPanel/HeaderMargin/HeaderRow" unique_id=676425911]
 layout_mode = 2
 text = "×"
 
-[node name="HeaderDivider" type="ColorRect" parent="Overlay/Wrapper/RootColumn"]
-layout_mode = 2
+[node name="HeaderDivider" type="ColorRect" parent="Overlay/Wrapper/RootColumn" unique_id=1894599060]
 custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
 color = Color(0.478431, 0.478431, 0.478431, 0.55)
 
-[node name="BodyRow" type="HBoxContainer" parent="Overlay/Wrapper/RootColumn"]
+[node name="BodyRow" type="HBoxContainer" parent="Overlay/Wrapper/RootColumn" unique_id=935795070]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 0
 
-[node name="LeftPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow"]
+[node name="LeftPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow" unique_id=766985752]
 custom_minimum_size = Vector2(360, 0)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="LeftMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel"]
+[node name="LeftMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel" unique_id=1500759486]
 layout_mode = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
 
-[node name="RosterColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin"]
+[node name="RosterColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin" unique_id=944425175]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 12
 
-[node name="SummaryPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn"]
+[node name="SummaryPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn" unique_id=1741391259]
 layout_mode = 2
 
-[node name="SummaryMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/SummaryPanel"]
+[node name="SummaryMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/SummaryPanel" unique_id=491334277]
 layout_mode = 2
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 10
 
-[node name="SummaryColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/SummaryPanel/SummaryMargin"]
+[node name="SummaryColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/SummaryPanel/SummaryMargin" unique_id=1285993673]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="SummaryTitle" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/SummaryPanel/SummaryMargin/SummaryColumn"]
+[node name="SummaryTitle" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/SummaryPanel/SummaryMargin/SummaryColumn" unique_id=2022861927]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "卷首批注"
 
-[node name="SummaryLabel" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/SummaryPanel/SummaryMargin/SummaryColumn"]
+[node name="SummaryLabel" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/SummaryPanel/SummaryMargin/SummaryColumn" unique_id=661583047]
 layout_mode = 2
 
-[node name="GovernanceLabel" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/SummaryPanel/SummaryMargin/SummaryColumn"]
+[node name="GovernanceLabel" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/SummaryPanel/SummaryMargin/SummaryColumn" unique_id=959265064]
 layout_mode = 2
 
-[node name="FilterPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn"]
+[node name="FilterPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn" unique_id=5984187]
 layout_mode = 2
 
-[node name="FilterMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/FilterPanel"]
+[node name="FilterMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/FilterPanel" unique_id=250356657]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 8
 
-[node name="FilterColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/FilterPanel/FilterMargin"]
+[node name="FilterColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/FilterPanel/FilterMargin" unique_id=1250861816]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="FilterOption" type="OptionButton" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/FilterPanel/FilterMargin/FilterColumn"]
+[node name="FilterOption" type="OptionButton" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/FilterPanel/FilterMargin/FilterColumn" unique_id=4925317]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="SortOption" type="OptionButton" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/FilterPanel/FilterMargin/FilterColumn"]
+[node name="SortOption" type="OptionButton" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/FilterPanel/FilterMargin/FilterColumn" unique_id=631010105]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="RosterFrame" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn"]
+[node name="RosterFrame" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn" unique_id=953342034]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="RosterMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/RosterFrame"]
+[node name="RosterMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/RosterFrame" unique_id=139661528]
 layout_mode = 2
 theme_override_constants/margin_left = 6
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
 
-[node name="RosterTree" type="Tree" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/RosterFrame/RosterMargin"]
-columns = 1
-hide_root = true
+[node name="RosterTree" type="Tree" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/RosterFrame/RosterMargin" unique_id=1388872930]
 custom_minimum_size = Vector2(0, 300)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+hide_root = true
 
-[node name="BodyDivider" type="ColorRect" parent="Overlay/Wrapper/RootColumn/BodyRow"]
-layout_mode = 2
+[node name="BodyDivider" type="ColorRect" parent="Overlay/Wrapper/RootColumn/BodyRow" unique_id=992367644]
 custom_minimum_size = Vector2(1, 0)
+layout_mode = 2
 size_flags_vertical = 3
 color = Color(0.478431, 0.478431, 0.478431, 0.32)
 
-[node name="RightPanel" type="Control" parent="Overlay/Wrapper/RootColumn/BodyRow"]
+[node name="RightPanel" type="Control" parent="Overlay/Wrapper/RootColumn/BodyRow" unique_id=324070073]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="RightMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel"]
-layout_mode = 2
+[node name="RightMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel" unique_id=1842090694]
+layout_mode = 0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/margin_left = 20
@@ -191,249 +190,411 @@ theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 16
 
-[node name="RightColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin"]
+[node name="RightColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin" unique_id=1346104800]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 14
 
-[node name="ProfilePanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn"]
+[node name="ProfilePanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn" unique_id=1129424395]
 layout_mode = 2
 
-[node name="ProfileMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel"]
+[node name="ProfileMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel" unique_id=1727514857]
 layout_mode = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 14
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 14
 
-[node name="ProfileHeader" type="GridContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin"]
-columns = 2
+[node name="ProfileHeader" type="GridContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin" unique_id=1311748949]
 layout_mode = 2
 theme_override_constants/h_separation = 14
 theme_override_constants/v_separation = 6
+columns = 2
 
-[node name="ProfileName" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader"]
+[node name="ProfileName" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader" unique_id=1413304954]
 layout_mode = 2
 theme_override_font_sizes/font_size = 26
 
-[node name="RootCircle" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader"]
+[node name="RootCircle" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader" unique_id=1723818615]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 
-[node name="RootCircleLabel" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader/RootCircle"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="RootCircleLabel" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader/RootCircle" unique_id=945783154]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
-theme_override_font_sizes/font_size = 12
 
-[node name="ProfileMeta" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader"]
+[node name="ProfileMeta" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader" unique_id=392714456]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 
-[node name="ProfileMetaSpacer" type="Control" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader"]
+[node name="ProfileMetaSpacer" type="Control" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader" unique_id=1734482063]
 layout_mode = 2
 
-[node name="ProfileStatus" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader"]
+[node name="ProfileStatus" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader" unique_id=1701864083]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 
-[node name="ProfileStatusSpacer" type="Control" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader"]
+[node name="ProfileStatusSpacer" type="Control" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader" unique_id=1694858979]
 layout_mode = 2
 
-[node name="DashboardRow" type="HBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn"]
+[node name="DashboardRow" type="HBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn" unique_id=57500561]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 24
 
-[node name="FoundationPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow"]
+[node name="FoundationPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow" unique_id=442415935]
 custom_minimum_size = Vector2(420, 0)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="FoundationMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel"]
+[node name="FoundationMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel" unique_id=687004032]
 layout_mode = 2
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 16
 
-[node name="FoundationColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin"]
+[node name="FoundationColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin" unique_id=903589452]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="FoundationTitle" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn"]
+[node name="FoundationTitle" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn" unique_id=791957738]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "先天根基评估"
 
-[node name="RadarCenter" type="CenterContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn"]
+[node name="RadarCenter" type="CenterContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn" unique_id=1275796685]
 custom_minimum_size = Vector2(0, 220)
 layout_mode = 2
 
-[node name="StatsCenter" type="CenterContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn"]
+[node name="StatsCenter" type="CenterContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn" unique_id=696345356]
 layout_mode = 2
 
-[node name="MetricGrid" type="GridContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter"]
-columns = 3
+[node name="MetricGrid" type="GridContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter" unique_id=1546340281]
 custom_minimum_size = Vector2(330, 0)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_constants/h_separation = 12
 theme_override_constants/v_separation = 12
+columns = 3
 
-[node name="CultivationPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow"]
+[node name="InsightTile" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid" unique_id=562946758]
+custom_minimum_size = Vector2(96, 78)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="InsightMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/InsightTile" unique_id=2042640726]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="InsightColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/InsightTile/InsightMargin" unique_id=406597907]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="InsightTitle" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/InsightTile/InsightMargin/InsightColumn" unique_id=1130622091]
+layout_mode = 2
+text = "悟性"
+horizontal_alignment = 1
+
+[node name="InsightValue" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/InsightTile/InsightMargin/InsightColumn" unique_id=1773474916]
+layout_mode = 2
+text = "0"
+horizontal_alignment = 1
+
+[node name="PotentialTile" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid" unique_id=47727931]
+custom_minimum_size = Vector2(96, 78)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="PotentialMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/PotentialTile" unique_id=1727614994]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="PotentialColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/PotentialTile/PotentialMargin" unique_id=958374804]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="PotentialTitle" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/PotentialTile/PotentialMargin/PotentialColumn" unique_id=1745263483]
+layout_mode = 2
+text = "潜力"
+horizontal_alignment = 1
+
+[node name="PotentialValue" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/PotentialTile/PotentialMargin/PotentialColumn" unique_id=400929408]
+layout_mode = 2
+text = "0"
+horizontal_alignment = 1
+
+[node name="HealthTile" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid" unique_id=930052229]
+custom_minimum_size = Vector2(96, 78)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="HealthMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/HealthTile" unique_id=307908567]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="HealthColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/HealthTile/HealthMargin" unique_id=75978708]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="HealthTitle" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/HealthTile/HealthMargin/HealthColumn" unique_id=614104437]
+layout_mode = 2
+text = "根骨"
+horizontal_alignment = 1
+
+[node name="HealthValue" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/HealthTile/HealthMargin/HealthColumn" unique_id=519031212]
+layout_mode = 2
+text = "0"
+horizontal_alignment = 1
+
+[node name="CraftTile" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid" unique_id=1859420627]
+custom_minimum_size = Vector2(96, 78)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="CraftMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/CraftTile" unique_id=1290881531]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="CraftColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/CraftTile/CraftMargin" unique_id=1084518606]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CraftTitle" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/CraftTile/CraftMargin/CraftColumn" unique_id=1788031128]
+layout_mode = 2
+text = "匠艺"
+horizontal_alignment = 1
+
+[node name="CraftValue" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/CraftTile/CraftMargin/CraftColumn" unique_id=2042625237]
+layout_mode = 2
+text = "0"
+horizontal_alignment = 1
+
+[node name="MoodTile" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid" unique_id=504443108]
+custom_minimum_size = Vector2(96, 78)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="MoodMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/MoodTile" unique_id=1894573754]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="MoodColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/MoodTile/MoodMargin" unique_id=575913811]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="MoodTitle" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/MoodTile/MoodMargin/MoodColumn" unique_id=1158589080]
+layout_mode = 2
+text = "神魂"
+horizontal_alignment = 1
+
+[node name="MoodValue" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/MoodTile/MoodMargin/MoodColumn" unique_id=649189207]
+layout_mode = 2
+text = "0"
+horizontal_alignment = 1
+
+[node name="HeartStateTile" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid" unique_id=682102455]
+custom_minimum_size = Vector2(96, 78)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="HeartStateMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/HeartStateTile" unique_id=1420901328]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="HeartStateColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/HeartStateTile/HeartStateMargin" unique_id=1663167114]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="HeartStateTitle" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/HeartStateTile/HeartStateMargin/HeartStateColumn" unique_id=1492308652]
+layout_mode = 2
+text = "心境"
+horizontal_alignment = 1
+
+[node name="HeartStateValue" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/HeartStateTile/HeartStateMargin/HeartStateColumn" unique_id=413943939]
+layout_mode = 2
+text = "0"
+horizontal_alignment = 1
+
+[node name="CultivationPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow" unique_id=2004348307]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="CultivationMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel"]
+[node name="CultivationMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel" unique_id=817749933]
 layout_mode = 2
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 16
 
-[node name="CultivationColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin"]
+[node name="CultivationColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin" unique_id=1457429121]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="CultivationTitle" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn"]
+[node name="CultivationTitle" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn" unique_id=1593557732]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "修为与造化"
 
-[node name="RealmBox" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn"]
+[node name="RealmBox" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn" unique_id=720990159]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="RealmTitle" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/RealmBox"]
+[node name="RealmTitle" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/RealmBox" unique_id=1931053874]
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 text = "修为境界"
 
-[node name="RealmStatus" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/RealmBox"]
+[node name="RealmStatus" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/RealmBox" unique_id=477675971]
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 
-[node name="RealmProgress" type="ProgressBar" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/RealmBox"]
+[node name="RealmProgress" type="ProgressBar" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/RealmBox" unique_id=1057806342]
 layout_mode = 2
-max_value = 100.0
-value = 0.0
 show_percentage = false
 
-[node name="RealmHint" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/RealmBox"]
+[node name="RealmHint" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/RealmBox" unique_id=2046322782]
 layout_mode = 2
 theme_override_font_sizes/font_size = 11
 
-[node name="QiSeaBox" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn"]
+[node name="QiSeaBox" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn" unique_id=1570344902]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="QiSeaTitle" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/QiSeaBox"]
+[node name="QiSeaTitle" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/QiSeaBox" unique_id=344158845]
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 text = "灵力储备（气海）"
 
-[node name="QiSeaProgress" type="ProgressBar" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/QiSeaBox"]
+[node name="QiSeaProgress" type="ProgressBar" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/QiSeaBox" unique_id=824783127]
 layout_mode = 2
-max_value = 100.0
-value = 0.0
 show_percentage = false
 
-[node name="QiSeaHint" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/QiSeaBox"]
+[node name="QiSeaHint" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/QiSeaBox" unique_id=28438575]
 layout_mode = 2
 theme_override_font_sizes/font_size = 11
 
-[node name="CombatTag" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn"]
+[node name="CombatTag" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn" unique_id=1159818097]
 layout_mode = 2
 
-[node name="CombatMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/CombatTag"]
+[node name="CombatMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/CombatTag" unique_id=774741798]
 layout_mode = 2
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 10
 
-[node name="CombatColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/CombatTag/CombatMargin"]
+[node name="CombatColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/CombatTag/CombatMargin" unique_id=1193188364]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="CombatTitle" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/CombatTag/CombatMargin/CombatColumn"]
+[node name="CombatTitle" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/CombatTag/CombatMargin/CombatColumn" unique_id=140937394]
 layout_mode = 2
+theme_override_font_sizes/font_size = 12
 text = "综合战力评定"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 12
 
-[node name="CombatMain" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/CombatTag/CombatMargin/CombatColumn"]
+[node name="CombatMain" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/CombatTag/CombatMargin/CombatColumn" unique_id=1968984864]
 layout_mode = 2
-horizontal_alignment = 1
 theme_override_font_sizes/font_size = 22
-
-[node name="CombatHint" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/CombatTag/CombatMargin/CombatColumn"]
-layout_mode = 2
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 12
 
-[node name="TraitPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn"]
+[node name="CombatHint" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/CombatTag/CombatMargin/CombatColumn" unique_id=1573986467]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+horizontal_alignment = 1
+
+[node name="TraitPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn" unique_id=2045313825]
 layout_mode = 2
 
-[node name="TraitMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel"]
+[node name="TraitTagTemplate" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel"]
+visible = false
+layout_mode = 2
+
+[node name="TagMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel/TraitTagTemplate"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 4
+
+[node name="TagLabel" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel/TraitTagTemplate/TagMargin"]
+layout_mode = 2
+text = "特征"
+
+[node name="TraitMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel" unique_id=176258687]
 layout_mode = 2
 theme_override_constants/margin_left = 14
 theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 14
 theme_override_constants/margin_bottom = 12
 
-[node name="TraitColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel/TraitMargin"]
+[node name="TraitColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel/TraitMargin" unique_id=227004452]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="TraitTitle" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel/TraitMargin/TraitColumn"]
+[node name="TraitTitle" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel/TraitMargin/TraitColumn" unique_id=561384426]
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 text = "性情印记"
 
-[node name="TraitFlow" type="FlowContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel/TraitMargin/TraitColumn"]
+[node name="TraitFlow" type="FlowContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel/TraitMargin/TraitColumn" unique_id=1246022305]
 layout_mode = 2
 theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 8
 
-[node name="AnnotationPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn"]
+[node name="AnnotationPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn" unique_id=801365116]
 layout_mode = 2
 
-[node name="AnnotationMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/AnnotationPanel"]
+[node name="AnnotationMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/AnnotationPanel" unique_id=1122235317]
 layout_mode = 2
 theme_override_constants/margin_left = 18
 theme_override_constants/margin_top = 14
 theme_override_constants/margin_right = 18
 theme_override_constants/margin_bottom = 14
 
-[node name="AnnotationColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/AnnotationPanel/AnnotationMargin"]
+[node name="AnnotationColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/AnnotationPanel/AnnotationMargin" unique_id=291601773]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="AnnotationHeader" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/AnnotationPanel/AnnotationMargin/AnnotationColumn"]
+[node name="AnnotationHeader" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/AnnotationPanel/AnnotationMargin/AnnotationColumn" unique_id=135734135]
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 text = "【衍天批注】"
 
-[node name="AnnotationText" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/AnnotationPanel/AnnotationMargin/AnnotationColumn"]
+[node name="AnnotationText" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/AnnotationPanel/AnnotationMargin/AnnotationColumn" unique_id=1065459550]
 layout_mode = 2
 
-[node name="FooterDivider" type="ColorRect" parent="Overlay/Wrapper/RootColumn"]
-layout_mode = 2
+[node name="FooterDivider" type="ColorRect" parent="Overlay/Wrapper/RootColumn" unique_id=1334632408]
 custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
 color = Color(0.478431, 0.478431, 0.478431, 0.35)
 
-[node name="HintLabel" type="Label" parent="Overlay/Wrapper/RootColumn"]
-layout_mode = 2
+[node name="HintLabel" type="Label" parent="Overlay/Wrapper/RootColumn" unique_id=618563016]
 custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
 vertical_alignment = 1

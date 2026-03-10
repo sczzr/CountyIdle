@@ -29,6 +29,8 @@ public partial class Main
         _taskPanel.DoctrineRuleShiftRequested += OnDoctrineRuleShiftRequested;
         _taskPanel.DisciplineRuleShiftRequested += OnDisciplineRuleShiftRequested;
         _taskPanel.ResetRequested += OnTaskOrdersResetRequested;
+        _taskPanel.Opened += OnTaskPanelOpened;
+        _taskPanel.Closed += OnTaskPanelClosed;
         AddChild(_taskPanel);
         MoveChild(_taskPanel, GetChildCount() - 1);
     }
@@ -114,6 +116,16 @@ public partial class Main
         _gameLoop.ShiftDisciplineRule(delta);
     }
 
+    private void OnTaskPanelOpened()
+    {
+        SetTaskQuickButtonState(true);
+    }
+
+    private void OnTaskPanelClosed()
+    {
+        SetTaskQuickButtonState(false);
+    }
+
     private void UnbindTaskPanelEvents()
     {
         var taskPanelButton = GetTaskPanelButton();
@@ -136,6 +148,8 @@ public partial class Main
         _taskPanel.DoctrineRuleShiftRequested -= OnDoctrineRuleShiftRequested;
         _taskPanel.DisciplineRuleShiftRequested -= OnDisciplineRuleShiftRequested;
         _taskPanel.ResetRequested -= OnTaskOrdersResetRequested;
+        _taskPanel.Opened -= OnTaskPanelOpened;
+        _taskPanel.Closed -= OnTaskPanelClosed;
     }
 
     private Button? GetTaskPanelButton()
@@ -152,5 +166,17 @@ public partial class Main
         }
 
         return GetNodeOrNull<Button>($"{CenterTopTabRowPath}/TaskPanelButton");
+    }
+
+    private void SetTaskQuickButtonState(bool pressed)
+    {
+        var bottomQuickButton = GetTaskPanelButton();
+        if (bottomQuickButton == null)
+        {
+            return;
+        }
+
+        bottomQuickButton.ToggleMode = true;
+        bottomQuickButton.ButtonPressed = pressed;
     }
 }

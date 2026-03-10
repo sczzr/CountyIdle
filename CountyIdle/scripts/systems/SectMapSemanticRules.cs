@@ -133,6 +133,6 @@ public static class SectMapSemanticRules
 
     public static string GetMapInteractionHint()
     {
-        return "左键选中浮云宗场所查看状态 · 右键取消选中";
+        return "当前仅展示天衍峰地貌，不提供场所与门人选中";
     }
 }
