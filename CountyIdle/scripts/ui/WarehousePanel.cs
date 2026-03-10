@@ -372,6 +372,11 @@ public partial class WarehousePanel : PopupPanelBase
 
 	private void UpdateInventoryColumns()
 	{
+		if (_inventoryScroll == null || _inventoryGrid == null)
+		{
+			return;
+		}
+
 		var availableWidth = _inventoryScroll.Size.X;
 		if (availableWidth <= 0f)
 		{

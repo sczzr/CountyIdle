@@ -8,7 +8,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/EventLogPanel.tscn" id="5_2c9up"]
 [ext_resource type="PackedScene" path="res://scenes/ui/BottomBar.tscn" id="6_empmh"]
 [ext_resource type="PackedScene" path="res://scenes/ui/figma/MakeGameUI.tscn" id="7_q2j8d"]
-[ext_resource type="Shader" uid="uid://bp4rtoxr5s7n4" path="res://assets/ui/background/background_frosted_glass.gdshader" id="8_s0l7t"]
+[ext_resource type="Shader" path="res://assets/ui/background/background_frosted_glass.gdshader" id="8_s0l7t"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_background_glass"]
 shader = ExtResource("8_s0l7t")

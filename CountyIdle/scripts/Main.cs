@@ -560,8 +560,6 @@ public partial class Main : Control
 
         _backgroundTextureRect.SetAnchorsPreset(LayoutPreset.FullRect);
         _backgroundTextureRect.SetOffsetsPreset(LayoutPreset.FullRect);
-        _backgroundTextureRect.Position = Vector2.Zero;
-        _backgroundTextureRect.Size = GetViewportRect().Size;
     }
 
     private void BindLegacyUiNodes()
