@@ -14,6 +14,14 @@ public static class SectOrganizationRules
         string DepartmentDetails,
         bool IsCurrentPlayableFocus = false);
 
+    public readonly record struct PeakProfile(
+        string Name,
+        string Positioning,
+        string CoreUnits,
+        string Responsibility,
+        string DepartmentDetails,
+        bool IsCurrentPlayableFocus);
+
     private static readonly IReadOnlyList<PeakEntry> PeakEntries =
     [
         new("青云峰", "宗门中枢", "内务总殿 / 外事总殿 / 传功总殿", "总账、外务协调、核心传承审核",
@@ -103,6 +111,18 @@ public static class SectOrganizationRules
     {
         var entry = PeakEntries[NormalizePeakIndex(peakIndex)];
         return entry.PeakName;
+    }
+
+    public static PeakProfile GetPeakProfile(int peakIndex)
+    {
+        var entry = PeakEntries[NormalizePeakIndex(peakIndex)];
+        return new PeakProfile(
+            entry.PeakName,
+            entry.Positioning,
+            entry.CoreUnits,
+            entry.Responsibility,
+            entry.DepartmentDetails,
+            entry.IsCurrentPlayableFocus);
     }
 
     public static string GetPeakSummary(int peakIndex)

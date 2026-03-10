@@ -1,9 +1,10 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://rqjosnanrvs7"]
 
-[ext_resource type="Script" path="res://scripts/ui/DisciplePanel.cs" id="1_disciple_panel"]
+[ext_resource type="Script" uid="uid://dis2ijq6cro48" path="res://scripts/ui/DisciplePanel.cs" id="1_disciple_panel"]
 
 [node name="DisciplePanel" type="Control"]
-layout_mode = 3
+visible = false
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -11,3 +12,428 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
 script = ExtResource("1_disciple_panel")
+
+[node name="Overlay" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+color = Color(0.08, 0.08, 0.08, 0.68)
+
+[node name="Wrapper" type="PanelContainer" parent="Overlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+offset_left = 18.0
+offset_top = 18.0
+offset_right = -18.0
+offset_bottom = -18.0
+
+[node name="RootColumn" type="VBoxContainer" parent="Overlay/Wrapper"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 0
+
+[node name="HeaderPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn"]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+
+[node name="HeaderMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/HeaderPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 10
+
+[node name="HeaderRow" type="HBoxContainer" parent="Overlay/Wrapper/RootColumn/HeaderPanel/HeaderMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/HeaderPanel/HeaderMargin/HeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="TitleLabel" type="Label" parent="Overlay/Wrapper/RootColumn/HeaderPanel/HeaderMargin/HeaderRow/TitleColumn"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "浮云宗 · 弟子谱"
+
+[node name="SubtitleLabel" type="Label" parent="Overlay/Wrapper/RootColumn/HeaderPanel/HeaderMargin/HeaderRow/TitleColumn"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "卷中分峰录名，可按峰脉、职司和修为检索门人根基。"
+
+[node name="CloseButton" type="Button" parent="Overlay/Wrapper/RootColumn/HeaderPanel/HeaderMargin/HeaderRow"]
+layout_mode = 2
+text = "×"
+
+[node name="HeaderDivider" type="ColorRect" parent="Overlay/Wrapper/RootColumn"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 1)
+color = Color(0.478431, 0.478431, 0.478431, 0.55)
+
+[node name="BodyRow" type="HBoxContainer" parent="Overlay/Wrapper/RootColumn"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 0
+
+[node name="LeftPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LeftMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="RosterColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="SummaryPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn"]
+layout_mode = 2
+
+[node name="SummaryMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/SummaryPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="SummaryColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/SummaryPanel/SummaryMargin"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="SummaryTitle" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/SummaryPanel/SummaryMargin/SummaryColumn"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "卷首批注"
+
+[node name="SummaryLabel" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/SummaryPanel/SummaryMargin/SummaryColumn"]
+layout_mode = 2
+
+[node name="GovernanceLabel" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/SummaryPanel/SummaryMargin/SummaryColumn"]
+layout_mode = 2
+
+[node name="FilterPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn"]
+layout_mode = 2
+
+[node name="FilterMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/FilterPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="FilterColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/FilterPanel/FilterMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="FilterOption" type="OptionButton" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/FilterPanel/FilterMargin/FilterColumn"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SortOption" type="OptionButton" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/FilterPanel/FilterMargin/FilterColumn"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RosterFrame" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="RosterMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/RosterFrame"]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="RosterTree" type="Tree" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/RosterFrame/RosterMargin"]
+columns = 1
+hide_root = true
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="BodyDivider" type="ColorRect" parent="Overlay/Wrapper/RootColumn/BodyRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(1, 0)
+size_flags_vertical = 3
+color = Color(0.478431, 0.478431, 0.478431, 0.32)
+
+[node name="RightPanel" type="Control" parent="Overlay/Wrapper/RootColumn/BodyRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="RightMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 16
+
+[node name="RightColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 14
+
+[node name="ProfilePanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn"]
+layout_mode = 2
+
+[node name="ProfileMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 14
+
+[node name="ProfileHeader" type="GridContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin"]
+columns = 2
+layout_mode = 2
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 6
+
+[node name="ProfileName" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+
+[node name="RootCircle" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+
+[node name="RootCircleLabel" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader/RootCircle"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 12
+
+[node name="ProfileMeta" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+
+[node name="ProfileMetaSpacer" type="Control" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader"]
+layout_mode = 2
+
+[node name="ProfileStatus" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+
+[node name="ProfileStatusSpacer" type="Control" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader"]
+layout_mode = 2
+
+[node name="DashboardRow" type="HBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="FoundationPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow"]
+custom_minimum_size = Vector2(420, 0)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="FoundationMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 16
+
+[node name="FoundationColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="FoundationTitle" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "先天根基评估"
+
+[node name="RadarCenter" type="CenterContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn"]
+custom_minimum_size = Vector2(0, 220)
+layout_mode = 2
+
+[node name="StatsCenter" type="CenterContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn"]
+layout_mode = 2
+
+[node name="MetricGrid" type="GridContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter"]
+columns = 3
+custom_minimum_size = Vector2(330, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
+
+[node name="CultivationPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="CultivationMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 16
+
+[node name="CultivationColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="CultivationTitle" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "修为与造化"
+
+[node name="RealmBox" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="RealmTitle" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/RealmBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "修为境界"
+
+[node name="RealmStatus" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/RealmBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+
+[node name="RealmProgress" type="ProgressBar" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/RealmBox"]
+layout_mode = 2
+max_value = 100.0
+value = 0.0
+show_percentage = false
+
+[node name="RealmHint" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/RealmBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+
+[node name="QiSeaBox" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="QiSeaTitle" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/QiSeaBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "灵力储备（气海）"
+
+[node name="QiSeaProgress" type="ProgressBar" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/QiSeaBox"]
+layout_mode = 2
+max_value = 100.0
+value = 0.0
+show_percentage = false
+
+[node name="QiSeaHint" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/QiSeaBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+
+[node name="CombatTag" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn"]
+layout_mode = 2
+
+[node name="CombatMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/CombatTag"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="CombatColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/CombatTag/CombatMargin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="CombatTitle" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/CombatTag/CombatMargin/CombatColumn"]
+layout_mode = 2
+text = "综合战力评定"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 12
+
+[node name="CombatMain" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/CombatTag/CombatMargin/CombatColumn"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 22
+
+[node name="CombatHint" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/CombatTag/CombatMargin/CombatColumn"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 12
+
+[node name="TraitPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn"]
+layout_mode = 2
+
+[node name="TraitMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 12
+
+[node name="TraitColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel/TraitMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TraitTitle" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel/TraitMargin/TraitColumn"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "性情印记"
+
+[node name="TraitFlow" type="FlowContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel/TraitMargin/TraitColumn"]
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+
+[node name="AnnotationPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn"]
+layout_mode = 2
+
+[node name="AnnotationMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/AnnotationPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 14
+
+[node name="AnnotationColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/AnnotationPanel/AnnotationMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="AnnotationHeader" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/AnnotationPanel/AnnotationMargin/AnnotationColumn"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "【衍天批注】"
+
+[node name="AnnotationText" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/AnnotationPanel/AnnotationMargin/AnnotationColumn"]
+layout_mode = 2
+
+[node name="FooterDivider" type="ColorRect" parent="Overlay/Wrapper/RootColumn"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 1)
+color = Color(0.478431, 0.478431, 0.478431, 0.35)
+
+[node name="HintLabel" type="Label" parent="Overlay/Wrapper/RootColumn"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 30)
+vertical_alignment = 1

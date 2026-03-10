@@ -1,154 +1,149 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene format=3 uid="uid://b41bsu0i675xo"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_alerts"]
-bg_color = Color(0.94902, 0.917647, 0.85098, 0.24)
-border_width_top = 1
-border_width_bottom = 1
-border_color = Color(0.701961, 0.65098, 0.560784, 0.48)
-content_margin_top = 4.0
-content_margin_bottom = 8.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_log"]
-bg_color = Color(0, 0, 0, 0)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_alert_bad"]
-bg_color = Color(0.647059, 0.164706, 0.164706, 0.045)
-border_width_left = 2
-border_width_bottom = 1
-border_color = Color(0.619608, 0.164706, 0.133333, 0.76)
-content_margin_left = 8.0
-content_margin_top = 4.0
-content_margin_right = 4.0
-content_margin_bottom = 5.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_alert_good"]
-bg_color = Color(0.545098, 0.415686, 0.231373, 0.035)
-border_width_left = 2
-border_width_bottom = 1
-border_color = Color(0.619608, 0.164706, 0.133333, 0.45)
-content_margin_left = 8.0
-content_margin_top = 4.0
-content_margin_right = 4.0
-content_margin_bottom = 5.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_log_content"]
-bg_color = Color(0.94902, 0.917647, 0.85098, 0.72)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.94902, 0.92549, 0.862745, 0.88)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.701961, 0.65098, 0.560784, 0.72)
-content_margin_left = 14.0
-content_margin_top = 14.0
-content_margin_right = 14.0
-content_margin_bottom = 14.0
+border_color = Color(0.701961, 0.65098, 0.560784, 0.84)
+shadow_color = Color(0, 0, 0, 0.2)
+shadow_size = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_alerts"]
+content_margin_top = 6.0
+content_margin_bottom = 8.0
+bg_color = Color(0.94902, 0.92549, 0.862745, 0.42)
+border_width_top = 1
+border_width_bottom = 1
+border_color = Color(0.752941, 0.701961, 0.607843, 0.7)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_alert_bad"]
+content_margin_left = 6.0
+content_margin_top = 2.0
+content_margin_right = 4.0
+content_margin_bottom = 2.0
+bg_color = Color(0.647059, 0.164706, 0.164706, 0.03)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_alert_good"]
+content_margin_left = 6.0
+content_margin_top = 2.0
+content_margin_right = 4.0
+content_margin_bottom = 2.0
+bg_color = Color(0.545098, 0.415686, 0.231373, 0.03)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_log_content"]
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
+bg_color = Color(0.94902, 0.917647, 0.85098, 0.46)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.752941, 0.701961, 0.607843, 0.72)
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_log_rich"]
 
-[node name="EventLogPanel" type="VBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
+[node name="EventLogPanel" type="PanelContainer" unique_id=1403717425]
 clip_contents = true
-theme_override_constants/separation = 6
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
-[node name="TopTrim" type="ColorRect" parent="."]
-custom_minimum_size = Vector2(0, 3)
-layout_mode = 2
-color = Color(0.831373, 0.686275, 0.215686, 1)
-
-[node name="PanelContent" type="VBoxContainer" parent="."]
+[node name="PanelContent" type="MarginContainer" parent="." unique_id=1978472251]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 12
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
 
-[node name="MainVBox" type="VBoxContainer" parent="PanelContent"]
+[node name="MainVBox" type="VBoxContainer" parent="PanelContent" unique_id=2115762427]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 10
 
-[node name="AlertsBox" type="PanelContainer" parent="PanelContent/MainVBox"]
-custom_minimum_size = Vector2(0, 86)
+[node name="PanelTitle" type="Label" parent="PanelContent/MainVBox" unique_id=986258871]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 22
+text = "天衍峰记事"
+horizontal_alignment = 1
+
+[node name="TitleRule" type="ColorRect" parent="PanelContent/MainVBox" unique_id=1919532563]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+color = Color(0.701961, 0.65098, 0.560784, 0.85)
+
+[node name="AlertsBox" type="PanelContainer" parent="PanelContent/MainVBox" unique_id=1499689792]
+custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_alerts")
 
-[node name="AlertsVBox" type="VBoxContainer" parent="PanelContent/MainVBox/AlertsBox"]
+[node name="AlertsVBox" type="VBoxContainer" parent="PanelContent/MainVBox/AlertsBox" unique_id=1544390158]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 6
 
-[node name="AlertHeader" type="Label" parent="PanelContent/MainVBox/AlertsBox/AlertsVBox"]
+[node name="AlertsPadding" type="MarginContainer" parent="PanelContent/MainVBox/AlertsBox/AlertsVBox" unique_id=2123920437]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
-theme_override_font_sizes/font_size = 14
-text = "山门近闻"
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_right = 2
 
-[node name="AlertsPadding" type="MarginContainer" parent="PanelContent/MainVBox/AlertsBox/AlertsVBox"]
+[node name="AlertsList" type="VBoxContainer" parent="PanelContent/MainVBox/AlertsBox/AlertsVBox/AlertsPadding" unique_id=1203205486]
 layout_mode = 2
-theme_override_constants/margin_top = 2
-theme_override_constants/margin_bottom = 2
+theme_override_constants/separation = 6
 
-[node name="AlertsList" type="VBoxContainer" parent="PanelContent/MainVBox/AlertsBox/AlertsVBox/AlertsPadding"]
-layout_mode = 2
-theme_override_constants/separation = 10
-
-[node name="AlertItem1" type="PanelContainer" parent="PanelContent/MainVBox/AlertsBox/AlertsVBox/AlertsPadding/AlertsList"]
+[node name="AlertItem1" type="PanelContainer" parent="PanelContent/MainVBox/AlertsBox/AlertsVBox/AlertsPadding/AlertsList" unique_id=470849061]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_alert_bad")
 
-[node name="AlertLabel" type="Label" parent="PanelContent/MainVBox/AlertsBox/AlertsVBox/AlertsPadding/AlertsList/AlertItem1"]
+[node name="AlertLabel" type="Label" parent="PanelContent/MainVBox/AlertsBox/AlertsVBox/AlertsPadding/AlertsList/AlertItem1" unique_id=1027679212]
 layout_mode = 2
-autowrap_mode = 3
 theme_override_colors/font_color = Color(0.619608, 0.164706, 0.133333, 1)
 theme_override_font_sizes/font_size = 12
-text = "【申时风闻】灵石见绌，庶务与峰内工务皆需缓转。"
+text = "·【辰时】仓储消耗偏高，庶务需加紧统筹。"
+autowrap_mode = 3
 
-[node name="AlertItem2" type="PanelContainer" parent="PanelContent/MainVBox/AlertsBox/AlertsVBox/AlertsPadding/AlertsList"]
+[node name="AlertItem2" type="PanelContainer" parent="PanelContent/MainVBox/AlertsBox/AlertsVBox/AlertsPadding/AlertsList" unique_id=803061073]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_alert_good")
 
-[node name="AlertLabel" type="Label" parent="PanelContent/MainVBox/AlertsBox/AlertsVBox/AlertsPadding/AlertsList/AlertItem2"]
+[node name="AlertLabel" type="Label" parent="PanelContent/MainVBox/AlertsBox/AlertsVBox/AlertsPadding/AlertsList/AlertItem2" unique_id=1553059266]
 layout_mode = 2
-autowrap_mode = 3
-theme_override_colors/font_color = Color(0.619608, 0.164706, 0.133333, 0.92)
+theme_override_colors/font_color = Color(0.294118, 0.247059, 0.2, 0.95)
 theme_override_font_sizes/font_size = 12
-text = "【午时风闻】姻缘祠新得麟儿，传闻具稀有【武骨】资质。"
+text = "·【午时】外务坊市回流转正，灵石略有回补。"
+autowrap_mode = 3
 
-[node name="LogBox" type="PanelContainer" parent="PanelContent/MainVBox"]
+[node name="LogBox" type="PanelContainer" parent="PanelContent/MainVBox" unique_id=715546861]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_log")
 
-[node name="LogVBox" type="VBoxContainer" parent="PanelContent/MainVBox/LogBox"]
+[node name="LogVBox" type="VBoxContainer" parent="PanelContent/MainVBox/LogBox" unique_id=1721894762]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 8
+theme_override_constants/separation = 6
 
-[node name="LogHeader" type="Label" parent="PanelContent/MainVBox/LogBox/LogVBox"]
+[node name="LogHeader" type="Label" parent="PanelContent/MainVBox/LogBox/LogVBox" unique_id=1612065511]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
-theme_override_font_sizes/font_size = 18
-text = "天衍峰札记"
+theme_override_font_sizes/font_size = 15
+text = "峰务札记"
 
-[node name="LogHeaderDivider" type="ColorRect" parent="PanelContent/MainVBox/LogBox/LogVBox"]
-custom_minimum_size = Vector2(0, 1)
-layout_mode = 2
-color = Color(0.294118, 0.247059, 0.207843, 0.88)
-
-[node name="LogContent" type="PanelContainer" parent="PanelContent/MainVBox/LogBox/LogVBox"]
+[node name="LogContent" type="PanelContainer" parent="PanelContent/MainVBox/LogBox/LogVBox" unique_id=1334528593]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_log_content")
 
-[node name="LogLabel" type="RichTextLabel" parent="PanelContent/MainVBox/LogBox/LogVBox/LogContent"]
+[node name="LogLabel" type="RichTextLabel" parent="PanelContent/MainVBox/LogBox/LogVBox/LogContent" unique_id=1393955424]
 layout_mode = 2
 size_flags_vertical = 3
-bbcode_enabled = true
-fit_content = false
-scroll_active = true
 theme_override_colors/default_color = Color(0.294118, 0.247059, 0.2, 0.96)
 theme_override_styles/normal = SubResource("StyleBoxEmpty_log_rich")
-text = "[color=#2b2520][子时] 新岁初启，山门诸殿点灯待命。[/color]\n[color=#5b4d42][丑时] 灵田 [2,-1] 灌溉完毕，地力稍涨。[/color]\n[color=#5b4d42][辰时] 文书封存，主存档归档完成。[/color]\n[color=#8a6a3b][午时] 探险队大捷，缴获玄金廿一两。[/color]\n[color=#9e2a22][申时] 户部重编，调拨 6 人至农亩。[/color]"
-
-[node name="BottomTrim" type="ColorRect" parent="."]
-custom_minimum_size = Vector2(0, 3)
-layout_mode = 2
-color = Color(0.831373, 0.686275, 0.215686, 1)
+bbcode_enabled = true
+text = "[color=#2b2520]· [子时] 新岁初启，山门诸殿点灯待命。[/color]
+[color=#5b4d42]· [丑时] 灵田 [2,-1] 灌溉完毕，地力稍涨。[/color]
+[color=#5b4d42]· [辰时] 文书封存，主存档归档完成。[/color]
+[color=#8a6a3b]· [午时] 探险队大捷，缴获玄金廿一两。[/color]
+[color=#9e2a22]· [申时] 户部重编，调拨 6 人至农亩。[/color]"

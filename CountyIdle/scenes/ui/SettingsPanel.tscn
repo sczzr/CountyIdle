@@ -1,6 +1,6 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://buftahoe0gh2l"]
 
-[ext_resource type="Script" path="res://scripts/ui/SettingsPanel.cs" id="1_4af7x"]
+[ext_resource type="Script" uid="uid://b4wfyy6kthib2" path="res://scripts/ui/SettingsPanel.cs" id="1_4af7x"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dialog"]
 bg_color = Color(0.0823529, 0.0862745, 0.101961, 1)
@@ -14,9 +14,9 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[node name="SettingsPanel" type="Control"]
+[node name="SettingsPanel" type="Control" unique_id=2074523316]
 visible = false
-layout_mode = 1
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -25,7 +25,7 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_4af7x")
 
-[node name="Backdrop" type="ColorRect" parent="."]
+[node name="Backdrop" type="ColorRect" parent="." unique_id=426550606]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -34,7 +34,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.101961, 0.0862745, 0.0745098, 0.9)
 
-[node name="CenterLayer" type="CenterContainer" parent="."]
+[node name="CenterLayer" type="CenterContainer" parent="." unique_id=507445027]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -42,285 +42,273 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="DecorLayer" type="Control" parent="CenterLayer"]
+[node name="DecorLayer" type="Control" parent="CenterLayer" unique_id=1673268974]
 custom_minimum_size = Vector2(688, 640)
 layout_mode = 2
 
-[node name="TopTrim" type="ColorRect" parent="CenterLayer/DecorLayer"]
+[node name="TopTrim" type="ColorRect" parent="CenterLayer/DecorLayer" unique_id=619824403]
+layout_mode = 0
 offset_left = 10.0
 offset_top = 12.0
 offset_right = 678.0
 offset_bottom = 22.0
 color = Color(0.831373, 0.686275, 0.215686, 1)
 
-[node name="BottomTrim" type="ColorRect" parent="CenterLayer/DecorLayer"]
+[node name="BottomTrim" type="ColorRect" parent="CenterLayer/DecorLayer" unique_id=1710738169]
+layout_mode = 0
 offset_left = 10.0
 offset_top = 618.0
 offset_right = 678.0
 offset_bottom = 628.0
 color = Color(0.831373, 0.686275, 0.215686, 1)
 
-[node name="LeftRoller" type="PanelContainer" parent="CenterLayer/DecorLayer"]
+[node name="LeftRoller" type="PanelContainer" parent="CenterLayer/DecorLayer" unique_id=1911820242]
+layout_mode = 0
 offset_left = 10.0
 offset_top = 24.0
 offset_right = 34.0
 offset_bottom = 616.0
 
-[node name="LeftTopCap" type="ColorRect" parent="CenterLayer/DecorLayer/LeftRoller"]
-layout_mode = 0
-offset_left = -3.0
-offset_top = -6.0
-offset_right = 27.0
-offset_bottom = 6.0
+[node name="LeftTopCap" type="ColorRect" parent="CenterLayer/DecorLayer/LeftRoller" unique_id=197813865]
+layout_mode = 2
 color = Color(0.831373, 0.686275, 0.215686, 1)
 
-[node name="LeftBottomCap" type="ColorRect" parent="CenterLayer/DecorLayer/LeftRoller"]
-layout_mode = 0
-offset_left = -3.0
-offset_top = 580.0
-offset_right = 27.0
-offset_bottom = 592.0
+[node name="LeftBottomCap" type="ColorRect" parent="CenterLayer/DecorLayer/LeftRoller" unique_id=1938062936]
+layout_mode = 2
 color = Color(0.831373, 0.686275, 0.215686, 1)
 
-[node name="RightRoller" type="PanelContainer" parent="CenterLayer/DecorLayer"]
+[node name="RightRoller" type="PanelContainer" parent="CenterLayer/DecorLayer" unique_id=882607346]
+layout_mode = 0
 offset_left = 654.0
 offset_top = 24.0
 offset_right = 678.0
 offset_bottom = 616.0
 
-[node name="RightTopCap" type="ColorRect" parent="CenterLayer/DecorLayer/RightRoller"]
-layout_mode = 0
-offset_left = -3.0
-offset_top = -6.0
-offset_right = 27.0
-offset_bottom = 6.0
+[node name="RightTopCap" type="ColorRect" parent="CenterLayer/DecorLayer/RightRoller" unique_id=1956975515]
+layout_mode = 2
 color = Color(0.831373, 0.686275, 0.215686, 1)
 
-[node name="RightBottomCap" type="ColorRect" parent="CenterLayer/DecorLayer/RightRoller"]
-layout_mode = 0
-offset_left = -3.0
-offset_top = 580.0
-offset_right = 27.0
-offset_bottom = 592.0
+[node name="RightBottomCap" type="ColorRect" parent="CenterLayer/DecorLayer/RightRoller" unique_id=988155726]
+layout_mode = 2
 color = Color(0.831373, 0.686275, 0.215686, 1)
 
-[node name="Dialog" type="PanelContainer" parent="CenterLayer"]
+[node name="Dialog" type="PanelContainer" parent="CenterLayer" unique_id=1783547574]
 custom_minimum_size = Vector2(640, 592)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_dialog")
 
-[node name="Margin" type="MarginContainer" parent="CenterLayer/Dialog"]
+[node name="Margin" type="MarginContainer" parent="CenterLayer/Dialog" unique_id=127046386]
 layout_mode = 2
 theme_override_constants/margin_left = 24
 theme_override_constants/margin_top = 24
 theme_override_constants/margin_right = 24
 theme_override_constants/margin_bottom = 22
 
-[node name="MainColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin"]
+[node name="MainColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin" unique_id=229407272]
 layout_mode = 2
 theme_override_constants/separation = 14
 
-[node name="HeaderRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn"]
+[node name="HeaderRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn" unique_id=679785741]
 layout_mode = 2
 
-[node name="TitleLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/HeaderRow"]
+[node name="TitleLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/HeaderRow" unique_id=189672663]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 text = "天衍峰机宜卷"
 
-[node name="CloseButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/HeaderRow"]
+[node name="CloseButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/HeaderRow" unique_id=1639502561]
 custom_minimum_size = Vector2(44, 28)
 layout_mode = 2
 text = "✖"
 
-[node name="HintLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn"]
-layout_mode = 2
+[node name="HintLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn" unique_id=2068979100]
 modulate = Color(0.760784, 0.780392, 0.831373, 1)
-autowrap_mode = 3
+layout_mode = 2
 text = "校定言辞、窗格、字样、音律与符令。批复后即刻生效，并自动收录。"
+autowrap_mode = 3
 
-[node name="HeaderDivider" type="ColorRect" parent="CenterLayer/Dialog/Margin/MainColumn"]
+[node name="HeaderDivider" type="ColorRect" parent="CenterLayer/Dialog/Margin/MainColumn" unique_id=1936167359]
 custom_minimum_size = Vector2(0, 1)
 layout_mode = 2
 color = Color(0.294118, 0.247059, 0.207843, 1)
 
-[node name="SettingsRows" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn"]
+[node name="SettingsRows" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn" unique_id=274644095]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="LanguageRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows"]
+[node name="LanguageRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows" unique_id=430058772]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="LanguageLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/LanguageRow"]
+[node name="LanguageLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/LanguageRow" unique_id=686323106]
 custom_minimum_size = Vector2(118, 0)
 layout_mode = 2
 text = "言辞"
 
-[node name="LanguageOption" type="OptionButton" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/LanguageRow"]
+[node name="LanguageOption" type="OptionButton" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/LanguageRow" unique_id=1114681811]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ResolutionRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows"]
+[node name="ResolutionRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows" unique_id=752429266]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="ResolutionLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ResolutionRow"]
+[node name="ResolutionLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ResolutionRow" unique_id=184450504]
 custom_minimum_size = Vector2(118, 0)
 layout_mode = 2
 text = "窗格"
 
-[node name="ResolutionOption" type="OptionButton" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ResolutionRow"]
+[node name="ResolutionOption" type="OptionButton" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ResolutionRow" unique_id=577053610]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="FontScaleRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows"]
+[node name="FontScaleRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows" unique_id=403584588]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="FontScaleLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/FontScaleRow"]
+[node name="FontScaleLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/FontScaleRow" unique_id=3114838]
 custom_minimum_size = Vector2(118, 0)
 layout_mode = 2
 text = "字样"
 
-[node name="FontScaleOption" type="OptionButton" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/FontScaleRow"]
+[node name="FontScaleOption" type="OptionButton" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/FontScaleRow" unique_id=1251875490]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="VolumeRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows"]
+[node name="VolumeRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows" unique_id=1623347768]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="VolumeLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/VolumeRow"]
+[node name="VolumeLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/VolumeRow" unique_id=1812664821]
 custom_minimum_size = Vector2(118, 0)
 layout_mode = 2
 text = "音律"
 
-[node name="VolumeSlider" type="HSlider" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/VolumeRow"]
+[node name="VolumeSlider" type="HSlider" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/VolumeRow" unique_id=1624794870]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="VolumeValue" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/VolumeRow"]
+[node name="VolumeValue" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/VolumeRow" unique_id=1186455976]
 custom_minimum_size = Vector2(56, 0)
 layout_mode = 2
-horizontal_alignment = 2
 text = "80%"
+horizontal_alignment = 2
 
-[node name="ShortcutHeader" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows"]
+[node name="ShortcutHeader" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows" unique_id=660895169]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "符令配置"
 
-[node name="OpenSettingsKeyRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows"]
+[node name="OpenSettingsKeyRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows" unique_id=1705477224]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="OpenSettingsKeyLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/OpenSettingsKeyRow"]
+[node name="OpenSettingsKeyLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/OpenSettingsKeyRow" unique_id=1760348943]
 custom_minimum_size = Vector2(118, 0)
 layout_mode = 2
 text = "启机宜卷"
 
-[node name="OpenSettingsKeyOption" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/OpenSettingsKeyRow"]
+[node name="OpenSettingsKeyOption" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/OpenSettingsKeyRow" unique_id=1578468966]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "F1"
 
-[node name="OpenWarehouseKeyRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows"]
+[node name="OpenWarehouseKeyRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows" unique_id=609841197]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="OpenWarehouseKeyLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/OpenWarehouseKeyRow"]
+[node name="OpenWarehouseKeyLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/OpenWarehouseKeyRow" unique_id=1055516007]
 custom_minimum_size = Vector2(118, 0)
 layout_mode = 2
 text = "启库藏卷"
 
-[node name="OpenWarehouseKeyOption" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/OpenWarehouseKeyRow"]
+[node name="OpenWarehouseKeyOption" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/OpenWarehouseKeyRow" unique_id=918867287]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "B"
 
-[node name="ToggleExplorationKeyRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows"]
+[node name="ToggleExplorationKeyRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows" unique_id=1942059167]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="ToggleExplorationKeyLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ToggleExplorationKeyRow"]
+[node name="ToggleExplorationKeyLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ToggleExplorationKeyRow" unique_id=245622829]
 custom_minimum_size = Vector2(118, 0)
 layout_mode = 2
 text = "历练开关"
 
-[node name="ToggleExplorationKeyOption" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ToggleExplorationKeyRow"]
+[node name="ToggleExplorationKeyOption" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ToggleExplorationKeyRow" unique_id=278834597]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "E"
 
-[node name="ToggleSpeedKeyRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows"]
+[node name="ToggleSpeedKeyRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows" unique_id=232828564]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="ToggleSpeedKeyLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ToggleSpeedKeyRow"]
+[node name="ToggleSpeedKeyLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ToggleSpeedKeyRow" unique_id=423366587]
 custom_minimum_size = Vector2(118, 0)
 layout_mode = 2
 text = "流光切换"
 
-[node name="ToggleSpeedKeyOption" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ToggleSpeedKeyRow"]
+[node name="ToggleSpeedKeyOption" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ToggleSpeedKeyRow" unique_id=280989353]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Tab"
 
-[node name="QuickSaveKeyRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows"]
+[node name="QuickSaveKeyRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows" unique_id=1635890437]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="QuickSaveKeyLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/QuickSaveKeyRow"]
+[node name="QuickSaveKeyLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/QuickSaveKeyRow" unique_id=1693745839]
 custom_minimum_size = Vector2(118, 0)
 layout_mode = 2
 text = "速录主卷"
 
-[node name="QuickSaveKeyOption" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/QuickSaveKeyRow"]
+[node name="QuickSaveKeyOption" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/QuickSaveKeyRow" unique_id=504985379]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "F5"
 
-[node name="QuickLoadKeyRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows"]
+[node name="QuickLoadKeyRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows" unique_id=1753021499]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="QuickLoadKeyLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/QuickLoadKeyRow"]
+[node name="QuickLoadKeyLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/QuickLoadKeyRow" unique_id=1017319563]
 custom_minimum_size = Vector2(118, 0)
 layout_mode = 2
 text = "速启主卷"
 
-[node name="QuickLoadKeyOption" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/QuickLoadKeyRow"]
+[node name="QuickLoadKeyOption" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/QuickLoadKeyRow" unique_id=1017784165]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "F9"
 
-[node name="QuickResetKeyRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows"]
+[node name="QuickResetKeyRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows" unique_id=901257452]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="QuickResetKeyLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/QuickResetKeyRow"]
+[node name="QuickResetKeyLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/QuickResetKeyRow" unique_id=251567980]
 custom_minimum_size = Vector2(118, 0)
 layout_mode = 2
 text = "速归初局"
 
-[node name="QuickResetKeyOption" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/QuickResetKeyRow"]
+[node name="QuickResetKeyOption" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsRows/QuickResetKeyRow" unique_id=960532651]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "R"
 
-[node name="FooterRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn"]
+[node name="FooterRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn" unique_id=1198995349]
 layout_mode = 2
-alignment = 2
 theme_override_constants/separation = 8
+alignment = 2
 
-[node name="CancelButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/FooterRow"]
+[node name="CancelButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/FooterRow" unique_id=1277941175]
 custom_minimum_size = Vector2(96, 34)
 layout_mode = 2
 text = "作罢"
 
-[node name="ApplyButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/FooterRow"]
+[node name="ApplyButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/FooterRow" unique_id=914229376]
 custom_minimum_size = Vector2(110, 34)
 layout_mode = 2
 text = "批复并收录"

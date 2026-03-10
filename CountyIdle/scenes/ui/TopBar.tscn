@@ -1,7 +1,9 @@
 [gd_scene load_steps=5 format=3]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_topbar"]
-bg_color = Color(0, 0, 0, 0)
+bg_color = Color(0.94902, 0.929412, 0.882353, 0.72)
+border_width_bottom = 1
+border_color = Color(0.701961, 0.65098, 0.560784, 0.75)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_progress_bg"]
 bg_color = Color(0.811765, 0.764706, 0.678431, 0.45)
@@ -27,58 +29,58 @@ corner_radius_bottom_left = 1
 [node name="TopBar" type="PanelContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 44)
+custom_minimum_size = Vector2(0, 30)
 theme_override_styles/panel = SubResource("StyleBoxFlat_topbar")
 
 [node name="BarContent" type="MarginContainer" parent="."]
 layout_mode = 2
 theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 4
+theme_override_constants/margin_top = 2
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 2
 
 [node name="MainRow" type="HBoxContainer" parent="BarContent"]
 layout_mode = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = 14
 
 [node name="StatsRow" type="HBoxContainer" parent="BarContent/MainRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 14
+theme_override_constants/separation = 12
 
 [node name="PopulationLabel" type="Label" parent="BarContent/MainRow/StatsRow"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
-theme_override_font_sizes/font_size = 15
-text = "【人丁】120"
+theme_override_colors/font_color = Color(0.215686, 0.180392, 0.14902, 1)
+theme_override_font_sizes/font_size = 13
+text = "人丁 120"
 vertical_alignment = 1
 
 [node name="HappinessLabel" type="Label" parent="BarContent/MainRow/StatsRow"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
-theme_override_font_sizes/font_size = 15
-text = "【民心】72"
+theme_override_colors/font_color = Color(0.215686, 0.180392, 0.14902, 1)
+theme_override_font_sizes/font_size = 13
+text = "民心 72"
 vertical_alignment = 1
 
 [node name="FoodLabel" type="Label" parent="BarContent/MainRow/StatsRow"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
-theme_override_font_sizes/font_size = 15
-text = "【灵谷】680"
+theme_override_colors/font_color = Color(0.215686, 0.180392, 0.14902, 1)
+theme_override_font_sizes/font_size = 13
+text = "灵谷 680"
 vertical_alignment = 1
 
 [node name="WoodLabel" type="Label" parent="BarContent/MainRow/StatsRow"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
-theme_override_font_sizes/font_size = 15
-text = "【木石】220"
+theme_override_colors/font_color = Color(0.215686, 0.180392, 0.14902, 1)
+theme_override_font_sizes/font_size = 13
+text = "木石 220"
 vertical_alignment = 1
 
 [node name="GoldLabel" type="Label" parent="BarContent/MainRow/StatsRow"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
-theme_override_font_sizes/font_size = 15
-text = "【灵石】90"
+theme_override_colors/font_color = Color(0.215686, 0.180392, 0.14902, 1)
+theme_override_font_sizes/font_size = 13
+text = "灵石 90"
 vertical_alignment = 1
 
 [node name="StatsSpacer" type="Control" parent="BarContent/MainRow/StatsRow"]
@@ -86,34 +88,34 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="CycleBox" type="VBoxContainer" parent="BarContent/MainRow"]
-custom_minimum_size = Vector2(280, 0)
+custom_minimum_size = Vector2(340, 0)
 layout_mode = 2
-theme_override_constants/separation = 3
+theme_override_constants/separation = 2
 
 [node name="InfoRow" type="HBoxContainer" parent="BarContent/MainRow/CycleBox"]
 layout_mode = 2
 alignment = 2
-theme_override_constants/separation = 14
+theme_override_constants/separation = 12
 
 [node name="ThreatLabel" type="Label" parent="BarContent/MainRow/CycleBox/InfoRow"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.619608, 0.164706, 0.133333, 1)
-theme_override_font_sizes/font_size = 15
-text = "【危】威慑 42%"
+theme_override_font_sizes/font_size = 13
+text = "危兆 42%"
 vertical_alignment = 1
 
 [node name="TechLabel" type="Label" parent="BarContent/MainRow/CycleBox/InfoRow"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.368627, 0.313725, 0.258824, 1)
-theme_override_font_sizes/font_size = 14
-text = "【研】T1"
+theme_override_font_sizes/font_size = 13
+text = "研修 T1"
 vertical_alignment = 1
 
 [node name="CycleLabel" type="Label" parent="BarContent/MainRow/CycleBox/InfoRow"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
-theme_override_font_sizes/font_size = 15
-text = "景禾元年 正月"
+theme_override_colors/font_color = Color(0.215686, 0.180392, 0.14902, 1)
+theme_override_font_sizes/font_size = 13
+text = "景禾元年 正月 初一"
 horizontal_alignment = 2
 vertical_alignment = 1
 

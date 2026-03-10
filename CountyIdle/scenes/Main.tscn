@@ -75,10 +75,10 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 58.0
-offset_top = 30.0
-offset_right = -58.0
-offset_bottom = -30.0
+offset_left = 20.0
+offset_top = 8.0
+offset_right = -20.0
+offset_bottom = -8.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -237,35 +237,35 @@ grow_vertical = 2
 
 [node name="CenterPanel" parent="RootMargin/MainLayout/BodyRow" unique_id=2096398785 instance=ExtResource("4_a8trh")]
 z_index = 10
-offset_left = 406.0
-offset_top = 62.0
-offset_right = -274.0
-offset_bottom = -92.0
+offset_left = 326.0
+offset_top = 40.0
+offset_right = -326.0
+offset_bottom = -84.0
 
 [node name="LeftPanel" parent="RootMargin/MainLayout/BodyRow" unique_id=2081890903 instance=ExtResource("3_7d4x0")]
 z_index = 20
-custom_minimum_size = Vector2(370, 0)
+custom_minimum_size = Vector2(294, 0)
 layout_mode = 1
 anchors_preset = 9
 anchor_bottom = 1.0
-offset_left = 22.0
-offset_top = 62.0
-offset_right = 392.0
-offset_bottom = -72.0
+offset_left = 8.0
+offset_top = 40.0
+offset_right = 302.0
+offset_bottom = -56.0
 grow_vertical = 2
 
 [node name="RightPanel" parent="RootMargin/MainLayout/BodyRow" unique_id=1151408985 instance=ExtResource("5_2c9up")]
 z_index = 20
-custom_minimum_size = Vector2(226, 0)
+custom_minimum_size = Vector2(294, 0)
 layout_mode = 1
 anchors_preset = 11
 anchor_left = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -248.0
-offset_top = 62.0
-offset_right = -22.0
-offset_bottom = -72.0
+offset_left = -302.0
+offset_top = 40.0
+offset_right = -8.0
+offset_bottom = -56.0
 grow_horizontal = 0
 grow_vertical = 2
 
@@ -274,10 +274,10 @@ z_index = 30
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_left = 18.0
-offset_top = 12.0
-offset_right = -18.0
-offset_bottom = 52.0
+offset_left = 8.0
+offset_top = 0.0
+offset_right = -8.0
+offset_bottom = 30.0
 grow_horizontal = 2
 
 [node name="BottomBar" parent="RootMargin/MainLayout" unique_id=175182135 instance=ExtResource("6_empmh")]
@@ -287,10 +287,10 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 18.0
-offset_top = -54.0
-offset_right = -18.0
-offset_bottom = -10.0
+offset_left = 8.0
+offset_top = -44.0
+offset_right = -8.0
+offset_bottom = -4.0
 grow_horizontal = 2
 grow_vertical = 0
 

@@ -31,27 +31,27 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="LedgerWrapper" type="Control" parent="CenterLayer"]
-custom_minimum_size = Vector2(948, 640)
+custom_minimum_size = Vector2(1400, 640)
 layout_mode = 2
 
 [node name="TopTrim" type="ColorRect" parent="CenterLayer/LedgerWrapper"]
 offset_left = 10.0
 offset_top = 12.0
-offset_right = 938.0
+offset_right = 1390.0
 offset_bottom = 22.0
 color = Color(0.831373, 0.686275, 0.215686, 1)
 
 [node name="BottomTrim" type="ColorRect" parent="CenterLayer/LedgerWrapper"]
 offset_left = 10.0
 offset_top = 618.0
-offset_right = 938.0
+offset_right = 1390.0
 offset_bottom = 628.0
 color = Color(0.831373, 0.686275, 0.215686, 1)
 
 [node name="FrameRow" type="HBoxContainer" parent="CenterLayer/LedgerWrapper"]
 offset_left = 10.0
 offset_top = 24.0
-offset_right = 938.0
+offset_right = 1390.0
 offset_bottom = 616.0
 theme_override_constants/separation = 0
 
@@ -125,33 +125,59 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 10
 
-[node name="StatusRow" type="HBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin"]
+[node name="StatusContent" type="VBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="StatusRow" type="HBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent"]
 layout_mode = 2
 theme_override_constants/separation = 14
 alignment = 1
 
-[node name="WarningStampLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusRow"]
+[node name="WarningStampLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/StatusRow"]
 layout_mode = 2
 text = "满溢"
 
-[node name="StatusTextColumn" type="VBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusRow"]
+[node name="StatusTextColumn" type="VBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/StatusRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 2
 
-[node name="HintLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusRow/StatusTextColumn"]
+[node name="HintLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/StatusRow/StatusTextColumn"]
 layout_mode = 2
 autowrap_mode = 3
 text = "仓廪将满，亟需扩建或消耗度支。"
 
-[node name="WarehouseStatusValue" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusRow/StatusTextColumn"]
+[node name="WarehouseStatusValue" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/StatusRow/StatusTextColumn"]
 layout_mode = 2
 text = "仓储壹级 · 矿坑壹级"
 
-[node name="CapacityValueLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusRow"]
+[node name="CapacityValueLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/StatusRow"]
 layout_mode = 2
 horizontal_alignment = 2
 text = "已占 0 / 1200"
+
+[node name="CapacityBarFrame" type="Panel" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent"]
+custom_minimum_size = Vector2(0, 12)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CapacityBar" type="ProgressBar" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/CapacityBarFrame"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CapacityTickOverlay" type="TextureRect" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/CapacityBarFrame"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 
 [node name="BodyRow" type="HBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn"]
 layout_mode = 2
@@ -201,16 +227,18 @@ size_flags_vertical = 3
 layout_mode = 2
 columns = 2
 size_flags_horizontal = 3
-theme_override_constants/h_separation = 16
-theme_override_constants/v_separation = 14
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 18
 
 [node name="BodyDivider" type="ColorRect" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow"]
+visible = false
 custom_minimum_size = Vector2(1, 0)
 layout_mode = 2
 size_flags_vertical = 3
 color = Color(0.639216, 0.584314, 0.505882, 0.85)
 
 [node name="ActionArea" type="ScrollContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow"]
+visible = false
 custom_minimum_size = Vector2(290, 0)
 layout_mode = 2
 size_flags_vertical = 3

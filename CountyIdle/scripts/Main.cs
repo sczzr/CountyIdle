@@ -210,8 +210,8 @@ public partial class Main : Control
 
     private void OnStateChanged(GameState state)
     {
-        _populationLabel.Text = $"【人丁】{state.Population}";
-        _happinessLabel.Text = $"【民心】{state.Happiness:0.#}";
+        _populationLabel.Text = $"人丁 {state.Population}";
+        _happinessLabel.Text = $"民心 {state.Happiness:0.#}";
 
         var economyPreview = EconomySystem.BuildHourPreview(state);
         var toolCoverage = IndustryRules.GetToolCoverage(state);
@@ -231,21 +231,21 @@ public partial class Main : Control
         var visibleGoldDelta = InventoryRules.PredictDelta(state, nameof(GameState.Gold), economyPreview.GoldDeltaRaw);
         var visibleContributionDelta = InventoryRules.PredictDelta(state, nameof(GameState.ContributionPoints), economyPreview.ContributionDeltaRaw);
 
-        _foodLabel.Text = $"【{MaterialSemanticRules.GetDisplayName(nameof(GameState.Food))}】{state.Food:0}";
+        _foodLabel.Text = $"{MaterialSemanticRules.GetDisplayName(nameof(GameState.Food))} {state.Food:0}";
         _foodLabel.TooltipText =
             $"下一时辰预计：{MaterialSemanticRules.GetDisplayName(nameof(GameState.Food))}{FormatSigned(visibleFoodDelta)}，当前库存 {state.Food:0}。";
-        _woodLabel.Text = $"【木石】{state.Wood:0}";
+        _woodLabel.Text = $"木石 {state.Wood:0}";
         _woodLabel.TooltipText =
             $"下一时辰预计：{MaterialSemanticRules.GetDisplayName(nameof(GameState.Wood))}{FormatSigned(woodDelta)}、{MaterialSemanticRules.GetDisplayName(nameof(GameState.Stone))}{FormatSigned(stoneDelta)}、{MaterialSemanticRules.GetDisplayName(nameof(GameState.Timber))}库存 {state.Timber:0}、{MaterialSemanticRules.GetDisplayName(nameof(GameState.RawStone))}库存 {state.RawStone:0}。";
-        _goldLabel.Text = $"【灵石】{state.Gold:0}";
+        _goldLabel.Text = $"灵石 {state.Gold:0}";
         _goldLabel.TooltipText =
             $"功绩 {state.ContributionPoints:0}（{FormatSigned(visibleContributionDelta)}/时），灵石流转 {FormatSigned(visibleGoldDelta)}/时。";
-        _threatLabel.Text = $"【危】威慑 {state.Threat:0}%";
-        _techLabel.Text = $"【研】T{Math.Max(state.TechLevel + 1, 1)}";
+        _threatLabel.Text = $"危兆 {state.Threat:0}%";
+        _techLabel.Text = $"研修 T{Math.Max(state.TechLevel + 1, 1)}";
 
         _exploreButton.Text = _isUsingFigmaLayout
             ? (state.ExplorationEnabled ? "⏸ 探险中" : "▶ 探险")
-            : (state.ExplorationEnabled ? "历练中" : "启 历练");
+            : (state.ExplorationEnabled ? "历练中" : "历练");
 
         _sectMapRenderer?.RefreshMap(state.Population, state.HousingCapacity, state.ElitePopulation);
         _sectMapRenderer?.RefreshResidents(state);
@@ -862,19 +862,19 @@ public partial class Main : Control
         if (_speedX1Button != null)
         {
             _speedX1Button.ButtonPressed = Math.Abs(GetCurrentTimeScale() - 1.0) < 0.001;
-            _speedX1Button.Text = "壹倍";
+            _speedX1Button.Text = "常速";
         }
 
         if (_speedX2Button != null)
         {
             _speedX2Button.ButtonPressed = Math.Abs(GetCurrentTimeScale() - 2.0) < 0.001;
-            _speedX2Button.Text = "贰倍";
+            _speedX2Button.Text = "倍速";
         }
 
         if (_speedX4Button != null)
         {
             _speedX4Button.ButtonPressed = Math.Abs(GetCurrentTimeScale() - 4.0) < 0.001;
-            _speedX4Button.Text = "肆倍";
+            _speedX4Button.Text = "疾速";
         }
     }
 
@@ -882,17 +882,17 @@ public partial class Main : Control
     {
         if (Math.Abs(scale - 1.0) < 0.001)
         {
-            return "壹倍";
+            return "常速";
         }
 
         if (Math.Abs(scale - 2.0) < 0.001)
         {
-            return "贰倍";
+            return "倍速";
         }
 
         if (Math.Abs(scale - 4.0) < 0.001)
         {
-            return "肆倍";
+            return "疾速";
         }
 
         return $"x{scale:0}";

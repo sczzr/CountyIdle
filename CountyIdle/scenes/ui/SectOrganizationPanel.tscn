@@ -1,8 +1,8 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://so4ae68yhcvb"]
 
-[ext_resource type="Script" path="res://scripts/ui/SectOrganizationPanel.cs" id="1_sect_org_panel"]
+[ext_resource type="Script" uid="uid://chayv021pxhsw" path="res://scripts/ui/SectOrganizationPanel.cs" id="1_sect_org_panel"]
 
-[node name="SectOrganizationPanel" type="Control"]
+[node name="SectOrganizationPanel" type="Control" unique_id=1797637555]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
