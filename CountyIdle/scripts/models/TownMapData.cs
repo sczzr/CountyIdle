@@ -78,12 +78,14 @@ public sealed class TownActivityAnchorData
 public sealed class TownMapData
 {
     private readonly TownTerrainType[,] _terrain;
+    private readonly Dictionary<Vector2I, TownCellCompoundData> _cellCompounds;
 
     public TownMapData(int width, int height)
     {
         Width = Math.Max(width, 1);
         Height = Math.Max(height, 1);
         _terrain = new TownTerrainType[Width, Height];
+        _cellCompounds = new Dictionary<Vector2I, TownCellCompoundData>();
         Buildings = new List<TownBuildingData>();
         ActivityAnchors = new List<TownActivityAnchorData>();
 
@@ -144,6 +146,21 @@ public sealed class TownMapData
         }
 
         ActivityAnchors.Add(activityAnchor);
+    }
+
+    public void SetCellCompound(TownCellCompoundData compound)
+    {
+        if (!IsInside(compound.Cell))
+        {
+            return;
+        }
+
+        _cellCompounds[compound.Cell] = compound;
+    }
+
+    public TownCellCompoundData? GetCellCompound(Vector2I cell)
+    {
+        return _cellCompounds.TryGetValue(cell, out var compound) ? compound : null;
     }
 
     public IEnumerable<Vector2I> EnumerateAllCells()

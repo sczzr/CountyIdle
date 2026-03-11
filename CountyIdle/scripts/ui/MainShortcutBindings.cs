@@ -6,6 +6,25 @@ namespace CountyIdle;
 
 public partial class Main
 {
+    public override void _UnhandledKeyInput(InputEvent @event)
+    {
+        if (@event is not InputEventKey keyEvent || !keyEvent.Pressed || keyEvent.Echo)
+        {
+            return;
+        }
+
+        if (_settingsPanel?.Visible == true || _warehousePanel?.Visible == true || _saveSlotsPanel?.Visible == true)
+        {
+            return;
+        }
+
+        if (_currentMapTab is MapTab.World or MapTab.Sect &&
+            keyEvent.Keycode is Key.Up or Key.Down or Key.Left or Key.Right)
+        {
+            GetViewport().SetInputAsHandled();
+        }
+    }
+
     public override void _UnhandledInput(InputEvent @event)
     {
         if (_gameLoop == null)

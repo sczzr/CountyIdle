@@ -16,6 +16,7 @@ public partial class Main : Control
     {
         Sect,
         World,
+        WorldSite,
         Prefecture,
         EventPanel,
         ReportPanel,
@@ -106,6 +107,8 @@ public partial class Main : Control
     private HSlider? _mapZoomSlider;
     private bool _isUpdatingMapZoomSlider;
     private Control? _worldMapView;
+    private StrategicMapViewSystem? _worldMapRenderer;
+    private Control? _worldSiteMapView;
     private Control? _prefectureMapView;
     private Control? _countyTownMapView;
     private Control? _eventPanelView;
@@ -160,6 +163,7 @@ public partial class Main : Control
         CreateSectOrganizationPanel();
         CreateSaveSlotsPanel();
         BindUiEvents();
+        ConfigureLegacyFocusNavigation();
         BindLanternHoverEffects();
         SetupGameLoop();
         LoadInitialState();
@@ -609,6 +613,8 @@ public partial class Main : Control
         BindMapOperationalLegacyNodes();
 
         _worldMapView = GetNode<Control>($"{CenterMapPagesPath}/WorldMapView");
+        _worldMapRenderer = _worldMapView as StrategicMapViewSystem;
+        _worldSiteMapView = GetNode<Control>($"{CenterMapPagesPath}/SecondaryMapView");
         _prefectureMapView = GetNode<Control>($"{CenterMapPagesPath}/PrefectureMapView");
         _countyTownMapView = GetNode<Control>($"{CenterMapPagesPath}/CountyTownMapView");
         _eventPanelView = GetNode<Control>($"{CenterMapPagesPath}/EventPanelView");
@@ -617,6 +623,7 @@ public partial class Main : Control
         _sectMapRenderer = GetNode<SectMapViewSystem>($"{CenterMapPagesPath}/CountyTownMapView");
         _mineUpgradeButton = GetNodeOrNull<Button>($"{CenterReportDetailPagesPath}/MineCard/CardVBox/UpgradeButton");
         BindSectTileInspectorNodes();
+        BindWorldSitePanelNodes();
         BindSectChronicleNodes();
         ClearLegacyJobsPaddingBindings();
 
@@ -673,6 +680,8 @@ public partial class Main : Control
         _mapZoomResetButton = null;
         _mapZoomSlider = null;
         _worldMapView = null;
+        _worldMapRenderer = null;
+        _worldSiteMapView = null;
         _prefectureMapView = null;
         _countyTownMapView = null;
         _eventPanelView = null;
@@ -683,6 +692,7 @@ public partial class Main : Control
         ClearMapOperationalNodes();
         ClearLegacyJobsPaddingBindings();
         ClearSectTileInspectorNodes();
+        ClearWorldSitePanelNodes();
         ClearSectChronicleNodes();
     }
 
@@ -923,6 +933,7 @@ public partial class Main : Control
         }
 
         if (_worldMapView == null ||
+            _worldSiteMapView == null ||
             _prefectureMapView == null ||
             _countyTownMapView == null ||
             _eventPanelView == null ||
@@ -939,6 +950,7 @@ public partial class Main : Control
         }
 
         _worldMapView.Visible = mapTab == MapTab.World;
+        _worldSiteMapView.Visible = mapTab == MapTab.WorldSite;
         _prefectureMapView.Visible = mapTab == MapTab.Prefecture;
         _countyTownMapView.Visible = mapTab == MapTab.Sect;
         _eventPanelView.Visible = mapTab == MapTab.EventPanel;
@@ -953,6 +965,14 @@ public partial class Main : Control
         _expeditionMapButton.ButtonPressed = mapTab == MapTab.Expedition;
 
         _currentMapTab = mapTab;
+        if (mapTab == MapTab.World)
+        {
+            ApplyWorldSiteInspectorSummary(_worldMapRenderer?.SelectedWorldSite);
+        }
+        else if (mapTab == MapTab.WorldSite)
+        {
+            RefreshWorldSitePanel();
+        }
         RefreshMapZoomUi();
         RefreshMapOperationalLinkUi();
     }
@@ -977,7 +997,7 @@ public partial class Main : Control
             return;
         }
 
-        mapView.SetZoom(mapView.DefaultZoom);
+        mapView.ResetView();
         RefreshMapZoomUi();
     }
 
@@ -986,6 +1006,7 @@ public partial class Main : Control
         return _currentMapTab switch
         {
             MapTab.World => _worldMapView as IMapZoomView,
+            MapTab.WorldSite => null,
             MapTab.Sect => _countyTownMapView as IMapZoomView,
             _ => null
         };

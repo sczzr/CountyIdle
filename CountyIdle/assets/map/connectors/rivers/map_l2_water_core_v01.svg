@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96">
+  <defs>
+    <radialGradient id="waterFill" cx="48%" cy="46%" r="54%">
+      <stop offset="0%" stop-color="#d7eef7" stop-opacity="0.96"/>
+      <stop offset="70%" stop-color="#87bfd1" stop-opacity="0.90"/>
+      <stop offset="100%" stop-color="#5387a1" stop-opacity="0.55"/>
+    </radialGradient>
+  </defs>
+  <path d="M23 49 C23 34 35 24 49 24 C63 24 74 34 74 48 C74 63 63 72 49 72 C35 72 23 63 23 49 Z" fill="url(#waterFill)"/>
+  <path d="M31 47 C39 41 46 39 55 39 C60 39 65 40 70 43" fill="none" stroke="#f3fbff" stroke-opacity="0.58" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M28 56 C36 53 42 52 49 52 C56 52 62 53 68 56" fill="none" stroke="#dff5fb" stroke-opacity="0.42" stroke-width="1.8" stroke-linecap="round"/>
+</svg>

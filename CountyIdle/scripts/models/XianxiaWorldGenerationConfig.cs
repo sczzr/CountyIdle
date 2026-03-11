@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace CountyIdle.Models;
@@ -108,4 +109,25 @@ public sealed class XianxiaWorldGenerationConfig
 
     [JsonPropertyName("sect_monster_threat_penalty")]
     public float SectMonsterThreatPenalty { get; set; } = 0.10f;
+
+    [JsonPropertyName("region_profiles")]
+    public List<WorldRegionProfile> RegionProfiles { get; set; } = [];
+
+    [JsonPropertyName("primary_type_spawn_rules")]
+    public List<WorldPrimaryTypeSpawnRule> PrimaryTypeSpawnRules { get; set; } = [];
+
+    [JsonPropertyName("secondary_tag_spawn_rules")]
+    public List<WorldSecondaryTagSpawnRule> SecondaryTagSpawnRules { get; set; } = [];
+
+    [JsonPropertyName("adjacency_weight_rules")]
+    public List<WorldAdjacencyWeightRule> AdjacencyWeightRules { get; set; } = [];
+
+    [JsonPropertyName("rarity_profiles")]
+    public List<WorldRarityProfile> RarityProfiles { get; set; } = [];
+
+    [JsonPropertyName("unlock_rules")]
+    public List<WorldUnlockRule> UnlockRules { get; set; } = [];
+
+    [JsonPropertyName("companion_spawn_rules")]
+    public List<WorldCompanionSpawnRule> CompanionSpawnRules { get; set; } = [];
 }

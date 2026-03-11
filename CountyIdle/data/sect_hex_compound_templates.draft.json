@@ -1,0 +1,205 @@
+{
+  "version": 1,
+  "slot_rules": {
+    "default_slots": 2,
+    "core_cell_slots": 3,
+    "special_cell_slots": 4,
+    "max_slots_stage_two": 3,
+    "max_slots_stage_three": 5
+  },
+  "cell_defaults": {
+    "base_qi_capacity_normal_min": 80,
+    "base_qi_capacity_normal_max": 110,
+    "base_qi_capacity_spirit_min": 110,
+    "base_qi_capacity_spirit_max": 140,
+    "base_qi_capacity_special_min": 140,
+    "base_qi_capacity_special_max": 180,
+    "qi_recovery_normal_min": 4,
+    "qi_recovery_normal_max": 8,
+    "qi_recovery_special_min": 8,
+    "qi_recovery_special_max": 14,
+    "base_stability": 1.0
+  },
+  "terrain_presets": [
+    {
+      "id": "plain",
+      "display_name": "平地",
+      "terrain_fit_tags": ["buildable"],
+      "qi_capacity_bias": 0,
+      "qi_recovery_bias": 0,
+      "default_slots": 2
+    },
+    {
+      "id": "spirit_soil",
+      "display_name": "灵壤",
+      "terrain_fit_tags": ["wood", "herb", "food"],
+      "qi_capacity_bias": 18,
+      "qi_recovery_bias": 4,
+      "default_slots": 3
+    },
+    {
+      "id": "ridge",
+      "display_name": "山脊",
+      "terrain_fit_tags": ["patrol", "safety"],
+      "qi_capacity_bias": 8,
+      "qi_recovery_bias": 2,
+      "default_slots": 2
+    }
+  ],
+  "feature_pool": [
+    {
+      "id": "spirit_spring",
+      "display_name": "灵泉",
+      "visible": true,
+      "tags": ["water_friendly", "wood"],
+      "qi_capacity_bonus": 16,
+      "qi_recovery_bonus": 3
+    },
+    {
+      "id": "ancient_tree",
+      "display_name": "古树",
+      "visible": true,
+      "tags": ["quiet", "recovery", "wood"],
+      "qi_capacity_bonus": 10,
+      "qi_recovery_bonus": 2
+    },
+    {
+      "id": "hidden_fire_vein",
+      "display_name": "潜火地脉",
+      "visible": false,
+      "tags": ["forge", "fire_restless"],
+      "qi_capacity_bonus": 12,
+      "qi_recovery_bonus": 1
+    }
+  ],
+  "building_templates": [
+    {
+      "id": "empty_buildable",
+      "display_name": "空地",
+      "category": "empty",
+      "slot_cost": 0,
+      "qi_demand": 0,
+      "labor_demand": 0,
+      "maintenance_demand": 0,
+      "synergy_tags": ["reserve"],
+      "conflict_tags": []
+    },
+    {
+      "id": "mountain_road",
+      "display_name": "坊路/山道",
+      "category": "infrastructure",
+      "slot_cost": 1,
+      "qi_demand": 4,
+      "labor_demand": 1,
+      "maintenance_demand": 2,
+      "synergy_tags": ["traffic", "patrol"],
+      "conflict_tags": ["erosion"]
+    },
+    {
+      "id": "spirit_field_t1",
+      "display_name": "阵材圃/灵田",
+      "category": "production",
+      "slot_cost": 1,
+      "qi_demand": 18,
+      "labor_demand": 4,
+      "maintenance_demand": 3,
+      "synergy_tags": ["wood", "food", "water_friendly"],
+      "conflict_tags": ["wet_dense"]
+    },
+    {
+      "id": "herb_garden_t1",
+      "display_name": "药圃",
+      "category": "production",
+      "slot_cost": 1,
+      "qi_demand": 22,
+      "labor_demand": 5,
+      "maintenance_demand": 4,
+      "synergy_tags": ["herb", "alchemy_feed", "water_friendly"],
+      "conflict_tags": ["wet_dense"]
+    },
+    {
+      "id": "workshop_puppet_t1",
+      "display_name": "傀儡工坊",
+      "category": "production",
+      "slot_cost": 1,
+      "qi_demand": 28,
+      "labor_demand": 6,
+      "maintenance_demand": 5,
+      "synergy_tags": ["craft", "forge", "warehouse_link"],
+      "conflict_tags": ["noise", "fire_restless"]
+    },
+    {
+      "id": "warehouse_inner_t1",
+      "display_name": "仓阁/内库",
+      "category": "service",
+      "slot_cost": 1,
+      "qi_demand": 10,
+      "labor_demand": 3,
+      "maintenance_demand": 2,
+      "synergy_tags": ["storage", "traffic", "loss_reduce"],
+      "conflict_tags": ["crowded"]
+    },
+    {
+      "id": "academy_outer_hall_t1",
+      "display_name": "传法院",
+      "category": "service",
+      "slot_cost": 1,
+      "qi_demand": 26,
+      "labor_demand": 5,
+      "maintenance_demand": 3,
+      "synergy_tags": ["research", "teaching", "quiet"],
+      "conflict_tags": ["noise"]
+    },
+    {
+      "id": "disciple_residence_t1",
+      "display_name": "居舍",
+      "category": "residence",
+      "slot_cost": 1,
+      "qi_demand": 14,
+      "labor_demand": 2,
+      "maintenance_demand": 3,
+      "synergy_tags": ["rest", "recovery", "stability"],
+      "conflict_tags": ["crowded", "noise"]
+    },
+    {
+      "id": "watch_post_t1",
+      "display_name": "巡山岗",
+      "category": "special",
+      "slot_cost": 1,
+      "qi_demand": 12,
+      "labor_demand": 3,
+      "maintenance_demand": 3,
+      "synergy_tags": ["patrol", "safety", "threat_control"],
+      "conflict_tags": ["isolated"]
+    }
+  ],
+  "event_templates": [
+    {
+      "id": "spirit_spring_surge",
+      "display_name": "灵泉喷涌",
+      "intensity": "medium",
+      "duration_hours": 6,
+      "required_tags": ["water_friendly"],
+      "effect_tags": ["qi_boost", "congestion_up"],
+      "player_actions": ["harvest_bonus", "stabilize_flow"]
+    },
+    {
+      "id": "earth_fire_restless",
+      "display_name": "地火躁动",
+      "intensity": "medium",
+      "duration_hours": 4,
+      "required_tags": ["forge"],
+      "effect_tags": ["forge_bonus", "stability_down"],
+      "player_actions": ["push_output", "cooldown_ritual"]
+    },
+    {
+      "id": "night_fog_lockdown",
+      "display_name": "夜雾封山",
+      "intensity": "light",
+      "duration_hours": 3,
+      "required_tags": ["traffic"],
+      "effect_tags": ["traffic_down", "patrol_need_up"],
+      "player_actions": ["dispatch_patrol", "delay_transport"]
+    }
+  ]
+}

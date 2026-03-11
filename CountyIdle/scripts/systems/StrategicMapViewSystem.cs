@@ -18,9 +18,9 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     private const float DefaultMaxZoom = 15.0f;
     private const float PrefectureMaxZoom = 5.0f;
     private const float PrefectureUrbanTextureZoom = 4.0f;
-    private const float ZoomWheelImpulse = 0.8f;
     private const float ZoomVelocityDamping = 8.0f;
     private const float ZoomLerpSpeed = 10.0f;
+    private const float PanSpeed = 520f;
     private const int PopulationBucketSize = 24;
     private const int HousingBucketSize = 30;
     private const int ThreatBucketSize = 8;
@@ -64,16 +64,21 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     private float _zoom = 1.0f;
     private float _targetZoom = 1.0f;
     private float _zoomVelocity;
+    private Vector2 _panOffset = Vector2.Zero;
     private int? _populationBucket;
     private int? _housingBucket;
     private int? _threatBucket;
     private int? _settlementBucket;
     private MapViewStyle _operationalStyle = new();
+    private XianxiaSiteData? _selectedWorldSite;
+
+    public event Action<XianxiaSiteData?>? WorldSiteSelectionChanged;
 
     public float Zoom => _targetZoom;
     public float MinZoom => DefaultMinZoom;
     public float MaxZoom => _mode == StrategicMapMode.Prefecture ? PrefectureMaxZoom : DefaultMaxZoom;
     public float DefaultZoom => 1.0f;
+    public XianxiaSiteData? SelectedWorldSite => _selectedWorldSite;
 
     public override void _Ready()
     {
@@ -125,6 +130,13 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         var dt = (float)delta;
         var needsUpdate = false;
 
+        var panDirection = GetPanDirection();
+        if (panDirection != Vector2.Zero)
+        {
+            _panOffset += panDirection.Normalized() * PanSpeed * dt;
+            needsUpdate = true;
+        }
+
         if (Mathf.Abs(_zoomVelocity) > 0.001f)
         {
             _targetZoom = Mathf.Clamp(_targetZoom + (_zoomVelocity * dt), MinZoom, MaxZoom);
@@ -153,14 +165,37 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
             return;
         }
 
-        if (mouseButton.ButtonIndex == MouseButton.WheelUp)
+        if (mouseButton.ButtonIndex == MouseButton.Left && _mode == StrategicMapMode.World)
         {
-            AddZoomImpulse(1f);
+            TrySelectWorldSite(mouseButton.Position);
+            GetViewport().SetInputAsHandled();
+        }
+        else if (mouseButton.ButtonIndex == MouseButton.Right && _mode == StrategicMapMode.World)
+        {
+            ClearWorldSiteSelection();
+            GetViewport().SetInputAsHandled();
+        }
+        else if (mouseButton.ButtonIndex == MouseButton.WheelUp)
+        {
+            AdjustZoomAt(mouseButton.Position, ZoomStep);
             GetViewport().SetInputAsHandled();
         }
         else if (mouseButton.ButtonIndex == MouseButton.WheelDown)
         {
-            AddZoomImpulse(-1f);
+            AdjustZoomAt(mouseButton.Position, -ZoomStep);
+            GetViewport().SetInputAsHandled();
+        }
+    }
+
+    public override void _Input(InputEvent @event)
+    {
+        if (!IsVisibleInTree() || @event is not InputEventKey keyEvent || !keyEvent.Pressed || keyEvent.Echo)
+        {
+            return;
+        }
+
+        if (keyEvent.Keycode is Key.Up or Key.Down or Key.Left or Key.Right)
+        {
             GetViewport().SetInputAsHandled();
         }
     }
@@ -172,13 +207,13 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
             return;
         }
 
-        var mapRect = new Rect2(12f, 44f, Math.Max(Size.X - 24f, 8f), Math.Max(Size.Y - 56f, 8f));
+        var mapRect = GetMapRect();
         DrawMapBackdrop(mapRect);
-        DrawGrid(mapRect, _mapDefinition.GridLines);
+        var mapRectWithOffset = new Rect2(mapRect.Position + _panOffset, mapRect.Size);
+        DrawGrid(mapRectWithOffset, _mapDefinition.GridLines);
 
-        var center = mapRect.GetCenter();
-        var safeScale = Mathf.Clamp(_mapDefinition.UnitScale, 0.20f, 0.90f);
-        var unit = Math.Min(mapRect.Size.X, mapRect.Size.Y) * safeScale * _zoom;
+        var center = mapRectWithOffset.GetCenter();
+        var unit = GetUnitForZoom(mapRect, _zoom);
         if (unit <= 8f)
         {
             return;
@@ -224,6 +259,17 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         QueueRedraw();
     }
 
+    private Rect2 GetMapRect()
+    {
+        return new Rect2(12f, 44f, Math.Max(Size.X - 24f, 8f), Math.Max(Size.Y - 56f, 8f));
+    }
+
+    private float GetUnitForZoom(Rect2 mapRect, float zoom)
+    {
+        var safeScale = Mathf.Clamp(_mapDefinition.UnitScale, 0.20f, 0.90f);
+        return Math.Min(mapRect.Size.X, mapRect.Size.Y) * safeScale * zoom;
+    }
+
     private void DrawMapBackdrop(Rect2 mapRect)
     {
         DrawRect(mapRect, _operationalStyle.BackdropColor, true);
@@ -237,16 +283,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
 
     public void SetZoom(float zoom)
     {
-        var clampedZoom = Mathf.Clamp(zoom, MinZoom, MaxZoom);
-        if (Mathf.IsEqualApprox(clampedZoom, _targetZoom))
-        {
-            return;
-        }
-
-        _targetZoom = clampedZoom;
-        _zoomVelocity = 0f;
-        UpdateTitle();
-        QueueRedraw();
+        SetZoomTarget(zoom);
     }
 
     public void AdjustZoom(float delta)
@@ -254,9 +291,100 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         SetZoom(_targetZoom + delta);
     }
 
-    private void AddZoomImpulse(float direction)
+    public void ResetView()
     {
-        _zoomVelocity += direction * ZoomWheelImpulse;
+        _panOffset = Vector2.Zero;
+        SetZoomTarget(DefaultZoom, null, true);
+    }
+
+    public void ClearWorldSiteSelection()
+    {
+        if (_selectedWorldSite == null)
+        {
+            return;
+        }
+
+        _selectedWorldSite = null;
+        WorldSiteSelectionChanged?.Invoke(null);
+        QueueRedraw();
+    }
+
+    private void AdjustZoomAt(Vector2 anchorPosition, float delta)
+    {
+        SetZoomTarget(_targetZoom + delta, anchorPosition);
+    }
+
+    private void SetZoomTarget(float zoom, Vector2? anchorPosition = null, bool force = false)
+    {
+        var clampedZoom = Mathf.Clamp(zoom, MinZoom, MaxZoom);
+        if (!force && Mathf.IsEqualApprox(clampedZoom, _targetZoom))
+        {
+            return;
+        }
+
+        var mapRect = GetMapRect();
+        var baseCenter = mapRect.GetCenter();
+        var unitCurrent = GetUnitForZoom(mapRect, _zoom);
+        var unitNext = GetUnitForZoom(mapRect, clampedZoom);
+
+        if (anchorPosition.HasValue && unitCurrent > 0.01f && unitNext > 0.01f)
+        {
+            var anchor = anchorPosition.Value;
+            var mapSpace = (anchor - (baseCenter + _panOffset)) / unitCurrent;
+            _panOffset = anchor - baseCenter - (mapSpace * unitNext);
+        }
+
+        _targetZoom = clampedZoom;
+        _zoomVelocity = 0f;
+        _zoom = clampedZoom;
+        UpdateTitle();
+        QueueRedraw();
+    }
+
+    private Vector2 GetPanDirection()
+    {
+        var direction = Vector2.Zero;
+        if (Input.IsKeyPressed(Key.W))
+        {
+            direction.Y += 1f;
+        }
+
+        if (Input.IsKeyPressed(Key.S))
+        {
+            direction.Y -= 1f;
+        }
+
+        if (Input.IsKeyPressed(Key.A))
+        {
+            direction.X += 1f;
+        }
+
+        if (Input.IsKeyPressed(Key.D))
+        {
+            direction.X -= 1f;
+        }
+
+        if (Input.IsKeyPressed(Key.Up))
+        {
+            direction.Y += 1f;
+        }
+
+        if (Input.IsKeyPressed(Key.Down))
+        {
+            direction.Y -= 1f;
+        }
+
+        if (Input.IsKeyPressed(Key.Left))
+        {
+            direction.X += 1f;
+        }
+
+        if (Input.IsKeyPressed(Key.Right))
+        {
+            direction.X -= 1f;
+        }
+
+        return direction;
     }
 
     public void RefreshPrefectureMap(int populationHint, int housingHint, double threatHint, int hourSettlements)
@@ -425,6 +553,12 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
             }
 
             DrawHexMarker(canvasPoint, radius, color);
+            if (_mode == StrategicMapMode.World && IsSelectedWorldSite(node))
+            {
+                var selectionHex = BuildHexPolygon(canvasPoint, radius * 1.34f);
+                DrawPath(selectionHex, color.Lightened(0.25f), Math.Max(1.5f, radius * 0.18f), true);
+                DrawCircle(canvasPoint, Math.Max(1.2f, radius * 0.24f), new Color(0.98f, 0.95f, 0.84f, 0.92f));
+            }
         }
     }
 
@@ -1123,6 +1257,54 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         }
     }
 
+    private void TrySelectWorldSite(Vector2 mousePosition)
+    {
+        if (_xianxiaWorldMap == null || _xianxiaWorldCenters.Count == 0)
+        {
+            return;
+        }
+
+        var mapRect = GetMapRect();
+        var center = (new Rect2(mapRect.Position + _panOffset, mapRect.Size)).GetCenter();
+        var unit = GetUnitForZoom(mapRect, _zoom);
+        XianxiaSiteData? bestSite = null;
+        var bestDistance = float.MaxValue;
+
+        foreach (var site in _xianxiaWorldMap.Sites)
+        {
+            if (!_xianxiaWorldCenters.TryGetValue((site.Coord.Q, site.Coord.R), out var normalizedCenter))
+            {
+                continue;
+            }
+
+            var canvasPoint = ToCanvas(center, unit, normalizedCenter.X, normalizedCenter.Y);
+            var hitRadius = Math.Max(ResolveWorldSiteHitRadius(site) + 6f, 10f);
+            var distance = mousePosition.DistanceTo(canvasPoint);
+            if (distance > hitRadius || distance >= bestDistance)
+            {
+                continue;
+            }
+
+            bestDistance = distance;
+            bestSite = site;
+        }
+
+        if (bestSite == null)
+        {
+            ClearWorldSiteSelection();
+            return;
+        }
+
+        if (IsSameSite(_selectedWorldSite, bestSite))
+        {
+            return;
+        }
+
+        _selectedWorldSite = bestSite;
+        WorldSiteSelectionChanged?.Invoke(_selectedWorldSite);
+        QueueRedraw();
+    }
+
     private void DrawWorldEdgeOverlays(Vector2 center, float unit)
     {
         if (_xianxiaWorldMap == null || _xianxiaWorldCenters.Count == 0)
@@ -1362,6 +1544,54 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     private static Vector2 ToCanvas(Vector2 center, float unit, float x, float y)
     {
         return center + new Vector2(x * unit, y * unit);
+    }
+
+    private bool IsSelectedWorldSite(StrategicNodeDefinition node)
+    {
+        if (_selectedWorldSite == null)
+        {
+            return false;
+        }
+
+        if (!_xianxiaWorldCenters.TryGetValue((_selectedWorldSite.Coord.Q, _selectedWorldSite.Coord.R), out var normalizedCenter))
+        {
+            return false;
+        }
+
+        return Mathf.IsEqualApprox(node.X, normalizedCenter.X) &&
+               Mathf.IsEqualApprox(node.Y, normalizedCenter.Y);
+    }
+
+    private static bool IsSameSite(XianxiaSiteData? left, XianxiaSiteData? right)
+    {
+        if (left == null || right == null)
+        {
+            return false;
+        }
+
+        return left.Coord.Q == right.Coord.Q &&
+               left.Coord.R == right.Coord.R &&
+               string.Equals(left.Label, right.Label, StringComparison.Ordinal);
+    }
+
+    private static float ResolveWorldSiteHitRadius(XianxiaSiteData site)
+    {
+        return site.PrimaryType switch
+        {
+            "ImmortalCity" => 5.1f,
+            "Sect" => 4.8f,
+            "CultivatorClan" => 4.5f,
+            "MortalRealm" => 4.2f,
+            "Market" => 4.0f,
+            "Ruin" => 3.5f,
+            _ => site.Role switch
+            {
+                XianxiaSiteRoleType.SectCandidate => 4.8f,
+                XianxiaSiteRoleType.Settlement => 4.2f,
+                XianxiaSiteRoleType.Ruin => 3.4f,
+                _ => 3.4f
+            }
+        };
     }
 
     private static Vector2[] BuildHexPolygon(Vector2 center, float radius)

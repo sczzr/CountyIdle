@@ -24,7 +24,7 @@
 - 包含：
   - 世界/郡图/县城地图的经营状态视觉联动；
   - 地图页专用状态条与双按钮调度入口；
-  - 地图调度对 `Happiness`、`Threat`、`AverageCommuteDistanceKm`、`RoadMobilityMultiplier` 与资源库存的即时影响；
+- 地图调度对 `Happiness`、`Threat` 与资源库存的即时影响；
   - 日志与状态刷新闭环。
 - 不包含：
   - 新地图页；

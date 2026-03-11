@@ -78,26 +78,10 @@ public static class MaterialRules
         return state.CopperIngot > 0.01 || state.WroughtIron > 0.01;
     }
 
-    public static double GetClothingEquivalent(GameState state)
-    {
-        return Math.Max(state.ClothingStock, 0) +
-               (Math.Max(state.HempCloth, 0) * 1.4) +
-               (Math.Max(state.Leather, 0) * 1.1);
-    }
-
     public static int GetEffectiveGatherers(GameState state)
     {
         var productionAssigned = Math.Min(state.Farmers, IndustryRules.GetProductionCapacity(state));
-        if (productionAssigned <= 0)
-        {
-            return 0;
-        }
-
-        var laborAvailabilityFactor =
-            PopulationRules.GetOnDutyFactor(state) *
-            PopulationRules.GetSleepFactor(state) *
-            PopulationRules.GetHealthLaborFactor(state);
-        return Math.Max((int)Math.Floor(productionAssigned * laborAvailabilityFactor), 0);
+        return Math.Max(productionAssigned, 0);
     }
 
     public static double GetGatheringProductionFactor(GameState state)

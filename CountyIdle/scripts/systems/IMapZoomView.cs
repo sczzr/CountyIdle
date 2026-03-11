@@ -9,4 +9,5 @@ public interface IMapZoomView
 
     void SetZoom(float zoom);
     void AdjustZoom(float delta);
+    void ResetView();
 }

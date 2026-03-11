@@ -73,14 +73,23 @@ public partial class CountyTownMapViewSystem
     {
         var dt = (float)delta;
         var needsUpdate = false;
+        var needsHintUpdate = false;
 
         if (_isInitialized)
         {
+            var panDirection = GetPanDirection();
+            if (panDirection != Vector2.Zero)
+            {
+                _panOffset += panDirection.Normalized() * PanSpeed * dt;
+                needsUpdate = true;
+            }
+
             if (Mathf.Abs(_zoomVelocity) > 0.001f)
             {
                 _zoomTarget = Mathf.Clamp(_zoomTarget + (_zoomVelocity * dt), MinZoom, MaxZoom);
                 _zoomVelocity = Mathf.Lerp(_zoomVelocity, 0f, dt * ZoomVelocityDamping);
                 needsUpdate = true;
+                needsHintUpdate = true;
             }
 
             var nextZoom = Mathf.Lerp(_zoom, _zoomTarget, dt * ZoomLerpSpeed);
@@ -88,9 +97,10 @@ public partial class CountyTownMapViewSystem
             {
                 _zoom = nextZoom;
                 needsUpdate = true;
+                needsHintUpdate = true;
             }
 
-            if (needsUpdate)
+            if (needsHintUpdate)
             {
                 UpdateMapHint();
             }

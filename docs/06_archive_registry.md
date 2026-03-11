@@ -43,7 +43,7 @@
 | `building-elements-pack` | FC（无 CP/BL） | 资产交付 | 保持独立资产 topic |
 | `client-settings-panel` | FC（无 CP/BL） | 已实现 | 下次涉及机制联动时补 CP/BL |
 | `prefecture-village-style-generator` | FC/CP/BL（本次新增） | 演进 | 当前对外语义为“江陵府外域程序化生成”；并入战略地图史诗链路，后续扩展可复用同 topic |
-| `population-allocation-lifecycle-commute` | FC/CP/BL（本次新增） | 演进 | 已完成一期落地，后续沿用同 topic 持续调参 |
+| `population-allocation-lifecycle-commute` | FC/CP/BL（已归档下线） | 历史 | 2026-03-12 按需求移除文档与功能实现，不再继续沿用该 topic |
 | `countytown-resident-walkers` | FC/BL（本次新增） | 演进 | 当前对外语义为“宗门弟子可视移动”；并入 `countytown-25d-map` 史诗链路，后续可替换正式人物美术 |
 | `sect-management-docs-reframe` | FC/BL（本次新增） | 稳定 | 用于“天衍峰经营文档重梳”类任务；后续文档治理迭代沿用同 topic |
 | `archive-semantic-bridges` | FC/BL（本次新增） | 稳定 | 用于给历史归档补“当前对外语义”与摘要层宗门化说明，减少旧正文跳戏 |

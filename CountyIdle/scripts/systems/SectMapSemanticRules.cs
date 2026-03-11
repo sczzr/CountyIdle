@@ -133,6 +133,6 @@ public static class SectMapSemanticRules
 
     public static string GetMapInteractionHint()
     {
-        return "当前仅展示天衍峰地貌，不提供场所与门人选中";
+        return "左键检视任意院域，右键清除选中；当前先展示院域底盘、灵气与推荐坊局，不接弟子实体联动";
     }
 }

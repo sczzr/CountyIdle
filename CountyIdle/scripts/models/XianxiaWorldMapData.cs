@@ -510,6 +510,21 @@ public sealed class XianxiaSiteData
 
     [JsonPropertyName("importance")]
     public int Importance { get; set; } = 1;
+
+    [JsonPropertyName("primary_type")]
+    public string PrimaryType { get; set; } = string.Empty;
+
+    [JsonPropertyName("secondary_tag")]
+    public string SecondaryTag { get; set; } = string.Empty;
+
+    [JsonPropertyName("region_id")]
+    public string RegionId { get; set; } = string.Empty;
+
+    [JsonPropertyName("rarity_tier")]
+    public string RarityTier { get; set; } = "Common";
+
+    [JsonPropertyName("unlock_tier")]
+    public int UnlockTier { get; set; }
 }
 
 public sealed class XianxiaWorldMapData

@@ -16,7 +16,6 @@ public static class MaterialSemanticRules
             [nameof(GameState.Gold)] = new("灵石", "宗门流转、赏赐与扩建使用的灵石储备。"),
             [nameof(GameState.ContributionPoints)] = new("贡献点", "宗门内部流通的功绩凭据，用于内务建设与宗务调度。"),
             [nameof(GameState.IndustryTools)] = new("工器", "工坊与采集岗位使用的基础工器。"),
-            [nameof(GameState.ClothingStock)] = new("衣袍", "弟子与住民的日常衣袍储备。"),
             [nameof(GameState.Timber)] = new("灵木", "采自山林的灵木原材，可锯作梁木与工料。"),
             [nameof(GameState.RawStone)] = new("青罡原石", "山脉采出的原生石材，可切制石料。"),
             [nameof(GameState.Clay)] = new("赤陶土", "可烧制砖瓦与陶器的赤陶土。"),

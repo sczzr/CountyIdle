@@ -1031,14 +1031,17 @@ public sealed partial class XianxiaWorldGeneratorSystem
             }
 
             context.Cell.Structure = XianxiaStructureType.SectFoundation;
-            worldMap.Sites.Add(new XianxiaSiteData
-            {
-                Role = XianxiaSiteRoleType.SectCandidate,
-                Coord = CloneCoord(candidate.Coord),
-                Structure = XianxiaStructureType.SectFoundation,
-                Label = $"宗门候选 {index + 1}",
-                Importance = 3
-            });
+            var secondaryTag = index == 0 ? "MountainGate" : index == 1 ? "BranchPeak" : "OuterCourtyard";
+            worldMap.Sites.Add(CreateSite(
+                context,
+                XianxiaSiteRoleType.SectCandidate,
+                XianxiaStructureType.SectFoundation,
+                $"宗门候选 {index + 1}",
+                3,
+                "Sect",
+                secondaryTag,
+                DetermineRarityTierForTag(config, "Sect", secondaryTag),
+                0));
         }
 
         var settlementPool = SelectSpacedCells(
@@ -1052,18 +1055,155 @@ public sealed partial class XianxiaWorldGeneratorSystem
             config.SettlementCount,
             4);
 
+        var sectCompanionMarkets = TryGenerateCompanionMarkets(worldMap, cells, random, config);
+
         for (var index = 0; index < settlementPool.Count; index++)
         {
-            var structure = index % 2 == 0 ? XianxiaStructureType.VillageBase : XianxiaStructureType.MarketSquare;
-            settlementPool[index].Cell.Structure = structure;
-            worldMap.Sites.Add(new XianxiaSiteData
+            var settlementContext = settlementPool[index];
+            var shouldPromoteToMarket =
+                (index % 3 == 1 && ComputeWaterAccess(cells, settlementContext) > 0.34f) ||
+                HasNearbySiteType(worldMap.Sites, settlementContext, "Sect", 3) ||
+                settlementContext.Cell.Corruption < 0.24f && settlementContext.Cell.Fertility > 0.62f && index == settlementPool.Count - 1;
+
+            if (shouldPromoteToMarket)
             {
-                Role = XianxiaSiteRoleType.Settlement,
-                Coord = CloneCoord(settlementPool[index].Cell.Coord),
-                Structure = structure,
-                Label = index % 2 == 0 ? $"附庸据点 {index + 1}" : $"坊市 {index + 1}",
-                Importance = 2
-            });
+                settlementContext.Cell.Structure = XianxiaStructureType.MarketSquare;
+                var secondaryTag = ComputeWaterAccess(cells, settlementContext) > 0.42f
+                    ? "RoadsideMarket"
+                    : "LooseCultivatorBazaar";
+                worldMap.Sites.Add(CreateSite(
+                    settlementContext,
+                    XianxiaSiteRoleType.Settlement,
+                    XianxiaStructureType.MarketSquare,
+                    secondaryTag == "RoadsideMarket" ? $"路市 {index + 1}" : $"散修坊市 {index + 1}",
+                    2,
+                    "Market",
+                    secondaryTag,
+                    DetermineRarityTierForTag(config, "Market", secondaryTag),
+                    0));
+                continue;
+            }
+
+            settlementContext.Cell.Structure = XianxiaStructureType.VillageBase;
+            var mortalTag = ComputeWaterAccess(cells, settlementContext) > 0.45f
+                ? "RiverTown"
+                : settlementContext.Cell.Fertility > 0.72f
+                    ? "FarmVillage"
+                    : "CountySeat";
+            worldMap.Sites.Add(CreateSite(
+                settlementContext,
+                XianxiaSiteRoleType.Settlement,
+                XianxiaStructureType.VillageBase,
+                mortalTag switch
+                {
+                    "RiverTown" => $"水镇 {index + 1}",
+                    "CountySeat" => $"府县治所 {index + 1}",
+                    _ => $"农庄乡里 {index + 1}"
+                },
+                mortalTag == "CountySeat" ? 3 : 2,
+                "MortalRealm",
+                mortalTag,
+                DetermineRarityTierForTag(config, "MortalRealm", mortalTag),
+                0));
+        }
+
+        if (sectCompanionMarkets.Count > 0)
+        {
+            worldMap.Sites.AddRange(sectCompanionMarkets);
+        }
+
+        var clanCount = ResolvePrimaryTypeTargetCount(config, "CultivatorClan", 4);
+        var clanPool = SelectSpacedCells(
+            cells.Values,
+            context => context.Cell.Structure == XianxiaStructureType.None &&
+                       context.Cell.Wonder == XianxiaWonderType.None &&
+                       context.Cell.Water == XianxiaWaterType.None &&
+                       context.Cell.QiDensity > 0.44f &&
+                       context.Cell.Corruption < 0.56f,
+            context => (context.Cell.QiDensity * 0.34f) +
+                       (context.Cell.Fertility * 0.24f) +
+                       (ComputeWaterAccess(cells, context) * 0.18f) +
+                       (ComputeTravelConnectivity(context) * 0.24f),
+            clanCount,
+            6);
+
+        for (var index = 0; index < clanPool.Count; index++)
+        {
+            var clanContext = clanPool[index];
+            var clanTag = DetermineClanTag(cells, clanContext);
+            var structure = clanTag switch
+            {
+                "GuestHall" => XianxiaStructureType.ImmortalPavilion,
+                "ForgeLineage" => XianxiaStructureType.MartialArena,
+                "MedicineLineage" => XianxiaStructureType.TempleComplex,
+                _ => XianxiaStructureType.TempleFoundation
+            };
+
+            clanContext.Cell.Structure = structure;
+            worldMap.Sites.Add(CreateSite(
+                clanContext,
+                XianxiaSiteRoleType.Settlement,
+                structure,
+                clanTag switch
+                {
+                    "GuestHall" => $"客卿别馆 {index + 1}",
+                    "SpiritFieldManor" => $"灵田庄园 {index + 1}",
+                    "ForgeLineage" => $"铸器世家 {index + 1}",
+                    "MedicineLineage" => $"丹药世家 {index + 1}",
+                    _ => $"祖庭本家 {index + 1}"
+                },
+                3,
+                "CultivatorClan",
+                clanTag,
+                DetermineRarityTierForTag(config, "CultivatorClan", clanTag),
+                DetermineUnlockTierForTag(config, "CultivatorClan", clanTag)));
+        }
+
+        var cityCount = ResolvePrimaryTypeTargetCount(config, "ImmortalCity", 3);
+        var cityPool = SelectSpacedCells(
+            cells.Values,
+            context => context.Cell.Structure == XianxiaStructureType.None &&
+                       context.Cell.Wonder == XianxiaWonderType.None &&
+                       context.Cell.Water == XianxiaWaterType.None &&
+                       context.Cell.Corruption < 0.48f &&
+                       ComputeTravelConnectivity(context) > 0.24f,
+            context => (ComputeTravelConnectivity(context) * 0.42f) +
+                       (ComputeWaterAccess(cells, context) * 0.28f) +
+                       (context.Cell.QiDensity * 0.18f) +
+                       ((1f - context.Cell.Corruption) * 0.12f),
+            cityCount,
+            10);
+
+        for (var index = 0; index < cityPool.Count; index++)
+        {
+            var cityContext = cityPool[index];
+            var cityTag = DetermineImmortalCityTag(cells, cityContext, index);
+            var structure = cityTag switch
+            {
+                "HarborCity" => XianxiaStructureType.HeavenlyGate,
+                "FrontierCity" => XianxiaStructureType.FortressBase,
+                "ImperialCultCity" => XianxiaStructureType.ImmortalPavilion,
+                _ => XianxiaStructureType.MarketSquare
+            };
+
+            cityContext.Cell.Structure = structure;
+            worldMap.Sites.Add(CreateSite(
+                cityContext,
+                XianxiaSiteRoleType.Settlement,
+                structure,
+                cityTag switch
+                {
+                    "HarborCity" => $"河港仙城 {index + 1}",
+                    "FrontierCity" => $"边陲仙城 {index + 1}",
+                    "ImperialCultCity" => $"王朝修士都城 {index + 1}",
+                    "TransitHub" => $"驿城 {index + 1}",
+                    _ => $"仙城 {index + 1}"
+                },
+                cityTag is "ImperialCultCity" or "GrandCity" ? 4 : 3,
+                "ImmortalCity",
+                cityTag,
+                DetermineRarityTierForTag(config, "ImmortalCity", cityTag),
+                DetermineUnlockTierForTag(config, "ImmortalCity", cityTag)));
         }
 
         var ruinPool = SelectSpacedCells(
@@ -1077,17 +1217,341 @@ public sealed partial class XianxiaWorldGeneratorSystem
 
         for (var index = 0; index < ruinPool.Count; index++)
         {
+            var ruinContext = ruinPool[index];
             var structure = index % 2 == 0 ? XianxiaStructureType.AncientCityRuins : XianxiaStructureType.RuinsPlatform;
-            ruinPool[index].Cell.Structure = structure;
-            worldMap.Sites.Add(new XianxiaSiteData
-            {
-                Role = XianxiaSiteRoleType.Ruin,
-                Coord = CloneCoord(ruinPool[index].Cell.Coord),
-                Structure = structure,
-                Label = $"古遗迹 {index + 1}",
-                Importance = 1
-            });
+            ruinContext.Cell.Structure = structure;
+            var secondaryTag = ruinContext.Cell.Corruption > 0.62f
+                ? "SealedDungeon"
+                : ruinContext.Cell.QiDensity > 0.68f
+                    ? "TrialRealm"
+                    : index % 2 == 0
+                        ? "BattlefieldRemnant"
+                        : "AncientCave";
+            worldMap.Sites.Add(CreateSite(
+                ruinContext,
+                XianxiaSiteRoleType.Ruin,
+                structure,
+                secondaryTag switch
+                {
+                    "SealedDungeon" => $"封印地宫 {index + 1}",
+                    "TrialRealm" => $"试炼秘境 {index + 1}",
+                    "BattlefieldRemnant" => $"古战场遗址 {index + 1}",
+                    _ => $"古修洞府 {index + 1}"
+                },
+                secondaryTag is "TrialRealm" or "SealedDungeon" ? 2 : 1,
+                "Ruin",
+                secondaryTag,
+                DetermineRarityTierForTag(config, "Ruin", secondaryTag),
+                secondaryTag == "TrialRealm" ? 2 : 0));
         }
+    }
+
+    private static List<XianxiaSiteData> TryGenerateCompanionMarkets(
+        XianxiaWorldMapData worldMap,
+        Dictionary<(int Q, int R), CellContext> cells,
+        Random random,
+        XianxiaWorldGenerationConfig config)
+    {
+        var results = new List<XianxiaSiteData>();
+        foreach (var site in worldMap.Sites)
+        {
+            if (!string.Equals(site.PrimaryType, "Sect", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            var companionRule = FindCompanionRule(config, site.PrimaryType, site.SecondaryTag, "Market");
+            if (companionRule == null)
+            {
+                continue;
+            }
+
+            var roll = random.NextSingle();
+            if (roll > companionRule.SpawnChance.Max)
+            {
+                continue;
+            }
+
+            if (!cells.TryGetValue((site.Coord.Q, site.Coord.R), out var hostContext))
+            {
+                continue;
+            }
+
+            var candidate = FindNearestAvailableCompanionCell(cells, hostContext, companionRule.MinDistanceFromHost, companionRule.MaxDistanceFromHost);
+            if (candidate == null)
+            {
+                continue;
+            }
+
+            candidate.Cell.Structure = XianxiaStructureType.MarketSquare;
+            results.Add(CreateSite(
+                candidate,
+                XianxiaSiteRoleType.Settlement,
+                XianxiaStructureType.MarketSquare,
+                $"宗门坊市 {results.Count + 1}",
+                2,
+                "Market",
+                companionRule.CompanionTag,
+                DetermineRarityTierForTag(config, "Market", companionRule.CompanionTag),
+                0));
+        }
+
+        return results;
+    }
+
+    private static int ResolvePrimaryTypeTargetCount(XianxiaWorldGenerationConfig config, string primaryType, int fallbackCount)
+    {
+        foreach (var rule in config.PrimaryTypeSpawnRules)
+        {
+            if (!string.Equals(rule.PrimaryType, primaryType, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            if (rule.GlobalCap > 0)
+            {
+                return Math.Min(fallbackCount, rule.GlobalCap);
+            }
+
+            return fallbackCount;
+        }
+
+        return fallbackCount;
+    }
+
+    private static string DetermineClanTag(Dictionary<(int Q, int R), CellContext> cells, CellContext context)
+    {
+        var waterAccess = ComputeWaterAccess(cells, context);
+        var travelConnectivity = ComputeTravelConnectivity(context);
+
+        if (travelConnectivity > 0.72f)
+        {
+            return "GuestHall";
+        }
+
+        if (context.Cell.Fertility > 0.66f && waterAccess > 0.42f)
+        {
+            return "SpiritFieldManor";
+        }
+
+        if (context.Cell.Biome is XianxiaBiomeType.SacredForest or XianxiaBiomeType.BambooValley or XianxiaBiomeType.SpiritSwamps)
+        {
+            return "MedicineLineage";
+        }
+
+        if (context.Cell.Biome is XianxiaBiomeType.MistyMountains or XianxiaBiomeType.JadeHighlands or XianxiaBiomeType.CrystalFields)
+        {
+            return "ForgeLineage";
+        }
+
+        return "AncestralEstate";
+    }
+
+    private static string DetermineImmortalCityTag(Dictionary<(int Q, int R), CellContext> cells, CellContext context, int index)
+    {
+        var waterAccess = ComputeWaterAccess(cells, context);
+        var travelConnectivity = ComputeTravelConnectivity(context);
+
+        if (index == 0 && travelConnectivity > 0.78f && context.Cell.QiDensity > 0.70f && context.Cell.Corruption < 0.18f)
+        {
+            return "ImperialCultCity";
+        }
+
+        if (context.Cell.MonsterThreat > 0.56f)
+        {
+            return "FrontierCity";
+        }
+
+        if (waterAccess > 0.48f)
+        {
+            return "HarborCity";
+        }
+
+        if (travelConnectivity > 0.80f)
+        {
+            return "TransitHub";
+        }
+
+        return "GrandCity";
+    }
+
+    private static CellContext? FindNearestAvailableCompanionCell(
+        Dictionary<(int Q, int R), CellContext> cells,
+        CellContext hostContext,
+        int minDistance,
+        int maxDistance)
+    {
+        CellContext? best = null;
+        var bestScore = float.MinValue;
+        var hostCoord = ToCoord(hostContext.Cell);
+
+        foreach (var candidate in cells.Values)
+        {
+            if (candidate.Cell.Structure != XianxiaStructureType.None ||
+                candidate.Cell.Wonder != XianxiaWonderType.None ||
+                candidate.Cell.Water != XianxiaWaterType.None ||
+                !candidate.Cell.IsPassable)
+            {
+                continue;
+            }
+
+            var distance = HexDistance(hostCoord, ToCoord(candidate.Cell));
+            if (distance < minDistance || distance > maxDistance)
+            {
+                continue;
+            }
+
+            var score = candidate.Cell.Fertility + ComputeWaterAccess(cells, candidate) - (candidate.Cell.Corruption * 0.4f);
+            if (score <= bestScore)
+            {
+                continue;
+            }
+
+            bestScore = score;
+            best = candidate;
+        }
+
+        return best;
+    }
+
+    private static WorldCompanionSpawnRule? FindCompanionRule(
+        XianxiaWorldGenerationConfig config,
+        string hostType,
+        string hostTag,
+        string companionType)
+    {
+        foreach (var rule in config.CompanionSpawnRules)
+        {
+            if (!string.Equals(rule.HostType, hostType, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            if (!string.Equals(rule.CompanionType, companionType, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            if (!string.IsNullOrWhiteSpace(rule.HostTag) &&
+                !string.Equals(rule.HostTag, hostTag, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            return rule;
+        }
+
+        return null;
+    }
+
+    private static bool HasNearbySiteType(List<XianxiaSiteData> sites, CellContext context, string primaryType, int radius)
+    {
+        var coord = ToCoord(context.Cell);
+        foreach (var site in sites)
+        {
+            if (!string.Equals(site.PrimaryType, primaryType, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            if (HexDistance(coord, new AxialCoord(site.Coord.Q, site.Coord.R)) <= radius)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static XianxiaSiteData CreateSite(
+        CellContext context,
+        XianxiaSiteRoleType role,
+        XianxiaStructureType structure,
+        string label,
+        int importance,
+        string primaryType,
+        string secondaryTag,
+        string rarityTier,
+        int unlockTier)
+    {
+        return new XianxiaSiteData
+        {
+            Role = role,
+            Coord = CloneCoord(context.Cell.Coord),
+            Structure = structure,
+            Label = label,
+            Importance = importance,
+            PrimaryType = primaryType,
+            SecondaryTag = secondaryTag,
+            RegionId = DetermineRegionId(context),
+            RarityTier = rarityTier,
+            UnlockTier = unlockTier
+        };
+    }
+
+    private static string DetermineRarityTierForTag(XianxiaWorldGenerationConfig config, string primaryType, string secondaryTag)
+    {
+        foreach (var rule in config.SecondaryTagSpawnRules)
+        {
+            if (!string.Equals(rule.PrimaryType, primaryType, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            if (!string.Equals(rule.SecondaryTag, secondaryTag, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            return rule.RarityTier;
+        }
+
+        return "Common";
+    }
+
+    private static int DetermineUnlockTierForTag(XianxiaWorldGenerationConfig config, string primaryType, string secondaryTag)
+    {
+        foreach (var rule in config.SecondaryTagSpawnRules)
+        {
+            if (!string.Equals(rule.PrimaryType, primaryType, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            if (!string.Equals(rule.SecondaryTag, secondaryTag, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            return rule.UnlockTier;
+        }
+
+        return 0;
+    }
+
+    private static string DetermineRegionId(CellContext context)
+    {
+        if (context.Cell.Biome == XianxiaBiomeType.AncientRuinsLand || (context.Cell.Corruption > 0.62f && context.Cell.QiDensity < 0.46f))
+        {
+            return "BrokenVeinRuins";
+        }
+
+        if (context.Height01 > 0.66f || context.Cell.Biome is XianxiaBiomeType.MistyMountains or XianxiaBiomeType.JadeHighlands or XianxiaBiomeType.SnowPeaks)
+        {
+            return "SpiritMountain";
+        }
+
+        if (context.Cell.MonsterThreat > 0.58f || context.Cell.Biome is XianxiaBiomeType.DesertBadlands or XianxiaBiomeType.SpiritSwamps)
+        {
+            return "FrontierWilds";
+        }
+
+        if (context.Cell.Fertility > 0.62f && context.Cell.Moisture > 0.48f)
+        {
+            return "MortalHeartland";
+        }
+
+        return "TradeCorridor";
     }
 
     private static void GenerateRoads(
@@ -2004,9 +2468,9 @@ public sealed partial class XianxiaWorldGeneratorSystem
             {
                 X = center.X,
                 Y = center.Y,
-                Radius = ResolveSiteRadius(site.Role),
-                Color = ToHtmlColor(ResolveSiteColor(site.Role, site.Structure)),
-                Kind = ResolveSiteKind(site.Role)
+                Radius = ResolveSiteRadius(site),
+                Color = ToHtmlColor(ResolveSiteColor(site)),
+                Kind = ResolveSiteKind(site)
             });
         }
 
@@ -2082,8 +2546,8 @@ public sealed partial class XianxiaWorldGeneratorSystem
                 Y = center.Y + (layout.HexRadius * 1.2f),
                 Text = site.Label,
                 Color = "#EEDCB8E6",
-                FontSize = site.Role == XianxiaSiteRoleType.SectCandidate ? 11 : 10,
-                MinZoom = site.Role == XianxiaSiteRoleType.SectCandidate ? 0.88f : 1.05f
+                FontSize = ResolveSiteLabelFontSize(site),
+                MinZoom = ResolveSiteLabelMinZoom(site)
             });
         }
 
@@ -2276,6 +2740,25 @@ public sealed partial class XianxiaWorldGeneratorSystem
         };
     }
 
+    private static Color ResolveSiteColor(XianxiaSiteData site)
+    {
+        if (!string.IsNullOrWhiteSpace(site.PrimaryType))
+        {
+            return site.PrimaryType switch
+            {
+                "Sect" => new Color(0.54f, 0.84f, 0.62f, 1f),
+                "MortalRealm" => new Color(0.87f, 0.74f, 0.51f, 1f),
+                "Market" => new Color(0.95f, 0.62f, 0.38f, 1f),
+                "CultivatorClan" => new Color(0.76f, 0.68f, 0.50f, 1f),
+                "ImmortalCity" => new Color(0.50f, 0.78f, 0.88f, 1f),
+                "Ruin" => new Color(0.62f, 0.58f, 0.56f, 1f),
+                _ => ResolveSiteColor(site.Role, site.Structure)
+            };
+        }
+
+        return ResolveSiteColor(site.Role, site.Structure);
+    }
+
     private static Color ResolveSiteColor(XianxiaSiteRoleType role, XianxiaStructureType structure)
     {
         return role switch
@@ -2338,6 +2821,25 @@ public sealed partial class XianxiaWorldGeneratorSystem
         };
     }
 
+    private static float ResolveSiteRadius(XianxiaSiteData site)
+    {
+        if (!string.IsNullOrWhiteSpace(site.PrimaryType))
+        {
+            return site.PrimaryType switch
+            {
+                "ImmortalCity" => 5.1f,
+                "Sect" => 4.8f,
+                "CultivatorClan" => 4.5f,
+                "MortalRealm" => 4.2f,
+                "Market" => 4.0f,
+                "Ruin" => 3.5f,
+                _ => ResolveSiteRadius(site.Role)
+            };
+        }
+
+        return ResolveSiteRadius(site.Role);
+    }
+
     private static float ResolveSiteRadius(XianxiaSiteRoleType role)
     {
         return role switch
@@ -2351,6 +2853,25 @@ public sealed partial class XianxiaWorldGeneratorSystem
         };
     }
 
+    private static string ResolveSiteKind(XianxiaSiteData site)
+    {
+        if (!string.IsNullOrWhiteSpace(site.PrimaryType))
+        {
+            return site.PrimaryType switch
+            {
+                "ImmortalCity" => "city",
+                "CultivatorClan" => "landmark",
+                "Sect" => "sect",
+                "MortalRealm" => "settlement",
+                "Market" => "settlement",
+                "Ruin" => "ruin",
+                _ => ResolveSiteKind(site.Role)
+            };
+        }
+
+        return ResolveSiteKind(site.Role);
+    }
+
     private static string ResolveSiteKind(XianxiaSiteRoleType role)
     {
         return role switch
@@ -2361,6 +2882,29 @@ public sealed partial class XianxiaWorldGeneratorSystem
             XianxiaSiteRoleType.WonderAnchor => "wonder",
             XianxiaSiteRoleType.ResourceHub => "resource",
             _ => "site"
+        };
+    }
+
+    private static int ResolveSiteLabelFontSize(XianxiaSiteData site)
+    {
+        return site.PrimaryType switch
+        {
+            "ImmortalCity" => 11,
+            "Sect" => 11,
+            "CultivatorClan" => 10,
+            _ => site.Importance >= 3 ? 10 : 9
+        };
+    }
+
+    private static float ResolveSiteLabelMinZoom(XianxiaSiteData site)
+    {
+        return site.PrimaryType switch
+        {
+            "Sect" => 0.88f,
+            "ImmortalCity" => 0.92f,
+            "CultivatorClan" => 1.00f,
+            "Ruin" => 1.04f,
+            _ => 1.05f
         };
     }
 

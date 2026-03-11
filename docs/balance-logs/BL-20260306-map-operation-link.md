@@ -25,7 +25,7 @@
 - 新增地图调度动作：
   - 郡图：整修驿路、赈济乡里；
   - 县城：修整街坊、夜巡清巷。
-- 调度即时影响 `Happiness`、`Threat`、`MapCommuteReductionBonusKm`、`MapRoadMobilityBonus` 与资源库存。
+- 调度即时影响 `Happiness`、`Threat` 与资源库存。
 
 ## 指标结果
 

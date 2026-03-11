@@ -50,7 +50,7 @@
 
 - 验证方式：
   - 手动切换世界/郡图/县城页观察状态文本与色调变化；
-  - 执行地图调度并观察 `Happiness`、`Threat`、`AverageCommuteDistanceKm`、资源数值与日志变化；
+- 执行地图调度并观察 `Happiness`、`Threat`、资源数值与日志变化；
   - 运行 `dotnet build .\Finally.sln`。
 - 观察周期：单次会话即时验证 + 至少一个小时结算周期。
 - 成功判定阈值：

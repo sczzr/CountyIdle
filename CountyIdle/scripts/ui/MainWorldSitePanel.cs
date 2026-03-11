@@ -1,0 +1,280 @@
+using Godot;
+using CountyIdle.Models;
+
+namespace CountyIdle;
+
+public partial class Main
+{
+    private Label? _worldSitePanelTitleLabel;
+    private Label? _worldSitePanelSubtitleLabel;
+    private Label? _worldSitePanelTypeValueLabel;
+    private Label? _worldSitePanelRegionValueLabel;
+    private Label? _worldSitePanelRarityValueLabel;
+    private Label? _worldSitePanelUnlockValueLabel;
+    private Label? _worldSitePanelFocusValueLabel;
+    private Label? _worldSitePanelYieldValueLabel;
+    private Label? _worldSitePanelRiskValueLabel;
+    private Label? _worldSitePanelDescriptionLabel;
+    private Label? _worldSitePanelHintLabel;
+    private Button? _worldSitePanelBackButton;
+    private Button? _worldSitePanelActionButton;
+
+    private void BindWorldSitePanelNodes()
+    {
+        _worldSitePanelTitleLabel = GetNodeOrNull<Label>($"{CenterMapPagesPath}/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/HeaderBox/TitleLabel");
+        _worldSitePanelSubtitleLabel = GetNodeOrNull<Label>($"{CenterMapPagesPath}/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/HeaderBox/SubtitleLabel");
+        _worldSitePanelTypeValueLabel = GetNodeOrNull<Label>($"{CenterMapPagesPath}/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/SummaryBox/TypeCard/TypeMargin/TypeVBox/Value");
+        _worldSitePanelRegionValueLabel = GetNodeOrNull<Label>($"{CenterMapPagesPath}/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/SummaryBox/RegionCard/RegionMargin/RegionVBox/Value");
+        _worldSitePanelRarityValueLabel = GetNodeOrNull<Label>($"{CenterMapPagesPath}/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/SummaryBox/RarityCard/RarityMargin/RarityVBox/Value");
+        _worldSitePanelUnlockValueLabel = GetNodeOrNull<Label>($"{CenterMapPagesPath}/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/SummaryBox/UnlockCard/UnlockMargin/UnlockVBox/Value");
+        _worldSitePanelFocusValueLabel = GetNodeOrNull<Label>($"{CenterMapPagesPath}/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/TemplateGrid/FocusCard/FocusMargin/FocusVBox/Value");
+        _worldSitePanelYieldValueLabel = GetNodeOrNull<Label>($"{CenterMapPagesPath}/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/TemplateGrid/YieldCard/YieldMargin/YieldVBox/Value");
+        _worldSitePanelRiskValueLabel = GetNodeOrNull<Label>($"{CenterMapPagesPath}/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/TemplateGrid/RiskCard/RiskMargin/RiskVBox/Value");
+        _worldSitePanelDescriptionLabel = GetNodeOrNull<Label>($"{CenterMapPagesPath}/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/DescriptionCard/DescriptionMargin/DescriptionLabel");
+        _worldSitePanelHintLabel = GetNodeOrNull<Label>($"{CenterMapPagesPath}/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/HintLabel");
+        _worldSitePanelBackButton = GetNodeOrNull<Button>($"{CenterMapPagesPath}/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/ActionRow/BackButton");
+        _worldSitePanelActionButton = GetNodeOrNull<Button>($"{CenterMapPagesPath}/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/ActionRow/ActionButton");
+
+        if (_worldSitePanelBackButton != null)
+        {
+            _worldSitePanelBackButton.Pressed += OnWorldSitePanelBackPressed;
+        }
+
+        if (_worldSitePanelActionButton != null)
+        {
+            _worldSitePanelActionButton.Pressed += OnWorldSitePanelActionPressed;
+        }
+
+        RefreshWorldSitePanel();
+    }
+
+    private void ClearWorldSitePanelNodes()
+    {
+        if (_worldSitePanelBackButton != null)
+        {
+            _worldSitePanelBackButton.Pressed -= OnWorldSitePanelBackPressed;
+        }
+
+        if (_worldSitePanelActionButton != null)
+        {
+            _worldSitePanelActionButton.Pressed -= OnWorldSitePanelActionPressed;
+        }
+
+        _worldSitePanelTitleLabel = null;
+        _worldSitePanelSubtitleLabel = null;
+        _worldSitePanelTypeValueLabel = null;
+        _worldSitePanelRegionValueLabel = null;
+        _worldSitePanelRarityValueLabel = null;
+        _worldSitePanelUnlockValueLabel = null;
+        _worldSitePanelFocusValueLabel = null;
+        _worldSitePanelYieldValueLabel = null;
+        _worldSitePanelRiskValueLabel = null;
+        _worldSitePanelDescriptionLabel = null;
+        _worldSitePanelHintLabel = null;
+        _worldSitePanelBackButton = null;
+        _worldSitePanelActionButton = null;
+    }
+
+    private void RefreshWorldSitePanel()
+    {
+        if (_worldSitePanelTitleLabel == null ||
+            _worldSitePanelSubtitleLabel == null ||
+            _worldSitePanelTypeValueLabel == null ||
+            _worldSitePanelRegionValueLabel == null ||
+            _worldSitePanelRarityValueLabel == null ||
+            _worldSitePanelUnlockValueLabel == null ||
+            _worldSitePanelFocusValueLabel == null ||
+            _worldSitePanelYieldValueLabel == null ||
+            _worldSitePanelRiskValueLabel == null ||
+            _worldSitePanelDescriptionLabel == null ||
+            _worldSitePanelHintLabel == null ||
+            _worldSitePanelActionButton == null)
+        {
+            return;
+        }
+
+        var site = _worldMapRenderer?.SelectedWorldSite;
+        if (site == null)
+        {
+            _worldSitePanelTitleLabel.Text = "二级地图";
+            _worldSitePanelSubtitleLabel.Text = "尚未选中世界点位";
+            _worldSitePanelTypeValueLabel.Text = "未选中";
+            _worldSitePanelRegionValueLabel.Text = "未定区块";
+            _worldSitePanelRarityValueLabel.Text = "常见";
+            _worldSitePanelUnlockValueLabel.Text = "待判定";
+            _worldSitePanelFocusValueLabel.Text = "先在世界舆图里点选一个站点。";
+            _worldSitePanelYieldValueLabel.Text = "不同类型的点位会回流不同资源、关系或机缘。";
+            _worldSitePanelRiskValueLabel.Text = "未选中时暂不显示具体风险。";
+            _worldSitePanelDescriptionLabel.Text = "先返回世界舆图并点选一个外域点位，再从左侧检视器或这里进入对应的二级地图入口。";
+            _worldSitePanelHintLabel.Text = "当前为二级地图占位页，后续会按点位类型展开不同的下级地图模板。";
+            _worldSitePanelActionButton.Text = "返回后再选择点位";
+            _worldSitePanelActionButton.Disabled = true;
+            ApplyWorldSitePanelTone("world");
+            return;
+        }
+
+        var primaryTypeText = ResolveWorldPrimaryTypeText(site.PrimaryType);
+        _worldSitePanelTitleLabel.Text = site.Label;
+        _worldSitePanelSubtitleLabel.Text = $"{primaryTypeText} · {ResolveWorldSecondaryTagText(site.SecondaryTag)}";
+        _worldSitePanelTypeValueLabel.Text = primaryTypeText;
+        _worldSitePanelRegionValueLabel.Text = ResolveWorldRegionText(site.RegionId);
+        _worldSitePanelRarityValueLabel.Text = ResolveWorldRarityText(site.RarityTier);
+        _worldSitePanelUnlockValueLabel.Text = site.UnlockTier switch
+        {
+            <= 0 => "开局可至",
+            1 => "中期开启",
+            _ => "后期开启"
+        };
+        var templateInfo = BuildWorldSiteTemplateInfo(site);
+        _worldSitePanelFocusValueLabel.Text = templateInfo.FocusText;
+        _worldSitePanelYieldValueLabel.Text = templateInfo.YieldText;
+        _worldSitePanelRiskValueLabel.Text = templateInfo.RiskText;
+        _worldSitePanelDescriptionLabel.Text = BuildWorldSiteDescription(site, primaryTypeText, ResolveWorldRarityText(site.RarityTier));
+        _worldSitePanelHintLabel.Text = BuildWorldSiteHint(site);
+        _worldSitePanelActionButton.Text = ResolveWorldSiteActionText(site);
+        _worldSitePanelActionButton.Disabled = false;
+        ApplyWorldSitePanelTone(site.PrimaryType);
+    }
+
+    private void OpenSelectedWorldSitePanel()
+    {
+        if (_worldMapRenderer?.SelectedWorldSite == null)
+        {
+            AppendLog("当前尚未选中世界点位，无法进入二级地图入口。");
+            return;
+        }
+
+        RefreshWorldSitePanel();
+        SetMapTab(MapTab.WorldSite);
+    }
+
+    private void OnWorldSitePanelBackPressed()
+    {
+        SetMapTab(MapTab.World);
+    }
+
+    private void OnWorldSitePanelActionPressed()
+    {
+        var site = _worldMapRenderer?.SelectedWorldSite;
+        if (site == null)
+        {
+            return;
+        }
+
+        switch (site.PrimaryType)
+        {
+            case "Sect":
+                OpenTaskPanel();
+                AppendLog($"已从二级地图入口页转往【{site.Label}】相关的宗门筹备。");
+                break;
+            case "MortalRealm":
+            case "Market":
+            case "ImmortalCity":
+                OpenWarehousePanel();
+                AppendLog($"已从二级地图入口页查阅前往【{site.Label}】所需的物资准备。");
+                break;
+            case "CultivatorClan":
+            case "Ruin":
+                OpenDisciplePanel();
+                AppendLog($"已从二级地图入口页查阅前往【{site.Label}】的人选与门人准备。");
+                break;
+            default:
+                OpenTaskPanel();
+                AppendLog($"已从二级地图入口页查阅【{site.Label}】相关的外域筹备。");
+                break;
+        }
+    }
+
+    private static string ResolveWorldSiteActionText(XianxiaSiteData site)
+    {
+        return site.PrimaryType switch
+        {
+            "Sect" => "转往宗门筹备",
+            "MortalRealm" => "查阅供养准备",
+            "Market" => "查阅贸易准备",
+            "CultivatorClan" => "查阅往来人选",
+            "ImmortalCity" => "查阅远行补给",
+            "Ruin" => "查阅历练人选",
+            _ => "查阅相关筹备"
+        };
+    }
+
+    private static string BuildWorldSiteHint(XianxiaSiteData site)
+    {
+        return site.PrimaryType switch
+        {
+            "Sect" => "当前占位页后续将承接宗门访问、结盟、论道与传承交换等宗门型二级地图。",
+            "MortalRealm" => "当前占位页后续将承接凡俗国度的供养、安民、附庸护持与苗子招揽等二级地图。",
+            "Market" => "当前占位页后续将承接坊市交易、传闻、短期委托与黑白市机会等二级地图。",
+            "CultivatorClan" => "当前占位页后续将承接世家关系、客卿合作、血脉与专精资源往来等二级地图。",
+            "ImmortalCity" => "当前占位页后续将承接仙城驻点、大宗交易、拍卖与跨域任务等二级地图。",
+            "Ruin" => "当前占位页后续将承接遗迹探索、试炼、机缘与高风险回报等二级地图。",
+            _ => "当前占位页后续将承接该点位的专属二级地图。"
+        };
+    }
+
+    private void ApplyWorldSitePanelTone(string primaryType)
+    {
+        if (_worldSitePanelTitleLabel == null ||
+            _worldSitePanelSubtitleLabel == null ||
+            _worldSitePanelActionButton == null)
+        {
+            return;
+        }
+
+        var accent = primaryType switch
+        {
+            "Sect" => new Color(0.24f, 0.47f, 0.29f, 1f),
+            "MortalRealm" => new Color(0.56f, 0.41f, 0.20f, 1f),
+            "Market" => new Color(0.69f, 0.31f, 0.16f, 1f),
+            "CultivatorClan" => new Color(0.46f, 0.36f, 0.16f, 1f),
+            "ImmortalCity" => new Color(0.16f, 0.42f, 0.53f, 1f),
+            "Ruin" => new Color(0.42f, 0.30f, 0.34f, 1f),
+            _ => new Color(0.24f, 0.21f, 0.18f, 1f)
+        };
+
+        _worldSitePanelTitleLabel.AddThemeColorOverride("font_color", accent);
+        _worldSitePanelSubtitleLabel.AddThemeColorOverride("font_color", accent.Lightened(0.12f));
+        _worldSitePanelActionButton.Modulate = new Color(1f, 1f, 1f, 1f);
+    }
+
+    private static WorldSiteTemplateInfo BuildWorldSiteTemplateInfo(XianxiaSiteData site)
+    {
+        return site.PrimaryType switch
+        {
+            "Sect" => new WorldSiteTemplateInfo(
+                "访问、结盟、论道、交换传承与驻点往来。",
+                "功法、人脉、弟子来源、盟友支持。",
+                "关系恶化、资源依赖、宗门冲突。"),
+            "MortalRealm" => new WorldSiteTemplateInfo(
+                "护持、赈济、安民、征调供给与招收苗子。",
+                "人口、粮草、供奉、稳定度、苗子来源。",
+                "民乱、灾荒、失德、供给断裂。"),
+            "Market" => new WorldSiteTemplateInfo(
+                "短频交易、淘货、打听消息、接短委托。",
+                "稀缺货、流通资源、传闻、临时机会。",
+                "被坑、价格波动、黑市风险、真假难辨。"),
+            "CultivatorClan" => new WorldSiteTemplateInfo(
+                "走关系、谈合作、接家族委托、换秘术与门客。",
+                "血脉资源、人情网络、专属材料、客卿机会。",
+                "结怨、失信、派系站队、家族禁忌。"),
+            "ImmortalCity" => new WorldSiteTemplateInfo(
+                "大宗交易、拍卖、驻点经营、跨域任务中转。",
+                "高级交易渠道、情报、委托、跨势力接触。",
+                "竞争、税费、治安波动、声望门槛。"),
+            "Ruin" => new WorldSiteTemplateInfo(
+                "探索、破阵、试炼、夺宝与传承触发。",
+                "稀有掉落、古传承、法器胚、高价值线索。",
+                "高战损、封印、机关、一次性失败成本。"),
+            _ => new WorldSiteTemplateInfo(
+                "承接当前世界点位的下级地图玩法。",
+                "回流宗门的资源、关系或情报。",
+                "尚待后续根据类型细化。")
+        };
+    }
+
+    private sealed record WorldSiteTemplateInfo(
+        string FocusText,
+        string YieldText,
+        string RiskText);
+}

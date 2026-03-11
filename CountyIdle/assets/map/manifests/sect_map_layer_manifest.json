@@ -1,0 +1,24 @@
+{
+  "tile_pixel_size": [40, 38],
+  "render_anchor": [20, 19],
+  "tiles": {
+    "l1_ground_v01": {
+      "pixel_region": [8, 32, 902, 732]
+    },
+    "l1_ground_v02": {
+      "pixel_region": [921, 21, 902, 744]
+    },
+    "l1_ground_v03": {
+      "pixel_region": [1837, 28, 908, 736]
+    },
+    "l1_ground_v04": {
+      "pixel_region": [10, 768, 898, 744]
+    },
+    "l1_ground_v05": {
+      "pixel_region": [922, 770, 895, 743]
+    },
+    "l1_ground_v06": {
+      "pixel_region": [1840, 768, 895, 739]
+    }
+  }
+}

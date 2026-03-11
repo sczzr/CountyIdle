@@ -419,12 +419,11 @@ public partial class DisciplePanel : PopupPanelBase
 		var talentPlan = SectGovernanceRules.GetActiveTalentPlanDefinition(_state);
 		var law = SectGovernanceRules.GetActiveLawDefinition(_state);
 		var direction = SectGovernanceRules.GetActiveDevelopmentDefinition(_state);
-		var commuteMinutes = PopulationRules.GetCommuteMinutes(_state);
 
 		_summaryLabel.Text =
-			$"卷册总录：门人 {_state.Population} · 真传 {_state.ElitePopulation} · 现役 {_state.GetAssignedPopulation()} · 待命 {_state.GetUnassignedPopulation()} · 伤病 {_state.SickPopulation}";
+			$"卷册总录：门人 {_state.Population} · 真传 {_state.ElitePopulation} · 现役 {_state.GetAssignedPopulation()} · 待命 {_state.GetUnassignedPopulation()}";
 		_governanceLabel.Text =
-			$"当前治宗：{direction.DisplayName} / {law.DisplayName} / {talentPlan.DisplayName} · 平均通勤 {commuteMinutes:0} 分。";
+			$"当前治宗：{direction.DisplayName} / {law.DisplayName} / {talentPlan.DisplayName}";
 	}
 
 	private void RebuildDiscipleList()

@@ -26,10 +26,6 @@ public class EconomySystem
         var tradeMultiplier = Math.Max(state.TradeProductionMultiplier, 1.0);
         var managementBoost = IndustryRules.GetManagementBoost(state);
         var toolCoverage = IndustryRules.GetToolCoverage(state);
-        var onDutyFactor = PopulationRules.GetOnDutyFactor(state);
-        var sleepFactor = PopulationRules.GetSleepFactor(state);
-        var healthLaborFactor = PopulationRules.GetHealthLaborFactor(state);
-        var laborAvailabilityFactor = onDutyFactor * sleepFactor * healthLaborFactor;
         var productionFactor = managementBoost * toolCoverage;
         var taskSnapshot = SectTaskRules.BuildResolutionSnapshot(state);
         var governanceFoodModifier = SectGovernanceRules.GetFoodYieldModifier(state);
@@ -56,7 +52,7 @@ public class EconomySystem
         foreach (var definition in SectTaskRules.GetOrderedDefinitions())
         {
             var assigned = taskSnapshot.ResolvedWorkersByTask[definition.TaskType];
-            var effectiveWorkers = Math.Max((int)Math.Floor(assigned * laborAvailabilityFactor), 0);
+            var effectiveWorkers = Math.Max(assigned, 0);
             if (effectiveWorkers <= 0)
             {
                 continue;

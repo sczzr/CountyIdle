@@ -70,12 +70,6 @@ public static class DiscipleRosterSystem
         var ageBands = BuildAgeAssignments(state, population);
         var eliteSet = BuildEliteSet(state, population);
         var minuteOfDay = Modulo(state.GameMinutes, MinutesPerDay);
-        var medicineCoverage = PopulationRules.GetMedicineCoverage(state);
-        var clothingCoverage = PopulationRules.GetClothingCoverage(state);
-        var sleepFactor = PopulationRules.GetSleepFactor(state);
-        var housingPressure = PopulationRules.GetHousingPressure(state);
-        var healthLaborFactor = PopulationRules.GetHealthLaborFactor(state);
-        var commuteMinutes = PopulationRules.GetCommuteMinutes(state);
         var talentPlan = SectGovernanceRules.GetActiveTalentPlan(state);
         var direction = SectGovernanceRules.GetActiveDevelopmentDirection(state);
         var law = SectGovernanceRules.GetActiveLaw(state);
@@ -87,8 +81,8 @@ public static class DiscipleRosterSystem
             var ageBand = ageBands[index];
             var isElite = eliteSet.Contains(index);
             var age = ResolveAge(index, ageBand);
-            var health = ResolveHealth(index, state, ageBand, isElite, medicineCoverage, clothingCoverage, housingPressure, healthLaborFactor);
-            var mood = ResolveMood(index, state, law, sleepFactor, housingPressure, clothingCoverage);
+            var health = ResolveHealth(index, state, ageBand, isElite);
+            var mood = ResolveMood(index, state, law);
             var potential = ResolvePotential(index, state, jobType, isElite, talentPlan, ageBand);
             var combat = ResolveCombat(index, state, jobType, isElite, talentPlan, direction, ageBand);
             var craft = ResolveCraft(index, state, jobType, isElite, direction);
@@ -100,7 +94,7 @@ public static class DiscipleRosterSystem
             var residenceName = ResolveResidenceName(jobType, ageBand, isElite);
             var linkedPeakSummary = ResolveLinkedPeakSummary(jobType, ageBand);
             var traitSummary = ResolveTraitSummary(index, jobType, ageBand, talentPlan, law);
-            var note = ResolveNote(jobType, isElite, health, mood, potential, insight, currentAssignment, commuteMinutes);
+            var note = ResolveNote(jobType, isElite, health, mood, potential, insight, currentAssignment);
 
             roster.Add(new DiscipleProfile(
                 index + 1,
@@ -256,19 +250,12 @@ public static class DiscipleRosterSystem
         int index,
         GameState state,
         DiscipleAgeBand ageBand,
-        bool isElite,
-        double medicineCoverage,
-        double clothingCoverage,
-        double housingPressure,
-        double healthLaborFactor)
+        bool isElite)
     {
-        var sickRatio = state.SickPopulation / Math.Max(state.AdultPopulation, 1.0);
-        var baseValue = 78 +
-                        (medicineCoverage * 16.0) +
-                        (clothingCoverage * 6.0) +
-                        (healthLaborFactor * 9.0) -
-                        (housingPressure * 26.0) -
-                        (sickRatio * 20.0);
+        var baseValue = 74 +
+                        (state.Happiness * 0.12) +
+                        (state.TechLevel * 2.0) -
+                        (state.Threat * 0.16);
 
         if (ageBand == DiscipleAgeBand.Elder)
         {
@@ -290,10 +277,7 @@ public static class DiscipleRosterSystem
     private static int ResolveMood(
         int index,
         GameState state,
-        SectLawType law,
-        double sleepFactor,
-        double housingPressure,
-        double clothingCoverage)
+        SectLawType law)
     {
         var lawBonus = law switch
         {
@@ -305,10 +289,7 @@ public static class DiscipleRosterSystem
         };
 
         var baseValue = state.Happiness +
-                        (sleepFactor * 12.0) +
-                        (clothingCoverage * 5.0) -
                         (state.Threat * 0.38) -
-                        (housingPressure * 28.0) +
                         lawBonus;
 
         return Math.Clamp((int)Math.Round(baseValue + SampleSigned(index, 251, 9)), 18, 100);
@@ -624,8 +605,7 @@ public static class DiscipleRosterSystem
         int mood,
         int potential,
         int insight,
-        string currentAssignment,
-        double commuteMinutes)
+        string currentAssignment)
     {
         if (health <= 44)
         {
@@ -645,11 +625,6 @@ public static class DiscipleRosterSystem
         if (isElite)
         {
             return "当前已列入峰内重点名册，可承担更高阶护山或推演职责。";
-        }
-
-        if (jobType == JobType.Merchant && commuteMinutes >= 20)
-        {
-            return "外务往返耗时偏长，后续可借道路优化继续压缩轮值损耗。";
         }
 
         return $"当前以“{currentAssignment}”为主，整体状态平稳，可按既定方略继续历练。";

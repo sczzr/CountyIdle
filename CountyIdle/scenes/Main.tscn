@@ -8,7 +8,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/EventLogPanel.tscn" id="5_2c9up"]
 [ext_resource type="PackedScene" path="res://scenes/ui/BottomBar.tscn" id="6_empmh"]
 [ext_resource type="PackedScene" path="res://scenes/ui/figma/MakeGameUI.tscn" id="7_q2j8d"]
-[ext_resource type="Shader" path="res://assets/ui/background/background_frosted_glass.gdshader" id="8_s0l7t"]
+[ext_resource type="Shader" uid="uid://bp4rtoxr5s7n4" path="res://assets/ui/background/background_frosted_glass.gdshader" id="8_s0l7t"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_background_glass"]
 shader = ExtResource("8_s0l7t")
@@ -237,6 +237,7 @@ grow_vertical = 2
 
 [node name="CenterPanel" parent="RootMargin/MainLayout/BodyRow" unique_id=2096398785 instance=ExtResource("4_a8trh")]
 z_index = 10
+layout_mode = 1
 offset_left = 326.0
 offset_top = 40.0
 offset_right = -326.0
@@ -275,7 +276,6 @@ layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
 offset_left = 8.0
-offset_top = 0.0
 offset_right = -8.0
 offset_bottom = 30.0
 grow_horizontal = 2

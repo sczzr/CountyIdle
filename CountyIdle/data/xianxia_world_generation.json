@@ -33,5 +33,224 @@
   "sect_connectivity_weight": 0.08,
   "sect_fertility_weight": 0.06,
   "sect_corruption_penalty": 0.20,
-  "sect_monster_threat_penalty": 0.10
+  "sect_monster_threat_penalty": 0.10,
+  "region_profiles": [
+    {
+      "region_id": "SpiritMountain",
+      "display_name": "灵脉山域",
+      "coverage_weight": 0.22,
+      "terrain_affinity": ["Mountain", "Highland", "Cliff"],
+      "spiritual_density_range": { "min": 0.75, "max": 1.0 },
+      "road_density_range": { "min": 0.20, "max": 0.40 },
+      "threat_baseline": { "min": 0.45, "max": 0.65 },
+      "primary_type_bias": [
+        { "key": "Sect", "weight": 1.35 },
+        { "key": "Wilderness", "weight": 1.10 },
+        { "key": "Ruin", "weight": 0.90 }
+      ],
+      "ruin_bias": 0.90,
+      "market_bias": 0.45,
+      "unlock_tier": 0
+    },
+    {
+      "region_id": "MortalHeartland",
+      "display_name": "凡俗腹地",
+      "coverage_weight": 0.30,
+      "terrain_affinity": ["Plain", "Farmland", "River"],
+      "spiritual_density_range": { "min": 0.20, "max": 0.45 },
+      "road_density_range": { "min": 0.55, "max": 0.85 },
+      "threat_baseline": { "min": 0.10, "max": 0.30 },
+      "primary_type_bias": [
+        { "key": "MortalRealm", "weight": 1.40 },
+        { "key": "Market", "weight": 1.12 },
+        { "key": "CultivatorClan", "weight": 0.85 }
+      ],
+      "ruin_bias": 0.20,
+      "market_bias": 1.10,
+      "unlock_tier": 0
+    },
+    {
+      "region_id": "TradeCorridor",
+      "display_name": "商路走廊",
+      "coverage_weight": 0.14,
+      "terrain_affinity": ["River", "Road", "Pass"],
+      "spiritual_density_range": { "min": 0.30, "max": 0.55 },
+      "road_density_range": { "min": 0.75, "max": 1.0 },
+      "threat_baseline": { "min": 0.20, "max": 0.40 },
+      "primary_type_bias": [
+        { "key": "ImmortalCity", "weight": 1.40 },
+        { "key": "Market", "weight": 1.25 },
+        { "key": "MortalRealm", "weight": 0.82 }
+      ],
+      "ruin_bias": 0.15,
+      "market_bias": 1.25,
+      "unlock_tier": 0
+    }
+  ],
+  "primary_type_spawn_rules": [
+    {
+      "primary_type": "Sect",
+      "base_weight": 0.42,
+      "region_weight_multiplier": [
+        { "key": "SpiritMountain", "weight": 1.45 },
+        { "key": "MortalHeartland", "weight": 0.40 }
+      ],
+      "terrain_weight_multiplier": [
+        { "key": "Mountain", "weight": 1.40 },
+        { "key": "Plain", "weight": 0.35 }
+      ],
+      "spiritual_weight_curve": { "low": 0.40, "mid": 1.00, "high": 1.55 },
+      "road_weight_curve": { "low": 0.70, "mid": 1.00, "high": 0.95 },
+      "threat_weight_curve": { "low": 0.95, "mid": 1.05, "high": 0.82 },
+      "min_hex_distance": 12,
+      "soft_cap_per_region": 3,
+      "global_cap": 8,
+      "unlock_tier": 0,
+      "visibility_tier": 0
+    },
+    {
+      "primary_type": "ImmortalCity",
+      "base_weight": 0.18,
+      "region_weight_multiplier": [
+        { "key": "TradeCorridor", "weight": 1.50 },
+        { "key": "SpiritMountain", "weight": 0.45 }
+      ],
+      "terrain_weight_multiplier": [
+        { "key": "River", "weight": 1.35 },
+        { "key": "Road", "weight": 1.30 }
+      ],
+      "spiritual_weight_curve": { "low": 0.82, "mid": 1.00, "high": 1.08 },
+      "road_weight_curve": { "low": 0.50, "mid": 1.10, "high": 1.55 },
+      "threat_weight_curve": { "low": 1.00, "mid": 1.00, "high": 0.72 },
+      "min_hex_distance": 16,
+      "soft_cap_per_region": 2,
+      "global_cap": 4,
+      "unlock_tier": 1,
+      "visibility_tier": 1
+    },
+    {
+      "primary_type": "Ruin",
+      "base_weight": 0.24,
+      "region_weight_multiplier": [
+        { "key": "SpiritMountain", "weight": 1.10 },
+        { "key": "MortalHeartland", "weight": 0.35 }
+      ],
+      "terrain_weight_multiplier": [
+        { "key": "Cliff", "weight": 1.25 },
+        { "key": "Ancient", "weight": 1.30 }
+      ],
+      "spiritual_weight_curve": { "low": 0.80, "mid": 1.00, "high": 1.12 },
+      "road_weight_curve": { "low": 1.05, "mid": 0.92, "high": 0.68 },
+      "threat_weight_curve": { "low": 0.72, "mid": 1.00, "high": 1.32 },
+      "min_hex_distance": 10,
+      "soft_cap_per_region": 4,
+      "global_cap": 12,
+      "unlock_tier": 0,
+      "visibility_tier": 0
+    }
+  ],
+  "secondary_tag_spawn_rules": [
+    {
+      "primary_type": "Sect",
+      "secondary_tag": "MountainGate",
+      "base_weight": 0.20,
+      "region_bias": [{ "key": "SpiritMountain", "weight": 1.40 }],
+      "terrain_bias": [{ "key": "Mountain", "weight": 1.35 }],
+      "requires_adjacency": ["Wilderness"],
+      "avoids_adjacency": ["ImmortalCity"],
+      "unlock_tier": 0,
+      "rarity_tier": "Rare",
+      "can_companion_spawn": true
+    },
+    {
+      "primary_type": "Market",
+      "secondary_tag": "SectMarket",
+      "base_weight": 0.24,
+      "region_bias": [{ "key": "SpiritMountain", "weight": 1.10 }],
+      "terrain_bias": [{ "key": "Road", "weight": 1.20 }],
+      "requires_adjacency": ["Sect"],
+      "avoids_adjacency": [],
+      "unlock_tier": 0,
+      "rarity_tier": "Common",
+      "can_companion_spawn": true
+    },
+    {
+      "primary_type": "Ruin",
+      "secondary_tag": "AncientCave",
+      "base_weight": 0.34,
+      "region_bias": [{ "key": "SpiritMountain", "weight": 1.20 }],
+      "terrain_bias": [{ "key": "Cliff", "weight": 1.15 }],
+      "requires_adjacency": ["Wilderness"],
+      "avoids_adjacency": ["MortalRealm"],
+      "unlock_tier": 0,
+      "rarity_tier": "Common",
+      "can_companion_spawn": true
+    }
+  ],
+  "adjacency_weight_rules": [
+    { "source_type": "Sect", "target_type": "Wilderness", "weight_delta": 0.40, "radius": 2, "rule_mode": "Attract" },
+    { "source_type": "MortalRealm", "target_type": "Market", "weight_delta": 0.30, "radius": 2, "rule_mode": "Attract" },
+    { "source_type": "ImmortalCity", "target_type": "ImmortalCity", "weight_delta": -0.70, "radius": 5, "rule_mode": "Repel" }
+  ],
+  "rarity_profiles": [
+    {
+      "rarity_tier": "Common",
+      "spawn_multiplier": 1.0,
+      "reveal_by_default": true,
+      "fog_priority": 10,
+      "discovery_hint_chance": { "min": 0.0, "max": 0.05 }
+    },
+    {
+      "rarity_tier": "Rare",
+      "spawn_multiplier": 0.28,
+      "reveal_by_default": false,
+      "fog_priority": 60,
+      "discovery_hint_chance": { "min": 0.15, "max": 0.35 }
+    },
+    {
+      "rarity_tier": "Legendary",
+      "spawn_multiplier": 0.08,
+      "reveal_by_default": false,
+      "fog_priority": 90,
+      "discovery_hint_chance": { "min": 0.35, "max": 0.65 }
+    }
+  ],
+  "unlock_rules": [
+    {
+      "unlock_tier": 0,
+      "min_sect_reputation": { "min": 0, "max": 0 },
+      "min_expedition_depth": { "min": 0, "max": 0 },
+      "min_hero_power": { "min": 0, "max": 0 },
+      "required_rumor_tags": [],
+      "required_faction_relation": []
+    },
+    {
+      "unlock_tier": 1,
+      "min_sect_reputation": { "min": 20, "max": 40 },
+      "min_expedition_depth": { "min": 3, "max": 6 },
+      "min_hero_power": { "min": 80, "max": 140 },
+      "required_rumor_tags": ["mid_world_access"],
+      "required_faction_relation": ["neutral_or_above"]
+    }
+  ],
+  "companion_spawn_rules": [
+    {
+      "host_type": "Sect",
+      "host_tag": "MountainGate",
+      "companion_type": "Market",
+      "companion_tag": "SectMarket",
+      "spawn_chance": { "min": 0.35, "max": 0.60 },
+      "min_distance_from_host": 1,
+      "max_distance_from_host": 2
+    },
+    {
+      "host_type": "ImmortalCity",
+      "host_tag": "GrandCity",
+      "companion_type": "Market",
+      "companion_tag": "RoadsideMarket",
+      "spawn_chance": { "min": 0.40, "max": 0.70 },
+      "min_distance_from_host": 1,
+      "max_distance_from_host": 2
+    }
+  ]
 }

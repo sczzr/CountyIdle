@@ -356,6 +356,301 @@ text = "江陵府外域（隐藏备用视图）"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="SecondaryMapView" type="PanelContainer" parent="PanelContent/MapViewport/MapPages" unique_id=170336771]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_card_normal")
+
+[node name="SecondaryMapPadding" type="MarginContainer" parent="PanelContent/MapViewport/MapPages/SecondaryMapView" unique_id=953207711]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 18
+
+[node name="SecondaryMapVBox" type="VBoxContainer" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding" unique_id=1790406740]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="HeaderBox" type="VBoxContainer" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox" unique_id=226944285]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/HeaderBox" unique_id=1725369803]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 22
+text = "二级地图"
+
+[node name="SubtitleLabel" type="Label" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/HeaderBox" unique_id=1038581139]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.415686, 0.341176, 0.25098, 0.95)
+theme_override_font_sizes/font_size = 13
+text = "世界点位分层入口"
+
+[node name="SummaryBox" type="GridContainer" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox" unique_id=99481927]
+layout_mode = 2
+columns = 2
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 10
+
+[node name="TypeCard" type="PanelContainer" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/SummaryBox" unique_id=1272934502]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_card_new")
+
+[node name="TypeMargin" type="MarginContainer" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/SummaryBox/TypeCard" unique_id=160430239]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="TypeVBox" type="VBoxContainer" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/SummaryBox/TypeCard/TypeMargin" unique_id=702877104]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/SummaryBox/TypeCard/TypeMargin/TypeVBox" unique_id=530339626]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.368627, 0.313725, 0.258824, 1)
+theme_override_font_sizes/font_size = 11
+text = "主类型"
+
+[node name="Value" type="Label" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/SummaryBox/TypeCard/TypeMargin/TypeVBox" unique_id=463834514]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 16
+text = "未选中"
+
+[node name="RegionCard" type="PanelContainer" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/SummaryBox" unique_id=1335345929]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_card_new")
+
+[node name="RegionMargin" type="MarginContainer" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/SummaryBox/RegionCard" unique_id=1792500670]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="RegionVBox" type="VBoxContainer" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/SummaryBox/RegionCard/RegionMargin" unique_id=1098911732]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/SummaryBox/RegionCard/RegionMargin/RegionVBox" unique_id=518815725]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.368627, 0.313725, 0.258824, 1)
+theme_override_font_sizes/font_size = 11
+text = "所属区块"
+
+[node name="Value" type="Label" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/SummaryBox/RegionCard/RegionMargin/RegionVBox" unique_id=1472909048]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 16
+text = "未定区块"
+
+[node name="RarityCard" type="PanelContainer" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/SummaryBox" unique_id=1795731633]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_card_new")
+
+[node name="RarityMargin" type="MarginContainer" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/SummaryBox/RarityCard" unique_id=1534522034]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="RarityVBox" type="VBoxContainer" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/SummaryBox/RarityCard/RarityMargin" unique_id=1818673276]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/SummaryBox/RarityCard/RarityMargin/RarityVBox" unique_id=525256163]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.368627, 0.313725, 0.258824, 1)
+theme_override_font_sizes/font_size = 11
+text = "稀有度"
+
+[node name="Value" type="Label" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/SummaryBox/RarityCard/RarityMargin/RarityVBox" unique_id=1318744874]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 16
+text = "常见"
+
+[node name="UnlockCard" type="PanelContainer" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/SummaryBox" unique_id=933085186]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_card_new")
+
+[node name="UnlockMargin" type="MarginContainer" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/SummaryBox/UnlockCard" unique_id=1669096197]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="UnlockVBox" type="VBoxContainer" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/SummaryBox/UnlockCard/UnlockMargin" unique_id=158771485]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/SummaryBox/UnlockCard/UnlockMargin/UnlockVBox" unique_id=617467078]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.368627, 0.313725, 0.258824, 1)
+theme_override_font_sizes/font_size = 11
+text = "开放层级"
+
+[node name="Value" type="Label" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/SummaryBox/UnlockCard/UnlockMargin/UnlockVBox" unique_id=409390243]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 16
+text = "开局可至"
+
+[node name="TemplateGrid" type="GridContainer" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox" unique_id=165864273]
+layout_mode = 2
+columns = 3
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 10
+
+[node name="FocusCard" type="PanelContainer" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/TemplateGrid" unique_id=372973565]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_card_new")
+
+[node name="FocusMargin" type="MarginContainer" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/TemplateGrid/FocusCard" unique_id=1387703439]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="FocusVBox" type="VBoxContainer" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/TemplateGrid/FocusCard/FocusMargin" unique_id=151691584]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Label" type="Label" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/TemplateGrid/FocusCard/FocusMargin/FocusVBox" unique_id=1066635058]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.368627, 0.313725, 0.258824, 1)
+theme_override_font_sizes/font_size = 11
+text = "核心玩法"
+
+[node name="Value" type="Label" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/TemplateGrid/FocusCard/FocusMargin/FocusVBox" unique_id=1900208127]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 13
+text = "待定"
+autowrap_mode = 3
+
+[node name="YieldCard" type="PanelContainer" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/TemplateGrid" unique_id=911496667]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_card_new")
+
+[node name="YieldMargin" type="MarginContainer" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/TemplateGrid/YieldCard" unique_id=779637430]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="YieldVBox" type="VBoxContainer" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/TemplateGrid/YieldCard/YieldMargin" unique_id=832227932]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Label" type="Label" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/TemplateGrid/YieldCard/YieldMargin/YieldVBox" unique_id=935284608]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.368627, 0.313725, 0.258824, 1)
+theme_override_font_sizes/font_size = 11
+text = "主要产出"
+
+[node name="Value" type="Label" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/TemplateGrid/YieldCard/YieldMargin/YieldVBox" unique_id=1562008632]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 13
+text = "待定"
+autowrap_mode = 3
+
+[node name="RiskCard" type="PanelContainer" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/TemplateGrid" unique_id=420473446]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_card_warn")
+
+[node name="RiskMargin" type="MarginContainer" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/TemplateGrid/RiskCard" unique_id=1572576297]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="RiskVBox" type="VBoxContainer" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/TemplateGrid/RiskCard/RiskMargin" unique_id=910806813]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Label" type="Label" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/TemplateGrid/RiskCard/RiskMargin/RiskVBox" unique_id=1946037015]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.368627, 0.313725, 0.258824, 1)
+theme_override_font_sizes/font_size = 11
+text = "主要风险"
+
+[node name="Value" type="Label" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/TemplateGrid/RiskCard/RiskMargin/RiskVBox" unique_id=394876928]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 13
+text = "待定"
+autowrap_mode = 3
+
+[node name="DescriptionCard" type="PanelContainer" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox" unique_id=627114334]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_card_normal")
+
+[node name="DescriptionMargin" type="MarginContainer" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/DescriptionCard" unique_id=1836362931]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="DescriptionLabel" type="Label" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/DescriptionCard/DescriptionMargin" unique_id=33326544]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 13
+text = "当前尚未打开任何二级地图入口。"
+autowrap_mode = 3
+
+[node name="ActionRow" type="HBoxContainer" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox" unique_id=744982725]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BackButton" type="Button" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/ActionRow" unique_id=1309257268]
+custom_minimum_size = Vector2(124, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_tab_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_tab_disabled")
+theme_override_styles/focus = SubResource("StyleBoxFlat_tab_hover")
+text = "返回世界舆图"
+
+[node name="ActionButton" type="Button" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/ActionRow" unique_id=209736042]
+custom_minimum_size = Vector2(148, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_tab_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_tab_disabled")
+theme_override_styles/focus = SubResource("StyleBoxFlat_tab_hover")
+text = "相关筹备入口"
+
+[node name="HintLabel" type="Label" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox" unique_id=740880730]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.368627, 0.313725, 0.258824, 1)
+theme_override_font_sizes/font_size = 11
+text = "当前为二级地图入口占位页，后续将在这里承接对应类型的下级地图。"
+autowrap_mode = 3
+
 [node name="CountyTownMapView" type="PanelContainer" parent="PanelContent/MapViewport/MapPages" unique_id=606572574]
 visible = false
 clip_contents = true

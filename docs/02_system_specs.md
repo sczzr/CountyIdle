@@ -264,7 +264,7 @@
 - 交互约束：
   - 关闭方式支持右上角关闭与 `Esc`；
   - 状态刷新跟随主界面 `OnStateChanged` 同步，默认保持上次筛选与选中对象；
-  - 天衍峰山门图当前不提供场所/弟子点击联动，“弟子谱”仅通过底部入口打开；
+- 天衍峰山门图提供地块检视入口，但不提供弟子/场所点击联动，“弟子谱”仍通过底部入口打开；
   - 名册为派生展示层，不允许在该面板直接改动人口、岗位或资源数值。
 
 ## 4. 资源链与仓储系统（Resource）
@@ -622,14 +622,290 @@
 
 - 网格固定：`22x16`
 - 默认种子：`20260306`（当传入种子为 0）
-- 生成流程：主街 -> 支路 -> 路肩庭院 -> 水域点缀
+- 生成流程：当前已生成以 `Ground` 为主的六角地貌，并补入最小可用 `Road / Courtyard / Water` terrain 语义，用于地图表现层与地块检视摘要
 - 宗门投影：宗门主视图使用 pointy-top hex tile 俯视布局；逻辑网格仍保留 `TownMapData(width,height)` 的二维坐标，不改生成规则
-- 渲染方式：宗门地表改为运行时程序化 hex 俯视纯绘制，不依赖独立 tile 资产目录；当前不生成住宅/场所实体
+- 渲染方式：宗门地表已支持 `Layer 1` atlas + `Layer 2` decal / connector 的运行时接入；当前优先复用现有六边形草地图集与轻量 decal 贴图，作为正式国风量产素材接入前的过渡方案
 - 正式入口：`WorldPanel` 当前主地图区域只保留 `天衍峰山门图 / 世界地图` 两类入口；仓储弹窗继续保留在顶部按钮，不再将江陵府外域备用视图/事件/报表/探险作为主地图页签
-- 表现层次：仅绘制 hex 地表与地形语义，暂不绘制建筑、场所与居民
-- 地形语义：道路格会额外绘制 hex 核心通路与相邻格连接带；水域格会额外绘制内层水面、岸线高亮与轻量波纹，强化宗门 hex 地形识别
-- 交互提示：当前不提供场所/门人选中与场所检视
+- 表现层次：当前已接入 `Layer 1` 基础地块与 `Layer 2` 道路 / 院坪 / 水域表现；`Layer 3` 建筑与立体物件、`Layer 4` 氛围层仍待后续接入
+- 地形语义：当前已生成道路 / 水域 / 庭院语义，并服务于地图表现与地块检视；后续可继续扩展到更细的路网、水网与法阵连接规则
+- 交互提示：支持全格点击检视；暂不提供弟子/场所可视对象联动
 - 地图仅用于可视化反馈，不改写经济/人口核心数值
+- 地图素材生产：正式表现层资产的分层、命名、锚点、拼接与交付规范统一参照 `docs/11_map_asset_production_spec.md`
+- 运行时一期（Layer 1 / Layer 2）：宗门图现已允许优先读取 `Layer 1` atlas manifest，并在 `Layer 2` 叠加道路 / 院坪 / 水域 decal 与连接线；terrain 语义仍由 `TownMapGeneratorSystem` 提供最小可用输入，不改变小时结算与左栏检视链路
+
+### 12.0 天衍峰院域坊局系统（设计中 / 一期）
+
+- 当前地图主线：本章为天衍峰山门图后续迭代的唯一主线规格；其余同主题 map 分支文档与旧命名方案均视为废弃。
+- 目标：将天衍峰山门图的单个 hex 从“纯背景格”升级为“可检视、可规划、可承载坊局组合”的固定院域底盘。
+- 设计原则：
+  - 外层 `hex 地块` 固定，内层 `院域坊局` 可变；
+  - 同一地块可容纳多个子建筑，但共享该地块的固定灵气池；
+  - 多建筑组合可以形成协同收益，但也会带来灵气分流、环境互扰和维护压力；
+  - 随机性用于“改题”，不用于“掀桌”，不得无预警摧毁长期规划。
+- 一期数据分层：
+  - `SectHexCellData`：存地块固定底盘，至少包含 `coord / region / terrain / baseQiCapacity / qiRecovery / buildSlotCount / featureIds / roadMask / waterMask / variationSeed`
+  - `SectHexCompoundState`：存地块内坊局组合，至少包含 `coord / buildings / synergyScore / qiCongestion / stability / activeModifierIds`
+  - `SectSubBuildingState`：存地块内单建筑槽位，至少包含 `templateId / slotIndex / level / qiDemand / laborDemand / maintenanceDemand / currentQiShare / efficiency / synergyTagIds`
+  - `SectHexInspectorData`：作为左侧 `Tile Inspector` 投影视图，统一输出 `title / subtitle / description / stats / actions / tags`
+- 地块固定底盘：
+  - 每个地块必须至少拥有 `灵气总量`、`灵气回复/波动`、`分区`、`天然特征`、`可建坊位数`
+  - 地块底盘在同一局内固定，作为长期规划依据
+  - 天然特征示例：`灵泉 / 古树 / 风口 / 石台 / 巡山角 / 晨雾坡`
+- 坊局组合规则：
+  - 同一地块内允许放入 `2~5` 个子建筑，具体上限由地块与后续扩建/科技决定
+  - 子建筑组合按 `生产 / 服务 / 居住 / 休憩 / 特殊` 五类组织
+  - 强组合优先设计为“核心建筑 + 支撑建筑 + 稳定建筑”，禁止鼓励纯同类堆叠成为唯一最优解
+- 灵气共享规则：
+  - 地块存在固定 `baseQiCapacity`
+  - 各子建筑拥有理想 `qiDemand`
+  - 当 `总需求 <= 地块灵气池` 时，各建筑按理想值运行
+  - 当 `总需求 > 地块灵气池` 时，进入 `灵池分流` 状态，导致单体效率下降并累积 `qiCongestion`
+  - 局部效率至少受 `地块适配 / 坊局协同 / 灵气满足率 / 人手满足率 / 稳定度` 五项共同影响
+- 随机性来源（一期只定义来源，不硬写最终数值）：
+  - 地块先天差异：五行偏性、天然特征、隐藏地脉 traits
+  - 节气/季节波动：使“当前最优地块布局”随时间轻微偏移
+  - 低频局部事件：灵泉喷涌、地火躁动、药田生异、夜雾遮山等
+  - 驻守弟子差异：同样坊局在不同弟子驻守下表现不同
+  - 宗门当前缺口：资源、治安、人口、研修压力会改变局部最优解
+- 全格点击检视目标：
+  - 任意 hex 都应可被点中，而非只限少数场所锚点
+  - 点击后至少回答四件事：`这里是什么 / 它现在在干什么 / 为什么顺或为什么卡 / 我现在能做什么`
+  - 左侧 `Tile Inspector` 一期统一展示 `状态 / 人数或坊位 / 效率或灵气 / 位置或邻接` 四格属性
+  - 动作区一期保持 `1 个主动作 + 2 个辅助动作`，避免一次性塞满局部操作
+- 一期典型模板（设计基线）：
+  - `空地`：规划建造、查看推荐用途、标记预留
+  - `坊路/山道`：整修道路、设巡查点、查看流量
+  - `阵材圃/灵田`：扩建、调优先级、查仓储
+  - `工坊`：扩建、切产线、查工料
+  - `居舍`：修缮、改善供养、查弟子
+  - `巡山岗`：增派巡山、整修岗哨、查看威胁
+- 设计约束：
+  - 一期先做“全格可检视 + 数据骨架”，不直接承诺完整地块内拖拽编辑器
+  - 不得把全局资源库存、长段文案或完整岗位分配表直接塞进单格存档
+  - 任何后续布局重排或 UI 改版，都不得破坏 `地图点击 -> 左栏检视 -> 推荐动作` 主链路
+
+#### 12.0.1 字段职责表（一期）
+
+- `SectHexCellData`
+  - 作用：描述地块的固定底盘，是长期规划依据。
+  - 建议字段：
+    - `Coord`：逻辑坐标
+    - `RegionId`：所属分区，例如 `前山 / 后山 / 坊市外缘 / 居舍区`
+    - `Terrain`：基础地貌
+    - `BaseQiCapacity`：地块灵气池上限
+    - `QiRecoveryPerHour`：灵气恢复或自然波动
+    - `QiAffinity`：五行偏性
+    - `BuildSlotCount`：坊位数
+    - `RoadMask / WaterMask`：边语义
+    - `FeatureIds`：显性天然特征
+    - `HiddenTraitIds`：隐性 traits，仅在满足条件后显露
+    - `VariationSeed`：确保同地块随机事件可复现
+- `SectHexCompoundState`
+  - 作用：描述该地块当前的坊局结构和整体状态。
+  - 建议字段：
+    - `Coord`
+    - `Buildings`
+    - `QiCongestion`
+    - `SynergyScore`
+    - `Stability`
+    - `ActiveModifierIds`
+    - `ActiveEventId`
+- `SectSubBuildingState`
+  - 作用：描述坊局内单个建筑槽位。
+  - 建议字段：
+    - `BuildingId`
+    - `TemplateId`
+    - `SlotIndex`
+    - `Level`
+    - `QiDemand`
+    - `LaborDemand`
+    - `MaintenanceDemand`
+    - `CurrentQiShare`
+    - `Efficiency`
+    - `SynergyTagIds`
+- `SectHexInspectorData`
+  - 作用：专供左侧 `Tile Inspector` 使用，不进入长期存档。
+  - 建议字段：
+    - `Title`
+    - `Subtitle`
+    - `Description`
+    - `Stats`
+    - `Actions`
+    - `Tags`
+- 存档约束：
+  - `CellData` 与 `CompoundState` 进入正式状态层；
+  - `InspectorData` 运行时生成；
+  - 长段描述文案、按钮文字和推荐说明不直接写入存档。
+
+#### 12.0.2 核心公式（设计草案）
+
+- 地块可用灵气：
+  - `QiAvailable = BaseQiCapacity + TerrainBonus + FeatureBonus + SeasonBonus + EventBonus`
+- 单建筑灵气满足率：
+  - `QiSatisfaction = clamp(CurrentQiShare / QiDemand, 0.15, 1.20)`
+- 单建筑综合效率：
+  - `BuildingEfficiency = BaseEfficiency * TerrainFit * SynergyBonus * QiSatisfaction * LaborSatisfaction * StabilityModifier`
+- 地块灵气拥堵：
+  - 当 `TotalQiDemand <= QiAvailable` 时，`QiCongestion = 0`
+  - 当 `TotalQiDemand > QiAvailable` 时，`QiCongestion = (TotalQiDemand - QiAvailable) / max(QiAvailable, 1)`
+- 坊局稳定度：
+  - `Stability = clamp(1 - QiCongestion - ConflictPenalty - ThreatPenalty + SupportBonus, 0.35, 1.25)`
+- 坊局协同分：
+  - `SynergyScore = Sum(组合加成) - Sum(互扰惩罚)`
+- 设计解释：
+  - 高协同不等于高稳定；
+  - 高灵气不等于高效率；
+  - 玩家需要在“专精吃满灵气”和“多建筑拿协同”之间做取舍。
+
+#### 12.0.3 坊局模板卡（一期基线）
+
+- `空地`
+  - 定位：规划入口
+  - 默认显示：`可建性 / 邻接 / 灵气 / 坐标`
+  - 主动作：`规划建造`
+  - 辅助动作：`查看推荐用途`、`标记预留`
+  - 飞轮影响：为后续产业、人口、治安提供布局空间
+- `坊路/山道`
+  - 定位：基础设施
+  - 默认显示：`通达 / 流量 / 治安 / 坐标`
+  - 主动作：`整修道路`
+  - 辅助动作：`设巡查点`、`查看流量`
+  - 飞轮影响：通勤、巡山、物流效率
+- `阵材圃/灵田`
+  - 定位：基础生产
+  - 默认显示：`状态 / 在场人数 / 产能效率 / 相邻仓储或临水加成`
+  - 主动作：`扩建灵田`
+  - 辅助动作：`调整优先级`、`打开仓储`
+  - 飞轮影响：供养、基础材料、稳定产出
+- `药圃`
+  - 定位：灵植与丹材来源
+  - 默认显示：`药势 / 湿润度 / 灵气 / 照料人数`
+  - 主动作：`整治药圃`
+  - 辅助动作：`改种药材`、`调配弟子`
+  - 飞轮影响：丹药、恢复、研修支持
+- `工坊`
+  - 定位：加工与营造核心
+  - 默认显示：`订单 / 工料 / 效率 / 拥堵`
+  - 主动作：`扩建工坊`
+  - 辅助动作：`切换产线`、`查看工料仓`
+  - 飞轮影响：装备、构件、护山建设
+- `仓阁/内库`
+  - 定位：中转与吞吐
+  - 默认显示：`容量 / 装载率 / 吞吐 / 关联地块`
+  - 主动作：`扩容仓储`
+  - 辅助动作：`调整收储优先级`、`查看相邻产线`
+  - 飞轮影响：缓冲生产链和交通压力
+- `传法院`
+  - 定位：研修与讲法
+  - 默认显示：`研修效率 / 在场弟子 / 灵气 / 静谧度`
+  - 主动作：`扩建讲法位`
+  - 辅助动作：`下达研修法旨`、`查阅弟子谱`
+  - 飞轮影响：科技涌现、弟子成长
+- `居舍`
+  - 定位：居住与恢复
+  - 默认显示：`舒适 / 入住人数 / 恢复效率 / 通勤`
+  - 主动作：`修缮居舍`
+  - 辅助动作：`改善供养`、`查看居住弟子`
+  - 飞轮影响：人口恢复、情绪、健康
+- `巡山岗`
+  - 定位：安全与夜巡
+  - 默认显示：`警戒范围 / 安全度 / 巡查频率 / 邻近风险`
+  - 主动作：`增派巡山`
+  - 辅助动作：`整修岗哨`、`查看威胁来源`
+  - 飞轮影响：护山、事故率、夜间物流
+
+#### 12.0.4 随机事件框架（一期原则）
+
+- 事件设计原则：
+  - 事件应改变解题环境，而不是直接抹除玩家布局价值；
+  - 事件应有预警、持续时间和可应对动作；
+  - 高频事件只做轻扰动，强事件必须低频。
+- 事件来源：
+  - 地块先天 traits：例如 `古泉暗涌 / 地火脉浅 / 常年晨雾`
+  - 节气波动：例如春木旺、秋金肃、冬水寒
+  - 坊局冲突：例如火工坊过多导致躁火，药圃过密导致湿郁
+  - 驻守弟子差异：例如擅长炼丹者会提高丹房稳定度
+  - 宗门全局缺口：例如粮荒、治安压力会放大某类地块风险
+- 事件强度分级：
+  - `轻事件`：短时增减 `5%~10%` 某类效率或风险
+  - `中事件`：要求玩家在数小时内处理，否则进入惩罚态
+  - `强事件`：低频，触发特殊选择或一次性转型机会
+- 典型事件：
+  - `灵泉喷涌`：短时提高水木系建筑效率，但增加周边拥堵
+  - `地火躁动`：火系工坊产能上升，但稳定度下降
+  - `夜雾封山`：道路流量降低，巡山岗重要性上升
+  - `药田生异`：可选择保收成或赌高品质灵药
+
+#### 12.0.5 分阶段落地（建议）
+
+- 一期：全格点击检视 + 院域数据骨架
+  - 目标：让每个地块都能被点中并输出统一中文检视内容
+  - 不改存档，不做完整坊局编辑器
+- 二期：基础坊局组合
+  - 目标：开放 `2~3` 个子建筑槽位，接入共享灵气与协同/互扰
+  - 先做 `灵田 / 工坊 / 居舍 / 巡山岗 / 仓阁`
+- 三期：局部随机事件与弟子驻守联动
+  - 目标：把节气、traits、驻守特长真正挂到地块玩法上
+  - 再决定是否进入更重的地块内布局编辑
+
+#### 12.0.6 建筑模板表（一期建议）
+
+| 模板 ID | 名称 | 类别 | 默认坊位占用 | 默认灵气需求 | 默认人手需求 | 主要协同标签 | 主要互扰标签 | 推荐地块 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `empty_buildable` | 空地 | `empty` | `0` | `0` | `0` | `reserve` | `none` | 任意可建地 |
+| `mountain_road` | 坊路/山道 | `infrastructure` | `1` | `4` | `1` | `traffic`, `patrol` | `erosion` | 临路、山口 |
+| `spirit_field_t1` | 阵材圃/灵田 | `production` | `1` | `18` | `4` | `wood`, `food`, `water_friendly` | `wet_dense` | 临水、灵壤 |
+| `herb_garden_t1` | 药圃 | `production` | `1` | `22` | `5` | `herb`, `water_friendly`, `alchemy_feed` | `wet_dense` | 临水、晨雾坡 |
+| `workshop_puppet_t1` | 傀儡工坊 | `production` | `1` | `28` | `6` | `craft`, `forge`, `warehouse_link` | `noise`, `fire_restless` | 临路、近仓 |
+| `warehouse_inner_t1` | 仓阁/内库 | `service` | `1` | `10` | `3` | `storage`, `traffic`, `loss_reduce` | `crowded` | 交通节点 |
+| `academy_outer_hall_t1` | 传法院 | `service` | `1` | `26` | `5` | `research`, `teaching`, `quiet` | `noise` | 高灵气、清静地 |
+| `disciple_residence_t1` | 居舍 | `residence` | `1` | `14` | `2` | `rest`, `recovery`, `stability` | `crowded`, `noise` | 近路、近供养 |
+| `watch_post_t1` | 巡山岗 | `special` | `1` | `12` | `3` | `patrol`, `safety`, `threat_control` | `isolated` | 山口、边缘地 |
+
+- 模板设计约束：
+  - 一期单建筑默认占 `1` 个坊位，不引入多格建筑 footprint。
+  - `warehouse_inner_t1`、`watch_post_t1` 允许低产值但高系统性收益，避免所有模板都以直接产出为目标。
+  - `academy_outer_hall_t1` 与 `disciple_residence_t1` 视为“慢变量模板”，主要影响研修、恢复与长期成长，不以即时数值爽感为唯一目标。
+
+#### 12.0.7 字段默认值建议（一期）
+
+- 地块默认值：
+  - `BaseQiCapacity`：普通地 `80~110`，灵壤地 `110~140`，特殊地 `140~180`
+  - `QiRecoveryPerHour`：普通地 `4~8`，特殊地 `8~14`
+  - `BuildSlotCount`：普通地 `2`，核心地 `3`，特殊地 `4`
+  - `VariationSeed`：按地图种子 + 坐标生成，不手写
+- 坊局默认值：
+  - `QiCongestion`：初始 `0`
+  - `SynergyScore`：初始 `0`
+  - `Stability`：初始 `1.0`
+- 建筑默认值：
+  - `Level`：初始 `1`
+  - `CurrentQiShare`：默认按地块剩余灵气均分
+  - `Efficiency`：初始 `1.0`，再由地形、灵气、人手、稳定度修正
+- 检视器默认值：
+  - `Stats` 固定四格：`状态 / 人数或坊位 / 效率或灵气 / 位置或邻接`
+  - `Actions` 固定三键：`主动作 + 辅助动作 + 信息跳转`
+  - `Tags` 优先显示：`临路 / 临水 / 灵脉 / 拥堵 / 安定 / 预留`
+
+#### 12.0.8 配置化草案（建议路径）
+
+- 建议草案路径：`CountyIdle/data/sect_hex_compound_templates.draft.json`
+- 设计意图：
+  - 当前文件仅作为文档阶段的数据草案，不接入现有加载链路；
+  - 等一期代码实现开始时，再决定是否转正为正式配置文件；
+  - 命名采用 `*.draft.json`，避免被误认为当前生产配置。
+- 建议顶层结构：
+  - `version`
+  - `slot_rules`
+  - `cell_defaults`
+  - `terrain_presets`
+  - `feature_pool`
+  - `building_templates`
+  - `event_templates`
+- 约束：
+  - 所有模板必须有稳定 `id`
+  - 可变说明文字优先在代码或文案层生成，不把长段描述硬编码进配置
+  - 事件模板只描述触发条件、持续时间、影响标签和应对动作键，不直接写死 UI 文案
 
 ## 12.1 战略地图配置系统（StrategicMap）
 
@@ -670,6 +946,7 @@
 - 天衍峰山门图与世界地图均支持滚轮缩放（区间 `0.6 ~ 2.2`，默认 `1.0`）。
 - 主界面缩放按钮仅对当前激活地图页生效（宗门/世界）。
 - 页签切换时刷新缩放显示，不影响主循环与结算状态。
+- Legacy 主界面的地图页签 / 调度按钮需与左侧地块检视器、底部快捷入口建立显式焦点桥接；中央地图区被点击后，方向焦点仍可退出到外层菜单。
 - 世界图底层统一绘制 hex 战略底格；宗门图沿用独立 hex 驻地绘制链路。
 - 默认节点标记采用六角标记；世界图 edge overlay 用于河流、道路、桥梁、河岸与悬崖边表现。
 - 当前实现：世界地图 = 修仙 Hex 世界生成（`strategic_maps.json` 世界定义保留 fallback）；天衍峰山门图 = 复用当前 hex 驻地视图链路并统一天衍峰文案。
@@ -704,13 +981,549 @@
   - 二期补强后，默认配置额外验证为：`242` 个河流边语义格、`111` 个道路边语义格、`38` 个悬崖边语义格、`9` 个水域格、`8` 个桥梁边重叠格、`10` 个路口格
 - 设计约束：只增强世界图信息表达，不改 `GameState`、小时结算、人口/产业/战斗核心公式。
 
+## 13.2 世界格二级地图分层与入口系统（DL-048 / 设计中 / 文档一期）
+
+- 目标：让世界地图上的可交互 hex 不只是“地貌 + 点位”，而是具有明确身份、风险和回流方向的空间节点；玩家点击后可进入对应的二级地图或二级地图检视界面，形成“世界择地 -> 局部经营 / 交涉 / 历练 -> 回流宗门”的分层体验。
+- 设计约束：
+  - 第一级地图 = 世界战略层，负责回答“去哪里”；
+  - 第二级地图 = 地点玩法层，负责回答“到了这里主要做什么”；
+  - 二级地图必须服务现有飞轮，不做纯观光景观图；
+  - 进入与退出规则不得破坏 `1 秒 = 1 分钟` 与 `60 分钟小时结算` 节奏；
+  - 不把凡俗势力、附庸据点或关系对象写成可随意牺牲的“资源块”，需符合“共同建设、共同受益、共同护持”底线。
+- 数据建议：世界格至少应具备以下元数据字段：
+  - `PrimaryType`：地点主类型；
+  - `SecondaryTag`：地点子标签；
+  - `FactionOwner`：归属势力；
+  - `RiskTier`：风险层级；
+  - `ResourceBias`：资源偏向；
+  - `InteractionFocus`：主要交互；
+  - `ReturnFlow`：回流宗门的主要收益；
+  - `UnlockCondition`：解锁门槛；
+  - `TimeCostProfile`：轻交互 / 重交互时间消耗模型。
+
+### 13.2.1 PrimaryType（七类主类型）
+
+- `Sect / 宗门`
+  - 定位：修仙势力关系点。
+  - 主要玩法：访问、结盟、论道、交换传承、驻点互动。
+  - 核心产出：功法、人脉、弟子来源、盟友支持。
+  - 核心风险：关系恶化、资源依赖、宗门冲突。
+- `Wilderness / 野外`
+  - 定位：日常历练与资源点。
+  - 主要玩法：采集、巡查、护道、清妖、开路。
+  - 核心产出：原材料、低中阶机缘、路线安全。
+  - 核心风险：妖兽、迷途、耗时、轻中度战损。
+- `MortalRealm / 凡俗国度`
+  - 定位：人口与供养点。
+  - 主要玩法：护持、赈济、安民、征调供给、招收苗子。
+  - 核心产出：人口、粮草、供奉、稳定度、苗子。
+  - 核心风险：民乱、灾荒、失德、供给断裂。
+- `CultivatorClan / 修仙世家`
+  - 定位：血脉与人脉点。
+  - 主要玩法：走关系、谈合作、接家族委托、交换秘术。
+  - 核心产出：血脉资源、人脉、客卿机会、专属材料。
+  - 核心风险：结怨、失信、派系站队。
+- `ImmortalCity / 仙城`
+  - 定位：长期枢纽点。
+  - 主要玩法：大宗交易、拍卖、驻点经营、接跨域任务。
+  - 核心产出：高级交易渠道、情报、委托、跨势力接触。
+  - 核心风险：竞争、税费、治安波动、声望门槛。
+- `Market / 坊市`
+  - 定位：短期机会点。
+  - 主要玩法：短频快交易、打听消息、淘货、黑白市机会。
+  - 核心产出：稀缺货、流通资源、传闻、临时任务。
+  - 核心风险：被坑、价格波动、假货、黑市风险。
+- `Ruin / 遗迹`
+  - 定位：高风险高回报点。
+  - 主要玩法：探索、破阵、夺宝、触发传承事件。
+  - 核心产出：稀有掉落、古传承、法器胚、高价值线索。
+  - 核心风险：高战损、封印、机关、一次性失败成本。
+
+### 13.2.2 SecondaryTag（世界生成子标签）
+
+- `Sect / 宗门`
+  - `MountainGate`：山门本宗。
+  - `BranchPeak`：分峰别院。
+  - `OuterCourtyard`：外门院。
+  - `AllianceHall`：盟宗驻馆。
+  - `ForbiddenGround`：禁地。
+- `Wilderness / 野外`
+  - `SpiritForest`：灵林。
+  - `OreRange`：矿岭。
+  - `MarshWetland`：沼泽。
+  - `CanyonPass`：峡道。
+  - `SpiritVeinField`：灵脉荒野。
+- `MortalRealm / 凡俗国度`
+  - `CountySeat`：府县治所。
+  - `FarmVillage`：农庄乡里。
+  - `RiverTown`：水镇。
+  - `BorderFort`：边寨关堡。
+  - `DisasterLand`：灾区。
+- `CultivatorClan / 修仙世家`
+  - `AncestralEstate`：祖庭本家。
+  - `GuestHall`：客卿别馆。
+  - `SpiritFieldManor`：灵田庄园。
+  - `ForgeLineage`：铸器世家。
+  - `MedicineLineage`：丹药世家。
+- `ImmortalCity / 仙城`
+  - `GrandCity`：大城。
+  - `TransitHub`：驿城。
+  - `HarborCity`：河港仙城。
+  - `FrontierCity`：边陲仙城。
+  - `ImperialCultCity`：王朝修士都城。
+- `Market / 坊市`
+  - `SectMarket`：宗门坊。
+  - `LooseCultivatorBazaar`：散修集。
+  - `BlackMarket`：黑市。
+  - `FestivalFair`：节令市。
+  - `RoadsideMarket`：路市。
+- `Ruin / 遗迹`
+  - `AncientCave`：古修洞府。
+  - `FallenPalace`：坠落仙府。
+  - `SealedDungeon`：封印地宫。
+  - `BattlefieldRemnant`：古战场遗址。
+  - `TrialRealm`：试炼秘境。
+
+### 13.2.3 类型边界与防重叠规则
+
+- `ImmortalCity / 仙城` 与 `Market / 坊市` 的边界：
+  - `仙城` 是长期枢纽，负责大宗事务、驻点、拍卖、跨势力任务；
+  - `坊市` 是短期热点，负责捡漏、传闻、短交易、黑市与临时委托。
+- `MortalRealm / 凡俗国度` 与 `CultivatorClan / 修仙世家` 的边界：
+  - `凡俗国度` 的核心资产是人口、土地、秩序、供养；
+  - `修仙世家` 的核心资产是血脉、秘术、人情、门客。
+- `Wilderness / 野外` 与 `Ruin / 遗迹` 的边界：
+  - `野外` 是可持续进入的日常历练与采集层；
+  - `遗迹` 是高门槛、高风险、低频高收益的副本层。
+- `Sect / 宗门` 不得退化为普通贸易城；`CultivatorClan / 修仙世家` 不得实现为缩小版宗门；`MortalRealm / 凡俗国度` 不得实现为普通城建图换皮。
+
+### 13.2.4 二级地图模板建议
+
+- 为避免七类地点在实现上变成七套完全独立框架，二级地图建议先抽象为四种模板：
+  - `据点经营型`：适用于 `Sect / 宗门`、部分 `ImmortalCity / 仙城`；
+  - `势力关系型`：适用于 `MortalRealm / 凡俗国度`、`CultivatorClan / 修仙世家`；
+  - `野外历练型`：适用于 `Wilderness / 野外`；
+  - `高风险副本型`：适用于 `Ruin / 遗迹`，以及少数高门槛 `ForbiddenGround / 禁地`。
+- `Market / 坊市` 在一期可先复用 `势力关系型 + 轻量交易层` 组合，不单独建完整框架。
+
+### 13.2.5 时间推进与入口/退出规则
+
+- 世界格点击进入二级地图时，不暂停主世界时间。
+- 二级地图内的交互分为两类：
+  - `轻交互`：交易、接任务、关系查看、驻守布置；仅消耗极少固定分钟数，或不额外推进主时钟。
+  - `重交互`：深入野外、探索遗迹、长期驻点、护道；按明确分钟数或小时数推进，并通过统一回流接口写回 `GameState`。
+- 二级地图退出时必须明确写回：
+  - 获得或消耗的资源；
+  - 关系、稳定度或威胁变化；
+  - 英雄/队伍状态变化；
+  - 传闻、委托、地块解锁等衍生结果。
+
+### 13.2.6 世界生成分布建议（文档一期）
+
+- 高频常见点：
+  - `Wilderness + SpiritForest / OreRange / CanyonPass`
+  - `Market + LooseCultivatorBazaar / SectMarket`
+  - `MortalRealm + FarmVillage / CountySeat`
+  - `Sect + BranchPeak`
+  - `Ruin + AncientCave / BattlefieldRemnant`
+- 稀有或中后期点：
+  - `ImmortalCity + ImperialCultCity`
+  - `CultivatorClan + AncestralEstate`
+  - `Ruin + FallenPalace / TrialRealm`
+  - `Sect + ForbiddenGround`
+- 贴地形建议：
+  - `OreRange` 优先贴山脉；
+  - `SpiritForest` 优先贴林地与灵脉边；
+  - `BorderFort` 优先贴边界与峡道；
+  - `HarborCity`、`RiverTown` 优先贴主河道；
+  - `Sect`、`ForbiddenGround` 优先贴灵脉；
+  - `BlackMarket` 不单独刷在大道中央，应依附城市、坊市或边地节点；
+  - `FallenPalace`、`TrialRealm` 为低频稀有点，不应大面积分布。
+
+### 13.2.6.1 世界生成规则草案（文档二期）
+
+- 目标：把“世界观上合理的地点分布”收口为一套可执行的生成流程，供后续 `XianxiaWorldGeneratorSystem`、配置文件和调试面板使用。
+- 总原则：
+  - 先生成骨架，再挂地点；
+  - 先决定大区块，再决定点位类型；
+  - 先决定常见层，再决定稀有层；
+  - `PrimaryType` 之间不平均分布，修仙世界应体现“野外多、势力点少、遗迹稀有”的密度层级；
+  - 高级点位随游戏进度逐步开放，不要求开局全部可进。
+
+### 13.2.6.2 生成流程（推荐顺序）
+
+1. 生成地貌骨架：
+   - 山脉、平原、林地、湖泽、峡道、荒原、河谷。
+2. 生成灵气骨架：
+   - 主灵脉、支灵脉、枯竭带、灵潮节点、禁忌区。
+3. 生成人路骨架：
+   - 古道、商路、渡口、关隘、驿点。
+4. 生成势力区块：
+   - 凡俗王朝疆域、宗门辐射圈、世家经营圈、散修活跃带。
+5. 生成特殊区块：
+   - 古战场、封印区、陨落洞天、秘境裂口。
+6. 按区块和邻接规则分配 `PrimaryType`：
+   - 先放 `Sect / ImmortalCity / CultivatorClan` 等势力中枢；
+   - 再放 `MortalRealm / Market` 等人口与交易节点；
+   - 最后填充 `Wilderness` 并点缀 `Ruin`。
+7. 根据 `PrimaryType` 决定 `SecondaryTag`：
+   - 例如 `Wilderness` 再分为 `SpiritForest / OreRange / MarshWetland / CanyonPass / SpiritVeinField`。
+8. 最后做稀有度、最小间距与进度门槛校正：
+   - 防止高阶点位扎堆或初期可达内容过强。
+
+### 13.2.6.3 世界大区块建议
+
+- 为便于程序化生成与后续平衡，世界图可先分成五种大区块，每个 hex 至少隶属一种主区块：
+  - `灵脉山域`：山脉 + 高灵气，适合 `Sect / Wilderness / Ruin`；
+  - `凡俗腹地`：平原 + 水网 + 农业，适合 `MortalRealm / Market / CultivatorClan`；
+  - `商路走廊`：道路密集 + 渡口/关隘，适合 `ImmortalCity / Market / MortalRealm`；
+  - `边疆险地`：边界 + 峡谷 + 高威胁，适合 `Wilderness / BorderFort / BlackMarket / Ruin`；
+  - `古迹断脉区`：枯竭灵脉 + 古战场/封印，适合 `Ruin / ForbiddenGround / TrialRealm`。
+- 大区块不要求整齐切片，可彼此嵌套或边缘过渡，但必须能解释“这里为什么会长出这种点”。
+
+### 13.2.6.4 各 PrimaryType 的生成规则草案
+
+- `Sect / 宗门`
+  - 选点优先级：`高质量灵脉 > 山地/险地 > 可达性 > 周边供养圈`。
+  - 邻接偏好：至少邻接 `1` 个 `Wilderness`；优先邻接 `Market` 或 `MortalRealm` 供给圈，但不应紧贴大型凡俗腹心。
+  - 数量层级：低量。
+  - 最小间距：与其他 `Sect` 保持较大距离，避免顶级宗门密集挤在同一片山头。
+- `Wilderness / 野外`
+  - 选点优先级：作为默认填充层，根据地貌和灵气自动细分为林地、矿岭、沼泽、峡道、灵脉荒野。
+  - 邻接偏好：可邻接任何类型，但更常包围 `Sect / Ruin / BorderFort`。
+  - 数量层级：最高。
+  - 最小间距：不设强限制，核心是保证子标签分布合理而非数量稀缺。
+- `MortalRealm / 凡俗国度`
+  - 选点优先级：`宜居性 > 水路/农地 > 道路通达 > 风险可控`。
+  - 邻接偏好：优先与 `Market`、低风险 `Wilderness`、`CultivatorClan` 相邻；尽量远离高危 `Ruin` 核心区。
+  - 数量层级：次高。
+  - 最小间距：以片区形式成簇出现，单点间距可较近，但高阶治所之间保持中等距离。
+- `CultivatorClan / 修仙世家`
+  - 选点优先级：`专精资源 > 交通可达 > 富庶边缘 > 安全度`。
+  - 邻接偏好：常位于 `MortalRealm`、`Market` 与 `Sect / ImmortalCity` 之间，扮演中介型势力。
+  - 数量层级：中低。
+  - 最小间距：不必像宗门那样稀疏，但应避免多个世家完全重叠在同一小区域。
+- `ImmortalCity / 仙城`
+  - 选点优先级：`多路交汇 > 大河/渡口 > 势力交界 > 中高灵气`。
+  - 邻接偏好：优先与 `Market`、`MortalRealm`、`CultivatorClan` 相邻；可辐射多个道路节点。
+  - 数量层级：很低。
+  - 最小间距：全图大枢纽数量严格受限，避免“遍地仙城”。
+- `Market / 坊市`
+  - 选点优先级：伴生生成优先于独立生成。
+  - 伴生规则：
+    - `Sect` 周边可伴生 `SectMarket`；
+    - `ImmortalCity` 周边固定伴生 `1~2` 个交易节点；
+    - 渡口、驿路、边关可伴生 `RoadsideMarket`；
+    - 边疆险地或遗迹入口附近可低概率伴生 `BlackMarket`。
+  - 数量层级：中量。
+  - 最小间距：允许较近，但同类高价值坊市不应连续刷在同一条路上。
+- `Ruin / 遗迹`
+  - 选点优先级：`险地 > 古迹区 > 断脉区 > 远离腹地 > 神秘性`。
+  - 邻接偏好：优先邻接 `Wilderness`；少量可与 `Sect.ForbiddenGround` 或 `BorderFort` 形成特殊组合。
+  - 数量层级：最低。
+  - 最小间距：中高阶遗迹之间应保持大距离，超稀有点全图严格限量。
+
+### 13.2.6.5 邻接加权规则草案
+
+- 正向邻接：
+  - `Sect <-> Wilderness`
+  - `MortalRealm <-> Market`
+  - `ImmortalCity <-> Market`
+  - `ImmortalCity <-> MortalRealm`
+  - `CultivatorClan <-> MortalRealm`
+  - `CultivatorClan <-> Market`
+  - `Ruin <-> Wilderness`
+  - `BorderFort <-> CanyonPass`
+- 条件邻接：
+  - `BlackMarket` 更偏向 `FrontierCity / BorderFort / Ruin` 周边；
+  - `SectMarket` 更偏向 `Sect` 山门外缘；
+  - `HarborCity` 与 `RiverTown` 优先贴主河道。
+- 负向邻接：
+  - 高阶 `Ruin` 不应直接贴 `CountySeat`；
+  - 顶级 `Sect` 不应直接压在大型 `ImmortalCity` 中心；
+  - `ImperialCultCity` 不应与多个同级仙城连续紧邻。
+
+### 13.2.6.6 稀有度与数量层级草案
+
+- 全图数量级建议按以下层级控制：
+  - `Wilderness`：默认填充层，约占可交互点位主体。
+  - `MortalRealm`：第二层骨架，形成多个片区。
+  - `Market`：中量，主要通过伴生和交通节点生长。
+  - `CultivatorClan`：中低量，起连接作用。
+  - `Sect`：低量，代表区域修仙中枢。
+  - `ImmortalCity`：很低量，代表超级枢纽。
+  - `Ruin`：最低量，其中高阶遗迹比普通遗迹更稀少。
+- 稀有度分层建议：
+  - `常见`：`SpiritForest`、`FarmVillage`、`SectMarket`、`RoadsideMarket`
+  - `少见`：`BranchPeak`、`GuestHall`、`HarborCity`、`BattlefieldRemnant`
+  - `稀有`：`MountainGate`、`GrandCity`、`BlackMarket`、`SealedDungeon`
+  - `传说`：`ForbiddenGround`、`ImperialCultCity`、`FallenPalace`、`TrialRealm`
+
+### 13.2.6.7 进度解锁规则草案
+
+- 开局可见可进：
+  - `Wilderness` 常见点；
+  - 近域 `MortalRealm`；
+  - 普通 `Market`；
+  - 少量低阶 `Sect` 访问点；
+  - 小型 `Ruin`，如 `AncientCave`。
+- 中期开启：
+  - `CultivatorClan` 主要节点；
+  - `ImmortalCity`；
+  - 边疆 `BorderFort`；
+  - 中阶 `Ruin`，如 `BattlefieldRemnant / SealedDungeon`。
+- 后期开启：
+  - `ForbiddenGround`；
+  - `ImperialCultCity`；
+  - `TrialRealm`；
+  - `FallenPalace`。
+- 解锁条件可挂接：
+  - 宗门声望；
+  - 历练层数；
+  - 英雄/真传平均战力；
+  - 盟约或关系网络；
+  - 特定传闻或前置遗迹线索。
+
+### 13.2.6.8 配置化建议
+
+- 后续若写入配置文件，建议至少拆为三层：
+  - `WorldRegionProfile`：大区块参数；
+  - `WorldPrimaryTypeSpawnRule`：主类型权重、邻接偏好、最小间距；
+  - `WorldSecondaryTagSpawnRule`：子标签权重、伴生条件、解锁门槛。
+- 调试入口建议支持查看：
+  - 当前 hex 的区块类型；
+  - 候选 `PrimaryType` 权重；
+  - 邻接加权结果；
+  - 稀有度与解锁门槛；
+  - 最终被刷成该点位的原因摘要。
+
+### 13.2.6.9 参数草案（文档三期 / 接近数据表）
+
+- 目的：为后续 JSON 配置与 C# 模型提供第一版字段草案与推荐参数量级；本节不是最终平衡值，而是“结构先行、数值后细调”的起点。
+
+#### A. `WorldRegionProfile` 参数草案
+
+- 建议字段：
+  - `RegionId`
+  - `DisplayName`
+  - `CoverageWeight`
+  - `TerrainAffinity`
+  - `SpiritualDensityRange`
+  - `RoadDensityRange`
+  - `ThreatBaseline`
+  - `PrimaryTypeBias`
+  - `RuinBias`
+  - `MarketBias`
+  - `UnlockTier`
+- 推荐区块参数：
+
+| RegionId | 中文 | CoverageWeight | SpiritualDensity | RoadDensity | ThreatBaseline | 主类型倾向 |
+| --- | --- | --- | --- | --- | --- | --- |
+| `SpiritMountain` | 灵脉山域 | `0.18 ~ 0.24` | `0.75 ~ 1.00` | `0.20 ~ 0.40` | `0.45 ~ 0.65` | `Sect / Wilderness / Ruin` |
+| `MortalHeartland` | 凡俗腹地 | `0.26 ~ 0.34` | `0.20 ~ 0.45` | `0.55 ~ 0.85` | `0.10 ~ 0.30` | `MortalRealm / Market / CultivatorClan` |
+| `TradeCorridor` | 商路走廊 | `0.12 ~ 0.18` | `0.30 ~ 0.55` | `0.75 ~ 1.00` | `0.20 ~ 0.40` | `ImmortalCity / Market / MortalRealm` |
+| `FrontierWilds` | 边疆险地 | `0.16 ~ 0.22` | `0.35 ~ 0.65` | `0.20 ~ 0.50` | `0.55 ~ 0.85` | `Wilderness / BorderFort / Ruin / BlackMarket` |
+| `BrokenVeinRuins` | 古迹断脉区 | `0.08 ~ 0.14` | `0.10 ~ 0.35` | `0.05 ~ 0.20` | `0.70 ~ 1.00` | `Ruin / ForbiddenGround / TrialRealm` |
+
+- 护栏：
+  - `CoverageWeight` 归一化后总和为 `1.0`；
+  - `BrokenVeinRuins` 与 `ImmortalCity` 的直接重叠概率应极低；
+  - `MortalHeartland` 不得成为高阶遗迹的主要出生区。
+
+#### B. `WorldPrimaryTypeSpawnRule` 参数草案
+
+- 建议字段：
+  - `PrimaryType`
+  - `BaseWeight`
+  - `RegionWeightMultiplier`
+  - `TerrainWeightMultiplier`
+  - `SpiritualWeightCurve`
+  - `RoadWeightCurve`
+  - `ThreatWeightCurve`
+  - `MinHexDistance`
+  - `SoftCapPerRegion`
+  - `GlobalCap`
+  - `CompanionSpawnRules`
+  - `UnlockTier`
+  - `VisibilityTier`
+- 推荐权重与约束：
+
+| PrimaryType | BaseWeight | MinHexDistance | SoftCapPerRegion | GlobalCap | UnlockTier | 备注 |
+| --- | --- | --- | --- | --- | --- | --- |
+| `Sect` | `0.42` | `10 ~ 14` | `1 ~ 3` | `6 ~ 10` | `0` | 低量，强依赖灵脉与山地 |
+| `Wilderness` | `1.00` | `0` | `无` | `无` | `0` | 默认填充层 |
+| `MortalRealm` | `0.82` | `3 ~ 6` | `6 ~ 12` | `无` | `0` | 以片区簇状生成 |
+| `CultivatorClan` | `0.36` | `6 ~ 9` | `2 ~ 4` | `8 ~ 14` | `1` | 资源与交通双偏好 |
+| `ImmortalCity` | `0.18` | `14 ~ 20` | `0 ~ 2` | `3 ~ 5` | `1` | 超级枢纽，严格限量 |
+| `Market` | `0.64` | `2 ~ 4` | `4 ~ 8` | `无` | `0` | 伴生优先，高流动 |
+| `Ruin` | `0.24` | `8 ~ 16` | `1 ~ 4` | `8 ~ 16` | `0` | 稀有，按阶层再拆 |
+
+- 调参说明：
+  - `BaseWeight` 只表达“默认倾向”，真正落点还要叠加区块、地形、邻接与门槛修正；
+  - `Wilderness` 作为默认填充层，可不走严格 `GlobalCap`；
+  - `ImmortalCity`、高阶 `Sect`、高阶 `Ruin` 必须同时受 `MinHexDistance` 与 `GlobalCap` 双重限制。
+
+#### C. `WorldSecondaryTagSpawnRule` 参数草案
+
+- 建议字段：
+  - `PrimaryType`
+  - `SecondaryTag`
+  - `BaseWeight`
+  - `RegionBias`
+  - `TerrainBias`
+  - `RequiresAdjacency`
+  - `AvoidsAdjacency`
+  - `UnlockTier`
+  - `RarityTier`
+  - `CanCompanionSpawn`
+- 推荐子标签参数：
+
+| PrimaryType | SecondaryTag | BaseWeight | UnlockTier | RarityTier | 关键条件 |
+| --- | --- | --- | --- | --- | --- |
+| `Sect` | `MountainGate` | `0.20` | `0` | `Rare` | 高灵脉 + 山地 |
+| `Sect` | `BranchPeak` | `0.42` | `0` | `Uncommon` | 靠近主宗门辐射圈 |
+| `Sect` | `OuterCourtyard` | `0.24` | `0` | `Common` | 可达性较高 |
+| `Sect` | `AllianceHall` | `0.10` | `1` | `Rare` | 靠近仙城或盟宗 |
+| `Sect` | `ForbiddenGround` | `0.04` | `2` | `Legendary` | 断脉/高威胁/禁区 |
+| `Wilderness` | `SpiritForest` | `0.28` | `0` | `Common` | 林地 + 中高灵气 |
+| `Wilderness` | `OreRange` | `0.24` | `0` | `Common` | 山地 + 矿脉 |
+| `Wilderness` | `MarshWetland` | `0.16` | `0` | `Uncommon` | 沼泽/河湖 |
+| `Wilderness` | `CanyonPass` | `0.18` | `0` | `Uncommon` | 峡谷/边关 |
+| `Wilderness` | `SpiritVeinField` | `0.14` | `1` | `Rare` | 支灵脉无人区 |
+| `MortalRealm` | `CountySeat` | `0.22` | `0` | `Uncommon` | 平原 + 路网 |
+| `MortalRealm` | `FarmVillage` | `0.38` | `0` | `Common` | 平原 + 水网 |
+| `MortalRealm` | `RiverTown` | `0.22` | `0` | `Uncommon` | 主河道 |
+| `MortalRealm` | `BorderFort` | `0.12` | `1` | `Rare` | 边界 + 峡道 |
+| `MortalRealm` | `DisasterLand` | `0.06` | `1` | `Rare` | 高威胁/低稳态 |
+| `CultivatorClan` | `AncestralEstate` | `0.20` | `1` | `Rare` | 富庶区边缘 + 稳定 |
+| `CultivatorClan` | `GuestHall` | `0.24` | `1` | `Uncommon` | 贴交通点 |
+| `CultivatorClan` | `SpiritFieldManor` | `0.22` | `1` | `Uncommon` | 资源专精区 |
+| `CultivatorClan` | `ForgeLineage` | `0.18` | `1` | `Rare` | 贴矿岭/工路 |
+| `CultivatorClan` | `MedicineLineage` | `0.16` | `1` | `Rare` | 贴灵林/药泽 |
+| `ImmortalCity` | `GrandCity` | `0.34` | `1` | `Rare` | 多路交汇 |
+| `ImmortalCity` | `TransitHub` | `0.28` | `1` | `Uncommon` | 驿路枢纽 |
+| `ImmortalCity` | `HarborCity` | `0.20` | `1` | `Rare` | 大河/渡口 |
+| `ImmortalCity` | `FrontierCity` | `0.12` | `2` | `Rare` | 边疆险地 |
+| `ImmortalCity` | `ImperialCultCity` | `0.06` | `2` | `Legendary` | 王朝核心 + 声望门槛 |
+| `Market` | `SectMarket` | `0.24` | `0` | `Common` | 需邻接宗门 |
+| `Market` | `LooseCultivatorBazaar` | `0.30` | `0` | `Common` | 散修活跃带 |
+| `Market` | `BlackMarket` | `0.08` | `1` | `Rare` | 边地/遗迹/前线 |
+| `Market` | `FestivalFair` | `0.10` | `1` | `Rare` | 节令/事件驱动 |
+| `Market` | `RoadsideMarket` | `0.28` | `0` | `Common` | 需邻接道路/渡口 |
+| `Ruin` | `AncientCave` | `0.34` | `0` | `Common` | 山野/隐蔽点 |
+| `Ruin` | `FallenPalace` | `0.08` | `2` | `Legendary` | 断脉/稀有奇观 |
+| `Ruin` | `SealedDungeon` | `0.20` | `1` | `Rare` | 封印区/高威胁 |
+| `Ruin` | `BattlefieldRemnant` | `0.24` | `1` | `Uncommon` | 古战场区 |
+| `Ruin` | `TrialRealm` | `0.14` | `2` | `Legendary` | 高灵潮/试炼门槛 |
+
+#### D. 邻接权重参数草案
+
+- 可在 `WorldAdjacencyWeightRule` 中配置：
+  - `SourceType`
+  - `TargetType`
+  - `WeightDelta`
+  - `Radius`
+  - `RuleMode`：`Attract / Repel / Require`
+- 推荐值：
+
+| Source -> Target | WeightDelta | Radius | RuleMode | 说明 |
+| --- | --- | --- | --- | --- |
+| `Sect -> Wilderness` | `+0.30 ~ +0.45` | `2` | `Attract` | 宗门周边应有历练圈 |
+| `MortalRealm -> Market` | `+0.25 ~ +0.40` | `2` | `Attract` | 人口与交易共生 |
+| `ImmortalCity -> Market` | `+0.35 ~ +0.50` | `2` | `Attract` | 大城带动坊市 |
+| `CultivatorClan -> Market` | `+0.18 ~ +0.28` | `2` | `Attract` | 世家偏好交易与客卿 |
+| `Ruin -> Wilderness` | `+0.22 ~ +0.35` | `2` | `Attract` | 遗迹外侧应被野外包裹 |
+| `BlackMarket -> FrontierCity` | `+0.28 ~ +0.42` | `2` | `Attract` | 黑市依附边地 |
+| `HighRuin -> CountySeat` | `-0.40 ~ -0.60` | `3` | `Repel` | 高危遗迹远离腹地 |
+| `ImmortalCity -> ImmortalCity` | `-0.55 ~ -0.80` | `5` | `Repel` | 大城避免扎堆 |
+| `Sect -> Sect` | `-0.45 ~ -0.70` | `4` | `Repel` | 顶级宗门保持势力空间 |
+
+#### E. 稀有度与可见性参数草案
+
+- 可在 `WorldRarityProfile` 中配置：
+  - `RarityTier`
+  - `SpawnMultiplier`
+  - `RevealByDefault`
+  - `FogPriority`
+  - `DiscoveryHintChance`
+- 推荐值：
+
+| RarityTier | SpawnMultiplier | RevealByDefault | DiscoveryHintChance | 用途 |
+| --- | --- | --- | --- | --- |
+| `Common` | `1.00` | `true` | `0.00 ~ 0.05` | 常规可见点 |
+| `Uncommon` | `0.60` | `true` | `0.05 ~ 0.15` | 需要轻探索 |
+| `Rare` | `0.28` | `false` | `0.15 ~ 0.35` | 依赖传闻或接近后发现 |
+| `Legendary` | `0.08` | `false` | `0.35 ~ 0.65` | 强依赖线索、门槛或事件链 |
+
+#### F. 解锁门槛参数草案
+
+- 可在 `WorldUnlockRule` 中配置：
+  - `UnlockTier`
+  - `MinSectReputation`
+  - `MinExpeditionDepth`
+  - `MinHeroPower`
+  - `RequiredRumorTags`
+  - `RequiredFactionRelation`
+- 推荐门槛：
+
+| UnlockTier | 宗门声望 | 历练层数 | 英雄平均战力 | 关系/线索要求 |
+| --- | --- | --- | --- | --- |
+| `0` | `0` | `0` | `0` | 无 |
+| `1` | `20 ~ 40` | `3 ~ 6` | `80 ~ 140` | 至少一种传闻或基础关系 |
+| `2` | `60 ~ 100` | `8 ~ 12` | `180 ~ 260` | 需要特定传闻、盟约或遗迹前置 |
+
+#### G. 伴生生成参数草案
+
+- 可在 `WorldCompanionSpawnRule` 中配置：
+  - `HostType`
+  - `HostTag`
+  - `CompanionType`
+  - `CompanionTag`
+  - `SpawnChance`
+  - `MinDistanceFromHost`
+  - `MaxDistanceFromHost`
+- 推荐伴生规则：
+
+| Host | Companion | SpawnChance | 距离建议 | 说明 |
+| --- | --- | --- | --- | --- |
+| `Sect` | `Market.SectMarket` | `0.35 ~ 0.60` | `1 ~ 2` | 山门外宗门坊 |
+| `ImmortalCity` | `Market.RoadsideMarket` | `0.40 ~ 0.70` | `1 ~ 2` | 城郊交易点 |
+| `ImmortalCity` | `Market.BlackMarket` | `0.08 ~ 0.18` | `1 ~ 3` | 大城暗面 |
+| `Ruin` | `Market.BlackMarket` | `0.10 ~ 0.22` | `1 ~ 2` | 遗迹外围倒货 |
+| `MortalRealm.CountySeat` | `Market.RoadsideMarket` | `0.22 ~ 0.40` | `1 ~ 2` | 县镇集市 |
+| `MortalRealm.BorderFort` | `Market.BlackMarket` | `0.12 ~ 0.24` | `1 ~ 2` | 边地私市 |
+
+#### H. 调参优先级建议
+
+- 若首版生成结果“不像修仙世界”，优先调：
+  - `WorldRegionProfile.CoverageWeight`
+  - `Sect / ImmortalCity / Ruin` 的 `MinHexDistance`
+  - `Market` 的伴生概率
+  - `Rare / Legendary` 的 `SpawnMultiplier`
+- 若首版结果“像修仙世界但不好玩”，优先调：
+  - `UnlockTier`
+  - `DiscoveryHintChance`
+  - `MortalRealm / Market` 的密度
+  - `Wilderness` 到 `Ruin` 的过渡强度
+- 不建议在第一轮就精细到单个 tag 的最终平衡；先让世界骨架与点位层级正确，再做局部调权。
+
+### 13.2.7 一期实现顺序建议
+
+- 一期先落地高差异四类：
+  - `Sect / 宗门`
+  - `Wilderness / 野外`
+  - `Market / 坊市`
+  - `Ruin / 遗迹`
+- 二期补 `MortalRealm / 凡俗国度`、`CultivatorClan / 修仙世家`、`ImmortalCity / 仙城` 的关系经营与长期驻点逻辑。
+- 原因：后三类若没有关系系统、委托系统、供给系统支撑，容易先做成仅名字不同的 UI 空壳。
+
 ## 14. 主界面与客户端设置
 
 - 双布局（Legacy/Figma）共享同一 `GameLoop` 与 `GameState`。
 - Legacy 主界面当前额外采用“案几 + 宣纸 + 左右画轴”的卷轴隐喻：`Main.tscn` 负责桌面背景、卷轴纸面、木轴与上下界栏，所有 Legacy UI 默认写在卷面而非漂浮黑底。
 - Legacy 主界面根背景已切换为 `CountyIdle/assets/ui/background/background_2.png` 对应的卷轴山水底图；该图本身已对齐内框长画幅构图，运行时直接整图作为背景源，并随窗口尺寸变化自动重排，以 cover 方式始终填满整个游戏窗口；背景节点额外挂载毛玻璃 shader，通过轻微散射、乳白染色与细颗粒压低山水细节，减少对前景 UI 的干扰。
 - Legacy 主界面当前采用“中央六边形沙盘 + 左侧地块检视器 + 右侧宗门纪事 + 底部控制台”的 overlay 布局；中央视觉优先留给 `WorldPanel` 中的天衍峰山门图 / 世界地图。
-- 天衍峰山门图当前仅展示地貌，左侧检视卡维持默认提示，不提供场所与门人选中入口。
+- 天衍峰山门图当前仅展示地貌，左侧检视卡支持全格检视；弟子/场所可视化仍停用。
 - `宗主中枢 / 弟子谱 / 仓储` 的常用入口当前收口到底部控制台；地图页签区域只保留地图切换与缩放相关控件，降低中央地图上沿的按钮密度。
 - 左侧 `Tile Inspector` 当前采用“主标题 + 地块副标题 + 4 格属性卡 + 三级动作按钮 + 卷内批注”的层次，玩家优先读取地块信息与当前可执行项。
 - 左侧 `Tile Inspector` 在未选中时默认禁用动作按钮；选中不同 tile 后，三级动作会按 `灵田 / 工坊 / 总坊 / 传法院 / 庶务殿 / 休憩点` 等类型切换为更具体的“扩建 / 调度 / 打开对应面板”入口。
@@ -793,81 +1606,6 @@
   - 已实现槽位复制分支
   - 未实现云存档、事件流水表、资源流水表、外部导入导出
 
-## 16. 人口分配与生活循环系统（Population Allocation，一期）
-
-### 16.1 设计目标与边界
-
-- 主目标：让人口受“住房、食物、睡眠、情绪、衣物、通勤”共同约束，并可解释地影响岗位有效产能。
-- 结算边界：仍按每 `60` 游戏分钟小时结算，不引入分钟级实时路径模拟。
-- 伦理约束：职业只体现分工，不对职业群体赋予高低价值评价。
-
-### 16.2 状态输入与新增字段（建议）
-
-- 输入复用：`Population`、`HousingCapacity`、`Food`、`Happiness`、`IndustryTools`、岗位分配。
-- 建议新增字段（默认值保证旧存档可读）：
-  - `ChildPopulation`（默认 `0`）
-  - `AdultPopulation`（默认 `Population`）
-  - `ElderPopulation`（默认 `0`）
-  - `SickPopulation`（默认 `0`）
-  - `ClothingStock`（默认 `0`）
-  - `AverageCommuteDistanceKm`（默认 `1.2`）
-  - `RoadMobilityMultiplier`（默认 `1.0`，夹紧 `0.7~1.3`）
-- 一期输入说明：`AverageCommuteDistanceKm` 由“人口规模 + 住房承压 + 产业建筑数量”动态估算，后续再接入地图空间映射。
-
-### 16.3 住房与睡眠承载
-
-- 每小时睡眠需求：`sleepNeed = Population * 0.33`
-- 每小时可睡容量：`sleepCapacity = HousingCapacity * 0.40`
-- 睡眠恢复系数：`sleepFactor = clamp(sleepCapacity / max(sleepNeed, 1), 0.55, 1.05)`
-- 居住拥挤度：`housingPressure = clamp((Population - HousingCapacity) / max(Population, 1), 0, 0.45)`
-- 影响规则：
-  - `housingPressure > 0`：幸福追加惩罚 `-(housingPressure * 2.4)`
-  - `sleepFactor < 0.8`：岗位到岗率与疾病恢复速度同时下降
-
-### 16.4 食物、衣物与健康
-
-- 衣物覆盖：`clothingCoverage = clamp(ClothingStock / max(Population, 1), 0.30, 1.00)`
-- 每小时衣物损耗：`Population * 0.012`
-- 患病率：`sicknessRate = 0.002 + housingPressure*0.012 + max(0, 0.75-sleepFactor)*0.010 + (1-clothingCoverage)*0.006`
-- 新增病患：`newSick = floor(AdultPopulation * sicknessRate)`
-- 每小时恢复：`recover = floor(SickPopulation * (0.11 + clothingCoverage*0.06))`
-- 约束：`SickPopulation` 夹紧到 `[0, AdultPopulation]`
-
-### 16.5 生老病死（小时聚合）
-
-- 出生：`births = floor(AdultPopulation * 0.0032 * clamp(Happiness/100, 0.5, 1.2) * clamp(HousingCapacity/max(Population,1), 0.6, 1.1))`
-- 成长：`childToAdult = floor(ChildPopulation * 0.0018)`
-- 衰老：`adultToElder = floor(AdultPopulation * 0.0009)`
-- 死亡率：`deathRate = 0.0004 + (SickPopulation/max(Population,1))*0.0015 + max(0, -Food)/max(Population,1)*0.004`
-- 死亡人数：`deaths = ceil(Population * deathRate)`（下限 `0`，人口总量下限 `20`）
-
-### 16.6 通勤步行与到岗率
-
-- 单程通勤时长（分钟）：`commuteMinutes = clamp(AverageCommuteDistanceKm / (4.2 * RoadMobilityMultiplier) * 60, 3, 45)`
-- 到岗系数：`onDutyFactor = clamp((60 - commuteMinutes) / 60, 0.25, 0.95)`
-- 健康劳动力系数：`healthLaborFactor = clamp(1 - SickPopulation / max(AdultPopulation, 1), 0.45, 1.0)`
-- 岗位有效人数（一期已接入经济结算）：`effectiveJob = floor(jobAssigned * onDutyFactor * sleepFactor * healthLaborFactor)`
-- 观测要求：`commuteMinutes >= 35` 时写“远距通勤导致迟到”日志。
-
-### 16.7 情绪修正扩展（在第 7.3 基础上叠加）
-
-- 睡眠情绪：`sleepFactor >= 0.95` 则 `+0.4`，`<0.8` 则 `-0.9`
-- 衣物情绪：`clothingCoverage >= 0.9` 则 `+0.3`，`<0.6` 则 `-0.7`
-- 通勤情绪：`-(commuteMinutes/60)*0.8`
-- 疾病情绪：`-(SickPopulation/max(Population,1))*1.6`
-- 最终幸福仍夹紧：`clamp(Happiness, 5, 100)`
-
-### 16.8 验收与回滚护栏
-
-- 验收（实现后）：
-  - 人口增减由出生/衰老/死亡/患病恢复四类日志可解释；
-  - 住房或通勤恶化会在 `1~2` 小时内反馈到有效岗位产能；
-  - 全部人口与岗位相关字段保持非负，存档可读。
-- 回滚触发：连续 `6` 小时出现“有效岗位下降且食物/金币同步恶化”。
-- 回滚方式：保留字段，停用本节系数，退回第 7 节当前人口增长与幸福规则。
-
----
-
 ## 影响摘要（Flywheel）
 
 - 人口繁衍：由食物/住房/睡眠/衣物/通勤/疾病多因子控制，具备出生、衰老、患病、死亡与恢复反馈。
@@ -881,13 +1619,11 @@
 
 “在不改变 `60 分钟小时结算` 与 `GameState` 存档兼容的前提下，按 `Industry -> Resource -> Economy` 串行结算资源链，并同步更新本文对应章节与改动记录。”
 
-“在保持 `1 秒=1 分钟` 与小时结算节奏不变的前提下，为人口系统接入住房睡眠、衣物健康与步行通勤到岗率，并将有效岗位人数替换为 `onDutyFactor * sleepFactor * healthLaborFactor` 的聚合计算。”
-
 ## 17. 宗门弟子可视移动系统（Town Residents）
 
 - 状态：当前停用。
 - 作用范围：天衍峰山门图仅保留地貌、道路与水域渲染，不生成住宅、场所与弟子可视对象。
-- 交互规则：不提供场所/门人选中与“弟子谱”联动。
+- 交互规则：不提供场所/门人选中与“弟子谱”联动；地块检视入口保留。
 - 恢复方式：如需重启，可按历史“弟子可视移动”规则恢复生成与渲染链路。
 
 ## 18. 地图与经营状态联动（Map Operation Link）
@@ -895,8 +1631,8 @@
 - 作用范围：`World / Prefecture / CountyTown` 三类地图页共用一套经营状态映射，其中 `CountyTown` 对外语义为天衍峰山门图。
 - 经营 → 地图：
   - 世界图重点读取：`Happiness`、`Threat`、`Gold`、`Food`；
-  - 江陵府外域备用视图重点读取：`Threat`、`Happiness`、`AverageCommuteDistanceKm`、`RoadMobilityMultiplier`；
-  - 宗门图重点读取：`HousingCapacity / Population`、`Threat`、`AverageCommuteDistanceKm`、`RoadMobilityMultiplier`。
+  - 江陵府外域备用视图重点读取：`Threat`、`Happiness`、`Gold`、`Food`；
+  - 宗门图重点读取：`HousingCapacity / Population`、`Threat`、`Happiness`、`ContributionPoints`。
 - 地图状态档位：`繁荣 / 平稳 / 吃紧 / 紧张`，至少影响：
   - 地图标题附加状态词；
   - 地图状态条提示文案；
@@ -904,10 +1640,9 @@
 - 地图 → 经营：
   - 地图页提供双按钮调度入口；
   - 当前调度包括：外域 `整修灵道 / 抚恤附庸` 与宗门 `修整坊路 / 夜巡清巷`；
-  - 调度即时改变 `Happiness`、`Threat`、`AverageCommuteDistanceKm`、`RoadMobilityMultiplier` 及部分资源库存，并立刻发布日志与状态刷新。
-  - 道路类调度通过 `MapCommuteReductionBonusKm` 与 `MapRoadMobilityBonus` 持久化到 `GameState`，再由 `PopulationRules.RefreshDynamicCommute` 回写到实时通勤表现。
+  - 调度即时改变 `Happiness`、`Threat` 与部分资源库存，并立刻发布日志与状态刷新。
 - 护栏：
-  - 调度不得使资源、威胁、通勤等字段出现负值异常；
+  - 调度不得使资源或威胁等字段出现负值异常；
   - 不改变小时结算顺序；
   - Figma 布局可暂不暴露地图调度入口，但核心状态计算需保持兼容。
 

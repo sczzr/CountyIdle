@@ -15,8 +15,6 @@ public class MapOperationalLinkSystem
     private const int StreetRepairContributionCost = 8;
     private const int NightWatchGoldCost = 10;
     private const int NightWatchContributionCost = 6;
-    private const double MaximumCommuteReductionBonusKm = 0.80;
-    private const double MaximumRoadMobilityBonus = 0.18;
 
     public MapOperationalSnapshot BuildSnapshot(GameState state, MapRegionScope activeScope)
     {
@@ -76,21 +74,12 @@ public class MapOperationalLinkSystem
                     return false;
                 }
 
-                if (state.MapCommuteReductionBonusKm >= MaximumCommuteReductionBonusKm &&
-                    state.MapRoadMobilityBonus >= MaximumRoadMobilityBonus)
-                {
-                    log = $"整修{SectMapSemanticRules.GetOuterRegionRoadName()}已达当前上限，可先把资源用于其他地图调度。";
-                    return false;
-                }
-
                 var courierWoodDelta = InventoryRules.ApplyDelta(state, nameof(GameState.Wood), -CourierRoadWoodCost);
                 var courierStoneDelta = InventoryRules.ApplyDelta(state, nameof(GameState.Stone), -CourierRoadStoneCost);
-                state.MapCommuteReductionBonusKm = Math.Min(state.MapCommuteReductionBonusKm + 0.12, MaximumCommuteReductionBonusKm);
-                state.MapRoadMobilityBonus = Math.Min(state.MapRoadMobilityBonus + 0.03, MaximumRoadMobilityBonus);
                 state.Happiness = Math.Min(state.Happiness + 1.0, 100.0);
-                PopulationRules.RefreshDynamicCommute(state);
+                state.Threat = Math.Max(state.Threat - 1.5, 0.0);
                 log =
-                    $"整修{SectMapSemanticRules.GetOuterRegionRoadName()}：木 {courierWoodDelta:+#;-#;0}、石 {courierStoneDelta:+#;-#;0}，通勤压缩到 {state.AverageCommuteDistanceKm:0.00}km，道路机动提升至 x{state.RoadMobilityMultiplier:0.00}。";
+                    $"整修{SectMapSemanticRules.GetOuterRegionRoadName()}：木 {courierWoodDelta:+#;-#;0}、石 {courierStoneDelta:+#;-#;0}，外域秩序稍稳，威胁降至 {state.Threat:0.#}%。";
                 return true;
 
             case MapDirectiveAction.ReliefVillages:
@@ -104,12 +93,6 @@ public class MapOperationalLinkSystem
                 var reliefGoldDelta = InventoryRules.ApplyDelta(state, nameof(GameState.Gold), -ReliefGoldCost);
                 state.Happiness = Math.Min(state.Happiness + 4.0, 100.0);
                 state.Threat = Math.Max(state.Threat - 3.0, 0.0);
-                if (state.SickPopulation > 0)
-                {
-                    state.SickPopulation = Math.Max(state.SickPopulation - 1, 0);
-                }
-
-                PopulationRules.RefreshDynamicCommute(state);
                 log =
                     $"{SectMapSemanticRules.GetOuterRegionReliefActionName()}：粮 {reliefFoodDelta:+#;-#;0}、金 {reliefGoldDelta:+#;-#;0}，民心回升至 {state.Happiness:0.#}，威胁降至 {state.Threat:0.#}%。";
                 return true;
@@ -123,22 +106,13 @@ public class MapOperationalLinkSystem
                     return false;
                 }
 
-                if (state.MapCommuteReductionBonusKm >= MaximumCommuteReductionBonusKm &&
-                    state.MapRoadMobilityBonus >= MaximumRoadMobilityBonus)
-                {
-                    log = "街坊道路已较为顺畅，当前无需继续堆叠修整。";
-                    return false;
-                }
-
                 var streetWoodDelta = InventoryRules.ApplyDelta(state, nameof(GameState.Wood), -StreetRepairWoodCost);
                 var streetGoldDelta = InventoryRules.ApplyDelta(state, nameof(GameState.Gold), -StreetRepairGoldCost);
                 var streetContributionDelta = InventoryRules.ApplyDelta(state, nameof(GameState.ContributionPoints), -StreetRepairContributionCost);
-                state.MapCommuteReductionBonusKm = Math.Min(state.MapCommuteReductionBonusKm + 0.08, MaximumCommuteReductionBonusKm);
-                state.MapRoadMobilityBonus = Math.Min(state.MapRoadMobilityBonus + 0.02, MaximumRoadMobilityBonus);
                 state.Happiness = Math.Min(state.Happiness + 2.0, 100.0);
-                PopulationRules.RefreshDynamicCommute(state);
+                state.Threat = Math.Max(state.Threat - 1.0, 0.0);
                 log =
-                    $"修整坊路：木 {streetWoodDelta:+#;-#;0}、灵石 {streetGoldDelta:+#;-#;0}、贡献 {streetContributionDelta:+#;-#;0}，宗门通勤压缩到 {state.AverageCommuteDistanceKm:0.00}km，民心提升至 {state.Happiness:0.#}。";
+                    $"修整坊路：木 {streetWoodDelta:+#;-#;0}、灵石 {streetGoldDelta:+#;-#;0}、贡献 {streetContributionDelta:+#;-#;0}，宗门民心提升至 {state.Happiness:0.#}，威胁降至 {state.Threat:0.#}%。";
                 return true;
 
             case MapDirectiveAction.NightWatch:
@@ -153,7 +127,6 @@ public class MapOperationalLinkSystem
                 var nightWatchContributionDelta = InventoryRules.ApplyDelta(state, nameof(GameState.ContributionPoints), -NightWatchContributionCost);
                 state.Threat = Math.Max(state.Threat - 4.0, 0.0);
                 state.Happiness = Math.Min(state.Happiness + 1.0, 100.0);
-                PopulationRules.RefreshDynamicCommute(state);
                 log =
                     $"夜巡清巷：灵石 {nightWatchGoldDelta:+#;-#;0}、贡献 {nightWatchContributionDelta:+#;-#;0}，宗门威胁降至 {state.Threat:0.#}% ，民心回升至 {state.Happiness:0.#}。";
                 return true;
@@ -189,21 +162,20 @@ public class MapOperationalLinkSystem
     {
         var happinessScore = NormalizePercent(state.Happiness);
         var securityScore = InvertPercent(state.Threat);
-        var logisticsScore = GetLogisticsScore(state);
         var foodScore = NormalizeReserve(state.Food, Math.Max(state.Population * 3.8, 180.0));
-        var score = (happinessScore * 0.28) + (securityScore * 0.28) + (logisticsScore * 0.26) + (foodScore * 0.18);
+        var reserveScore = NormalizeReserve(state.Gold, Math.Max(state.Population * 0.9, 90.0));
+        var score = (happinessScore * 0.30) + (securityScore * 0.32) + (foodScore * 0.20) + (reserveScore * 0.18);
         var level = ResolveLevel(score);
-        var commuteMinutes = PopulationRules.GetCommuteMinutes(state);
 
         return CreateStyle(
             level,
             score,
             level switch
             {
-                MapConditionLevel.Flourishing => $"{SectMapSemanticRules.GetOuterRegionRoadName()}与{SectMapSemanticRules.GetOuterRegionSettlementName()}都较安定，通勤约 {commuteMinutes:0} 分钟，道路机动 x{state.RoadMobilityMultiplier:0.00}。",
-                MapConditionLevel.Stable => $"外域{SectMapSemanticRules.GetOuterRegionRoadName()}平稳，可通过整修{SectMapSemanticRules.GetOuterRegionRoadName()}或{SectMapSemanticRules.GetOuterRegionReliefActionName()}继续压低风险。通勤约 {commuteMinutes:0} 分钟。",
-                MapConditionLevel.Strained => $"外域{SectMapSemanticRules.GetOuterRegionRoadName()}拥挤或{SectMapSemanticRules.GetOuterRegionSettlementName()}承压，建议优先整修{SectMapSemanticRules.GetOuterRegionRoadName()}与{SectMapSemanticRules.GetOuterRegionReliefActionName()}。通勤约 {commuteMinutes:0} 分钟。",
-                _ => $"外域{SectMapSemanticRules.GetOuterRegionRoadName()}吃紧且威胁攀升，须尽快安抚{SectMapSemanticRules.GetOuterRegionSettlementName()}。通勤约 {commuteMinutes:0} 分钟，威胁 {state.Threat:0.#}%。"
+                MapConditionLevel.Flourishing => $"{SectMapSemanticRules.GetOuterRegionRoadName()}与{SectMapSemanticRules.GetOuterRegionSettlementName()}都较安定，可继续稳步采办与巡护。",
+                MapConditionLevel.Stable => $"外域{SectMapSemanticRules.GetOuterRegionRoadName()}平稳，可通过整修{SectMapSemanticRules.GetOuterRegionRoadName()}或{SectMapSemanticRules.GetOuterRegionReliefActionName()}继续压低风险。",
+                MapConditionLevel.Strained => $"外域{SectMapSemanticRules.GetOuterRegionRoadName()}或{SectMapSemanticRules.GetOuterRegionSettlementName()}承压，建议优先整修与抚恤。",
+                _ => $"外域{SectMapSemanticRules.GetOuterRegionRoadName()}吃紧且威胁攀升，须尽快安抚{SectMapSemanticRules.GetOuterRegionSettlementName()}。威胁 {state.Threat:0.#}%。"
             });
     }
 
@@ -211,9 +183,9 @@ public class MapOperationalLinkSystem
     {
         var happinessScore = NormalizePercent(state.Happiness);
         var securityScore = InvertPercent(state.Threat);
-        var logisticsScore = GetLogisticsScore(state);
         var housingScore = NormalizeHousing(state);
-        var score = (happinessScore * 0.28) + (securityScore * 0.24) + (logisticsScore * 0.24) + (housingScore * 0.24);
+        var reserveScore = NormalizeReserve(state.ContributionPoints, 120.0);
+        var score = (happinessScore * 0.30) + (securityScore * 0.30) + (housingScore * 0.22) + (reserveScore * 0.18);
         var level = ResolveLevel(score);
 
         return CreateStyle(
@@ -232,16 +204,15 @@ public class MapOperationalLinkSystem
     {
         var enabled =
             state.Wood >= CourierRoadWoodCost &&
-            state.Stone >= CourierRoadStoneCost &&
-            (state.MapCommuteReductionBonusKm < MaximumCommuteReductionBonusKm || state.MapRoadMobilityBonus < MaximumRoadMobilityBonus);
+            state.Stone >= CourierRoadStoneCost;
 
         return new MapDirectiveChoice
         {
             Action = MapDirectiveAction.RepairCourierRoad,
             Label = $"整修{SectMapSemanticRules.GetOuterRegionRoadName()} (-18木 -8石)",
             HintText = enabled
-                ? "压缩通勤并提升道路机动。"
-                : $"木材/石料不足，或当前{SectMapSemanticRules.GetOuterRegionRoadName()}整修已接近上限。",
+                ? "稳住外域道路秩序并压低威胁。"
+                : "木材或石料不足，暂时无法整修。",
             Enabled = enabled
         };
     }
@@ -265,8 +236,7 @@ public class MapOperationalLinkSystem
         var enabled =
             state.Wood >= StreetRepairWoodCost &&
             state.Gold >= StreetRepairGoldCost &&
-            state.ContributionPoints >= StreetRepairContributionCost &&
-            (state.MapCommuteReductionBonusKm < MaximumCommuteReductionBonusKm || state.MapRoadMobilityBonus < MaximumRoadMobilityBonus);
+            state.ContributionPoints >= StreetRepairContributionCost;
 
         return new MapDirectiveChoice
         {
@@ -274,7 +244,7 @@ public class MapOperationalLinkSystem
             Label = $"修整坊路 (-24木 -{StreetRepairGoldCost}灵石 -{StreetRepairContributionCost}贡献)",
             HintText = enabled
                 ? "疏理天衍峰坊路并提升门人安稳度。"
-                : "木材、灵石、贡献不足，或天衍峰坊路已接近当前整修上限。",
+                : "木材、灵石或贡献不足，暂时无法修整坊路。",
             Enabled = enabled
         };
     }
@@ -323,13 +293,6 @@ public class MapOperationalLinkSystem
     {
         var ratio = state.HousingCapacity / Math.Max(state.Population, 1.0);
         return Math.Clamp((ratio - 0.70) / 0.55, 0.0, 1.0);
-    }
-
-    private static double GetLogisticsScore(GameState state)
-    {
-        var commuteScore = Math.Clamp(1.0 - (state.AverageCommuteDistanceKm / 6.5), 0.0, 1.0);
-        var mobilityScore = Math.Clamp((state.RoadMobilityMultiplier - 0.7) / 0.6, 0.0, 1.0);
-        return (commuteScore * 0.55) + (mobilityScore * 0.45);
     }
 
     private static MapConditionLevel ResolveLevel(double score)
