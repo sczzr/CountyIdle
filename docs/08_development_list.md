@@ -95,7 +95,7 @@
 | DL-045 | 主界面六边形沙盘重构 | DONE（本轮） | 反哺宗门 | 主界面改为“中央 hex 沙盘 + 左侧地块检视 + 右侧宗门纪事 + 底部控制台”布局；天衍峰场所选中会同步刷新地块检视卡；不改小时结算与存档结构；`dotnet build .\\Finally.sln` 通过 |
 | DL-046 | 交互 icon 规范文档 | DONE（本轮） | 反哺宗门 | 输出 UI 交互 icon 清单、命名规范、尺寸/状态与入口映射文档（`docs/10_ui_icon_guide.md`） |
 | DL-047 | 天衍峰院域坊局与全格检视系统 | IN_PROGRESS（代码二期：坊局数值骨架） | 产业涌现→科技涌现→人口繁衍→反哺宗门 | 天衍峰任意 hex 可点击检视；地块具备固定灵气池、坊位数、天然特征与分区；同地块支持多建筑坊局组合、共享灵气与协同/互扰规则；随机性来自地块 traits、节气、局部事件与驻守差异，而非纯硬摇点 |
-| DL-048 | 世界格二级地图分层与入口系统 | IN_PROGRESS（运行时五期：占位页按类型分化） | 反哺宗门→产业涌现→武装探险 | 世界地图 hex 支持按地块类型进入二级地图；二级地图采用 `Sect / Wilderness / MortalRealm / CultivatorClan / ImmortalCity / Market / Ruin` 七类 `PrimaryType` 与对应 `SecondaryTag`；文档已明确入口条件、主玩法、产出/风险、生成边界、退出回流与参数草案，配置模型与 JSON 骨架已接入；当前生成器已开始产出带 `PrimaryType / SecondaryTag / RegionId / RarityTier / UnlockTier` 的点位语义，并让 `Sect / MortalRealm / Market / CultivatorClan / ImmortalCity / Ruin` 六类进入世界点位与节点样式；世界图现已支持点选站点、同步左侧检视器，并可进入按类型分化的二级地图占位页，待继续细化专属模板与真实玩法 |
+| DL-048 | 世界格二级地图分层与入口系统 | IN_PROGRESS（运行时七期：格子驱动沙盘） | 反哺宗门→产业涌现→武装探险 | 世界地图任意 hex 点选后都会先在左侧刷新该格详情；玩家通过进入按钮可打开 `SecondaryMapView`，并基于该格的 `Biome / Terrain / Water / Wonder / Structure / QiDensity / Corruption / MonsterThreat / Fertility` 生成一张与山门沙盘同形的下一层 hex 沙盘；已有站点继续沿用原生 `PrimaryType / SecondaryTag / RegionId / RarityTier / UnlockTier`，非站点格则回退生成格子级入口语义；`Wilderness` 已进入点击链路与占位页模板，后续继续细化专属模板与真实玩法 |
 | DL-049 | 地图素材生产规格与分层资产流水线 | IN_PROGRESS（运行时一期：Layer 1 / Layer 2 接入） | 反哺宗门→产业涌现→武装探险 | 已形成正式地图素材规格文档，明确 5 层分层、命名目录、尺寸锚点、连接类拼接、破框遮挡与首批交付包；当前宗门图已接入 `Layer 1` atlas manifest 与 `Layer 2` decal / connector 链路，后续可继续扩到正式国风地块、宗门图立体物件、世界图与二级地图 |
 | DL-050 | 三相治宗循环重设计（季度战略相位 + 双层时间制） | TODO（文档重设计中） | 门人生息→产业供养→传承研修→职司分化→武装历练→反哺宗门 | 将玩法主循环收口为“季度立纲 -> 月度筹划 -> 小时结算”三相节奏，并补入“细时间运转 + 长时间岁月感”的双层时间制；完成 `docs/01` 重写、`docs/02` 可执行规格补充、`feature-card + change-proposal` 归档，并给出首批可实现工单 |
 
@@ -583,7 +583,7 @@
 
 ### 3.27 DL-047 功能包详情（天衍峰院域坊局与全格检视系统）
 
-- 当前状态：文档一期完成，待进入代码实现。
+- 当前状态：代码三期进行中，已打通运行时坊局切换，待补事件触发与小时结算联动。
 - 目标（玩家价值）：让山门图的每个地块都从“背景 hex”变成“可检视、可规划、可做坊局组合”的经营对象，玩家可以围绕同地块多建筑、共享灵气和局部协同做长期钻研。
 - 飞轮环节：产业涌现 → 科技涌现 → 人口繁衍 → 反哺宗门。
 - 依赖（前置系统）：`DL-045`、`TownMapGeneratorSystem`、`CountyTownMapViewSystem`、`Tile Inspector`、后续建筑/弟子/资源系统。
@@ -611,6 +611,12 @@
   - `TownMapGeneratorSystem` 现已为不同院域生成 `2~3` 个子建筑计划，并计算共享灵气与协同/互扰摘要；
   - 左侧检视器现可直接展示 `灵池分流 / 坊局协同 / 稳定度` 等二期文案；
   - `dotnet build .\Finally.sln` 继续通过。
+- 2026-03-12 代码三期补入：
+  - `TownCellCompoundData` 新增 `PlanStyle`，明确区分天然 / 主修 / 协同 / 稳态四档院域方案；
+  - `TownMapGeneratorSystem` 现可基于当前院域底盘重算三档运行时坊局，并刷新共享灵气、协同分与稳定度；
+  - `MainSectTileInspector` 三颗动作按钮已改为对当前选中 hex 生效，可直接切换 `主修坊局 / 协同坊局 / 稳态坊局`；
+  - `CountyTownMapViewSystem` 已支持对当前选中院域即时回写新坊局并刷新左侧检视摘要；
+  - `docs/02_system_specs.md`、`docs/05_feature_inventory.md`、`docs/08_development_list.md`、`FC / BL` 已同步回写。
 - 分阶段建议：
   - 一期：全格点击检视 + 院域数据骨架；
   - 二期：开放基础坊局组合与共享灵气；
@@ -618,7 +624,7 @@
 
 ### 3.28 DL-048 功能包详情（世界格二级地图分层与入口系统）
 
-- 当前状态：文档一期完成，待进入系统实现。
+- 当前状态：运行时七期完成，已打通“左侧详情 -> 进入按钮 -> 格子驱动局部地图”，待继续细化专属模板与真实玩法。
 - 目标（玩家价值）：让世界地图上的每个可交互 hex 不只是“看得到的地貌块”，而是能进一步进入一个具有明确身份和玩法节奏的二级地图，形成“世界择地 -> 局部经营 / 交涉 / 历练 -> 回流宗门”的空间层级体验。
 - 飞轮环节：反哺宗门 -> 产业涌现 -> 武装探险。
 - 依赖（前置系统）：`DL-026` 修仙 Hex 世界生成系统、`DL-027` 双地图布局、`DL-047` 天衍峰院域坊局与全格检视系统、后续英雄 / 探险 / 外域运营系统。
@@ -648,7 +654,10 @@
   - 检视与入口阶段：`StrategicMapViewSystem` 已支持点选世界站点并绘制高亮，`MainSectTileInspector` 已可切到世界点位检视模式，左侧动作区已接入“前往二级地图”入口；
   - 二级地图占位阶段：`WorldPanel.tscn` 已新增统一的 `SecondaryMapView` 占位页，`MainWorldSitePanel.cs` 已接入标题、类型、区块、稀有度、开放层级、描述与动作区刷新逻辑，且支持从占位页返回世界舆图；
   - 类型分化阶段：`SecondaryMapView` 已新增 `核心玩法 / 主要产出 / 主要风险` 三张类型卡，并按 `Sect / MortalRealm / Market / CultivatorClan / ImmortalCity / Ruin` 填充差异化模板说明；
-  - 当前边界：二级地图已完成“可点选 -> 可检视 -> 可进入类型化占位页”的最小闭环，但仍停留在信息模板层，尚未为各类型接入独立交互控件、结算或专属场景逻辑；
+  - 全格入口阶段：`StrategicMapViewSystem` 现已支持“站点优先、地块回退”的 world hex 点击逻辑；若未命中已生成站点，则会基于当前地块的 `Biome / Terrain / Water / Wonder / Structure` 合成一份可进入的格子级二级地图入口，并直接进入 `SecondaryMapView`；
+  - 野外模板阶段：`MainSectTileInspector` 与 `MainWorldSitePanel` 已补 `Wilderness` 分支，世界地图不再只有少数站点能进入二级页，普通野外格也能给出主玩法、产出、风险与筹备动作；
+  - 沙盘生成阶段：点击世界格后会先刷新左侧检视器，玩家再通过“前往二级地图”按钮打开 `SecondaryMapView`；该页现已接入 `WorldSiteLocalMapGeneratorSystem`，并复用 `CountyTownMapViewSystem / SectMapViewSystem` 的同形 hex 沙盘视图，会按所选格的类型、地形、水体、奇观、建筑与威胁语义生成不同内容的下层沙盘；
+  - 当前边界：二级地图已完成“任意世界格可点选、可看详情、可按格语义生成同形态沙盘”的最小闭环，但仍停留在模板化入口层，尚未为各类型接入独立交互控件、结算或专属场景逻辑；
   - 验证结论：上述阶段接入后，`dotnet build .\Finally.sln` 持续通过。
 - 讨论约束：
   - 二级地图类型要服务飞轮，不做纯景观地图；

@@ -51,3 +51,20 @@
   - 如果进入地图没有清晰回流，玩家会觉得在“逛景点”，而不是在经营宗门。
 - 回滚方式：
   - 保留统一的“地图类型模板”中间层，若细分类太多，可先收敛为少量模板，再继续复用世界观包装。
+
+## 2026-03-12 运行时补记
+
+- 已补“世界地图任意 hex 可进入下一层占位页”的最小闭环：点击已生成站点时沿用站点语义；点击普通 world hex 时，会回退合成格子级入口语义并直接进入 `SecondaryMapView`。
+- 本轮没有新开独立场景，而是继续复用现有 `MainWorldSitePanel`，保证 `世界图 -> 二级页 -> 返回世界图` 的链路先跑通。
+- `Wilderness` 已正式进入点击链路和占位页模板，不再只是背景区块或默认 fallback 文案。
+
+## 2026-03-12 运行时补记（二）
+
+- 交互顺序已进一步收口为：`点击 world hex -> 左侧检视器显示该格详情 -> 点击进入按钮 -> SecondaryMapView 生成局部地图`。
+- `SecondaryMapView` 现在不再只是说明卡片，而会基于该格的 `Biome / Terrain / Water / Wonder / Structure / QiDensity / Corruption / MonsterThreat / Fertility` 生成一张局部地图。
+- 本轮仍不包含专属战斗、事件或经营控件，但已经把“世界图块 -> 下一层地图”的核心感知做出来了。
+
+## 2026-03-12 运行时补记（三）
+
+- 二级地图的表现形态已经收口为“和山门沙盘同一族的 hex 沙盘，只换内容”，不再另起一套独立的小预览器样式。
+- 当前做法是复用 `CountyTownMapViewSystem / SectMapViewSystem` 的视图骨架，把 world hex 语义转成新的 `TownMapData` 内容后灌进 `SecondaryMapView`。

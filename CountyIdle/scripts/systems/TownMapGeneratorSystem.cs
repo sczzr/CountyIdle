@@ -147,6 +147,7 @@ public class TownMapGeneratorSystem
             cell,
             regionName,
             contentKind,
+            TownCompoundPlanStyle.Natural,
             qiAffinityText,
             baseQiCapacity,
             qiRecoveryPerHour,
@@ -158,6 +159,44 @@ public class TownMapGeneratorSystem
             synergyScore,
             stability,
             suggestedBuildType);
+    }
+
+    public TownCellCompoundData ReplanCompound(TownCellCompoundData current, TownCompoundPlanStyle planStyle)
+    {
+        var structuralCapacity = Math.Max(
+            current.BaseQiCapacity - Math.Clamp((int)Math.Round(current.SynergyScore * 2f), 0, 10),
+            0);
+        var subBuildings = CreatePlannedSubBuildings(
+            current.ContentKind,
+            current.SuggestedBuildType,
+            current.BuildSlotCount,
+            planStyle);
+        var totalQiDemand = subBuildings.Sum(static building => building.QiDemand);
+        var synergyScore = CalculateSynergyScore(subBuildings);
+        var baseQiCapacity = structuralCapacity + Math.Clamp((int)Math.Round(synergyScore * 2f), 0, 10);
+        var qiCongestion = CalculateQiCongestion(baseQiCapacity, totalQiDemand);
+        var stability = CalculateStability(
+            current.ContentKind,
+            qiCongestion,
+            synergyScore,
+            GetCellHash(current.Cell, 20260312 + (((int)planStyle + 1) * 97)));
+
+        return new TownCellCompoundData(
+            current.Cell,
+            current.RegionName,
+            current.ContentKind,
+            planStyle,
+            current.QiAffinityText,
+            baseQiCapacity,
+            current.QiRecoveryPerHour,
+            current.BuildSlotCount,
+            current.FeatureTexts,
+            subBuildings,
+            totalQiDemand,
+            qiCongestion,
+            synergyScore,
+            stability,
+            current.SuggestedBuildType);
     }
 
     private static string GetRegionName(Vector2I cell)
@@ -308,6 +347,244 @@ public class TownMapGeneratorSystem
         };
 
         return plans.Take(Math.Max(buildSlotCount, 0)).ToArray();
+    }
+
+    private static TownSubBuildingPlan[] CreatePlannedSubBuildings(
+        TownCellContentKind contentKind,
+        IndustryBuildingType? suggestedBuildType,
+        int buildSlotCount,
+        TownCompoundPlanStyle planStyle)
+    {
+        var plans = contentKind switch
+        {
+            TownCellContentKind.Production => CreateProductionPlans(suggestedBuildType, planStyle),
+            TownCellContentKind.Service => CreateServicePlans(suggestedBuildType, planStyle),
+            TownCellContentKind.Residence => CreateResidencePlans(planStyle),
+            TownCellContentKind.Infrastructure => CreateInfrastructurePlans(planStyle),
+            TownCellContentKind.Special => CreateSpecialPlans(planStyle),
+            _ => CreateReservePlans(planStyle)
+        };
+
+        return plans.Take(Math.Max(buildSlotCount, 0)).ToArray();
+    }
+
+    private static TownSubBuildingPlan[] CreateProductionPlans(
+        IndustryBuildingType? suggestedBuildType,
+        TownCompoundPlanStyle planStyle)
+    {
+        var specialization = suggestedBuildType switch
+        {
+            IndustryBuildingType.Workshop => "Workshop",
+            IndustryBuildingType.Trade => "Trade",
+            _ => "Agriculture"
+        };
+
+        return (specialization, planStyle) switch
+        {
+            ("Workshop", TownCompoundPlanStyle.Specialized) =>
+                [
+                    CreatePlan("workshop_puppet_t1", "傀儡工坊", 28f, 6, ["craft", "forge", "warehouse_link"], ["noise", "fire_restless"]),
+                    CreatePlan("smithy_annex_t1", "炼材坊", 18f, 4, ["forge", "craft"], ["noise"]),
+                    CreatePlan("warehouse_inner_t1", "仓阁", 10f, 3, ["warehouse_link", "storage"], ["crowded"])
+                ],
+            ("Workshop", TownCompoundPlanStyle.Synergy) =>
+                [
+                    CreatePlan("workshop_puppet_t1", "傀儡工坊", 24f, 5, ["craft", "warehouse_link"], ["noise"]),
+                    CreatePlan("transfer_shed_t1", "转运棚", 10f, 2, ["warehouse_link", "traffic"], ["crowded"]),
+                    CreatePlan("warehouse_inner_t1", "仓阁", 9f, 3, ["storage", "warehouse_link"], ["crowded"])
+                ],
+            ("Workshop", TownCompoundPlanStyle.Balanced) =>
+                [
+                    CreatePlan("repair_platform_t1", "修缮台", 12f, 3, ["craft", "stability"], ["noise"]),
+                    CreatePlan("watch_corner_t1", "巡查点", 8f, 2, ["safety", "stability"], ["isolated"]),
+                    CreatePlan("warehouse_inner_t1", "仓阁", 8f, 2, ["storage", "traffic"], ["crowded"])
+                ],
+            ("Trade", TownCompoundPlanStyle.Specialized) =>
+                [
+                    CreatePlan("trade_hall_t1", "青云总坊", 16f, 4, ["trade", "traffic"], ["crowded"]),
+                    CreatePlan("warehouse_inner_t1", "仓阁", 10f, 3, ["storage", "trade"], ["crowded"]),
+                    CreatePlan("relay_kiosk_t1", "转运亭", 12f, 3, ["traffic", "trade"], ["crowded"])
+                ],
+            ("Trade", TownCompoundPlanStyle.Synergy) =>
+                [
+                    CreatePlan("trade_hall_t1", "青云总坊", 14f, 4, ["trade", "traffic"], ["crowded"]),
+                    CreatePlan("relay_kiosk_t1", "转运亭", 10f, 2, ["trade", "traffic"], ["crowded"]),
+                    CreatePlan("warehouse_inner_t1", "仓阁", 9f, 2, ["trade", "storage"], ["crowded"])
+                ],
+            ("Trade", TownCompoundPlanStyle.Balanced) =>
+                [
+                    CreatePlan("warehouse_inner_t1", "仓阁", 8f, 2, ["storage", "loss_reduce"], ["crowded"]),
+                    CreatePlan("relay_kiosk_t1", "转运亭", 9f, 2, ["traffic", "stability"], ["crowded"]),
+                    CreatePlan("watch_corner_t1", "巡查点", 7f, 2, ["safety", "stability"], ["isolated"])
+                ],
+            ("Agriculture", TownCompoundPlanStyle.Specialized) =>
+                [
+                    CreatePlan("spirit_field_t1", "阵材圃", 18f, 4, ["wood", "food", "water_friendly"], ["wet_dense"]),
+                    CreatePlan("herb_garden_t1", "药圃", 22f, 5, ["herb", "alchemy_feed", "water_friendly"], ["wet_dense"]),
+                    CreatePlan("warehouse_inner_t1", "仓阁", 10f, 3, ["storage", "herb"], ["crowded"])
+                ],
+            ("Agriculture", TownCompoundPlanStyle.Synergy) =>
+                [
+                    CreatePlan("spirit_field_t1", "阵材圃", 16f, 4, ["wood", "water_friendly"], ["wet_dense"]),
+                    CreatePlan("spring_channel_t1", "蕴灵渠", 11f, 2, ["water_friendly", "recovery"], ["crowded"]),
+                    CreatePlan("herb_garden_t1", "药圃", 18f, 4, ["water_friendly", "herb"], ["wet_dense"])
+                ],
+            ("Agriculture", TownCompoundPlanStyle.Balanced) =>
+                [
+                    CreatePlan("spirit_field_t1", "阵材圃", 14f, 3, ["wood", "food"], ["wet_dense"]),
+                    CreatePlan("warehouse_inner_t1", "仓阁", 8f, 2, ["storage", "loss_reduce"], ["crowded"]),
+                    CreatePlan("nourish_shed_t1", "养脉棚", 9f, 2, ["recovery", "stability"], ["isolated"])
+                ],
+            _ => CreateProductionPlans(suggestedBuildType, TownCompoundPlanStyle.Specialized)
+        };
+    }
+
+    private static TownSubBuildingPlan[] CreateServicePlans(
+        IndustryBuildingType? suggestedBuildType,
+        TownCompoundPlanStyle planStyle)
+    {
+        var specialization = suggestedBuildType == IndustryBuildingType.Research ? "Research" : "Administration";
+
+        return (specialization, planStyle) switch
+        {
+            ("Research", TownCompoundPlanStyle.Specialized) =>
+                [
+                    CreatePlan("academy_outer_hall_t1", "传法院", 26f, 5, ["research", "teaching", "quiet"], ["noise"]),
+                    CreatePlan("meditation_platform_t1", "静修位", 14f, 2, ["quiet", "recovery"], ["noise"]),
+                    CreatePlan("scriptorium_t1", "抄经室", 16f, 3, ["research", "quiet"], ["noise"])
+                ],
+            ("Research", TownCompoundPlanStyle.Synergy) =>
+                [
+                    CreatePlan("academy_outer_hall_t1", "传法院", 22f, 4, ["research", "quiet"], ["noise"]),
+                    CreatePlan("scriptorium_t1", "抄经室", 13f, 3, ["research", "quiet"], ["noise"]),
+                    CreatePlan("meditation_platform_t1", "静修位", 11f, 2, ["quiet", "recovery"], ["noise"])
+                ],
+            ("Research", TownCompoundPlanStyle.Balanced) =>
+                [
+                    CreatePlan("meditation_platform_t1", "静修位", 10f, 2, ["quiet", "recovery"], ["noise"]),
+                    CreatePlan("rest_pavilion_t1", "守静亭", 8f, 2, ["quiet", "stability"], ["crowded"]),
+                    CreatePlan("scriptorium_t1", "抄经室", 12f, 2, ["research", "stability"], ["noise"])
+                ],
+            ("Administration", TownCompoundPlanStyle.Specialized) =>
+                [
+                    CreatePlan("administration_yard_t1", "庶务院", 14f, 3, ["governance", "traffic"], ["crowded"]),
+                    CreatePlan("warehouse_inner_t1", "仓阁", 10f, 3, ["storage", "governance"], ["crowded"]),
+                    CreatePlan("dispatch_hall_t1", "签押厅", 13f, 3, ["governance", "safety"], ["crowded"])
+                ],
+            ("Administration", TownCompoundPlanStyle.Synergy) =>
+                [
+                    CreatePlan("administration_yard_t1", "庶务院", 12f, 3, ["governance", "traffic"], ["crowded"]),
+                    CreatePlan("dispatch_hall_t1", "签押厅", 11f, 2, ["governance", "safety"], ["crowded"]),
+                    CreatePlan("warehouse_inner_t1", "仓阁", 9f, 2, ["governance", "storage"], ["crowded"])
+                ],
+            ("Administration", TownCompoundPlanStyle.Balanced) =>
+                [
+                    CreatePlan("administration_yard_t1", "庶务院", 11f, 2, ["governance", "stability"], ["crowded"]),
+                    CreatePlan("watch_corner_t1", "巡查点", 7f, 2, ["safety", "stability"], ["isolated"]),
+                    CreatePlan("meditation_platform_t1", "静修位", 8f, 1, ["recovery", "quiet"], ["noise"])
+                ],
+            _ => CreateServicePlans(suggestedBuildType, TownCompoundPlanStyle.Specialized)
+        };
+    }
+
+    private static TownSubBuildingPlan[] CreateResidencePlans(TownCompoundPlanStyle planStyle)
+    {
+        return planStyle switch
+        {
+            TownCompoundPlanStyle.Specialized =>
+                [
+                    CreatePlan("disciple_residence_t1", "居舍", 14f, 2, ["rest", "recovery", "stability"], ["crowded", "noise"]),
+                    CreatePlan("canteen_corner_t1", "小灶房", 8f, 2, ["rest", "food"], ["crowded"]),
+                    CreatePlan("wash_corner_t1", "洗尘处", 9f, 2, ["recovery", "rest"], ["crowded"])
+                ],
+            TownCompoundPlanStyle.Synergy =>
+                [
+                    CreatePlan("disciple_residence_t1", "居舍", 12f, 2, ["rest", "stability"], ["crowded", "noise"]),
+                    CreatePlan("rest_pavilion_t1", "休憩角", 9f, 2, ["rest", "quiet", "stability"], ["crowded"]),
+                    CreatePlan("care_corner_t1", "养息间", 10f, 2, ["rest", "recovery"], ["crowded"])
+                ],
+            TownCompoundPlanStyle.Balanced =>
+                [
+                    CreatePlan("disciple_residence_t1", "居舍", 11f, 2, ["rest", "stability"], ["crowded"]),
+                    CreatePlan("rest_pavilion_t1", "守静亭", 7f, 1, ["quiet", "stability"], ["crowded"]),
+                    CreatePlan("night_lamp_t1", "巡夜灯台", 6f, 1, ["safety", "stability"], ["isolated"])
+                ],
+            _ => CreateResidencePlans(TownCompoundPlanStyle.Specialized)
+        };
+    }
+
+    private static TownSubBuildingPlan[] CreateInfrastructurePlans(TownCompoundPlanStyle planStyle)
+    {
+        return planStyle switch
+        {
+            TownCompoundPlanStyle.Specialized =>
+                [
+                    CreatePlan("mountain_road", "坊路", 4f, 1, ["traffic", "patrol"], ["erosion"]),
+                    CreatePlan("relay_kiosk_t1", "转运亭", 9f, 2, ["traffic", "storage"], ["crowded"]),
+                    CreatePlan("watch_corner_t1", "巡查点", 8f, 2, ["patrol", "safety"], ["isolated"])
+                ],
+            TownCompoundPlanStyle.Synergy =>
+                [
+                    CreatePlan("mountain_road", "坊路", 4f, 1, ["traffic", "patrol"], ["erosion"]),
+                    CreatePlan("watch_corner_t1", "巡查点", 7f, 2, ["patrol", "traffic"], ["isolated"]),
+                    CreatePlan("relay_kiosk_t1", "转运亭", 8f, 2, ["traffic", "patrol"], ["crowded"])
+                ],
+            TownCompoundPlanStyle.Balanced =>
+                [
+                    CreatePlan("mountain_road", "坊路", 4f, 1, ["traffic", "stability"], ["erosion"]),
+                    CreatePlan("watch_corner_t1", "巡查点", 6f, 1, ["safety", "stability"], ["isolated"]),
+                    CreatePlan("stone_array_t1", "石台阵位", 7f, 2, ["stability", "threat_control"], ["fire_restless"])
+                ],
+            _ => CreateInfrastructurePlans(TownCompoundPlanStyle.Specialized)
+        };
+    }
+
+    private static TownSubBuildingPlan[] CreateSpecialPlans(TownCompoundPlanStyle planStyle)
+    {
+        return planStyle switch
+        {
+            TownCompoundPlanStyle.Specialized =>
+                [
+                    CreatePlan("watch_post_t1", "巡山岗", 12f, 3, ["patrol", "safety", "threat_control"], ["isolated"]),
+                    CreatePlan("stone_array_t1", "石台阵位", 18f, 3, ["stability", "threat_control"], ["fire_restless"]),
+                    CreatePlan("ward_altar_t1", "镇煞坛", 16f, 3, ["safety", "threat_control"], ["fire_restless"])
+                ],
+            TownCompoundPlanStyle.Synergy =>
+                [
+                    CreatePlan("watch_post_t1", "巡山岗", 11f, 3, ["patrol", "threat_control"], ["isolated"]),
+                    CreatePlan("ward_altar_t1", "镇煞坛", 13f, 2, ["safety", "threat_control"], ["fire_restless"]),
+                    CreatePlan("stone_array_t1", "石台阵位", 14f, 2, ["stability", "threat_control"], ["fire_restless"])
+                ],
+            TownCompoundPlanStyle.Balanced =>
+                [
+                    CreatePlan("spirit_spring_altar_t1", "灵泉坛", 10f, 2, ["water_friendly", "quiet"], ["crowded"]),
+                    CreatePlan("watch_post_t1", "巡山岗", 9f, 2, ["safety", "patrol"], ["isolated"]),
+                    CreatePlan("rest_pavilion_t1", "守静亭", 7f, 1, ["quiet", "stability"], ["crowded"])
+                ],
+            _ => CreateSpecialPlans(TownCompoundPlanStyle.Specialized)
+        };
+    }
+
+    private static TownSubBuildingPlan[] CreateReservePlans(TownCompoundPlanStyle planStyle)
+    {
+        return planStyle switch
+        {
+            TownCompoundPlanStyle.Synergy =>
+                [
+                    CreatePlan("reserve_platform_t1", "预留台", 6f, 1, ["stability", "traffic"], ["crowded"]),
+                    CreatePlan("relay_kiosk_t1", "转运亭", 8f, 2, ["traffic", "storage"], ["crowded"])
+                ],
+            TownCompoundPlanStyle.Balanced =>
+                [
+                    CreatePlan("reserve_platform_t1", "预留台", 5f, 1, ["stability"], ["crowded"]),
+                    CreatePlan("watch_corner_t1", "巡查点", 6f, 1, ["safety", "stability"], ["isolated"])
+                ],
+            _ =>
+                [
+                    CreatePlan("reserve_platform_t1", "预留台", 7f, 1, ["stability", "traffic"], ["crowded"]),
+                    CreatePlan("warehouse_inner_t1", "临时堆场", 7f, 2, ["storage"], ["crowded"])
+                ]
+        };
     }
 
     private static TownSubBuildingPlan CreatePlan(

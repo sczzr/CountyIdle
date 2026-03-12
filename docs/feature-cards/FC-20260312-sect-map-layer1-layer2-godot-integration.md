@@ -33,7 +33,7 @@
 
 ## 验收标准（可测试）
 
-- [ ] `CountyTownMapViewSystem` 能优先读取 Layer 1 atlas manifest，而不是只画纯色 hex。
+- [x] `CountyTownMapViewSystem` 能优先读取 Layer 1 atlas manifest，而不是只画纯色 hex。
 - [ ] 道路 / 水域 / 院坪能以 Layer 2 decal + connector 的方式出现在宗门图上。
 - [ ] `TownMapGeneratorSystem` 生成结果中已存在 `Road / Courtyard / Water` 语义，而不再是全图 `Ground`。
 - [ ] `dotnet build .\Finally.sln` 通过。

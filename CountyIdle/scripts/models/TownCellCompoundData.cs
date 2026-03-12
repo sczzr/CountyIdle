@@ -13,6 +13,14 @@ public enum TownCellContentKind
     Special
 }
 
+public enum TownCompoundPlanStyle
+{
+    Natural,
+    Specialized,
+    Synergy,
+    Balanced
+}
+
 public sealed class TownSubBuildingPlan
 {
     public TownSubBuildingPlan(
@@ -45,6 +53,7 @@ public sealed class TownCellCompoundData
         Vector2I cell,
         string regionName,
         TownCellContentKind contentKind,
+        TownCompoundPlanStyle planStyle,
         string qiAffinityText,
         int baseQiCapacity,
         int qiRecoveryPerHour,
@@ -60,6 +69,7 @@ public sealed class TownCellCompoundData
         Cell = cell;
         RegionName = string.IsNullOrWhiteSpace(regionName) ? "天衍峰" : regionName;
         ContentKind = contentKind;
+        PlanStyle = planStyle;
         QiAffinityText = string.IsNullOrWhiteSpace(qiAffinityText) ? "地脉平稳" : qiAffinityText;
         BaseQiCapacity = Math.Max(baseQiCapacity, 0);
         QiRecoveryPerHour = Math.Max(qiRecoveryPerHour, 0);
@@ -76,6 +86,7 @@ public sealed class TownCellCompoundData
     public Vector2I Cell { get; }
     public string RegionName { get; }
     public TownCellContentKind ContentKind { get; }
+    public TownCompoundPlanStyle PlanStyle { get; }
     public string QiAffinityText { get; }
     public int BaseQiCapacity { get; }
     public int QiRecoveryPerHour { get; }

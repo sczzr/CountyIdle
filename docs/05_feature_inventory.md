@@ -85,9 +85,9 @@
 | 外域历练地图页 | 页签与占位面板已存在 | 补路线风险、节点事件与遭遇结算 | `CountyIdle/scenes/ui/WorldPanel.tscn` |
 | 宗门见闻面板 / 宗务报表 | 面板容器已在，数据仍偏静态 | 改为实时字段与历史统计 | `CountyIdle/scenes/ui/WorldPanel.tscn`、`CountyIdle/scripts/Main.cs` |
 | 真传 / 英雄实体化 | 当前仍由精英人口池抽象承担 | 形成可成长个体、职业成长与装备联动 | `CountyIdle/scripts/systems/CombatSystem.cs` |
-| 天衍峰院域坊局与全格检视 | 已有可点选检视与复合格摘要骨架 | 补真实坊局编辑、事件触发与结算联动 | `CountyIdle/scripts/models/TownCellCompoundData.cs`、`CountyIdle/scripts/ui/MainSectTileInspector.cs` |
-| 世界格二级地图分层与入口 | 已有世界点位语义、选中检视与二级地图占位页 | 先落地 `宗门 / 野外 / 坊市 / 遗迹` 四类专属模板 | `CountyIdle/scripts/systems/XianxiaWorldGeneratorSystem.cs`、`CountyIdle/scripts/ui/MainWorldSitePanel.cs` |
-| 地图素材分层资产流水线 | 文档与 `Layer 1 / 2` 接入已开始 | 补正式量产素材与 `Layer 3 / 4` 运行时接入 | `docs/11_map_asset_production_spec.md`、`CountyIdle/assets/map/manifests/sect_map_layer_manifest.json` |
+| 天衍峰院域坊局与全格检视 | 已有全格点击检视，且可在当前 hex 间切换主修 / 协同 / 稳态坊局 | 补院域事件触发与小时结算联动 | `CountyIdle/scripts/models/TownCellCompoundData.cs`、`CountyIdle/scripts/systems/CountyTownMapViewSystem.CompoundPlanning.cs`、`CountyIdle/scripts/ui/MainSectTileInspector.cs` |
+| 世界格二级地图分层与入口 | 已支持世界地图任意 hex 点选后在左侧显示详情，并通过进入按钮生成与山门沙盘同形的下一层 hex 沙盘 | 继续细化 `宗门 / 野外 / 坊市 / 遗迹` 四类专属模板与真实玩法 | `CountyIdle/scripts/systems/StrategicMapViewSystem.cs`、`CountyIdle/scripts/systems/StrategicMapViewSystem.WorldCellSelection.cs`、`CountyIdle/scripts/systems/WorldSiteLocalMapGeneratorSystem.cs`、`CountyIdle/scripts/systems/CountyTownMapViewSystem.cs`、`CountyIdle/scripts/ui/MainWorldSitePanel.cs` |
+| 地图素材分层资产流水线 | 文档与 `Layer 1 / 2` 接入已开始 | 补正式量产素材与 `Layer 3 / 4` 运行时接入 | `docs/11_map_asset_production_spec.md`、`CountyIdle/assets/map/manifests/l1_terrain_manifest.json` |
 | 弟子可视移动 | 代码链仍在，当前运行版停用 | 若要恢复，需按 `01 -> 02 -> 实现` 重新立项 | `CountyIdle/scripts/systems/CountyTownMapViewSystem.cs` |
 
 ## 5. 未入场主项（⭕）

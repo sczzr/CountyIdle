@@ -79,7 +79,7 @@ public partial class CountyTownMapViewSystem
             compound.SuggestedBuildType,
             GetContentKindBadgeText(compound.ContentKind),
             $"{compound.RegionName}·{GetContentKindTitle(compound.ContentKind)}",
-            $"{compound.QiAffinityText} · 建议坊局：{buildingSummary}",
+            $"{compound.QiAffinityText} · {GetPlanStyleText(compound.PlanStyle)} · 坊局：{buildingSummary}",
             "当前态势",
             statusText,
             "坊位格局",
@@ -216,6 +216,17 @@ public partial class CountyTownMapViewSystem
             TownCellContentKind.Residence => "院域 / 居舍",
             TownCellContentKind.Special => "院域 / 巡山",
             _ => "院域 / 预留"
+        };
+    }
+
+    private static string GetPlanStyleText(TownCompoundPlanStyle planStyle)
+    {
+        return planStyle switch
+        {
+            TownCompoundPlanStyle.Specialized => "主修坊局",
+            TownCompoundPlanStyle.Synergy => "协同坊局",
+            TownCompoundPlanStyle.Balanced => "稳态坊局",
+            _ => "天然坊局"
         };
     }
 

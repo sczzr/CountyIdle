@@ -362,6 +362,31 @@
 - 地图系统的职责是观察、进入、调度、反馈
 - 地图不得沦为纯观光图，也不得脱离宗门飞轮自成一套玩法
 
+#### 8.1.1 天衍峰院域坊局与全格检视（一期）
+
+本文裁定：
+
+- 天衍峰山门图的任意 hex 都必须可点选；若未命中场所锚点，则进入“院域坊局检视”分支，不再退回纯背景格。
+- 每个院域地块至少维护以下固定底盘字段：`RegionName`、`ContentKind`、`QiAffinityText`、`BaseQiCapacity`、`QiRecoveryPerHour`、`BuildSlotCount`、`FeatureTexts`。
+- 每个院域地块的一期坊局层至少维护以下可变字段：`PlanStyle`、`SubBuildings`、`TotalQiDemand`、`QiCongestion`、`SynergyScore`、`Stability`、`SuggestedBuildType`。
+- 检视器一期必须统一回答四个问题：`这里是什么`、`它现在在干什么`、`为什么顺或为什么卡`、`我现在能做什么`。
+- 当前运行版至少支持三档运行时坊局调整：`主修坊局`、`协同坊局`、`稳态坊局`；切换后要立即刷新坊位摘要、灵气需求、协同分和稳定度。
+- 一期允许把坊局切换停留在地图局部模拟层，不强制立刻写入 `GameState` 小时结算，也不强制立刻改动存档结构；未接入结算前，相关数值视为院域规划反馈，不视为全局经济事实。
+- 院域随机性来源继续限定为：`地块 traits`、`节气波动`、`低频局部事件`、`驻守差异`、`宗门缺口`；一期只允许先接入说明与规划反馈，不允许用高频随机把玩家长期规划直接打散。
+
+#### 8.1.2 世界格二级地图入口（一期）
+
+本文裁定：
+
+- 世界地图的任意 hex 都必须具备“进入下一层地图”的身份语义；不允许只有少数世界站点可进入，而其余地块只是不可交互背景。
+- 世界图点击链路采用 `站点优先、地块回退`：若点击命中已生成站点，则沿用该站点的 `PrimaryType / SecondaryTag / RegionId / RarityTier / UnlockTier`；若未命中站点，则必须基于当前地块的 `Biome / Terrain / Water / Wonder / Structure / QiDensity / Corruption / MonsterThreat / Fertility` 合成一份可进入的二级地图入口数据。
+- 站点回退生成的一期类型至少覆盖 `Wilderness`，并允许继续映射到 `Sect / MortalRealm / Market / CultivatorClan / ImmortalCity / Ruin`；其目标不是一次性补完独立玩法，而是保证“每格可进、每格有身份、每格有风险/收益描述”。
+- 点击世界 hex 后，运行时最小闭环为：`世界图点选 -> 左侧检视刷新 -> 左侧进入按钮 -> SecondaryMapView 生成下一层局部地图 -> 可返回世界图`。
+- `SecondaryMapView` 一期仍可复用统一占位页，但必须能按 `PrimaryType` 显示差异化的 `核心玩法 / 主要产出 / 主要风险` 文案；`Wilderness` 不得回落到默认未分类占位文案。
+- `SecondaryMapView` 在当前运行版必须包含一张按所选 world hex 语义生成的局部地图；地图生成至少要参考该格的 `Biome / Terrain / Water / Wonder / Structure / QiDensity / Corruption / MonsterThreat / Fertility` 中的可用字段。
+- 上述局部地图在表现形态上必须与天衍峰山门沙盘保持同族：继续使用同类 hex 沙盘视图、缩放/点选节奏与地块检视习惯，只允许改变地图内容、地块语义和局部布局，不另起一套完全不同的预览样式。
+- 当前阶段允许把“世界格二级地图”停留在模板化入口层，不强制立即接入专属场景、独立结算或存档结构；但所有世界格都必须能给出下一层身份、开放层级与回流方向。
+
 ### 8.2 界面定位
 
 界面的职责是组织判断，不是承载复杂玩法计算。

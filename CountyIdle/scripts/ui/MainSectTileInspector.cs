@@ -21,6 +21,9 @@ public partial class Main
         BuildResearch,
         BuildTrade,
         BuildAdministration,
+        PlanCompoundSpecialized,
+        PlanCompoundSynergy,
+        PlanCompoundBalanced,
         OpenTaskPanel,
         OpenDisciplePanel,
         OpenWarehousePanel
@@ -432,75 +435,54 @@ public partial class Main
         var primaryBinding = summary.SuggestedBuildType switch
         {
             IndustryBuildingType.Agriculture => new TileInspectorActionBinding(
-                TileInspectorAction.BuildAgriculture,
-                "规划阵材圃",
-                $"对【{tileName}】优先规划阵材圃与灵田，吃满当前院域的木水系地脉。",
+                TileInspectorAction.PlanCompoundSpecialized,
+                "定为阵材主坊局",
+                $"将【{tileName}】切到阵材主修布局，优先拉高灵植、药材与仓储配套。",
                 true),
             IndustryBuildingType.Workshop => new TileInspectorActionBinding(
-                TileInspectorAction.BuildWorkshop,
-                "规划傀儡工坊",
-                $"对【{tileName}】优先规划工坊坊局，利用当前地块的工务与交通条件。",
+                TileInspectorAction.PlanCompoundSpecialized,
+                "定为工坊主坊局",
+                $"将【{tileName}】切到工务主修布局，优先拉高傀儡营造与转运配套。",
                 true),
             IndustryBuildingType.Research => new TileInspectorActionBinding(
-                TileInspectorAction.BuildResearch,
-                "规划传法院",
-                $"对【{tileName}】优先规划传法院与静修坊位，放大研修与讲法收益。",
+                TileInspectorAction.PlanCompoundSpecialized,
+                "定为研修主坊局",
+                $"将【{tileName}】切到传法院主修布局，优先拉高研修、讲法与静修配套。",
                 true),
             IndustryBuildingType.Trade => new TileInspectorActionBinding(
-                TileInspectorAction.BuildTrade,
-                "规划青云总坊",
-                $"对【{tileName}】优先规划总坊与仓阁，强化流转与吞吐。",
+                TileInspectorAction.PlanCompoundSpecialized,
+                "定为总坊主坊局",
+                $"将【{tileName}】切到总坊主修布局，优先拉高流转、吞吐与转运配套。",
                 true),
             IndustryBuildingType.Administration => new TileInspectorActionBinding(
-                TileInspectorAction.BuildAdministration,
-                "规划庶务院",
-                $"对【{tileName}】优先规划庶务与巡查节点，提升治理与交通组织。",
+                TileInspectorAction.PlanCompoundSpecialized,
+                "定为治务主坊局",
+                $"将【{tileName}】切到庶务主修布局，优先拉高治理、巡查与签押节点。",
                 true),
             _ => new TileInspectorActionBinding(
-                TileInspectorAction.OpenTaskPanel,
-                "规划院域法旨",
-                $"打开宗主中枢，为【{tileName}】设定当前院域的建设与治理方向。",
+                TileInspectorAction.PlanCompoundSpecialized,
+                "定为主修坊局",
+                $"将【{tileName}】切到当前院域的主修布局，优先形成明确定位。",
                 true)
         };
 
-        var secondaryBinding = summary.ContentKind switch
-        {
-            TownCellContentKind.Production => new TileInspectorActionBinding(
-                TileInspectorAction.OpenWarehousePanel,
-                "查看仓储联动",
-                $"打开仓储，检查【{tileName}】规划中的产出链和吞吐压力。",
-                true),
-            TownCellContentKind.Residence => new TileInspectorActionBinding(
-                TileInspectorAction.OpenDisciplePanel,
-                "查看弟子安置",
-                $"打开弟子谱，查看【{tileName}】附近的居舍和恢复对象。",
-                true),
-            _ => new TileInspectorActionBinding(
-                TileInspectorAction.OpenTaskPanel,
-                "查看治理联动",
-                $"打开宗主中枢，查看【{tileName}】可承接的法旨与院域治理。",
-                true)
-        };
+        var secondaryBinding = new TileInspectorActionBinding(
+            TileInspectorAction.PlanCompoundSynergy,
+            "切为协同坊局",
+            $"将【{tileName}】改为共享标签更强的布局，优先追求坊位之间的连锁收益。",
+            true);
 
-        var tertiaryBinding = summary.ContentKind switch
-        {
-            TownCellContentKind.Infrastructure or TownCellContentKind.Special => new TileInspectorActionBinding(
-                TileInspectorAction.OpenTaskPanel,
-                "安排巡山与修整",
-                $"从【{tileName}】联动宗主中枢，安排巡山、修路或整备事项。",
-                true),
-            _ => new TileInspectorActionBinding(
-                TileInspectorAction.OpenWarehousePanel,
-                "查看资源准备",
-                $"打开仓储，确认【{tileName}】当前院域坊局所需的材料和供给。",
-                true)
-        };
+        var tertiaryBinding = new TileInspectorActionBinding(
+            TileInspectorAction.PlanCompoundBalanced,
+            "切为稳态坊局",
+            $"将【{tileName}】改为更稳的布局，优先缓解灵池压力、互扰与波动。",
+            true);
 
         ApplyPrimaryTileInspectorBinding(primaryBinding);
         ApplySecondaryTileInspectorBinding(secondaryBinding);
         ApplyTertiaryTileInspectorBinding(tertiaryBinding);
         ApplyTileInspectorActionHint(
-            $"可执行项：{primaryBinding.Text} / {secondaryBinding.Text} / {tertiaryBinding.Text}。{GetCompoundActionFocus(summary.StatusText)}");
+            $"可执行项：{primaryBinding.Text} / {secondaryBinding.Text} / {tertiaryBinding.Text}。切换后会立即刷新坊位、灵气、协同与稳定度反馈。{GetCompoundActionFocus(summary.StatusText)}");
     }
 
     private void ApplyPrimaryTileInspectorBinding(TileInspectorActionBinding binding)
@@ -549,7 +531,7 @@ public partial class Main
         var primaryBinding = new TileInspectorActionBinding(
             TileInspectorAction.OpenWorldSitePlaceholder,
             "前往二级地图",
-            $"为【{site.Label}】预留的二级地图入口；后续会从这里进入{primaryTypeText}对应的下级地图。",
+            $"进入【{site.Label}】的下一层地图，并按该 world hex 的具体语义生成局部地图。",
             true);
 
         var secondaryBinding = site.PrimaryType switch
@@ -557,6 +539,7 @@ public partial class Main
             "Sect" => new TileInspectorActionBinding(TileInspectorAction.OpenTaskPanel, "查阅宗门交涉", $"打开宗主中枢，先从全局层面筹备与【{site.Label}】有关的宗门交涉与治理。", true),
             "MortalRealm" => new TileInspectorActionBinding(TileInspectorAction.OpenWarehousePanel, "查阅供养储备", $"打开仓储，检查前往【{site.Label}】所需的供给与物资准备。", true),
             "Market" => new TileInspectorActionBinding(TileInspectorAction.OpenWarehousePanel, "查阅贸易物资", $"打开仓储，查看适合带往【{site.Label}】流转的物资。", true),
+            "Wilderness" => new TileInspectorActionBinding(TileInspectorAction.OpenDisciplePanel, "查阅历练人选", $"打开弟子谱，查看适合前往【{site.Label}】探路、采集或护送的人手。", true),
             "CultivatorClan" => new TileInspectorActionBinding(TileInspectorAction.OpenDisciplePanel, "查阅门人名录", $"打开弟子谱，查看适合前往【{site.Label}】接触世家的门人与真传。", true),
             "ImmortalCity" => new TileInspectorActionBinding(TileInspectorAction.OpenWarehousePanel, "查阅远行补给", $"打开仓储，查看前往【{site.Label}】这类大型枢纽所需的补给与交易品。", true),
             "Ruin" => new TileInspectorActionBinding(TileInspectorAction.OpenDisciplePanel, "查阅历练人选", $"打开弟子谱，查看适合前往【{site.Label}】的历练人选。", true),
@@ -567,6 +550,7 @@ public partial class Main
         {
             "Sect" or "CultivatorClan" => new TileInspectorActionBinding(TileInspectorAction.OpenDisciplePanel, "查阅往来门人", $"打开弟子谱，查看适合与【{site.Label}】往来的门人。", true),
             "Market" or "ImmortalCity" => new TileInspectorActionBinding(TileInspectorAction.OpenTaskPanel, "查看外务法旨", $"打开宗主中枢，筹备与【{site.Label}】相关的外事务令。", true),
+            "Wilderness" => new TileInspectorActionBinding(TileInspectorAction.OpenWarehousePanel, "查阅野外补给", $"打开仓储，确认前往【{site.Label}】所需的路粮、器具与应急物资。", true),
             "Ruin" => new TileInspectorActionBinding(TileInspectorAction.OpenWarehousePanel, "查阅探险物资", $"打开仓储，确认前往【{site.Label}】所需的探险物资。", true),
             _ => new TileInspectorActionBinding(TileInspectorAction.OpenTaskPanel, "查看外域法旨", $"打开宗主中枢，查看【{site.Label}】相关的外域法旨。", true)
         };
@@ -601,6 +585,7 @@ public partial class Main
             "Sect" => new Color(0.27f, 0.50f, 0.31f, 1f),
             "MortalRealm" => new Color(0.56f, 0.41f, 0.20f, 1f),
             "Market" => new Color(0.69f, 0.31f, 0.16f, 1f),
+            "Wilderness" => new Color(0.23f, 0.46f, 0.40f, 1f),
             "CultivatorClan" => new Color(0.48f, 0.38f, 0.17f, 1f),
             "ImmortalCity" => new Color(0.17f, 0.43f, 0.52f, 1f),
             "Ruin" => new Color(0.41f, 0.31f, 0.34f, 1f),
@@ -694,6 +679,24 @@ public partial class Main
             case TileInspectorAction.BuildAdministration:
                 _gameLoop?.BuildIndustryBuilding(IndustryBuildingType.Administration);
                 break;
+            case TileInspectorAction.PlanCompoundSpecialized:
+                if (_sectMapRenderer?.TryApplySelectedCompoundPlan(TownCompoundPlanStyle.Specialized, out var specializedLog) == true)
+                {
+                    AppendLog(specializedLog);
+                }
+                break;
+            case TileInspectorAction.PlanCompoundSynergy:
+                if (_sectMapRenderer?.TryApplySelectedCompoundPlan(TownCompoundPlanStyle.Synergy, out var synergyLog) == true)
+                {
+                    AppendLog(synergyLog);
+                }
+                break;
+            case TileInspectorAction.PlanCompoundBalanced:
+                if (_sectMapRenderer?.TryApplySelectedCompoundPlan(TownCompoundPlanStyle.Balanced, out var balancedLog) == true)
+                {
+                    AppendLog(balancedLog);
+                }
+                break;
             case TileInspectorAction.OpenTaskPanel:
                 OpenTaskPanel();
                 AppendLog($"已从地块检视器打开【{tileName}】对应的宗主中枢入口。");
@@ -751,6 +754,14 @@ public partial class Main
             "BattlefieldRemnant" => "古战场遗址",
             "SealedDungeon" => "封印地宫",
             "TrialRealm" => "试炼秘境",
+            "SpiritMountainWilds" => "灵脉山野",
+            "ForestWilds" => "古木荒野",
+            "SwampWilds" => "灵沼野地",
+            "CrystalWilds" => "晶砂荒原",
+            "SkyWilds" => "浮天野境",
+            "DesertWilds" => "流沙野境",
+            "RiverWilds" => "河谷野径",
+            "OpenWilds" => "外野地界",
             _ => string.IsNullOrWhiteSpace(secondaryTag) ? "未定子类" : secondaryTag
         };
     }
@@ -786,6 +797,7 @@ public partial class Main
             "Sect" => "此地更偏向宗门交涉、传承往来与势力关系。",
             "MortalRealm" => "此地更偏向供养、人口、安民与附庸护持。",
             "Market" => "此地更偏向交易、传闻、物资流转与短期机会。",
+            "Wilderness" => "此地更偏向探路、采集、遭遇事件与野外历练推进。",
             "CultivatorClan" => "此地更偏向血脉、人脉、客卿合作与家族委托。",
             "ImmortalCity" => "此地更偏向大宗交易、驻点经营与跨域枢纽往来。",
             "Ruin" => "此地更偏向探索、试炼、机缘与高风险回报。",

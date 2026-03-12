@@ -1,10 +1,13 @@
 using Godot;
 using CountyIdle.Models;
+using CountyIdle.Systems;
 
 namespace CountyIdle;
 
 public partial class Main
 {
+    private VBoxContainer? _worldSitePanelRootVBox;
+    private readonly WorldSiteLocalMapGeneratorSystem _worldSiteSandboxGenerator = new();
     private Label? _worldSitePanelTitleLabel;
     private Label? _worldSitePanelSubtitleLabel;
     private Label? _worldSitePanelTypeValueLabel;
@@ -18,9 +21,11 @@ public partial class Main
     private Label? _worldSitePanelHintLabel;
     private Button? _worldSitePanelBackButton;
     private Button? _worldSitePanelActionButton;
+    private SectMapViewSystem? _worldSiteSandboxMapView;
 
     private void BindWorldSitePanelNodes()
     {
+        _worldSitePanelRootVBox = GetNodeOrNull<VBoxContainer>($"{CenterMapPagesPath}/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox");
         _worldSitePanelTitleLabel = GetNodeOrNull<Label>($"{CenterMapPagesPath}/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/HeaderBox/TitleLabel");
         _worldSitePanelSubtitleLabel = GetNodeOrNull<Label>($"{CenterMapPagesPath}/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/HeaderBox/SubtitleLabel");
         _worldSitePanelTypeValueLabel = GetNodeOrNull<Label>($"{CenterMapPagesPath}/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/SummaryBox/TypeCard/TypeMargin/TypeVBox/Value");
@@ -34,6 +39,7 @@ public partial class Main
         _worldSitePanelHintLabel = GetNodeOrNull<Label>($"{CenterMapPagesPath}/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/HintLabel");
         _worldSitePanelBackButton = GetNodeOrNull<Button>($"{CenterMapPagesPath}/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/ActionRow/BackButton");
         _worldSitePanelActionButton = GetNodeOrNull<Button>($"{CenterMapPagesPath}/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/ActionRow/ActionButton");
+        EnsureWorldSiteSandboxMapView();
 
         if (_worldSitePanelBackButton != null)
         {
@@ -60,6 +66,7 @@ public partial class Main
             _worldSitePanelActionButton.Pressed -= OnWorldSitePanelActionPressed;
         }
 
+        _worldSitePanelRootVBox = null;
         _worldSitePanelTitleLabel = null;
         _worldSitePanelSubtitleLabel = null;
         _worldSitePanelTypeValueLabel = null;
@@ -73,6 +80,7 @@ public partial class Main
         _worldSitePanelHintLabel = null;
         _worldSitePanelBackButton = null;
         _worldSitePanelActionButton = null;
+        _worldSiteSandboxMapView = null;
     }
 
     private void RefreshWorldSitePanel()
@@ -109,10 +117,17 @@ public partial class Main
             _worldSitePanelHintLabel.Text = "当前为二级地图占位页，后续会按点位类型展开不同的下级地图模板。";
             _worldSitePanelActionButton.Text = "返回后再选择点位";
             _worldSitePanelActionButton.Disabled = true;
+            if (_worldSiteSandboxMapView != null)
+            {
+                _worldSiteSandboxMapView.Visible = false;
+                _worldSiteSandboxMapView.ClearExternalMap();
+            }
             ApplyWorldSitePanelTone("world");
             return;
         }
 
+        var sourceCell = _worldMapRenderer?.GetWorldCellForSite(site);
+        var sandboxMap = _worldSiteSandboxGenerator.GenerateSandboxMap(site, sourceCell);
         var primaryTypeText = ResolveWorldPrimaryTypeText(site.PrimaryType);
         _worldSitePanelTitleLabel.Text = site.Label;
         _worldSitePanelSubtitleLabel.Text = $"{primaryTypeText} · {ResolveWorldSecondaryTagText(site.SecondaryTag)}";
@@ -130,10 +145,68 @@ public partial class Main
         _worldSitePanelYieldValueLabel.Text = templateInfo.YieldText;
         _worldSitePanelRiskValueLabel.Text = templateInfo.RiskText;
         _worldSitePanelDescriptionLabel.Text = BuildWorldSiteDescription(site, primaryTypeText, ResolveWorldRarityText(site.RarityTier));
-        _worldSitePanelHintLabel.Text = BuildWorldSiteHint(site);
+        _worldSitePanelHintLabel.Text = BuildWorldSiteHint(site, sourceCell);
         _worldSitePanelActionButton.Text = ResolveWorldSiteActionText(site);
         _worldSitePanelActionButton.Disabled = false;
+        if (_worldSiteSandboxMapView != null)
+        {
+            _worldSiteSandboxMapView.Visible = true;
+            _worldSiteSandboxMapView.SetExternalMap(
+                sandboxMap,
+                $"{site.Label} · 局部沙盘",
+                $"左键点选局部 hex 检视当前二级地图地块。当前依据 {site.PrimaryType} / {site.SecondaryTag} 生成。");
+        }
         ApplyWorldSitePanelTone(site.PrimaryType);
+    }
+
+    private void EnsureWorldSiteSandboxMapView()
+    {
+        if (_worldSitePanelRootVBox == null)
+        {
+            return;
+        }
+
+        _worldSiteSandboxMapView = _worldSitePanelRootVBox.GetNodeOrNull<SectMapViewSystem>("GeneratedSecondarySandboxView");
+        if (_worldSiteSandboxMapView != null)
+        {
+            return;
+        }
+
+        _worldSiteSandboxMapView = new SectMapViewSystem
+        {
+            Name = "GeneratedSecondarySandboxView",
+            CustomMinimumSize = new Vector2(0f, 320f),
+            SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+            SizeFlagsVertical = Control.SizeFlags.ExpandFill,
+            Visible = false
+        };
+        _worldSiteSandboxMapView.AddThemeStyleboxOverride("panel", new StyleBoxFlat
+        {
+            BgColor = new Color(0.94902f, 0.92549f, 0.862745f, 0.12f),
+            BorderWidthLeft = 1,
+            BorderWidthTop = 1,
+            BorderWidthRight = 1,
+            BorderWidthBottom = 1,
+            BorderColor = new Color(0.270588f, 0.231373f, 0.192157f, 0.34f)
+        });
+        _worldSiteSandboxMapView.AddChild(new Label
+        {
+            Name = "MapHintLabel",
+            Visible = false,
+            ThemeTypeVariation = "Label"
+        });
+        _worldSiteSandboxMapView.AddChild(new Button
+        {
+            Name = "RegenerateButton",
+            Visible = false
+        });
+        _worldSitePanelRootVBox.AddChild(_worldSiteSandboxMapView);
+
+        var templateGrid = _worldSitePanelRootVBox.GetNodeOrNull<GridContainer>("TemplateGrid");
+        if (templateGrid != null)
+        {
+            _worldSitePanelRootVBox.MoveChild(_worldSiteSandboxMapView, templateGrid.GetIndex());
+        }
     }
 
     private void OpenSelectedWorldSitePanel()
@@ -173,6 +246,7 @@ public partial class Main
                 OpenWarehousePanel();
                 AppendLog($"已从二级地图入口页查阅前往【{site.Label}】所需的物资准备。");
                 break;
+            case "Wilderness":
             case "CultivatorClan":
             case "Ruin":
                 OpenDisciplePanel();
@@ -192,6 +266,7 @@ public partial class Main
             "Sect" => "转往宗门筹备",
             "MortalRealm" => "查阅供养准备",
             "Market" => "查阅贸易准备",
+            "Wilderness" => "查阅历练人选",
             "CultivatorClan" => "查阅往来人选",
             "ImmortalCity" => "查阅远行补给",
             "Ruin" => "查阅历练人选",
@@ -199,18 +274,24 @@ public partial class Main
         };
     }
 
-    private static string BuildWorldSiteHint(XianxiaSiteData site)
+    private static string BuildWorldSiteHint(XianxiaSiteData site, XianxiaHexCellData? sourceCell)
     {
-        return site.PrimaryType switch
+        var detailHint = sourceCell == null
+            ? "当前使用点位基础语义生成下层地图。"
+            : $"当前下层地图将按 {sourceCell.Biome} / {sourceCell.Terrain} / {sourceCell.Water} / 灵气 {sourceCell.QiDensity:0.00} 生成。";
+
+        var primaryHint = site.PrimaryType switch
         {
             "Sect" => "当前占位页后续将承接宗门访问、结盟、论道与传承交换等宗门型二级地图。",
             "MortalRealm" => "当前占位页后续将承接凡俗国度的供养、安民、附庸护持与苗子招揽等二级地图。",
             "Market" => "当前占位页后续将承接坊市交易、传闻、短期委托与黑白市机会等二级地图。",
+            "Wilderness" => "当前占位页后续将承接野外采集、路径推进、遭遇事件与局部历练等二级地图。",
             "CultivatorClan" => "当前占位页后续将承接世家关系、客卿合作、血脉与专精资源往来等二级地图。",
             "ImmortalCity" => "当前占位页后续将承接仙城驻点、大宗交易、拍卖与跨域任务等二级地图。",
             "Ruin" => "当前占位页后续将承接遗迹探索、试炼、机缘与高风险回报等二级地图。",
             _ => "当前占位页后续将承接该点位的专属二级地图。"
         };
+        return $"{detailHint}{primaryHint}";
     }
 
     private void ApplyWorldSitePanelTone(string primaryType)
@@ -227,6 +308,7 @@ public partial class Main
             "Sect" => new Color(0.24f, 0.47f, 0.29f, 1f),
             "MortalRealm" => new Color(0.56f, 0.41f, 0.20f, 1f),
             "Market" => new Color(0.69f, 0.31f, 0.16f, 1f),
+            "Wilderness" => new Color(0.22f, 0.45f, 0.40f, 1f),
             "CultivatorClan" => new Color(0.46f, 0.36f, 0.16f, 1f),
             "ImmortalCity" => new Color(0.16f, 0.42f, 0.53f, 1f),
             "Ruin" => new Color(0.42f, 0.30f, 0.34f, 1f),
@@ -254,6 +336,10 @@ public partial class Main
                 "短频交易、淘货、打听消息、接短委托。",
                 "稀缺货、流通资源、传闻、临时机会。",
                 "被坑、价格波动、黑市风险、真假难辨。"),
+            "Wilderness" => new WorldSiteTemplateInfo(
+                "探路、采集、遭遇战、护送与野外历练推进。",
+                "材料、情报、路径控制、局部机缘与历练收益。",
+                "迷路、伤损、妖兽袭扰、补给见底。"),
             "CultivatorClan" => new WorldSiteTemplateInfo(
                 "走关系、谈合作、接家族委托、换秘术与门客。",
                 "血脉资源、人情网络、专属材料、客卿机会。",

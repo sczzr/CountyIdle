@@ -73,12 +73,23 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     private XianxiaSiteData? _selectedWorldSite;
 
     public event Action<XianxiaSiteData?>? WorldSiteSelectionChanged;
-
     public float Zoom => _targetZoom;
     public float MinZoom => DefaultMinZoom;
     public float MaxZoom => _mode == StrategicMapMode.Prefecture ? PrefectureMaxZoom : DefaultMaxZoom;
     public float DefaultZoom => 1.0f;
     public XianxiaSiteData? SelectedWorldSite => _selectedWorldSite;
+
+    public XianxiaHexCellData? GetWorldCellForSite(XianxiaSiteData? site)
+    {
+        if (site == null)
+        {
+            return null;
+        }
+
+        return _xianxiaWorldCellLookup.TryGetValue((site.Coord.Q, site.Coord.R), out var cell)
+            ? cell
+            : null;
+    }
 
     public override void _Ready()
     {
@@ -589,6 +600,12 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
             var canvasCenter = ToCanvas(center, unit, normalizedCenter.X, normalizedCenter.Y);
             var hex = BuildHexPolygon(canvasCenter, hexRadius);
             DrawAtlasHex(hex, atlas, row, col, tint);
+
+            if (IsSelectedWorldCell(cell))
+            {
+                DrawFilledPolygon(hex, new Color(0.96f, 0.93f, 0.78f, 0.10f));
+                DrawPath(hex, new Color(0.97f, 0.92f, 0.68f, 0.92f), Math.Max(1.3f, hexRadius * 0.12f), true);
+            }
         }
     }
 
@@ -1257,52 +1274,33 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         }
     }
 
-    private void TrySelectWorldSite(Vector2 mousePosition)
+    private bool TrySelectWorldSite(Vector2 mousePosition)
     {
         if (_xianxiaWorldMap == null || _xianxiaWorldCenters.Count == 0)
         {
-            return;
+            return false;
         }
 
         var mapRect = GetMapRect();
         var center = (new Rect2(mapRect.Position + _panOffset, mapRect.Size)).GetCenter();
         var unit = GetUnitForZoom(mapRect, _zoom);
-        XianxiaSiteData? bestSite = null;
-        var bestDistance = float.MaxValue;
-
-        foreach (var site in _xianxiaWorldMap.Sites)
-        {
-            if (!_xianxiaWorldCenters.TryGetValue((site.Coord.Q, site.Coord.R), out var normalizedCenter))
-            {
-                continue;
-            }
-
-            var canvasPoint = ToCanvas(center, unit, normalizedCenter.X, normalizedCenter.Y);
-            var hitRadius = Math.Max(ResolveWorldSiteHitRadius(site) + 6f, 10f);
-            var distance = mousePosition.DistanceTo(canvasPoint);
-            if (distance > hitRadius || distance >= bestDistance)
-            {
-                continue;
-            }
-
-            bestDistance = distance;
-            bestSite = site;
-        }
+        var bestSite = TryPickWorldSite(mousePosition, center, unit) ?? TryBuildWorldCellSite(mousePosition, center, unit);
 
         if (bestSite == null)
         {
             ClearWorldSiteSelection();
-            return;
+            return false;
         }
 
         if (IsSameSite(_selectedWorldSite, bestSite))
         {
-            return;
+            return true;
         }
 
         _selectedWorldSite = bestSite;
         WorldSiteSelectionChanged?.Invoke(_selectedWorldSite);
         QueueRedraw();
+        return true;
     }
 
     private void DrawWorldEdgeOverlays(Vector2 center, float unit)

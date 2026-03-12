@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.Json;
 using Godot;
 using CountyIdle.Models;
 
@@ -46,8 +45,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
 
     private const string GeographyAtlasPath = "res://assets/ui/tilemap/tileset_geography.png";
 
-    private const string TerrainAtlasTexturePath = "res://assets/ui/tilemap/tileset_lush_grassland_terrain.png";
-    private const string TerrainAtlasManifestPath = "res://assets/map/manifests/sect_map_layer_manifest.json";
+    private const string TerrainAtlasManifestPath = "res://assets/map/manifests/l1_terrain_manifest.json";
     private const string TerrainGroundTexturePath = "";
     private const string TerrainRoadTexturePath = "res://assets/map/connectors/roads/map_l2_road_core_v01.svg";
     private const string TerrainCourtyardTexturePath = "res://assets/map/connectors/courtyards/map_l2_courtyard_core_v01.svg";
@@ -59,13 +57,14 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
 
     private readonly TownMapGeneratorSystem _generator = new();
     private readonly Dictionary<TownTerrainType, Texture2D?> _terrainTextures = new();
-    private readonly Dictionary<string, Rect2> _atlasRegions = new();
+    private readonly Dictionary<string, Texture2D> _terrainAtlasTextures = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, MapLayerAtlasTileDefinition> _terrainAtlasTiles = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, List<string>> _terrainAtlasFamilyVariants = new(StringComparer.Ordinal);
     private readonly Color[] _hexTintColors = new Color[6];
 
     private TownMapData? _mapData;
     private Button _regenerateButton = null!;
     private Label _mapHintLabel = null!;
-    private Texture2D? _terrainAtlasTexture;
     private HexAtlas5x4? _geographyAtlas;
     private Texture2D? _wallBrightTexture;
     private Texture2D? _wallDarkTexture;
@@ -86,6 +85,9 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
     private TownActivityAnchorData? _selectedActivityAnchor;
     private Vector2I? _selectedCell;
     private int? _selectedResidentDiscipleId;
+    private bool _usesExternalMap;
+    private string _externalMapTitle = string.Empty;
+    private string _externalMapInteractionHint = string.Empty;
 
     public float Zoom => _zoom;
     public float MinZoom => 0.6f;
@@ -94,6 +96,56 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
 
     public event Action<int, JobType?>? DiscipleInspectionRequested;
     public event Action<TownMapSelectionSummary>? SelectionSummaryChanged;
+
+    public void SetExternalMap(TownMapData mapData, string titleText, string interactionHint)
+    {
+        _usesExternalMap = true;
+        _externalMapTitle = string.IsNullOrWhiteSpace(titleText) ? "局部沙盘" : titleText;
+        _externalMapInteractionHint = string.IsNullOrWhiteSpace(interactionHint) ? "左键点选局部地块，右键清除当前选中。" : interactionHint;
+        _mapData = mapData;
+        _selectedActivityAnchor = null;
+        _selectedCell = null;
+        _selectedResidentDiscipleId = null;
+        _residentWalkers.Clear();
+
+        if (_regenerateButton != null)
+        {
+            _regenerateButton.Visible = false;
+        }
+
+        if (_mapHintLabel != null)
+        {
+            _mapHintLabel.Visible = true;
+        }
+
+        UpdateMapHint();
+        QueueRedraw();
+    }
+
+    public void ClearExternalMap()
+    {
+        _usesExternalMap = false;
+        _externalMapTitle = string.Empty;
+        _externalMapInteractionHint = string.Empty;
+
+        if (_regenerateButton != null)
+        {
+            _regenerateButton.Visible = false;
+        }
+
+        if (_mapHintLabel != null)
+        {
+            _mapHintLabel.Visible = false;
+        }
+
+        _mapData = null;
+        _selectedActivityAnchor = null;
+        _selectedCell = null;
+        _selectedResidentDiscipleId = null;
+        _residentWalkers.Clear();
+        NotifySelectionSummaryChanged();
+        QueueRedraw();
+    }
 
     public override void _Ready()
     {
@@ -269,6 +321,11 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
 
     public void RefreshMap(int populationHint, int housingHint, int eliteHint)
     {
+        if (_usesExternalMap)
+        {
+            return;
+        }
+
         var safePopulation = Math.Max(populationHint, 0);
         var safeHousing = Math.Max(housingHint, 0);
         var safeElite = Math.Max(eliteHint, 0);
@@ -302,7 +359,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
 
     private void OnRegeneratePressed()
     {
-        if (!_isInitialized)
+        if (!_isInitialized || _usesExternalMap)
         {
             return;
         }
@@ -313,6 +370,13 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
 
     private void RebuildMap()
     {
+        if (_usesExternalMap)
+        {
+            UpdateMapHint();
+            QueueRedraw();
+            return;
+        }
+
         _mapData = _generator.Generate(_populationHint, _housingHint, _eliteHint, _layoutSeed);
         _selectedActivityAnchor = null;
         _selectedCell = null;
@@ -326,12 +390,19 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
     {
         if (_mapData == null)
         {
+            if (_mapHintLabel != null)
+            {
+                _mapHintLabel.Text = string.Empty;
+            }
             return;
         }
 
-        var summaryLine =
-            $"浮云宗·天衍峰（hex 俯瞰） · {_operationalStyle.TitleSuffix} · 院域检视 · 缩放 {(int)Mathf.Round(_zoom * 100f)}%";
-        var interactionLine = SectMapSemanticRules.GetMapInteractionHint();
+        var summaryLine = _usesExternalMap
+            ? $"{_externalMapTitle} · 缩放 {(int)Mathf.Round(_zoom * 100f)}%"
+            : $"浮云宗·天衍峰（hex 俯瞰） · {_operationalStyle.TitleSuffix} · 院域检视 · 缩放 {(int)Mathf.Round(_zoom * 100f)}%";
+        var interactionLine = _usesExternalMap
+            ? _externalMapInteractionHint
+            : SectMapSemanticRules.GetMapInteractionHint();
         var operationalLine = string.IsNullOrWhiteSpace(_operationalStyle.HintText)
             ? interactionLine
             : $"{_operationalStyle.HintText}\n{interactionLine}";
@@ -509,7 +580,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
 
     private bool TryDrawLayer1TerrainAtlas(Vector2I cell, Vector2 center, TownTerrainType terrainType)
     {
-        if (_terrainAtlasTexture == null || _atlasRegions.Count == 0)
+        if (_terrainAtlasTiles.Count == 0)
         {
             return false;
         }
@@ -519,26 +590,33 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
             return false;
         }
 
-        DrawAtlasTile(atlasKey, center, GetTerrainAtlasTint(terrainType));
-        return true;
+        return DrawAtlasTile(atlasKey, center, GetTerrainAtlasTint(terrainType));
     }
 
     private bool TryGetTerrainAtlasKey(Vector2I cell, TownTerrainType terrainType, out string atlasKey)
     {
         atlasKey = string.Empty;
-        if (_atlasRegions.Count == 0)
+        if (_terrainAtlasTiles.Count == 0)
         {
             return false;
         }
 
-        if (terrainType == TownTerrainType.Water)
+        var candidates = terrainType switch
+        {
+            TownTerrainType.Water => BuildTerrainAtlasCandidates("shallow_water", "deep_water"),
+            TownTerrainType.Road => BuildTerrainAtlasCandidates("plain"),
+            TownTerrainType.Courtyard => BuildTerrainAtlasCandidates("plain", "spirit_vein"),
+            _ => BuildTerrainAtlasCandidates("plain", "spirit_vein", "foothill")
+        };
+
+        if (candidates.Count == 0)
         {
             return false;
         }
 
-        var variantIndex = (GetCellHash(cell, 211 + ((int)terrainType * 17)) % 6) + 1;
-        atlasKey = $"l1_ground_v0{variantIndex}";
-        return _atlasRegions.ContainsKey(atlasKey);
+        var variantIndex = GetCellHash(cell, 211 + ((int)terrainType * 17)) % candidates.Count;
+        atlasKey = candidates[variantIndex];
+        return true;
     }
 
     private Color GetTerrainAtlasTint(TownTerrainType terrainType)
@@ -887,8 +965,9 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
     private void LoadTextures()
     {
         _terrainTextures.Clear();
-        _atlasRegions.Clear();
-        _terrainAtlasTexture = LoadTextureOrNull(TerrainAtlasTexturePath);
+        _terrainAtlasTextures.Clear();
+        _terrainAtlasTiles.Clear();
+        _terrainAtlasFamilyVariants.Clear();
         _geographyAtlas = HexAtlas5x4.TryLoad(GeographyAtlasPath);
         LoadAtlasManifest();
         _terrainTextures[TownTerrainType.Ground] = null;
@@ -1001,64 +1080,61 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         }
     }
 
+    private List<string> BuildTerrainAtlasCandidates(params string[] families)
+    {
+        var candidates = new List<string>();
+        foreach (var family in families)
+        {
+            if (_terrainAtlasFamilyVariants.TryGetValue(family, out var variants))
+            {
+                candidates.AddRange(variants);
+            }
+        }
+
+        return candidates;
+    }
+
     private void LoadAtlasManifest()
     {
         _atlasTileSize = AtlasFallbackTileSize;
         _atlasAnchor = AtlasFallbackAnchor;
 
-        if (_terrainAtlasTexture == null || !FileAccess.FileExists(TerrainAtlasManifestPath))
+        var manifest = MapLayerAtlasManifest.TryLoad(TerrainAtlasManifestPath);
+        if (manifest == null)
         {
             return;
         }
 
-        try
+        _atlasTileSize = manifest.TilePixelSize;
+        _atlasAnchor = manifest.RenderAnchor;
+
+        foreach (var atlasEntry in manifest.Atlases.Values)
         {
-            using var manifest = JsonDocument.Parse(FileAccess.GetFileAsString(TerrainAtlasManifestPath));
-            var root = manifest.RootElement;
-
-            if (root.TryGetProperty("tile_pixel_size", out var tilePixelSizeElement) &&
-                tilePixelSizeElement.ValueKind == JsonValueKind.Array &&
-                tilePixelSizeElement.GetArrayLength() >= 2)
+            var atlasTexture = LoadTextureOrNull(atlasEntry.SourceImage);
+            if (atlasTexture == null)
             {
-                _atlasTileSize = new Vector2(
-                    tilePixelSizeElement[0].GetSingle(),
-                    tilePixelSizeElement[1].GetSingle());
+                GD.PushWarning($"Missing terrain atlas texture: {atlasEntry.SourceImage}");
+                continue;
             }
 
-            if (root.TryGetProperty("render_anchor", out var renderAnchorElement) &&
-                renderAnchorElement.ValueKind == JsonValueKind.Array &&
-                renderAnchorElement.GetArrayLength() >= 2)
-            {
-                _atlasAnchor = new Vector2(
-                    renderAnchorElement[0].GetSingle(),
-                    renderAnchorElement[1].GetSingle());
-            }
-
-            if (!root.TryGetProperty("tiles", out var tilesElement) || tilesElement.ValueKind != JsonValueKind.Object)
-            {
-                return;
-            }
-
-            foreach (var tileProperty in tilesElement.EnumerateObject())
-            {
-                if (!tileProperty.Value.TryGetProperty("pixel_region", out var regionElement) ||
-                    regionElement.ValueKind != JsonValueKind.Array ||
-                    regionElement.GetArrayLength() < 4)
-                {
-                    continue;
-                }
-
-                _atlasRegions[tileProperty.Name] = new Rect2(
-                    regionElement[0].GetSingle(),
-                    regionElement[1].GetSingle(),
-                    regionElement[2].GetSingle(),
-                    regionElement[3].GetSingle());
-            }
+            _terrainAtlasTextures[atlasEntry.AtlasName] = atlasTexture;
         }
-        catch (Exception exception)
+
+        foreach (var tileEntry in manifest.Tiles.Values)
         {
-            GD.PushWarning($"Failed to load county reference atlas manifest: {exception.Message}");
-            _atlasRegions.Clear();
+            if (!_terrainAtlasTextures.ContainsKey(tileEntry.AtlasName))
+            {
+                continue;
+            }
+
+            _terrainAtlasTiles[tileEntry.AssetId] = tileEntry;
+            if (!_terrainAtlasFamilyVariants.TryGetValue(tileEntry.Family, out var variants))
+            {
+                variants = new List<string>();
+                _terrainAtlasFamilyVariants[tileEntry.Family] = variants;
+            }
+
+            variants.Add(tileEntry.AssetId);
         }
     }
 
@@ -1155,17 +1231,19 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         }
     }
 
-    private void DrawAtlasTile(string atlasKey, Vector2 center, Color tint)
+    private bool DrawAtlasTile(string atlasKey, Vector2 center, Color tint)
     {
-        if (_terrainAtlasTexture == null || !_atlasRegions.TryGetValue(atlasKey, out var region))
+        if (!_terrainAtlasTiles.TryGetValue(atlasKey, out var tileDefinition) ||
+            !_terrainAtlasTextures.TryGetValue(tileDefinition.AtlasName, out var atlasTexture))
         {
-            return;
+            return false;
         }
 
         var destinationSize = new Vector2(ScaleValue(_atlasTileSize.X), ScaleValue(_atlasTileSize.Y));
         var scaledAnchor = new Vector2(ScaleValue(_atlasAnchor.X), ScaleValue(_atlasAnchor.Y));
         var destinationRect = new Rect2(center - scaledAnchor, destinationSize);
-        DrawTextureRectRegion(_terrainAtlasTexture, destinationRect, region, tint);
+        DrawTextureRectRegion(atlasTexture, destinationRect, tileDefinition.PixelRegion, tint);
+        return true;
     }
 
     private Color GetTerrainColor(TownTerrainType terrainType)
