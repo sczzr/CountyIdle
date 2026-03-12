@@ -1,10 +1,25 @@
-# CountyIdle 历史归档注册表（整合精简）
+# CountyIdle 历史归档注册表
 
-> 目标：避免同主题反复建档，统一“功能卡/提案/日志”三件套追踪。
+> 本文是历史归档的正式索引簿。  
+> 它只回答三件事：
 >
-> 世界观兼容说明（2026-03-08）：注册表中的 `canonical-topic` 以可追溯性优先，不因世界观升级而重命名；阅读与复用历史归档时，统一按当前“修仙宗门经营 + 外域探索”语义解释。
+> 1. 同一链路的历史文档应归到哪个 `canonical-topic`
+> 2. 历史 topic 在当前宗门语义下应如何阅读
+> 3. 后续新增归档应如何命名、收敛与去重
+>
+> 主设计裁决以 [01_game_design_guide.md](/E:/2_Personal/Finally/docs/01_game_design_guide.md) 为准。  
+> 系统法则与当前运行边界以 [02_system_specs.md](/E:/2_Personal/Finally/docs/02_system_specs.md) 为准。  
+> 世界观锚点、组织结构与术语门禁以 [09_xianxia_sect_setting.md](/E:/2_Personal/Finally/docs/09_xianxia_sect_setting.md) 为准。  
+> 本文只负责归档索引、topic 收口与历史语义桥接，不负责重新裁定玩法规则。
 
-## 0) 历史 Topic → 当前语义映射
+## 0. 文档使用裁定
+
+- 历史 `canonical-topic` 以可追溯性优先，不因世界观升级而强制重命名。
+- 旧归档在当前版本下，统一按“浮云宗天衍峰经营 + 外域探索”语义解释。
+- 本文可以为历史 topic 补“当前对外语义”，但不改写旧功能是否仍属主线的上位裁定。
+- 若 topic 的历史含义与当前设计冲突，以 `01 / 02 / 09` 为准，并回写索引说明。
+
+## 1. 历史 Topic → 当前语义映射
 
 | 历史 Topic / 关键词 | 当前解释 |
 | --- | --- |
@@ -14,7 +29,7 @@
 | `three-map-*` / 三地图 | 当前主流程的双地图（宗门 / 世界）+ 江陵府外域备用视图 |
 | `han-courtyard-*` | 古风庭院美术基底，可继续服务修仙宗门表现 |
 
-## 1) Canonical Topic 注册表
+## 2. Canonical Topic 注册表
 
 | Canonical Topic | 当前归档文件（按阶段） | 状态 | 合并建议 |
 | --- | --- | --- | --- |
@@ -51,7 +66,7 @@
 | `sect-quarter-decrees` | FC/CP/BL（本次新增） | 演进 | 用于“季度法令 / 季度宗门方针”链路；后续门规树与季度模板可继续沿用同 topic |
 | `sect-rule-tree` | FC/CP/BL（本次新增） | 演进 | 用于“庶务 / 传功 / 巡山常设门规”链路；后续完整树状解锁继续沿用同 topic |
 
-## 2) 建议收敛的“归档史诗”分组
+## 3. 建议收敛的“归档史诗”分组
 
 1. `ui-layout-migration`  
    覆盖：`ui-scene-split`、`rimworld-modular-ui`、`figma-make-ui-skeleton`、`main-layout-switch`、`html-reference-ui-parity`、`reference-layout-rebuild`、`reference-layout-update-b`、`responsive-layout-fix`
@@ -62,9 +77,9 @@
 4. `han-courtyard-theme-pack`  
    覆盖：`han-courtyard-theme`、`han-courtyard-textured-theme`、`lantern-hover-pulse`
 
-> 说明：历史文件不强制重命名；后续新增改动直接按史诗 topic 归档，减少同义命名扩散。若 topic 含旧世界观词汇，优先在正文和索引层补“当前语义解释”，不强行改历史 topic。
+> 裁定说明：历史文件不强制重命名；后续新增改动直接按史诗 topic 归档，减少同义命名扩散。若 topic 含旧世界观词汇，优先在正文和索引层补“当前语义解释”，不强行改历史 topic。
 
-## 3) 新增文档命名规范（从本次起）
+## 4. 新增文档命名规范（从本次起）
 
 - 功能卡：`FC-YYYYMMDD-<canonical-topic>[-NN].md`
 - 改动提案：`CP-YYYYMMDD-<canonical-topic>[-NN].md`
@@ -76,7 +91,7 @@
 - 同一改动链路固定不变（FC/CP/BL 使用同一 topic）
 - 默认不加 `-NN`；仅当“同目录 + 同日期 + 同 topic”会重名时，使用 `-01/-02` 序号
 
-## 4) 执行规则（精简）
+## 5. 执行规则（精简）
 
 1. 机制或平衡改动：必须落 FC + CP + BL。
 2. 纯表现层改动：至少落 FC + BL；若影响玩法感知阈值，补 CP。

@@ -1,14 +1,23 @@
 # CountyIdle 开发列表（顺序执行）
 
-> 用途：保证后续开发按“完整功能包”推进，不做突兀的零散插入。
+> 本文是 CountyIdle 的功能包排程簿。  
+> 它只回答三件事：
+>
+> 1. 当前版本接下来应按什么顺序推进功能包
+> 2. 每个功能包当前处于什么状态、以什么标准判完成
+> 3. 新需求应并入哪一条，不得零散插入
 >
 > 世界观基线：对外设计与文案统一使用“浮云宗（青云州江陵府）+ 天衍峰经营 + 青云峰总殿协同 + 外域附庸圈层”语义；文档中的 `County / Town / Prefecture` 仅视为历史技术命名或兼容层入口。
 >
 > 术语补充：本文中的“人口 / 职业 / 科技 / 英雄”等技术词，默认按 `docs/09_xianxia_sect_setting.md` 映射为“门人 / 职司 / 传承研修 / 真传与核心战力”理解。
+>
+> 本文负责“功能包排程、当前状态、完成标准与下一步”；不直接裁定公式、正式时间口径和结算顺序。  
+> 若本文与 [02_system_specs.md](/E:/2_Personal/Finally/docs/02_system_specs.md) 冲突，一律以 `02` 为准。  
+> 文中的阶段记录只保留关键里程碑；阅读时以“当前状态 + 完成标准 + 最近阶段结论”为准，不把流水记录视为现行规格。
 
-## 1) 需求受理规则（对话即执行）
+## 1. 需求受理规则（对话即执行）
 
-每次你提出新需求时，先执行以下检查：
+每次受理新需求时，一律先执行以下检查：
 
 1. 先查 `docs/05_feature_inventory.md`
    - 若是 `✅ 已实现`：按“优化/修复”处理，不重复造功能
@@ -19,7 +28,7 @@
 3. 每次“继续完善游戏”默认按本列表从上到下执行
    - 除非你明确指定某一条先做
 
-## 2) 功能包定义（必须完整）
+## 2. 功能包定义（必须完整）
 
 每条开发项必须包含：
 
@@ -28,7 +37,7 @@
 - 依赖（前置系统）
 - 完成标准（可验收）
 
-> 任何不满足以上四项的零散需求，不进入开发执行。
+> 裁定：任何不满足以上四项的零散需求，不进入开发执行。
 
 ### 2.1 价值观与伦理约束（强制门禁）
 
@@ -37,7 +46,7 @@
 - 宗门系统目标是“共同建设、共同受益、共同护持”。
 - 功能上线前必须做一次“伦理与表述检查”（文案 + 机制）。
 
-## 3) 当前开发列表（按顺序）
+## 3. 当前开发列表（按顺序）
 
 | ID | 功能包 | 当前状态 | 飞轮环节 | 完成标准（DoD） |
 | --- | --- | --- | --- | --- |
@@ -88,6 +97,7 @@
 | DL-047 | 天衍峰院域坊局与全格检视系统 | IN_PROGRESS（代码二期：坊局数值骨架） | 产业涌现→科技涌现→人口繁衍→反哺宗门 | 天衍峰任意 hex 可点击检视；地块具备固定灵气池、坊位数、天然特征与分区；同地块支持多建筑坊局组合、共享灵气与协同/互扰规则；随机性来自地块 traits、节气、局部事件与驻守差异，而非纯硬摇点 |
 | DL-048 | 世界格二级地图分层与入口系统 | IN_PROGRESS（运行时五期：占位页按类型分化） | 反哺宗门→产业涌现→武装探险 | 世界地图 hex 支持按地块类型进入二级地图；二级地图采用 `Sect / Wilderness / MortalRealm / CultivatorClan / ImmortalCity / Market / Ruin` 七类 `PrimaryType` 与对应 `SecondaryTag`；文档已明确入口条件、主玩法、产出/风险、生成边界、退出回流与参数草案，配置模型与 JSON 骨架已接入；当前生成器已开始产出带 `PrimaryType / SecondaryTag / RegionId / RarityTier / UnlockTier` 的点位语义，并让 `Sect / MortalRealm / Market / CultivatorClan / ImmortalCity / Ruin` 六类进入世界点位与节点样式；世界图现已支持点选站点、同步左侧检视器，并可进入按类型分化的二级地图占位页，待继续细化专属模板与真实玩法 |
 | DL-049 | 地图素材生产规格与分层资产流水线 | IN_PROGRESS（运行时一期：Layer 1 / Layer 2 接入） | 反哺宗门→产业涌现→武装探险 | 已形成正式地图素材规格文档，明确 5 层分层、命名目录、尺寸锚点、连接类拼接、破框遮挡与首批交付包；当前宗门图已接入 `Layer 1` atlas manifest 与 `Layer 2` decal / connector 链路，后续可继续扩到正式国风地块、宗门图立体物件、世界图与二级地图 |
+| DL-050 | 三相治宗循环重设计（季度战略相位 + 双层时间制） | TODO（文档重设计中） | 门人生息→产业供养→传承研修→职司分化→武装历练→反哺宗门 | 将玩法主循环收口为“季度立纲 -> 月度筹划 -> 小时结算”三相节奏，并补入“细时间运转 + 长时间岁月感”的双层时间制；完成 `docs/01` 重写、`docs/02` 可执行规格补充、`feature-card + change-proposal` 归档，并给出首批可实现工单 |
 
 ### 3.1 DL-019 功能包详情（宗门弟子可视移动）
 
@@ -518,15 +528,12 @@
   - `CountyTownMapViewSystem` 新增可视弟子 / 实体场所点击联动，能把地图中的代表弟子直接定位到“弟子谱”；
   - `docs/02 / 05 / 08` 同步补上弟子谱规格与状态看板；
   - 新增 `FC-20260309-disciple-attribute-panel.md` 与 `BL-20260309-disciple-attribute-panel.md`。
-  - 2026-03-09 视觉补强（卷轴档案）：弟子谱整体改为“左侧纵向名册 + 右侧宣纸档案”布局，主体显示灵根圆环、根基罗盘、修为进度、战力印鉴、气海储备与衍天批注；
-  - 新增 `FC-20260309-disciple-detail-card-refresh.md` 与 `BL-20260309-disciple-detail-card-refresh.md`。
-  - 新增 `FC-20260309-disciple-scroll-dossier-refresh.md` 与 `BL-20260309-disciple-scroll-dossier-refresh.md`。
-  - 2026-03-09 名册树补强：左侧卷册名册切为真正的多层树控件，按 `峰脉 -> 堂口 / 机构 -> 条线 / 班序 -> 册级 -> 弟子` 收口，方便在各峰内继续分层管理门人；
-  - 2026-03-09 家族统一补强：弟子谱外层补齐 `左右木轴 + 上下绫边 + 卷首横题`，左栏目录语义收口为“峰内名录”，整体正式纳入统一卷轴子面板家族。
-  - 2026-03-09 层级修正：`PopupPanelBase` 统一切到 `ZAsRelative = false + ZIndex = 200 + MoveToFront()`，修复主界面卷轴骨架与中央 hex 沙盘盖到“弟子谱”正文上的 Z 轴问题。
-  - 新增 `FC-20260309-disciple-roster-tree.md` 与 `BL-20260309-disciple-roster-tree.md`。
-  - 2026-03-09 固定宗门树补强：峰脉与堂口优先按固定宗门组织结构归类，不再主要依赖关联文本首段，并补入 `总枢亲传线 / 阵枢营造线 / 护山检修线 / 推演研修线 / 商路采办线` 等稳定条线；
-  - 新增 `FC-20260309-disciple-fixed-organization-tree.md` 与 `BL-20260309-disciple-fixed-organization-tree.md`。
+- 2026-03-09 关键阶段结论：
+  - 视觉结构已从基础弹窗收口为“左侧名录 + 右侧卷轴档案”布局，主体展示灵根圆环、根基罗盘、修为进度、战力印鉴、气海储备与衍天批注；
+  - 左侧名册已从普通列表升级为多层树控件，并按 `峰脉 -> 堂口 / 机构 -> 条线 / 班序 -> 册级 -> 弟子` 收口；
+  - 名册归类已优先按固定宗门组织结构落位，补入 `总枢亲传线 / 阵枢营造线 / 护山检修线 / 推演研修线 / 商路采办线` 等稳定条线；
+  - 弹窗外层已并入统一卷轴子面板家族，补齐 `左右木轴 + 上下绫边 + 卷首横题`，并修复与主界面沙盘的层级遮挡问题；
+  - 关联归档已补入 `disciple-detail-card-refresh`、`disciple-scroll-dossier-refresh`、`disciple-roster-tree`、`disciple-fixed-organization-tree` 四组 FC / BL。
 
 ### 3.25 DL-044 功能包详情（门规树：一期三支门规纲目）
 
@@ -563,139 +570,16 @@
   - `JobsPanel.tscn` 新增“地块检视”卡，并通过 `TownMapSelectionSummary` 接收天衍峰场所选中摘要；
   - `TopBar.tscn`、`BottomBar.tscn`、`EventLogPanel.tscn` 切到更轻的琉璃面板风格；
   - 新增 `FC-20260309-main-hex-sandbox-layout.md`。
-- 2026-03-09 二轮补强：
-  - `Main.tscn` 继续压窄左右悬浮栏，给中央沙盘让出更多横向空间；
-  - `WorldPanel.tscn` 将地图调度条从上沿收到底部页签上方，降低对地图首屏的遮挡；
-  - `BottomBar.tscn` 进一步压缩按钮高度与整体宽度，保留控制台感但减少体积；
-  - `Main.cs` 将世界图入口文案统一为 `世界大地图`。
-- 2026-03-09 三轮补强：
-  - `TopBar.tscn` 改为更薄的“顶部天幕”比例，压缩高度、边角与阴影，让顶部更像画框天幕而不是厚卡片；
-  - `Main.tscn` 同步继续上移中央地图与左右浮动栏，进一步扩大首屏沙盘可视面积。
-- 2026-03-09 四轮补强：
-  - `BottomBar.tscn` 新增底部快捷动作组，将 `仓储 / 宗主中枢 / 弟子谱` 收到底部控制台；
-  - `WorldPanel.tscn` 隐藏顶端同类按钮，只保留地图页签与缩放控件；
-  - `MainWarehousePanel.cs`、`MainTaskPanel.cs`、`MainDisciplePanel.cs` 改为优先绑定底部快捷按钮，保持原路径为兜底兼容。
-- 2026-03-09 五轮补强：
-  - `JobsPanel.tscn` 将左侧检视器改成更明确的 `Tile Inspector` 层次：主标题、地块副标题、属性格、主次动作按钮与次级治理摘要；
-  - `TownMapSelectionSummary` 与 `CountyTownMapViewSystem.Selection.cs` 的默认文案 / 选中文案改为更偏“地块检视卡”语气，弱化底层 `Lot / Road` 技术感。
-- 2026-03-09 六轮补强：
-  - `EventLogPanel.tscn` 将右侧日志区压成更轻更密的“微缩日志窗”：顶部仅保留两条高优先近讯，正文标题与留白同步收敛；
-  - 保持 `PanelContent/MainVBox/LogBox/LogVBox/LogContent/LogLabel` 节点路径不变，继续兼容 `Main.cs` 的日志绑定。
-- 2026-03-09 七轮补强：
-  - 新增 `SectChronicleRules.cs` 与 `MainSectChroniclePanel.cs`，将右侧两条风闻卡改为读取当前经营状态实时生成；
-  - 风闻优先反映 `威胁 / 仓储负载 / 民生覆盖 / 探险 / 法令 / 协同峰` 等摘要，但不介入小时结算与事件日志写入链。
-- 2026-03-09 八轮补强：
-  - `MainSectTileInspector.cs` 将左侧检视卡动作区改为真正的“tile 专属操作项”：未选中前禁用，选中后按地块类型切换为扩建 / 调度 / 打开对应面板；
-  - `TownMapSelectionSummary.CreateDefault()` 默认文案改为更明确的“点选中央 hex tile 后显示具体信息与可操作项”提示。
-- 2026-03-09 九轮补强：
-  - `JobsPanel.tscn` 在左侧检视卡补入 `tile 类型徽记` 与 `可执行项摘要`，让卡面更接近参考示例图的“被选中地块专属信息卡”；
-  - `MainSectTileInspector.cs` 根据 tile 类型切换徽记文案、强调色与状态色，进一步拉开灵田 / 工坊 / 总坊 / 传法院 / 庶务殿 / 休憩点的视觉差异。
-- 2026-03-09 十轮补强：
-  - 新增 `TownActivityAnchorVisualRules.cs` 统一维护 tile 类型配色，让左侧检视卡与中央沙盘高亮使用同一套强调色；
-  - `CountyTownMapViewSystem.Anchors.cs` 为选中 tile 增加双层 halo、描边与入口路径高亮，强化“选中地块”的中央反馈。
-- 2026-03-09 十一轮补强：
-  - `Main.tscn` 改为“案几 + 宣纸 + 左右画轴”的卷轴骨架，并用上下横线与左右界栏重组 Legacy 主界面视觉框架；
-  - `TopBar.tscn`、`BottomBar.tscn`、`JobsPanel.tscn`、`EventLogPanel.tscn`、`WorldPanel.tscn` 与 `Main.cs` 文案统一切到卷轴式墨书风格，进一步对齐参考图的书卷 UI。
-- 2026-03-09 十二轮补强：
-  - 按参考 HTML / 卷轴图继续收敛 Legacy 主界面布局，重点将卷面骨架、左右栏占比、顶部题头、底部控制台与地图控件排布进一步贴近一比一参考效果；
-  - 本轮只处理表现层与场景布局，不改 `GameLoop`、`GameState`、存档结构与小时结算；
-  - 保留 `TownMapSelectionSummary -> MainSectTileInspector` 数据通路，以及中央 tile 高亮与左栏状态 / 动作同步刷新链路。
-- 2026-03-09 十三轮补强：
-  - 清理左右卷栏残留黑底：左侧动作按钮、下方岗位卡与右侧日志正文统一改回宣纸底色与墨字配色；
-  - 为左栏摘要与右栏日志的 `RichTextLabel` 增加空样式覆盖，避免主题默认底色再次在卷面内出现黑块；
-  - 本轮仅修正表现层配色，不改 `TownMapSelectionSummary -> MainSectTileInspector` 联动链路，也不改小时结算、存档结构与玩法数据。
-- 2026-03-09 十四轮补强：
-  - 根据最新截图继续清理左栏残留深色块，补齐三个 tile 操作按钮的 `disabled` 样式与禁用文字颜色；
-  - 未选中 tile 时，按钮仍保持禁用逻辑，但视觉上统一为卷轴纸面淡墨态，不再回退到 Godot 默认黑底按钮；
-  - 本轮仍只处理表现层，不改玩法数据、tile 选中联动和存档结构。
-- 2026-03-09 十五轮补强：
-  - 从主界面左栏移除 `JobsPadding` 常驻区，左侧彻底收口为 `Tile Inspector + 批注` 结构，不再混放职司摘要、峰脉详批与协同峰令；
-  - `Main.cs` 不再在主界面绑定 `JobsPadding` 节点，避免场景残留节点继续参与刷新与事件注册；
-  - `SectOrganizationRules / SectPeakSupportRules / GameLoop.SetPeakSupport()` 等底层规则暂保留，后续再迁入独立治理面板或 `宗主中枢` 子页。
-- 2026-03-09 十六轮补强：
-  - `BottomBar.tscn` 新增底部 `【峰令】谱系` 快捷按钮，组织谱系与协同峰功能改由独立 `SectOrganizationPanel` 弹窗承载；
-  - `Main.cs` 在 `_Ready / OnStateChanged / _ExitTree` 中补齐该弹窗的创建、刷新与解绑，保持与仓储 / 中枢 / 弟子谱弹窗一致的生命周期；
-  - 主界面继续保持“tile 检视优先”，组织治理退为二级入口，但不删除峰脉规则与协同峰结算。
-- 2026-03-09 十七轮补强：
-  - `EventLogPanel.tscn` 右栏题头正式切到 `山门近闻 / 天衍峰札记` 语义，并补细金边与纸面札记感；
-  - 保持 `AlertItem1 / AlertItem2 / LogLabel` 现有节点路径不变，继续兼容 `MainSectChroniclePanel.cs` 与 `Main.cs` 的绑定；
-  - 本轮只改右栏表现层和示例文案，不改风闻生成与小时结算日志链路。
-- 2026-03-09 十八轮补强：
-  - `BottomBar.tscn` 与 `WorldPanel.tscn` 的底栏控制条、地图页签和缩放按钮补齐 `normal / hover / pressed` 三态，卷尾法令与卷中页签不再停留在“同一描边”状态；
-  - `JobsPanel.tscn` 与 `MainSectTileInspector.cs` 统一去除左侧动作按钮中的 emoji，改成 `扩建阵材圃 / 调度堂口法旨 / 查阅门人谱` 等墨线批令语义；
-  - `WorldPanel.tscn` 的备用报表卡、状态警示卡与新建卡底色统一回宣纸系，为后续恢复这些备用页签预留一致风格。
-- 2026-03-10 十九轮补强：
-  - `Main.tscn` 根背景改为 `CountyIdle/assets/ui/background/background_1.png`，统一主界面卷轴山水底图；
-  - 旧 `PaperSheet / LeftRoller / RightRoller / HeaderRule / FooterRule / LeftGuide / RightGuide` 装饰底稿默认停用，避免与新背景卷轴边框重复叠加；
-  - 本轮仅处理表现层，不改 `GameLoop`、`GameState`、地图页签、tile 检视联动与存档结构；新增 `FC-20260310-main-background-image.md`。
-- 2026-03-10 二十轮补强：
-  - `Main.cs` 为根背景节点补齐显式窗口缩放适配：监听主界面与 viewport 尺寸变化，实时重排背景 `TextureRect`；
-  - `background_1.png` 统一按 cover 方式铺满整个游戏窗口，窗口放大/缩小时始终保持全屏填充；
-  - 本轮仅强化表现层适配，不改 `GameLoop`、`GameState`、地图联动与存档结构。
-- 2026-03-10 二十一轮补强：
-  - `Main.cs` 将 `background_1.png` 改为先裁切卷轴中间画幅，再作为根背景源图使用，避免把卷轴木轴与外围留白一起拉进游戏背景；
-  - 裁切后的画幅继续按 cover 方式铺满整个游戏窗口，窗口变化时保持居中与全屏填充；
-  - 继续微调裁切框，使背景更贴近参考图中的内框长画幅构图；本轮仅调整表现层背景取样，不改 `GameLoop`、`GameState`、地图联动与存档结构。
-- 2026-03-10 二十二轮补强：
-  - 根背景资源正式切换为 `CountyIdle/assets/ui/background/background_2.png`；
-  - 由于 `background_2.png` 本身已经对齐目标画幅构图，`Main.cs` 取消额外裁切，直接整图作为背景源；
-  - 背景继续监听窗口与 viewport 尺寸变化，并以 cover 方式持续铺满整个游戏窗口；本轮不改 `GameLoop`、`GameState`、地图联动与存档结构。
-- 2026-03-10 二十三轮补强：
-  - 为 `Main.tscn` 根背景节点新增 `background_blur.gdshader`，对 `background_2.png` 应用高斯模糊；
-  - 模糊仅作用于背景 `TextureRect`，不影响前景 UI、地图交互与弹窗层级；
-  - 本轮仅处理表现层材质，不改 `GameLoop`、`GameState`、地图联动与存档结构。
-- 2026-03-10 二十四轮补强：
-  - 按最新表现要求，将根背景材质从高斯模糊改为 `background_frosted_glass.gdshader` 毛玻璃效果；
-  - 毛玻璃 shader 通过轻微散射采样、乳白 tint、对比度压低与细颗粒噪声，让背景保持卷轴气质但不过分抢前景；
-  - 效果仅作用于背景 `TextureRect`，不影响前景 UI、地图交互与弹窗层级；本轮不改 `GameLoop`、`GameState`、地图联动与存档结构。
-- 2026-03-10 二十五轮补强：
-  - 继续按参考图精简 Legacy 主界面可见信息密度：`TopBar / JobsPanel / EventLogPanel / BottomBar / WorldPanel / Main.tscn` 同步收口为“单行顶栏 + 左右卷栏 + 中央留白沙盘 + 底部双排控制台”；
-  - 删除多余可见控件：底栏隐藏 `重` 按钮与 `2x` 速度按钮，左栏去除竖排地志与过量说明块，右栏改为单主题记事卷，地图页内提示字样默认隐藏；
-  - 保持 `Main.cs` 与 `MainSectTileInspector.cs` 既有绑定路径不变，继续兼容 tile 检视联动、风闻摘要、地图调度与存档入口；本轮只改表现层，不改 `GameLoop`、`GameState` 与存档结构。
-- 2026-03-10 二十六轮补强（治宗册）：
-  - `TaskPanel.cs` 改为“左侧经脉导航 + 右侧卷宗滚动区”二级结构，将治理入口拆分为 `大政方针 / 节气法旨 / 门规戒律 / 庶务调度` 四类；
-  - 原“前令 / 后令”文本按钮全部替换为胶囊式 `◀ 当前态 ▶` 控件，并保留 `Development / Law / Talent / Quarter / RuleTree` 的原事件回调；
-  - 庶务调度页继续保留治务条目列表、详情与 `收敛 / 推进 / 鼎力推进 / 复归常制` 操作，不改 `GameLoop` 结算和存档结构。
-- 2026-03-10 二十七轮补强（弟子谱）：
-  - `DisciplePanel.cs` 拆为“左侧导航 + 右侧卷宗滚动区”，分组为 `峰内名录 / 人物档案 / 根基修为 / 印记批注`；
-  - 名录卷保留筛选、排序与名册树结构，其他卷按主题聚合当前弟子档案与修为信息；
-  - 仅改 UI 信息架构与排版，不改 `DiscipleRosterSystem`、结算链路与存档结构。
-- 2026-03-10 二十八轮补强（弟子谱全展开）：
-  - 弟子谱弹窗扩展为近全屏画幅，左侧名录与右侧档案三段同屏展示；
-  - 取消分页切换逻辑，改为同页完整呈现 `人物档案 / 根基修为 / 印记批注`；
-  - 保留筛选、名册树、数据联动与存档结构不变。
-- 2026-03-10 二十九轮补强（弟子谱宽屏仪表盘）：
-  - 右侧改为双列仪表盘：左列先天根基（雷达图 + 3x2 属性块），右列修为造化（修为/气海进度、战力签、印记）；
-  - 名录树改为“峰脉 + 弟子”两层，降低折叠深度；
-  - 仅改 UI 排版与组件尺寸，不改 `DiscipleRosterSystem` 与结算链路。
-- 2026-03-10 三十轮补强（库藏卷）：
-  - `WarehousePanel.tscn` 扩宽画幅，库存区独占画面，右侧建造/生产操作收起隐藏；
-  - 新增刻度感仓储容量条与朱红满载提示，数值强调为右侧大号；
-  - 物资条目 token 化、数量为 0 时灰态降噪，栅格改为 4~6 列自适应；
-  - 保持仓储操作事件与系统结算链路不变。
-- 2026-03-10 三十一轮补强（底部控制台选中态）：
-  - 底部快按入口选中态改为靛青底色，文字反白，提升焦点与识别度；
-  - 面板打开/关闭时按钮选中态同步变化；
-  - 悬停动效改为轻微放大并切换为靛青强调色，并附带轻微提示音；
-  - 保持玩法逻辑与存档结构不变。
-- 2026-03-11 三十二轮补强（机宜卷即时生效）：
-  - 音量与分辨率改为即时生效，批复仅负责收录；
-  - 设置项新增“即时生效/批复生效”分组提示；
-  - 下拉框点击展开时保持放大态，避免闪烁抖动，并对齐输入框；
-  - 下拉框弹出列表配色改为卷轴纸面风格；
-  - 保持玩法逻辑与存档结构不变。
-- 2026-03-11 三十三轮补强（沙盘清爽化）：
-  - `CountyTownMapViewSystem.cs` 降低 hex 描边透明度与线宽；
-  - 低缩放下隐藏道路/水域语义叠加，放大后再显示；
-  - 默认缩放上调，首屏更清爽；
-  - 新增 `FC-20260311-main-hex-sandbox-clarity.md`。
-- 2026-03-11 三十四轮补强（沙盘缩放与平移交互）：
-  - 天衍峰与世界/外域地图滚轮缩放改为以鼠标为中心；
-  - 支持 `WASD` 与 `↑↓←→` 平移沙盘，WASD/方向键逻辑反向；
-  - 键盘 `↑↓←→` 继续用于地图平移，但地图页签 / 调度按钮已补显式焦点邻接，手柄或方向焦点不会困在中央地图区；
-  - 点击“归中”后缩放与平移恢复初始状态；
-  - 点击“归中”后触发一次地图刷新；
-  - 新增 `FC-20260311-main-hex-sandbox-pan-zoom.md`。
+- 2026-03-09 至 2026-03-11 关键阶段结论：
+  - 布局阶段：主界面已收口为“中央沙盘 + 左侧检视 + 右侧纪事 + 底部控制台”，地图页签、缩放与核心弹窗入口统一下沉到底部控制台，中央沙盘成为第一视觉焦点；
+  - 检视阶段：左侧区域已稳定收口为 `Tile Inspector + 批注`，并补齐地块副标题、属性格、专属操作项、类型徽记、可执行项摘要与默认提示；选中反馈由 `TownActivityAnchorVisualRules` 与地图高亮共同统一；
+  - 纪事阶段：右侧日志区已改为“山门近闻 / 天衍峰札记”式微缩纪事窗，支持按当前经营状态生成高优先摘要，同时保持既有日志绑定路径不变；
+  - 卷轴风格阶段：`Main / TopBar / BottomBar / JobsPanel / EventLogPanel / WorldPanel` 已统一到卷轴式墨书风格，清理了残留黑底、禁用态黑块和不一致描边，并将底栏、页签、缩放按钮补齐状态样式；
+  - 入口治理阶段：主界面左侧已移除 `JobsPadding` 常驻区，组织谱系与协同峰改由独立 `SectOrganizationPanel` 承载；仓储 / 宗主中枢 / 弟子谱继续通过底部快捷入口打开；
+  - 背景与表现阶段：根背景已切换为 `background_2.png` 并按 cover 自适应窗口，最终使用 `background_frosted_glass.gdshader` 保持卷轴氛围但不过度抢前景；
+  - 关联面板阶段：治宗册、弟子谱、库房账册、机宜卷均已继续沿统一卷宗家族补强，其中治宗册收口为 `大政方针 / 节气法旨 / 门规戒律 / 庶务调度` 四类，弟子谱改为近全屏卷宗档案，库房账册强化容量条与 token 化库存，机宜卷补入即时生效提示；
+  - 交互阶段：沙盘已补入更清爽的低缩放显示策略、鼠标中心缩放、`WASD / ↑↓←→` 平移、归中复位与刷新联动；
+  - 关联归档已补入 `main-background-image`、`main-hex-sandbox-clarity`、`main-hex-sandbox-pan-zoom` 等 FC。
 
 ### 3.27 DL-047 功能包详情（天衍峰院域坊局与全格检视系统）
 
@@ -743,7 +627,7 @@
   - 点击世界格后，能够根据类型进入对应二级地图或对应二级地图检视界面；
   - 二级地图首批覆盖 `Sect / Wilderness / MortalRealm / CultivatorClan / ImmortalCity / Market / Ruin` 七类 `PrimaryType`，对应中文 `宗门 / 野外 / 凡俗国度 / 修仙世家 / 仙城 / 坊市 / 遗迹`；
   - 每类二级地图都要回答 `这里主要做什么 / 为什么值得来 / 可能付出什么代价 / 与宗门哪条飞轮相连`；
-  - 进入与退出规则不破坏现有 `1 秒 = 1 分钟` 与 `60 分钟小时结算` 节奏；
+  - 进入与退出规则不破坏双层时间制，即保持当前运行版细时间基线与“每 `60` 游戏分钟一次小时结算”的既有节奏；正式换算口径以 `docs/02_system_specs.md` 与运行配置为准；
   - 文档阶段先完成功能卡与系统规格草案，再决定是否做统一框架或按类型分批接入。
 - 文档一期结论：
   - `PrimaryType` 七类已经收口为 `Sect / Wilderness / MortalRealm / CultivatorClan / ImmortalCity / Market / Ruin`；
@@ -757,44 +641,15 @@
   - 已新增“参数草案”，将世界生成继续收口为接近数据表的结构，覆盖 `WorldRegionProfile / WorldPrimaryTypeSpawnRule / WorldSecondaryTagSpawnRule / WorldAdjacencyWeightRule / WorldRarityProfile / WorldUnlockRule / WorldCompanionSpawnRule`；
   - 已为大区块、主类型、子标签、邻接、稀有度、解锁与伴生生成提供第一版推荐权重区间与约束；
   - 后续若进入实现，可直接按本草案落 `JSON` 结构与 `C#` 模型，不必再从自然语言回译字段。
-- 代码骨架进度：
-  - `XianxiaWorldGenerationConfig` 已新增世界分区、主类型、子标签、邻接、稀有度、解锁与伴生生成七组规则列表；
-  - `XianxiaWorldGenerationRuleProfiles.cs` 已落地对应模型；
-  - `XianxiaWorldGenerationConfigSystem` 已补规则列表的归一化与克隆逻辑；
-  - `CountyIdle/data/xianxia_world_generation.json` 已写入首版示例配置；
-  - `dotnet build .\Finally.sln` 通过。
-- 运行时一期进度：
-  - `XianxiaSiteData` 已新增 `PrimaryType / SecondaryTag / RegionId / RarityTier / UnlockTier` 字段；
-  - `XianxiaWorldGeneratorSystem` 已开始为 `Sect / MortalRealm / Market / Ruin` 四类点位写入上述语义；
-  - 宗门周边已支持基于伴生规则追加 `SectMarket`；
-  - 当前仍未把 `CultivatorClan / ImmortalCity` 主类型正式刷入世界点位，也未接地图点击后的二级地图跳转；
-  - `dotnet build .\Finally.sln` 继续通过。
-- 运行时二期进度：
-  - `XianxiaWorldGeneratorSystem` 已新增 `CultivatorClan / ImmortalCity` 两类世界点位生成；
-  - 世界点位标签已扩展为 `祖庭本家 / 客卿别馆 / 灵田庄园 / 铸器世家 / 丹药世家 / 仙城 / 驿城 / 河港仙城 / 边陲仙城 / 王朝修士都城` 等二级语义；
-  - 世界图节点的 `kind / color / radius / label zoom` 已开始按 `PrimaryType` 区分，而不再只按旧 `Role` 粗分类；
-  - `Wilderness` 仍主要承担背景区块与地貌语义，尚未单独作为可见站点刷入世界图；
-  - 点击世界点位后的二级地图入口与模板跳转仍待后续实现；
-  - `dotnet build .\Finally.sln` 继续通过。
-- 运行时三期进度：
-  - `StrategicMapViewSystem` 已支持左键点选世界站点、右键清除选中，并在世界图上绘制选中高亮；
-  - `MainSectTileInspector` 已支持切换到世界点位检视模式，显示 `PrimaryType / SecondaryTag / RegionId / RarityTier / UnlockTier`；
-  - 左侧检视器动作区已新增“前往二级地图”占位入口，并按宗门 / 凡俗国度 / 坊市 / 世家 / 仙城 / 遗迹给出不同的筹备联动入口；
-  - 当前“前往二级地图”仍是占位动作，尚未真正切到下一级地图场景；
-  - `dotnet build .\Finally.sln` 继续通过。
-- 运行时四期进度：
-  - `WorldPanel.tscn` 已新增统一的 `SecondaryMapView` 二级地图占位页；
-  - `MainWorldSitePanel.cs` 已接入标题、类型、区块、稀有度、开放层级、描述与动作区刷新逻辑；
-  - 左侧检视器中的“前往二级地图”现已真正打开占位页，而不再只是日志提示；
-  - 二级地图占位页已按当前选中点位显示不同的筹备建议，并支持返回世界舆图；
-  - 当前仍为统一占位页，尚未分化为 `Sect / Market / Ruin / MortalRealm / CultivatorClan / ImmortalCity` 六类专属下级地图；
-  - `dotnet build .\Finally.sln` 继续通过。
-- 运行时五期进度：
-  - `SecondaryMapView` 已新增 `核心玩法 / 主要产出 / 主要风险` 三张类型卡；
-  - `MainWorldSitePanel.cs` 已按 `Sect / MortalRealm / Market / CultivatorClan / ImmortalCity / Ruin` 填充差异化模板说明；
-  - 二级地图占位页已开始体现“按类型分化”的信息架构，而不再是完全统一的说明页；
-  - 当前分化仍停留在信息模板层，尚未为各类型接入独立的交互控件、结算或场景逻辑；
-  - `dotnet build .\Finally.sln` 继续通过。
+- 运行时关键阶段结论：
+  - 骨架阶段：`XianxiaWorldGenerationConfig`、`XianxiaWorldGenerationRuleProfiles.cs`、`XianxiaWorldGenerationConfigSystem` 与 `CountyIdle/data/xianxia_world_generation.json` 已完成主类型、子标签、邻接、稀有度、解锁与伴生规则的配置骨架；
+  - 点位语义阶段：`XianxiaSiteData` 已补入 `PrimaryType / SecondaryTag / RegionId / RarityTier / UnlockTier` 字段，生成器已覆盖 `Sect / MortalRealm / Market / CultivatorClan / ImmortalCity / Ruin` 六类世界点位语义，并扩展对应二级标签；
+  - 世界图表现阶段：世界图节点的 `kind / color / radius / label zoom` 已开始按 `PrimaryType` 区分；`Wilderness` 当前仍主要承担背景区块与地貌语义，尚未单独作为可见站点刷入世界图；
+  - 检视与入口阶段：`StrategicMapViewSystem` 已支持点选世界站点并绘制高亮，`MainSectTileInspector` 已可切到世界点位检视模式，左侧动作区已接入“前往二级地图”入口；
+  - 二级地图占位阶段：`WorldPanel.tscn` 已新增统一的 `SecondaryMapView` 占位页，`MainWorldSitePanel.cs` 已接入标题、类型、区块、稀有度、开放层级、描述与动作区刷新逻辑，且支持从占位页返回世界舆图；
+  - 类型分化阶段：`SecondaryMapView` 已新增 `核心玩法 / 主要产出 / 主要风险` 三张类型卡，并按 `Sect / MortalRealm / Market / CultivatorClan / ImmortalCity / Ruin` 填充差异化模板说明；
+  - 当前边界：二级地图已完成“可点选 -> 可检视 -> 可进入类型化占位页”的最小闭环，但仍停留在信息模板层，尚未为各类型接入独立交互控件、结算或专属场景逻辑；
+  - 验证结论：上述阶段接入后，`dotnet build .\Finally.sln` 持续通过。
 - 讨论约束：
   - 二级地图类型要服务飞轮，不做纯景观地图；
   - `宗门 / 凡俗国度 / 修仙世家 / 仙城 / 坊市` 更偏经营、外交、供给与人脉；
@@ -824,21 +679,39 @@
   - 连接类资产统一按“六方向 bitmask + 样式集”设计，后续道路、河流、法阵与特殊裂隙可共用一套逻辑；
   - 破框遮挡只允许由山、塔、古树、城楼、奇观等高物件承担，基础地块不破框；
   - 已给出目录与命名规则，便于后续批量出图、挂 manifest 和接入 Godot。
-- 运行时一期进度：
-  - 新增 `FC-20260312-sect-map-layer1-layer2-godot-integration.md`；
-  - `CountyTownMapViewSystem` 现已优先读取 `Layer 1` atlas manifest，并使用现有六边形草地图集作为基础地块；
-  - `Road / Courtyard / Water` 现已在 `Layer 2` 叠加 decal 贴图，并继续保留逻辑连接线；
-  - `TownMapGeneratorSystem` 现已生成最小可用 `Ground / Road / Courtyard / Water` terrain 语义，供地图表现层与检视摘要复用；
-  - 正式国风量产素材、Layer 3 立体物件与 Layer 4 氛围层仍待后续接入。
+- 运行时关键阶段结论：
+  - 归档阶段：已新增 `FC-20260312-sect-map-layer1-layer2-godot-integration.md`，用于记录地图素材分层接入的运行时落地；
+  - 基础地块阶段：`CountyTownMapViewSystem` 已开始优先读取 `Layer 1` atlas manifest，并以现有六边形草地图集承接基础地块渲染；
+  - 连接层阶段：`Road / Courtyard / Water` 已在 `Layer 2` 接入 decal 贴图，同时保留逻辑连接线作为运行时兼容；
+  - 语义阶段：`TownMapGeneratorSystem` 已生成最小可用的 `Ground / Road / Courtyard / Water` terrain 语义，供地图表现层与检视摘要复用；
+  - 当前边界：正式国风量产素材、`Layer 3` 立体物件与 `Layer 4` 氛围层仍待后续接入。
 - 分阶段建议：
   - 一期：完成文档、目录与命名规范，准备首批基础地块和连接类资产；
   - 二期：接入 `Layer 1 / Layer 2`，先完成地块、道路、河流和法阵拼接；
   - 三期：接入 `Layer 3` 立体物件，验证 Y 排序、锚点与破框遮挡；
   - 四期：接入 `Layer 4` 氛围层，统一低缩放淡出和地图边界雾化表现。
 
-## 4) 执行与回写规则
+### 3.30 DL-050 功能包详情（三相治宗循环重设计）
 
-每完成一条开发项，必须同步更新：
+- 当前状态：设计立项中（先文档，后实现）。
+- 目标（玩家价值）：把当前“系统并列存在”的体验重构为“季度战略选择驱动全局”的宗门治理节奏，让玩家在 `10` 分钟内感知路线差异；同时通过双层时间制，让挂机阶段保留持续运转感，长期又具备修仙题材的岁月流逝感。
+- 飞轮环节：门人生息 -> 产业供养 -> 传承研修 -> 职司分化 -> 武装历练 -> 反哺宗门。
+- 依赖（前置系统）：`DL-006` 传承分支化、`DL-007` 职司转任、`DL-009` 真传实体化、`DL-011` 护山闭环、`DL-012` 灵根苗子深度化、`docs/01_game_design_guide.md`、`docs/02_system_specs.md`。
+- 完成标准（DoD）：
+  - 已在 `docs/01_game_design_guide.md` 完成重设计总纲（主目标、节奏分层、玩家决策语义）；
+  - 已在 `docs/02_system_specs.md` 明确战略相位系统的输入/输出、公式、边界与失败护栏；
+  - 已明确双层时间制的定义、正式时间口径与长线行为落点；
+  - 已补齐本轮 `feature-card` 与 `change-proposal`；
+  - 交付至少 `1` 条可直接执行的实现工单句，明确最小闭环范围；
+  - 明确存档兼容约束：不破坏小时结算基线与旧存档读取。
+- 分阶段建议：
+  - 一期（文档）：收口“季度立纲 -> 月度筹划 -> 小时结算”的规则、指标与观测点，并写清双层时间制的正式口径；
+  - 二期（实现）：在不破坏现有细时间与小时结算兼容性的前提下，评估是否将细时间口径正式收口为更明确的运行基线，并同步接入 `日 / 月 / 季` 推进层；正式裁定需先回写 `docs/02_system_specs.md`；
+  - 三期（扩展）：把职司转任、英雄实体与护山压力接到同一战略相位与长时间推进链。
+
+## 4. 执行与回写规则
+
+每完成一条开发项，必须同步回写：
 
 1. `docs/05_feature_inventory.md`（状态变更）
 2. `docs/02_system_specs.md`（新增或变更规则）
