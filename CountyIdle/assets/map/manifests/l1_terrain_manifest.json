@@ -1,14 +1,26 @@
 {
-  "tile_pixel_size": [568, 614],
-  "render_anchor": [284, 307],
+  "tile_pixel_size": [96, 96],
+  "render_anchor": [48, 62],
   "atlases": [
     {
       "atlas_name": "map_l1_atlas_a_plain_spirit_v01",
-      "source_image": "res://assets/ui/tilemap/tileset_lush_grassland_terrain.png"
+      "source_image": "res://assets/ui/tilemap/L1_tilemap_a.png",
+      "tile_pixel_size": [646, 742],
+      "render_anchor": [323, 371],
+      "draw_size": [96, 96],
+      "draw_anchor": [48, 62],
+      "margins": [38, 18],
+      "separation": [30, 15]
     },
     {
       "atlas_name": "map_l1_atlas_b_water_foothill_v01",
-      "source_image": "res://assets/map/terrain/map_l1_atlas_b_water_foothill_v01.png"
+      "source_image": "res://assets/ui/tilemap/L1_tilemap_b.png",
+      "tile_pixel_size": [640, 748],
+      "render_anchor": [320, 374],
+      "draw_size": [96, 96],
+      "draw_anchor": [48, 62],
+      "margins": [24, 10],
+      "separation": [48, 14]
     }
   ],
   "assets": [
@@ -17,112 +29,112 @@
       "atlas_name": "map_l1_atlas_a_plain_spirit_v01",
       "family": "plain",
       "variant": "v01",
-      "pixel_region": [60, 77, 568, 614]
+      "pixel_region": [38, 18, 646, 742]
     },
     {
       "asset_id": "map_l1_terrain_plain_v02",
       "atlas_name": "map_l1_atlas_a_plain_spirit_v01",
       "family": "plain",
       "variant": "v02",
-      "pixel_region": [748, 77, 568, 614]
+      "pixel_region": [714, 18, 646, 742]
     },
     {
       "asset_id": "map_l1_terrain_plain_v03",
       "atlas_name": "map_l1_atlas_a_plain_spirit_v01",
       "family": "plain",
       "variant": "v03",
-      "pixel_region": [1436, 77, 568, 614]
+      "pixel_region": [1390, 18, 646, 742]
     },
     {
       "asset_id": "map_l1_terrain_plain_v04",
       "atlas_name": "map_l1_atlas_a_plain_spirit_v01",
       "family": "plain",
       "variant": "v04",
-      "pixel_region": [2124, 77, 568, 614]
+      "pixel_region": [2066, 18, 646, 742]
     },
     {
       "asset_id": "map_l1_terrain_spirit_vein_v01",
       "atlas_name": "map_l1_atlas_a_plain_spirit_v01",
       "family": "spirit_vein",
       "variant": "v01",
-      "pixel_region": [60, 845, 568, 614]
+      "pixel_region": [38, 775, 646, 742]
     },
     {
       "asset_id": "map_l1_terrain_spirit_vein_v02",
       "atlas_name": "map_l1_atlas_a_plain_spirit_v01",
       "family": "spirit_vein",
       "variant": "v02",
-      "pixel_region": [748, 845, 568, 614]
+      "pixel_region": [714, 775, 646, 742]
     },
     {
       "asset_id": "map_l1_terrain_spirit_vein_v03",
       "atlas_name": "map_l1_atlas_a_plain_spirit_v01",
       "family": "spirit_vein",
       "variant": "v03",
-      "pixel_region": [1436, 845, 568, 614]
+      "pixel_region": [1390, 775, 646, 742]
     },
     {
       "asset_id": "map_l1_terrain_spirit_vein_v04",
       "atlas_name": "map_l1_atlas_a_plain_spirit_v01",
       "family": "spirit_vein",
       "variant": "v04",
-      "pixel_region": [2124, 845, 568, 614]
+      "pixel_region": [2066, 775, 646, 742]
     },
     {
       "asset_id": "map_l1_terrain_deep_water_v01",
       "atlas_name": "map_l1_atlas_b_water_foothill_v01",
       "family": "deep_water",
       "variant": "v01",
-      "pixel_region": [60, 77, 568, 614]
+      "pixel_region": [24, 10, 640, 748]
     },
     {
       "asset_id": "map_l1_terrain_deep_water_v02",
       "atlas_name": "map_l1_atlas_b_water_foothill_v01",
       "family": "deep_water",
       "variant": "v02",
-      "pixel_region": [748, 77, 568, 614]
+      "pixel_region": [712, 10, 640, 748]
     },
     {
       "asset_id": "map_l1_terrain_deep_water_v03",
       "atlas_name": "map_l1_atlas_b_water_foothill_v01",
       "family": "deep_water",
       "variant": "v03",
-      "pixel_region": [1436, 77, 568, 614]
+      "pixel_region": [1400, 10, 640, 748]
     },
     {
       "asset_id": "map_l1_terrain_shallow_water_v01",
       "atlas_name": "map_l1_atlas_b_water_foothill_v01",
       "family": "shallow_water",
       "variant": "v01",
-      "pixel_region": [2124, 77, 568, 614]
+      "pixel_region": [2088, 10, 640, 748]
     },
     {
       "asset_id": "map_l1_terrain_shallow_water_v02",
       "atlas_name": "map_l1_atlas_b_water_foothill_v01",
       "family": "shallow_water",
       "variant": "v02",
-      "pixel_region": [60, 845, 568, 614]
+      "pixel_region": [24, 772, 640, 748]
     },
     {
       "asset_id": "map_l1_terrain_foothill_v01",
       "atlas_name": "map_l1_atlas_b_water_foothill_v01",
       "family": "foothill",
       "variant": "v01",
-      "pixel_region": [748, 845, 568, 614]
+      "pixel_region": [712, 772, 640, 748]
     },
     {
       "asset_id": "map_l1_terrain_foothill_v02",
       "atlas_name": "map_l1_atlas_b_water_foothill_v01",
       "family": "foothill",
       "variant": "v02",
-      "pixel_region": [1436, 845, 568, 614]
+      "pixel_region": [1400, 772, 640, 748]
     },
     {
       "asset_id": "map_l1_terrain_foothill_v03",
       "atlas_name": "map_l1_atlas_b_water_foothill_v01",
       "family": "foothill",
       "variant": "v03",
-      "pixel_region": [2124, 845, 568, 614]
+      "pixel_region": [2088, 772, 640, 748]
     }
   ]
 }

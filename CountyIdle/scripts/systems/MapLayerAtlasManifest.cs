@@ -60,7 +60,13 @@ public sealed class MapLayerAtlasManifest
 
                     manifest.Atlases[atlasDto.AtlasName] = new MapLayerAtlasDefinition(
                         atlasDto.AtlasName,
-                        atlasDto.SourceImage);
+                        atlasDto.SourceImage,
+                        ParseVector2OrFallback(atlasDto.TilePixelSize, tilePixelSize),
+                        ParseVector2OrFallback(atlasDto.RenderAnchor, renderAnchor),
+                        ParseVector2OrFallback(atlasDto.DrawSize, tilePixelSize),
+                        ParseVector2OrFallback(atlasDto.DrawAnchor, renderAnchor),
+                        ParseVector2OrFallback(atlasDto.Margins, Vector2.Zero),
+                        ParseVector2OrFallback(atlasDto.Separation, Vector2.Zero));
                 }
             }
 
@@ -109,6 +115,12 @@ public sealed class MapLayerAtlasManifest
         return new Vector2(values[0], values[1]);
     }
 
+    private static Vector2 ParseVector2OrFallback(float[]? values, Vector2 fallback)
+    {
+        var parsed = ParseVector2(values);
+        return parsed == Vector2.Zero ? fallback : parsed;
+    }
+
     private sealed class MapLayerAtlasManifestDto
     {
         [JsonPropertyName("tile_pixel_size")]
@@ -131,6 +143,24 @@ public sealed class MapLayerAtlasManifest
 
         [JsonPropertyName("source_image")]
         public string? SourceImage { get; set; }
+
+        [JsonPropertyName("tile_pixel_size")]
+        public float[]? TilePixelSize { get; set; }
+
+        [JsonPropertyName("render_anchor")]
+        public float[]? RenderAnchor { get; set; }
+
+        [JsonPropertyName("draw_size")]
+        public float[]? DrawSize { get; set; }
+
+        [JsonPropertyName("draw_anchor")]
+        public float[]? DrawAnchor { get; set; }
+
+        [JsonPropertyName("margins")]
+        public float[]? Margins { get; set; }
+
+        [JsonPropertyName("separation")]
+        public float[]? Separation { get; set; }
     }
 
     private sealed class MapLayerAtlasAssetDto
@@ -152,7 +182,15 @@ public sealed class MapLayerAtlasManifest
     }
 }
 
-public sealed record MapLayerAtlasDefinition(string AtlasName, string SourceImage);
+public sealed record MapLayerAtlasDefinition(
+    string AtlasName,
+    string SourceImage,
+    Vector2 TilePixelSize,
+    Vector2 RenderAnchor,
+    Vector2 DrawSize,
+    Vector2 DrawAnchor,
+    Vector2 Margins,
+    Vector2 Separation);
 
 public sealed record MapLayerAtlasTileDefinition(
     string AssetId,

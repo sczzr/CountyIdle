@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "dgSpecHash": "EIFRH4FEI7U=",
+  "success": true,
+  "projectFilePath": "D:\\Files\\CountyIdle\\CountyIdle\\CountyIdle.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\shawn\\.nuget\\packages\\godot.sourcegenerators\\4.6.0\\godot.sourcegenerators.4.6.0.nupkg.sha512",
+    "C:\\Users\\shawn\\.nuget\\packages\\godotsharp\\4.6.0\\godotsharp.4.6.0.nupkg.sha512",
+    "C:\\Users\\shawn\\.nuget\\packages\\godotsharpeditor\\4.6.0\\godotsharpeditor.4.6.0.nupkg.sha512",
+    "C:\\Users\\shawn\\.nuget\\packages\\microsoft.data.sqlite\\8.0.11\\microsoft.data.sqlite.8.0.11.nupkg.sha512",
+    "C:\\Users\\shawn\\.nuget\\packages\\microsoft.data.sqlite.core\\8.0.11\\microsoft.data.sqlite.core.8.0.11.nupkg.sha512",
+    "C:\\Users\\shawn\\.nuget\\packages\\sqlitepclraw.bundle_e_sqlite3\\2.1.6\\sqlitepclraw.bundle_e_sqlite3.2.1.6.nupkg.sha512",
+    "C:\\Users\\shawn\\.nuget\\packages\\sqlitepclraw.core\\2.1.6\\sqlitepclraw.core.2.1.6.nupkg.sha512",
+    "C:\\Users\\shawn\\.nuget\\packages\\sqlitepclraw.lib.e_sqlite3\\2.1.6\\sqlitepclraw.lib.e_sqlite3.2.1.6.nupkg.sha512",
+    "C:\\Users\\shawn\\.nuget\\packages\\sqlitepclraw.provider.e_sqlite3\\2.1.6\\sqlitepclraw.provider.e_sqlite3.2.1.6.nupkg.sha512",
+    "C:\\Users\\shawn\\.nuget\\packages\\system.memory\\4.5.3\\system.memory.4.5.3.nupkg.sha512"
+  ],
+  "logs": []
+}

@@ -8,7 +8,7 @@
 > 经营对象：山门、门人、凡俗附庸、外域附庸据点、灵脉与资源链。  
 > `County / Town / Prefecture` 等命名仅保留在代码与历史归档中，作为兼容技术名使用。
 
-## 1) 先读这 8 份（核心文档）
+## 1) 先读这 9 份（核心文档）
 
 1. `09_xianxia_sect_setting.md`：宗门设定基线、术语表、文案门禁
 2. `01_game_design_guide.md`：游戏愿景、飞轮、设计边界
@@ -18,6 +18,7 @@
 6. `05_feature_inventory.md`：实现状态看板（已实现 / 部分实现 / TODO）
 7. `08_development_list.md`：顺序开发列表（继续完善时按条执行）
 8. `11_map_asset_production_spec.md`：地图素材生产规格（分层、命名、锚点、拼接与交付规范）
+9. `14_map_layer_rendering_implementation_plan.md`：地图 L1-L5 绘制实施方案（Godot 接法、绘制顺序、阶段实施）
 
 ## 2) 推荐阅读顺序
 

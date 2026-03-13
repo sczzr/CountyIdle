@@ -95,8 +95,8 @@
 | DL-045 | 主界面六边形沙盘重构 | DONE（本轮） | 反哺宗门 | 主界面改为“中央 hex 沙盘 + 左侧地块检视 + 右侧宗门纪事 + 底部控制台”布局；天衍峰场所选中会同步刷新地块检视卡；不改小时结算与存档结构；`dotnet build .\\Finally.sln` 通过 |
 | DL-046 | 交互 icon 规范文档 | DONE（本轮） | 反哺宗门 | 输出 UI 交互 icon 清单、命名规范、尺寸/状态与入口映射文档（`docs/10_ui_icon_guide.md`） |
 | DL-047 | 天衍峰院域坊局与全格检视系统 | IN_PROGRESS（代码二期：坊局数值骨架） | 产业涌现→科技涌现→人口繁衍→反哺宗门 | 天衍峰任意 hex 可点击检视；地块具备固定灵气池、坊位数、天然特征与分区；同地块支持多建筑坊局组合、共享灵气与协同/互扰规则；随机性来自地块 traits、节气、局部事件与驻守差异，而非纯硬摇点 |
-| DL-048 | 世界格二级地图分层与入口系统 | IN_PROGRESS（运行时七期：格子驱动沙盘） | 反哺宗门→产业涌现→武装探险 | 世界地图任意 hex 点选后都会先在左侧刷新该格详情；玩家通过进入按钮可打开 `SecondaryMapView`，并基于该格的 `Biome / Terrain / Water / Wonder / Structure / QiDensity / Corruption / MonsterThreat / Fertility` 生成一张与山门沙盘同形的下一层 hex 沙盘；已有站点继续沿用原生 `PrimaryType / SecondaryTag / RegionId / RarityTier / UnlockTier`，非站点格则回退生成格子级入口语义；`Wilderness` 已进入点击链路与占位页模板，后续继续细化专属模板与真实玩法 |
-| DL-049 | 地图素材生产规格与分层资产流水线 | IN_PROGRESS（运行时一期：Layer 1 / Layer 2 接入） | 反哺宗门→产业涌现→武装探险 | 已形成正式地图素材规格文档，明确 5 层分层、命名目录、尺寸锚点、连接类拼接、破框遮挡与首批交付包；当前宗门图已接入 `Layer 1` atlas manifest 与 `Layer 2` decal / connector 链路，后续可继续扩到正式国风地块、宗门图立体物件、世界图与二级地图 |
+| DL-048 | 世界格二级地图分层与入口系统 | IN_PROGRESS（运行时八期：局部检视闭环） | 反哺宗门→产业涌现→武装探险 | 世界地图任意 hex 点选后都会先在左侧刷新该格详情；玩家通过进入按钮可打开 `SecondaryMapView`，并基于该格的 `Biome / Terrain / Water / Wonder / Structure / QiDensity / Corruption / MonsterThreat / Fertility` 生成一张与山门沙盘同形的下一层 hex 沙盘；局部沙盘点选后会继续复用左侧检视器与缩放链路，未选中局部 hex 时则回退显示世界点位摘要；已有站点继续沿用原生 `PrimaryType / SecondaryTag / RegionId / RarityTier / UnlockTier`，非站点格则回退生成格子级入口语义；`Wilderness` 已进入点击链路与占位页模板，后续继续细化专属模板与真实玩法 |
+| DL-049 | 地图素材生产规格与分层资产流水线 | IN_PROGRESS（运行时四期：世界图底盘回收到 hex polygon 投影） | 反哺宗门→产业涌现→武装探险 | 已形成正式地图素材规格文档，并新增 L1-L5 绘制实施方案；当前宗门图已接入 `Layer 1` atlas manifest、`Layer 2` decal / connector 链路，并进一步补上 `Layer 3` 最小运行时闭环；世界图基础地块现继续复用 `L1_hex_tileset.tres`，但正式运行时底盘已回收到 hex polygon 投 atlas 区域的绘制方式，避免 `TileMapLayer` 方片排布产生白缝，后续可继续扩到正式国风地块、宗门图立体物件、世界图高层 overlay 与二级地图 |
 | DL-050 | 三相治宗循环重设计（季度战略相位 + 双层时间制） | TODO（文档重设计中） | 门人生息→产业供养→传承研修→职司分化→武装历练→反哺宗门 | 将玩法主循环收口为“季度立纲 -> 月度筹划 -> 小时结算”三相节奏，并补入“细时间运转 + 长时间岁月感”的双层时间制；完成 `docs/01` 重写、`docs/02` 可执行规格补充、`feature-card + change-proposal` 归档，并给出首批可实现工单 |
 
 ### 3.1 DL-019 功能包详情（宗门弟子可视移动）
@@ -624,7 +624,7 @@
 
 ### 3.28 DL-048 功能包详情（世界格二级地图分层与入口系统）
 
-- 当前状态：运行时七期完成，已打通“左侧详情 -> 进入按钮 -> 格子驱动局部地图”，待继续细化专属模板与真实玩法。
+- 当前状态：运行时八期完成，已打通“左侧详情 -> 进入按钮 -> 格子驱动局部地图 -> 局部 hex 检视回灌左侧”，待继续细化专属模板与真实玩法。
 - 目标（玩家价值）：让世界地图上的每个可交互 hex 不只是“看得到的地貌块”，而是能进一步进入一个具有明确身份和玩法节奏的二级地图，形成“世界择地 -> 局部经营 / 交涉 / 历练 -> 回流宗门”的空间层级体验。
 - 飞轮环节：反哺宗门 -> 产业涌现 -> 武装探险。
 - 依赖（前置系统）：`DL-026` 修仙 Hex 世界生成系统、`DL-027` 双地图布局、`DL-047` 天衍峰院域坊局与全格检视系统、后续英雄 / 探险 / 外域运营系统。
@@ -657,7 +657,8 @@
   - 全格入口阶段：`StrategicMapViewSystem` 现已支持“站点优先、地块回退”的 world hex 点击逻辑；若未命中已生成站点，则会基于当前地块的 `Biome / Terrain / Water / Wonder / Structure` 合成一份可进入的格子级二级地图入口，并直接进入 `SecondaryMapView`；
   - 野外模板阶段：`MainSectTileInspector` 与 `MainWorldSitePanel` 已补 `Wilderness` 分支，世界地图不再只有少数站点能进入二级页，普通野外格也能给出主玩法、产出、风险与筹备动作；
   - 沙盘生成阶段：点击世界格后会先刷新左侧检视器，玩家再通过“前往二级地图”按钮打开 `SecondaryMapView`；该页现已接入 `WorldSiteLocalMapGeneratorSystem`，并复用 `CountyTownMapViewSystem / SectMapViewSystem` 的同形 hex 沙盘视图，会按所选格的类型、地形、水体、奇观、建筑与威胁语义生成不同内容的下层沙盘；
-  - 当前边界：二级地图已完成“任意世界格可点选、可看详情、可按格语义生成同形态沙盘”的最小闭环，但仍停留在模板化入口层，尚未为各类型接入独立交互控件、结算或专属场景逻辑；
+  - 局部检视阶段：`SecondaryMapView` 内生成的局部沙盘现已把 `SelectionSummaryChanged` 回灌到左侧检视器；玩家在二级地图页点选局部 hex 时，会复用山门沙盘同族的检视面板与按钮节奏，清空局部选中后则自动回退到当前世界点位摘要；
+  - 当前边界：二级地图已完成“任意世界格可点选、可看详情、可按格语义生成同形态沙盘、可沿用同族检视习惯”的最小闭环，但仍停留在模板化入口层，尚未为各类型接入独立交互控件、结算或专属场景逻辑；
   - 验证结论：上述阶段接入后，`dotnet build .\Finally.sln` 持续通过。
 - 讨论约束：
   - 二级地图类型要服务飞轮，不做纯景观地图；
@@ -672,28 +673,37 @@
 
 ### 3.29 DL-049 功能包详情（地图素材生产规格与分层资产流水线）
 
-- 当前状态：文档一期完成，待进入素材制作与运行时接入。
+- 当前状态：运行时四期完成，世界图底盘已回收到 hex polygon 投 atlas 区域的正式主链，待继续补正式素材与 `Layer 4 / 5`。
 - 目标（玩家价值）：让天衍峰山门图与后续世界/二级地图拥有统一的卷轴修仙视觉语言、可扩展资产目录和稳定接入规范，避免地图长期停留在“可用但不成画”的纯底格阶段。
 - 飞轮环节：反哺宗门 -> 产业涌现 -> 武装探险。
 - 依赖（前置系统）：`DL-047` 天衍峰院域坊局与全格检视系统、`DL-048` 世界格二级地图分层与入口系统、`CountyTownMapViewSystem`、`TownMapGeneratorSystem`、后续世界图运行时渲染链路。
 - 完成标准（DoD）：
   - 已新增正式文档 `docs/11_map_asset_production_spec.md`；
-  - 文档明确 `Layer 0~4` 的职责边界，并规定 `Layer 1 / Layer 2` 必须 tile 化、`Layer 3 / Layer 4` 可半自由摆放；
+  - 文档明确 `Layer 0~4` 的职责边界，并规定 `Layer 1` 保持 tile 化、`Layer 2` 的道路 / 河流可独立摆放、`Layer 3 / Layer 4` 可半自由摆放；
   - 文档明确基础地块、道路 / 河流 / 法阵、立体物件与氛围层的首批资产包；
-  - 河流 / 道路 / 法阵已被收口为可程序消费的六方向连接逻辑；
+  - 河流 / 道路已收口为独立卷轴笔触资源，法阵等规则图案保留后续模块化扩展空间；
   - 已明确命名、目录、锚点、画布、破框遮挡与验收规则，可直接指导美术生产与后续 Godot 接入。
 - 文档一期结论：
   - 地图总基调收口为 `青绿山水 + 工笔重彩 + 羊皮古卷`；
   - 地图生产模型收口为“卷轴底图 + 六边格内地形 + 可拼接线路 + 可破框立体物件 + 顶层氛围”五层系统；
-  - 连接类资产统一按“六方向 bitmask + 样式集”设计，后续道路、河流、法阵与特殊裂隙可共用一套逻辑；
+  - 道路 / 河流改为独立卷轴笔触资源，优先服务地图整体引导与卷轴观感，而不是绑定单个 hex 连接片；
   - 破框遮挡只允许由山、塔、古树、城楼、奇观等高物件承担，基础地块不破框；
   - 已给出目录与命名规则，便于后续批量出图、挂 manifest 和接入 Godot。
+- 文档二期结论：
+  - 已新增 `docs/14_map_layer_rendering_implementation_plan.md`，把 `L1 ~ L5` 明确映射到当前项目的 Godot 绘制架构；
+  - 已明确 `L1` 在 UI 根层绘制，`L2` 基础地块层继续由 `CountyTownMapViewSystem._Draw()` 承接，但其纹理来源已改为直接读取 `L1_hex_tileset.tres`，`L3 ~ L5` 继续分阶段叠加；
+  - 已明确每层的数据来源、资源形式、绘制顺序、验收口径与禁区，可作为后续 `Layer 4 / Layer 5` 推进的直接执行文档。
 - 运行时关键阶段结论：
   - 归档阶段：已新增 `FC-20260312-sect-map-layer1-layer2-godot-integration.md`，用于记录地图素材分层接入的运行时落地；
-  - 基础地块阶段：`CountyTownMapViewSystem` 已开始优先读取 `Layer 1` atlas manifest，并以现有六边形草地图集承接基础地块渲染；
-  - 连接层阶段：`Road / Courtyard / Water` 已在 `Layer 2` 接入 decal 贴图，同时保留逻辑连接线作为运行时兼容；
+  - 基础地块阶段：`CountyTownMapViewSystem` 已先完成 `Layer 1` atlas manifest 过渡链路；
+  - tileset 运行时阶段：当前宗门图与局部沙盘的 L1 基础地块已改为直接加载 `L1_hex_tileset.tres`，并从 atlas source / texture region 中读取纹理，不再只是在运行时切 atlas 图片；
+  - 世界图底盘阶段：已新增 `FC-20260313-world-map-tilemaplayer-rendering.md`；`StrategicMapViewSystem` 当前继续复用 `L1_hex_tileset.tres` 的同一套地貌资源，但正式主链已回收到按 hex polygon 逐格投 atlas 区域的脚本绘制，避免先前 `WorldTerrainTileLayer` 方片排布经六边形裁切后留下连续白缝；`WorldTerrainTileLayer` 节点当前仅保留为后续实验/备用基础设施，同时继续保留现有 roads / rivers / cliffs / labels overlay 的脚本叠加口径；旧版蜂窝背景网格默认关闭；
+  - 几何收口阶段：基础地块继续沿用现有 hex polygon 几何完成无缝贴近绘制，同时默认关闭基础边沿描边，避免 tileset 方片口径与旧 hex 沙盘选取链路互相打架；
+  - 连接层一期：`Road / Courtyard / Water` 已在 `Layer 2` 接入 decal 贴图，同时保留逻辑连接线作为运行时兼容；
+  - 连接层二期：现有道路与水域仍保留过渡性的邻接贴图绘制，但文档主口径已切到“独立道路 / 独立河流”自由摆放方案；
   - 语义阶段：`TownMapGeneratorSystem` 已生成最小可用的 `Ground / Road / Courtyard / Water` terrain 语义，供地图表现层与检视摘要复用；
-  - 当前边界：正式国风量产素材、`Layer 3` 立体物件与 `Layer 4` 氛围层仍待后续接入。
+  - Layer 3 起步阶段：已新增 `FC-20260312-sect-map-layer3-minimal-runtime.md`；`TownMapGeneratorSystem` 现会为临路院域生成最小可用 `Building / ActivityAnchor`，`CountyTownMapViewSystem` 已把 `DrawStructures()` 接入主绘制链路并按 Y 值排序；
+  - 当前边界：世界图当前只切入了基础底盘层，正式国风量产素材、世界图专属高层 overlay 资产、独立山体/树木/塔类资产与 `Layer 4 / Layer 5` 氛围层仍待后续接入。
 - 分阶段建议：
   - 一期：完成文档、目录与命名规范，准备首批基础地块和连接类资产；
   - 二期：接入 `Layer 1 / Layer 2`，先完成地块、道路、河流和法阵拼接；

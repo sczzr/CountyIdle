@@ -22,7 +22,227 @@ public class TownMapGeneratorSystem
         }
 
         PopulateTerrain(map, safeSeed);
+        PopulateStructures(map, populationHint, housingHint, eliteHint, safeSeed);
         return map;
+    }
+
+    private static void PopulateStructures(TownMapData map, int populationHint, int housingHint, int eliteHint, int layoutSeed)
+    {
+        var usedLots = new HashSet<Vector2I>();
+        var anchorCounts = new Dictionary<TownActivityAnchorType, int>();
+
+        var anchorSeeds = new[]
+        {
+            (Type: TownActivityAnchorType.Farmstead, Content: TownCellContentKind.Production, Preferred: IndustryBuildingType.Agriculture, FloorBias: 1),
+            (Type: TownActivityAnchorType.Workshop, Content: TownCellContentKind.Production, Preferred: IndustryBuildingType.Workshop, FloorBias: 1),
+            (Type: TownActivityAnchorType.Market, Content: TownCellContentKind.Production, Preferred: IndustryBuildingType.Trade, FloorBias: 1),
+            (Type: TownActivityAnchorType.Academy, Content: TownCellContentKind.Service, Preferred: IndustryBuildingType.Research, FloorBias: eliteHint > 4 ? 2 : 1),
+            (Type: TownActivityAnchorType.Administration, Content: TownCellContentKind.Service, Preferred: IndustryBuildingType.Administration, FloorBias: 2),
+            (Type: TownActivityAnchorType.Leisure, Content: TownCellContentKind.Special, Preferred: (IndustryBuildingType?)null, FloorBias: 1)
+        };
+
+        foreach (var seed in anchorSeeds)
+        {
+            if (TryAddAnchorForSeed(map, usedLots, anchorCounts, seed.Type, seed.Content, seed.Preferred, seed.FloorBias, layoutSeed))
+            {
+                continue;
+            }
+
+            TryAddAnchorForSeed(map, usedLots, anchorCounts, seed.Type, seed.Content, null, seed.FloorBias, layoutSeed + 17);
+        }
+
+        var residenceBudget = Math.Clamp(Math.Max(housingHint, populationHint) / 70, 2, 5);
+        var residenceCandidates = GetCandidateCells(map, TownCellContentKind.Residence, null, layoutSeed + 101);
+        for (var index = 0; index < residenceCandidates.Count && residenceBudget > 0; index++)
+        {
+            var lotCell = residenceCandidates[index];
+            if (usedLots.Contains(lotCell))
+            {
+                continue;
+            }
+
+            var roadCell = FindNearestRoadCell(map, lotCell);
+            if (roadCell == null)
+            {
+                continue;
+            }
+
+            usedLots.Add(lotCell);
+            map.AddBuilding(new TownBuildingData(
+                lotCell,
+                ResolveFacingFromRoad(lotCell, roadCell.Value),
+                1,
+                (GetCellHash(lotCell, layoutSeed + 203) % 3) == 0));
+            residenceBudget--;
+        }
+    }
+
+    private static bool TryAddAnchorForSeed(
+        TownMapData map,
+        HashSet<Vector2I> usedLots,
+        Dictionary<TownActivityAnchorType, int> anchorCounts,
+        TownActivityAnchorType anchorType,
+        TownCellContentKind contentKind,
+        IndustryBuildingType? preferredBuildType,
+        int floorBias,
+        int layoutSeed)
+    {
+        var candidates = GetCandidateCells(map, contentKind, preferredBuildType, layoutSeed);
+        foreach (var lotCell in candidates)
+        {
+            if (usedLots.Contains(lotCell))
+            {
+                continue;
+            }
+
+            var roadCell = FindNearestRoadCell(map, lotCell);
+            if (roadCell == null)
+            {
+                continue;
+            }
+
+            usedLots.Add(lotCell);
+            var facing = ResolveFacingFromRoad(lotCell, roadCell.Value);
+            var visualVariant = GetCellHash(lotCell, layoutSeed + ((int)anchorType * 31)) % 3;
+            var count = anchorCounts.GetValueOrDefault(anchorType, 0) + 1;
+            anchorCounts[anchorType] = count;
+            var floors = Math.Max(1, floorBias + ((GetCellHash(lotCell, layoutSeed + 59) % 2 == 0 && floorBias > 1) ? 0 : 0));
+
+            map.AddActivityAnchor(new TownActivityAnchorData(
+                anchorType,
+                roadCell.Value,
+                lotCell,
+                facing,
+                floors,
+                visualVariant,
+                $"{SectMapSemanticRules.GetAnchorLabelPrefix(anchorType)}·{count}号"));
+
+            map.AddBuilding(new TownBuildingData(
+                lotCell,
+                facing,
+                floors,
+                anchorType is TownActivityAnchorType.Academy or TownActivityAnchorType.Administration));
+            return true;
+        }
+
+        return false;
+    }
+
+    private static List<Vector2I> GetCandidateCells(
+        TownMapData map,
+        TownCellContentKind contentKind,
+        IndustryBuildingType? preferredBuildType,
+        int layoutSeed)
+    {
+        var cells = new List<(Vector2I Cell, int Score)>();
+        foreach (var cell in map.EnumerateAllCells())
+        {
+            var compound = map.GetCellCompound(cell);
+            if (compound == null || compound.ContentKind != contentKind)
+            {
+                continue;
+            }
+
+            if (map.GetTerrain(cell.X, cell.Y) == TownTerrainType.Water)
+            {
+                continue;
+            }
+
+            if (preferredBuildType != null && compound.SuggestedBuildType != preferredBuildType)
+            {
+                continue;
+            }
+
+            var roadCell = FindNearestRoadCell(map, cell);
+            if (roadCell == null)
+            {
+                continue;
+            }
+
+            var hash = GetCellHash(cell, layoutSeed);
+            var score = 1000 - (Math.Abs(cell.X - (MapWidth / 2)) * 11) - (Math.Abs(cell.Y - (MapHeight / 2)) * 7) + (hash % 97);
+            if (map.GetTerrain(cell.X, cell.Y) == TownTerrainType.Courtyard)
+            {
+                score += 24;
+            }
+
+            if (compound.Stability >= 1.0f)
+            {
+                score += 12;
+            }
+
+            cells.Add((cell, score));
+        }
+
+        cells.Sort((left, right) => right.Score.CompareTo(left.Score));
+        var result = new List<Vector2I>(cells.Count);
+        foreach (var cell in cells)
+        {
+            result.Add(cell.Cell);
+        }
+
+        return result;
+    }
+
+    private static Vector2I? FindNearestRoadCell(TownMapData map, Vector2I lotCell)
+    {
+        Vector2I? bestRoadCell = null;
+        var bestDistance = int.MaxValue;
+
+        foreach (var neighbor in GetHexNeighbors(lotCell))
+        {
+            if (!map.IsInside(neighbor) || map.GetTerrain(neighbor.X, neighbor.Y) != TownTerrainType.Road)
+            {
+                continue;
+            }
+
+            var distance = Math.Abs(neighbor.X - lotCell.X) + Math.Abs(neighbor.Y - lotCell.Y);
+            if (distance < bestDistance)
+            {
+                bestDistance = distance;
+                bestRoadCell = neighbor;
+            }
+        }
+
+        return bestRoadCell;
+    }
+
+    private static IEnumerable<Vector2I> GetHexNeighbors(Vector2I cell)
+    {
+        var isOddRow = (cell.Y & 1) == 1;
+        if (isOddRow)
+        {
+            yield return cell + new Vector2I(0, -1);
+            yield return cell + new Vector2I(1, -1);
+            yield return cell + Vector2I.Right;
+            yield return cell + new Vector2I(1, 1);
+            yield return cell + new Vector2I(0, 1);
+            yield return cell + Vector2I.Left;
+            yield break;
+        }
+
+        yield return cell + new Vector2I(-1, -1);
+        yield return cell + new Vector2I(0, -1);
+        yield return cell + Vector2I.Right;
+        yield return cell + new Vector2I(0, 1);
+        yield return cell + new Vector2I(-1, 1);
+        yield return cell + Vector2I.Left;
+    }
+
+    private static TownFacing ResolveFacingFromRoad(Vector2I lotCell, Vector2I roadCell)
+    {
+        var delta = roadCell - lotCell;
+        if (delta.Y < 0)
+        {
+            return TownFacing.North;
+        }
+
+        if (delta.Y > 0)
+        {
+            return TownFacing.South;
+        }
+
+        return delta.X >= 0 ? TownFacing.East : TownFacing.West;
     }
 
     private static void PopulateTerrain(TownMapData map, int layoutSeed)

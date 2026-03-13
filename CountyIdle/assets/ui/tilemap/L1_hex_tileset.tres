@@ -1,0 +1,24 @@
+[gd_resource type="TileSet" format=3 uid="uid://d4cbccy7t2b2w"]
+
+[ext_resource type="Texture2D" uid="uid://bf6qswacsskuj" path="res://assets/ui/tilemap/L1_tilemap_c.png" id="3_75c0v"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_gw6sw"]
+texture = ExtResource("3_75c0v")
+margins = Vector2i(86, 122)
+separation = Vector2i(44, 48)
+texture_region_size = Vector2i(612, 622)
+0:1/0 = 0
+0:1/0/probability = 0.0
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+
+[resource]
+tile_shape = 3
+tile_size = Vector2i(568, 614)
+uv_clipping = true
+sources/0 = SubResource("TileSetAtlasSource_gw6sw")

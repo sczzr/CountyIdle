@@ -971,6 +971,7 @@ public partial class Main : Control
         }
         else if (mapTab == MapTab.WorldSite)
         {
+            ApplyWorldSiteInspectorSummary(_worldMapRenderer?.SelectedWorldSite);
             RefreshWorldSitePanel();
         }
         RefreshMapZoomUi();
@@ -1006,7 +1007,7 @@ public partial class Main : Control
         return _currentMapTab switch
         {
             MapTab.World => _worldMapView as IMapZoomView,
-            MapTab.WorldSite => null,
+            MapTab.WorldSite => _worldSiteSandboxMapView?.Visible == true ? _worldSiteSandboxMapView : null,
             MapTab.Sect => _countyTownMapView as IMapZoomView,
             _ => null
         };

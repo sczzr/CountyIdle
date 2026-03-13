@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="32" viewBox="0 0 128 32">
+  <defs>
+    <linearGradient id="roadBody" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#9d825c" stop-opacity="0.00"/>
+      <stop offset="12%" stop-color="#c2ab79" stop-opacity="0.88"/>
+      <stop offset="50%" stop-color="#efe1b5" stop-opacity="0.96"/>
+      <stop offset="88%" stop-color="#c2ab79" stop-opacity="0.88"/>
+      <stop offset="100%" stop-color="#9d825c" stop-opacity="0.00"/>
+    </linearGradient>
+  </defs>
+  <rect x="6" y="5" width="116" height="22" rx="11" fill="url(#roadBody)"/>
+  <path d="M18 11 C34 8 50 7 64 7 C78 7 94 8 110 11" fill="none" stroke="#7f6946" stroke-opacity="0.30" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M18 21 C34 24 50 25 64 25 C78 25 94 24 110 21" fill="none" stroke="#7f6946" stroke-opacity="0.22" stroke-width="1.8" stroke-linecap="round"/>
+</svg>

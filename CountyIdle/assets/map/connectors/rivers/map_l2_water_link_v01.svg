@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="34" viewBox="0 0 128 34">
+  <defs>
+    <linearGradient id="riverBody" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#77a8bf" stop-opacity="0.00"/>
+      <stop offset="12%" stop-color="#7fb6c9" stop-opacity="0.88"/>
+      <stop offset="50%" stop-color="#dff4fb" stop-opacity="0.96"/>
+      <stop offset="88%" stop-color="#7fb6c9" stop-opacity="0.88"/>
+      <stop offset="100%" stop-color="#77a8bf" stop-opacity="0.00"/>
+    </linearGradient>
+  </defs>
+  <rect x="5" y="4" width="118" height="26" rx="13" fill="url(#riverBody)"/>
+  <path d="M18 11 C32 15 46 9 64 13 C80 16 96 11 110 15" fill="none" stroke="#f3fbff" stroke-opacity="0.52" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M18 22 C32 18 48 24 64 20 C82 16 95 22 110 18" fill="none" stroke="#d8f0f8" stroke-opacity="0.30" stroke-width="1.6" stroke-linecap="round"/>
+</svg>

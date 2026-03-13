@@ -27,8 +27,35 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     private const int SettlementBucketSize = 6;
     private const float HexGridFillAlphaEven = 0.08f;
     private const float HexGridFillAlphaOdd = 0.12f;
-    private const string GeographyAtlasPath = "res://assets/ui/tilemap/tileset_geography.png";
-    private const string MountainsAtlasPath = "res://assets/ui/tilemap/tileset_mountains.png";
+    private const string Layer1TileSetPath = "res://assets/ui/tilemap/L1_hex_tileset.tres";
+    private const string WorldHexTileClipShaderPath = "res://assets/ui/tilemap/world_hex_tile_clip.gdshader";
+    private static readonly Vector2I[] WorldPlainTileCoords =
+    [
+        new Vector2I(0, 1),
+        new Vector2I(2, 1),
+        new Vector2I(3, 1)
+    ];
+    private static readonly Vector2I[] WorldSpiritTileCoords =
+    [
+        new Vector2I(1, 1),
+        new Vector2I(2, 0),
+        new Vector2I(2, 1)
+    ];
+    private static readonly Vector2I[] WorldWaterTileCoords =
+    [
+        new Vector2I(1, 0),
+        new Vector2I(3, 0)
+    ];
+    private static readonly Vector2I[] WorldRuggedTileCoords =
+    [
+        new Vector2I(0, 0),
+        new Vector2I(1, 1),
+        new Vector2I(3, 1)
+    ];
+    private static readonly Vector2I[] WorldSnowTileCoords =
+    [
+        new Vector2I(2, 0)
+    ];
     private static readonly Color MapBackdropColor = new(0.09f, 0.11f, 0.16f, 0.92f);
     private static readonly Color GridColor = new(0.16f, 0.20f, 0.28f, 0.55f);
     private static readonly Color DefaultOutlineColor = new(0.82f, 0.86f, 0.96f, 0.35f);
@@ -57,9 +84,14 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     private XianxiaWorldMapData? _xianxiaWorldMap;
     private Dictionary<(int Q, int R), XianxiaHexCellData> _xianxiaWorldCellLookup = [];
     private Dictionary<(int Q, int R), Vector2> _xianxiaWorldCenters = [];
+    private Dictionary<(int Q, int R), Vector2I> _xianxiaWorldTileCells = [];
     private float _xianxiaWorldHexRadius = 0.01f;
-    private HexAtlas5x4? _geographyAtlas;
-    private HexAtlas5x4? _mountainsAtlas;
+    private Vector2 _xianxiaWorldTileCenterLocal = Vector2.Zero;
+    private float _xianxiaWorldTileLayoutScale = 1f;
+    private TileSet? _worldLayer1TileSet;
+    private TileMapLayer? _worldTerrainTileLayer;
+    private ShaderMaterial? _worldTerrainClipMaterial;
+    private int _worldLayer1SourceId = -1;
     private Label? _titleLabel;
     private float _zoom = 1.0f;
     private float _targetZoom = 1.0f;
@@ -96,6 +128,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         ClipContents = true;
         _titleLabel = GetNodeOrNull<Label>("Label");
         LoadAtlases();
+        EnsureWorldTerrainLayerInfrastructure();
         if (_mode == StrategicMapMode.World)
         {
             try
@@ -111,6 +144,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
                 _xianxiaWorldCellLookup = [];
                 _xianxiaWorldCenters = [];
                 _xianxiaWorldHexRadius = 0.01f;
+                ClearWorldTerrainTileLayer();
             }
         }
         else
@@ -125,6 +159,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         ConfigureTitleLabel();
         _targetZoom = _zoom;
         UpdateTitle();
+        UpdateWorldTerrainLayerLayout();
         QueueRedraw();
     }
 
@@ -132,6 +167,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     {
         if (what == NotificationResized)
         {
+            UpdateWorldTerrainLayerLayout();
             QueueRedraw();
         }
     }
@@ -165,6 +201,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         if (needsUpdate)
         {
             UpdateTitle();
+            UpdateWorldTerrainLayerLayout();
             QueueRedraw();
         }
     }
@@ -221,7 +258,10 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         var mapRect = GetMapRect();
         DrawMapBackdrop(mapRect);
         var mapRectWithOffset = new Rect2(mapRect.Position + _panOffset, mapRect.Size);
-        DrawGrid(mapRectWithOffset, _mapDefinition.GridLines);
+        if (_mode != StrategicMapMode.World)
+        {
+            DrawGrid(mapRectWithOffset, _mapDefinition.GridLines);
+        }
 
         var center = mapRectWithOffset.GetCenter();
         var unit = GetUnitForZoom(mapRect, _zoom);
@@ -230,7 +270,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
             return;
         }
 
-        if (_mode == StrategicMapMode.World && _xianxiaWorldMap != null && _geographyAtlas != null)
+        if (_mode == StrategicMapMode.World && _xianxiaWorldMap != null)
         {
             DrawWorldTextureCells(center, unit);
         }
@@ -246,6 +286,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         if (_mode == StrategicMapMode.World && _xianxiaWorldMap != null)
         {
             DrawWorldEdgeOverlays(center, unit);
+            DrawWorldCellSelectionOverlay(center, unit);
         }
 
         DrawPolylines(center, unit, _mapDefinition.Outlines, _operationalStyle.OutlineColor, 1.2f);
@@ -267,6 +308,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         }
 
         UpdateTitle();
+        UpdateWorldTerrainLayerLayout();
         QueueRedraw();
     }
 
@@ -288,8 +330,6 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
 
     private void LoadAtlases()
     {
-        _geographyAtlas = HexAtlas5x4.TryLoad(GeographyAtlasPath);
-        _mountainsAtlas = HexAtlas5x4.TryLoad(MountainsAtlasPath);
     }
 
     public void SetZoom(float zoom)
@@ -317,6 +357,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
 
         _selectedWorldSite = null;
         WorldSiteSelectionChanged?.Invoke(null);
+        UpdateWorldTerrainLayerLayout();
         QueueRedraw();
     }
 
@@ -349,6 +390,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         _zoomVelocity = 0f;
         _zoom = clampedZoom;
         UpdateTitle();
+        UpdateWorldTerrainLayerLayout();
         QueueRedraw();
     }
 
@@ -430,6 +472,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
 
         _mapDefinition = _prefectureGenerator.Generate(safePopulation, safeHousing, safeThreat, safeSettlements);
         UpdateTitle();
+        UpdateWorldTerrainLayerLayout();
         QueueRedraw();
     }
 
@@ -575,7 +618,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
 
     private void DrawWorldTextureCells(Vector2 center, float unit)
     {
-        if (_xianxiaWorldMap == null || _xianxiaWorldCenters.Count == 0 || _geographyAtlas == null)
+        if (_xianxiaWorldMap == null || _xianxiaWorldCenters.Count == 0)
         {
             return;
         }
@@ -589,34 +632,47 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
                 continue;
             }
 
-            var atlas = ResolveWorldAtlas(cell);
-            if (atlas == null)
-            {
-                continue;
-            }
-
-            var row = atlas == _mountainsAtlas ? ResolveMountainRow(cell) : ResolveGeographyRow(cell);
-            var col = ResolveVariantColumn(cell, 137);
             var canvasCenter = ToCanvas(center, unit, normalizedCenter.X, normalizedCenter.Y);
             var hex = BuildHexPolygon(canvasCenter, hexRadius);
-            DrawAtlasHex(hex, atlas, row, col, tint);
-
-            if (IsSelectedWorldCell(cell))
+            if (!TryDrawWorldLayer1TileSetHex(hex, cell, tint))
             {
-                DrawFilledPolygon(hex, new Color(0.96f, 0.93f, 0.78f, 0.10f));
-                DrawPath(hex, new Color(0.97f, 0.92f, 0.68f, 0.92f), Math.Max(1.3f, hexRadius * 0.12f), true);
+                DrawFilledPolygon(hex, tint);
             }
         }
     }
 
-    private HexAtlas5x4? ResolveWorldAtlas(XianxiaHexCellData cell)
+    private bool TryDrawWorldLayer1TileSetHex(Vector2[] hex, XianxiaHexCellData cell, Color tint)
     {
-        if (IsMountainCell(cell))
+        if (_worldLayer1TileSet == null)
         {
-            return _mountainsAtlas ?? _geographyAtlas;
+            return false;
         }
 
-        return _geographyAtlas;
+        var variant = ResolveWorldLayer1TileVariant(cell);
+        if (variant.SourceId < 0 ||
+            _worldLayer1TileSet.GetSource(variant.SourceId) is not TileSetAtlasSource atlasSource ||
+            atlasSource.Texture == null)
+        {
+            return false;
+        }
+
+        var textureRegion = atlasSource.GetTileTextureRegion(variant.AtlasCoords);
+        if (textureRegion.Size == Vector2I.Zero)
+        {
+            return false;
+        }
+
+        for (var index = 0; index < _hexTintColors.Length; index++)
+        {
+            _hexTintColors[index] = tint;
+        }
+
+        DrawPolygon(
+            hex,
+            _hexTintColors,
+            CreateAtlasRegionUv(new Rect2(textureRegion.Position, textureRegion.Size), atlasSource.Texture),
+            atlasSource.Texture);
+        return true;
     }
 
     private static bool IsMountainCell(XianxiaHexCellData cell)
@@ -646,46 +702,6 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
             XianxiaBiomeType.SnowPeaks;
     }
 
-    private static int ResolveMountainRow(XianxiaHexCellData cell)
-    {
-        if (IsSnowTerrain(cell.Terrain) || cell.Biome == XianxiaBiomeType.SnowPeaks)
-        {
-            return 0;
-        }
-
-        if (cell.Biome == XianxiaBiomeType.MistyMountains)
-        {
-            return 1;
-        }
-
-        if (cell.Biome == XianxiaBiomeType.JadeHighlands || cell.Terrain == XianxiaTerrainType.MountainMoss)
-        {
-            return 2;
-        }
-
-        return 3;
-    }
-
-    private static int ResolveGeographyRow(XianxiaHexCellData cell)
-    {
-        if (cell.RiverMask != HexDirectionMask.None)
-        {
-            return 1;
-        }
-
-        if (cell.Water != XianxiaWaterType.None)
-        {
-            return 2;
-        }
-
-        if (IsSnowTerrain(cell.Terrain) || cell.Biome == XianxiaBiomeType.SnowPeaks)
-        {
-            return 3;
-        }
-
-        return 0;
-    }
-
     private static int ResolveVariantColumn(XianxiaHexCellData cell, int salt)
     {
         var hash = HashCell(cell.Coord.Q, cell.Coord.R, salt);
@@ -702,14 +718,20 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         }
     }
 
-    private void DrawAtlasHex(Vector2[] hex, HexAtlas5x4 atlas, int row, int col, Color tint)
+    private static Vector2[] CreateAtlasRegionUv(Rect2 region, Texture2D texture)
     {
-        for (var index = 0; index < _hexTintColors.Length; index++)
-        {
-            _hexTintColors[index] = tint;
-        }
+        var atlasWidth = texture.GetWidth();
+        var atlasHeight = texture.GetHeight();
 
-        DrawPolygon(hex, _hexTintColors, atlas.GetUv(col, row), atlas.Texture);
+        return
+        [
+            new Vector2((region.Position.X + (region.Size.X * 0.5f)) / atlasWidth, region.Position.Y / atlasHeight),
+            new Vector2((region.Position.X + region.Size.X) / atlasWidth, (region.Position.Y + (region.Size.Y * 0.25f)) / atlasHeight),
+            new Vector2((region.Position.X + region.Size.X) / atlasWidth, (region.Position.Y + (region.Size.Y * 0.75f)) / atlasHeight),
+            new Vector2((region.Position.X + (region.Size.X * 0.5f)) / atlasWidth, (region.Position.Y + region.Size.Y) / atlasHeight),
+            new Vector2(region.Position.X / atlasWidth, (region.Position.Y + (region.Size.Y * 0.75f)) / atlasHeight),
+            new Vector2(region.Position.X / atlasWidth, (region.Position.Y + (region.Size.Y * 0.25f)) / atlasHeight)
+        ];
     }
 
     private float ResolveNodeRadius(StrategicNodeDefinition node)
@@ -1232,7 +1254,11 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         _xianxiaWorldMap = worldMap;
         _xianxiaWorldCellLookup = [];
         _xianxiaWorldCenters = [];
+        _xianxiaWorldTileCells = [];
         _xianxiaWorldHexRadius = 0.01f;
+        _xianxiaWorldTileCenterLocal = Vector2.Zero;
+        _xianxiaWorldTileLayoutScale = 1f;
+        ClearWorldTerrainTileLayer();
 
         var rawCenters = new Dictionary<(int Q, int R), Vector2>(worldMap.Cells.Count);
         var minX = float.MaxValue;
@@ -1272,6 +1298,8 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         {
             _xianxiaWorldCenters[pair.Key] = (pair.Value - worldCenter) * scale;
         }
+
+        UpdateWorldTerrainLayerLayout();
     }
 
     private bool TrySelectWorldSite(Vector2 mousePosition)
@@ -1643,4 +1671,244 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     }
 
     private readonly record struct HexEdgeDefinition(HexDirectionMask Mask, int StartIndex, int EndIndex, int NeighborQ, int NeighborR);
+    private readonly record struct Layer1TileVariant(int SourceId, Vector2I AtlasCoords, int AlternativeTile);
+
+    private void EnsureWorldTerrainLayerInfrastructure()
+    {
+        _worldTerrainTileLayer = GetNodeOrNull<TileMapLayer>("WorldTerrainTileLayer");
+        if (_worldTerrainTileLayer == null)
+        {
+            return;
+        }
+
+        _worldTerrainTileLayer.ShowBehindParent = true;
+        _worldTerrainTileLayer.ZIndex = -10;
+        _worldTerrainTileLayer.Visible = false;
+        _worldTerrainTileLayer.Material = LoadWorldTerrainClipMaterial();
+
+        LoadWorldLayer1TileSet();
+    }
+
+    private void LoadWorldLayer1TileSet()
+    {
+        _worldLayer1TileSet = null;
+        _worldLayer1SourceId = -1;
+
+        if (!ResourceLoader.Exists(Layer1TileSetPath))
+        {
+            return;
+        }
+
+        var tileSet = ResourceLoader.Load<TileSet>(Layer1TileSetPath);
+        if (tileSet == null)
+        {
+            return;
+        }
+
+        _worldLayer1TileSet = tileSet;
+        _worldLayer1SourceId = tileSet.GetSourceCount() > 0 ? tileSet.GetSourceId(0) : -1;
+
+        if (_worldTerrainTileLayer != null)
+        {
+            _worldTerrainTileLayer.TileSet = tileSet;
+        }
+    }
+
+    private bool RebuildWorldTerrainTileLayer()
+    {
+        if (_xianxiaWorldMap == null || _worldTerrainTileLayer == null || _worldLayer1TileSet == null || _worldLayer1SourceId < 0)
+        {
+            ClearWorldTerrainTileLayer();
+            return false;
+        }
+
+        _worldTerrainTileLayer.TileSet = _worldLayer1TileSet;
+        _worldTerrainTileLayer.Clear();
+        _xianxiaWorldTileCells = [];
+
+        var tileSize = _worldLayer1TileSet.TileSize;
+        var halfWidth = Math.Max(tileSize.X * 0.5f, 1f);
+        var halfHeight = Math.Max(tileSize.Y * 0.5f, 1f);
+        var rawCenters = new Dictionary<(int Q, int R), Vector2>(_xianxiaWorldMap.Cells.Count);
+        var minX = float.MaxValue;
+        var minY = float.MaxValue;
+        var maxX = float.MinValue;
+        var maxY = float.MinValue;
+
+        foreach (var cell in _xianxiaWorldMap.Cells)
+        {
+            var key = (cell.Coord.Q, cell.Coord.R);
+            var tileCell = ToWorldTileCell(cell.Coord);
+            _xianxiaWorldTileCells[key] = tileCell;
+
+            var variant = ResolveWorldLayer1TileVariant(cell);
+            _worldTerrainTileLayer.SetCell(tileCell, variant.SourceId, variant.AtlasCoords, variant.AlternativeTile);
+
+            var rawCenter = _worldTerrainTileLayer.MapToLocal(tileCell);
+            rawCenters[key] = rawCenter;
+            minX = MathF.Min(minX, rawCenter.X - halfWidth);
+            maxX = MathF.Max(maxX, rawCenter.X + halfWidth);
+            minY = MathF.Min(minY, rawCenter.Y - halfHeight);
+            maxY = MathF.Max(maxY, rawCenter.Y + halfHeight);
+        }
+
+        if (rawCenters.Count == 0)
+        {
+            ClearWorldTerrainTileLayer();
+            return false;
+        }
+
+        var worldCenter = new Vector2((minX + maxX) * 0.5f, (minY + maxY) * 0.5f);
+        var spanX = Math.Max(maxX - minX, 0.01f);
+        var spanY = Math.Max(maxY - minY, 0.01f);
+        var scale = 1.82f / Math.Max(spanX, spanY);
+        _xianxiaWorldTileCenterLocal = worldCenter;
+        _xianxiaWorldTileLayoutScale = scale;
+        _xianxiaWorldHexRadius = Math.Max(halfHeight * scale, 0.01f);
+
+        foreach (var pair in rawCenters)
+        {
+            _xianxiaWorldCenters[pair.Key] = (pair.Value - worldCenter) * scale;
+        }
+
+        UpdateWorldTerrainLayerLayout();
+        return true;
+    }
+
+    private void ClearWorldTerrainTileLayer()
+    {
+        _xianxiaWorldTileCells = [];
+        _xianxiaWorldTileCenterLocal = Vector2.Zero;
+        _xianxiaWorldTileLayoutScale = 1f;
+
+        if (_worldTerrainTileLayer == null)
+        {
+            return;
+        }
+
+        _worldTerrainTileLayer.Clear();
+        _worldTerrainTileLayer.Visible = false;
+    }
+
+    private void UpdateWorldTerrainLayerLayout()
+    {
+        if (_worldTerrainTileLayer == null)
+        {
+            return;
+        }
+
+        if (!IsWorldTerrainTileLayerReady())
+        {
+            _worldTerrainTileLayer.Visible = false;
+            return;
+        }
+
+        var mapRect = GetMapRect();
+        var unit = GetUnitForZoom(mapRect, _zoom);
+        if (unit <= 0.01f)
+        {
+            _worldTerrainTileLayer.Visible = false;
+            return;
+        }
+
+        var center = (new Rect2(mapRect.Position + _panOffset, mapRect.Size)).GetCenter();
+        var scale = _xianxiaWorldTileLayoutScale * unit;
+        _worldTerrainTileLayer.Visible = true;
+        _worldTerrainTileLayer.Modulate = _operationalStyle.TerrainTint;
+        _worldTerrainTileLayer.Scale = Vector2.One * scale;
+        _worldTerrainTileLayer.Position = center - (_xianxiaWorldTileCenterLocal * scale);
+    }
+
+    private bool IsWorldTerrainTileLayerReady()
+    {
+        return _mode == StrategicMapMode.World &&
+               _worldTerrainTileLayer != null &&
+               _worldLayer1TileSet != null &&
+               _xianxiaWorldMap != null &&
+               _xianxiaWorldTileCells.Count > 0;
+    }
+
+    private ShaderMaterial? LoadWorldTerrainClipMaterial()
+    {
+        if (_worldTerrainClipMaterial != null)
+        {
+            return _worldTerrainClipMaterial;
+        }
+
+        if (!ResourceLoader.Exists(WorldHexTileClipShaderPath))
+        {
+            return null;
+        }
+
+        var shader = ResourceLoader.Load<Shader>(WorldHexTileClipShaderPath);
+        if (shader == null)
+        {
+            return null;
+        }
+
+        _worldTerrainClipMaterial = new ShaderMaterial
+        {
+            Shader = shader
+        };
+        return _worldTerrainClipMaterial;
+    }
+
+    private void DrawWorldCellSelectionOverlay(Vector2 center, float unit)
+    {
+        if (_selectedWorldSite == null ||
+            !_xianxiaWorldCenters.TryGetValue((_selectedWorldSite.Coord.Q, _selectedWorldSite.Coord.R), out var normalizedCenter))
+        {
+            return;
+        }
+
+        var hexRadius = Math.Max(_xianxiaWorldHexRadius * unit, 2f);
+        var canvasCenter = ToCanvas(center, unit, normalizedCenter.X, normalizedCenter.Y);
+        var hex = BuildHexPolygon(canvasCenter, hexRadius);
+        DrawFilledPolygon(hex, new Color(0.96f, 0.93f, 0.78f, 0.10f));
+        DrawPath(hex, new Color(0.97f, 0.92f, 0.68f, 0.92f), Math.Max(1.3f, hexRadius * 0.12f), true);
+    }
+
+    private Layer1TileVariant ResolveWorldLayer1TileVariant(XianxiaHexCellData cell)
+    {
+        var coords = ResolveWorldTileCoords(cell);
+        var variantIndex = ResolveVariantColumn(cell, 521) % coords.Length;
+        return new Layer1TileVariant(_worldLayer1SourceId, coords[variantIndex], 0);
+    }
+
+    private static Vector2I[] ResolveWorldTileCoords(XianxiaHexCellData cell)
+    {
+        if (cell.Water != XianxiaWaterType.None)
+        {
+            return WorldWaterTileCoords;
+        }
+
+        if (IsSnowTerrain(cell.Terrain) || cell.Biome == XianxiaBiomeType.SnowPeaks)
+        {
+            return WorldSnowTileCoords;
+        }
+
+        if (IsMountainCell(cell) ||
+            cell.CliffMask != HexDirectionMask.None ||
+            cell.Biome is XianxiaBiomeType.DesertBadlands or XianxiaBiomeType.VolcanicWastes or XianxiaBiomeType.AncientRuinsLand ||
+            cell.Corruption > 0.58f)
+        {
+            return WorldRuggedTileCoords;
+        }
+
+        if (cell.QiDensity > 0.66f ||
+            cell.Biome is XianxiaBiomeType.BambooValley or XianxiaBiomeType.SacredForest or XianxiaBiomeType.JadeHighlands or XianxiaBiomeType.CrystalFields or XianxiaBiomeType.FloatingIsles ||
+            cell.Terrain is XianxiaTerrainType.SpiritSoil or XianxiaTerrainType.CrystalGround or XianxiaTerrainType.CloudGround)
+        {
+            return WorldSpiritTileCoords;
+        }
+
+        return WorldPlainTileCoords;
+    }
+
+    private static Vector2I ToWorldTileCell(HexAxialCoordData coord)
+    {
+        var row = coord.R;
+        var column = coord.Q + (row >> 1);
+        return new Vector2I(column, row);
+    }
 }

@@ -41,6 +41,12 @@ public partial class Main
         _worldSitePanelActionButton = GetNodeOrNull<Button>($"{CenterMapPagesPath}/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/ActionRow/ActionButton");
         EnsureWorldSiteSandboxMapView();
 
+        if (_worldSiteSandboxMapView != null)
+        {
+            _worldSiteSandboxMapView.SelectionSummaryChanged -= OnWorldSiteSandboxSelectionSummaryChanged;
+            _worldSiteSandboxMapView.SelectionSummaryChanged += OnWorldSiteSandboxSelectionSummaryChanged;
+        }
+
         if (_worldSitePanelBackButton != null)
         {
             _worldSitePanelBackButton.Pressed += OnWorldSitePanelBackPressed;
@@ -64,6 +70,11 @@ public partial class Main
         if (_worldSitePanelActionButton != null)
         {
             _worldSitePanelActionButton.Pressed -= OnWorldSitePanelActionPressed;
+        }
+
+        if (_worldSiteSandboxMapView != null)
+        {
+            _worldSiteSandboxMapView.SelectionSummaryChanged -= OnWorldSiteSandboxSelectionSummaryChanged;
         }
 
         _worldSitePanelRootVBox = null;
@@ -157,6 +168,22 @@ public partial class Main
                 $"左键点选局部 hex 检视当前二级地图地块。当前依据 {site.PrimaryType} / {site.SecondaryTag} 生成。");
         }
         ApplyWorldSitePanelTone(site.PrimaryType);
+    }
+
+    private void OnWorldSiteSandboxSelectionSummaryChanged(TownMapSelectionSummary summary)
+    {
+        if (_currentMapTab != MapTab.WorldSite)
+        {
+            return;
+        }
+
+        if (summary.HasSelection)
+        {
+            ApplySectTileInspectorSummary(summary);
+            return;
+        }
+
+        ApplyWorldSiteInspectorSummary(_worldMapRenderer?.SelectedWorldSite);
     }
 
     private void EnsureWorldSiteSandboxMapView()
