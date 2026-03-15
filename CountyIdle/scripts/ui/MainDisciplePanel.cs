@@ -19,6 +19,7 @@ public partial class Main
         }
 
         _disciplePanel = panelScene.Instantiate<DisciplePanel>();
+        _disciplePanel.DirectiveRequested += OnDiscipleDirectiveRequested;
         _disciplePanel.Opened += OnDisciplePanelOpened;
         _disciplePanel.Closed += OnDisciplePanelClosed;
         AddChild(_disciplePanel);
@@ -63,6 +64,11 @@ public partial class Main
         _disciplePanel?.RefreshState(state);
     }
 
+    private void OnDiscipleDirectiveRequested(int discipleId, DiscipleDirectiveType directiveType)
+    {
+        _gameLoop.SetDiscipleDirective(discipleId, directiveType);
+    }
+
     private void OnDisciplePanelOpened()
     {
         SetDiscipleQuickButtonState(true);
@@ -91,6 +97,7 @@ public partial class Main
             return;
         }
 
+        _disciplePanel.DirectiveRequested -= OnDiscipleDirectiveRequested;
         _disciplePanel.Opened -= OnDisciplePanelOpened;
         _disciplePanel.Closed -= OnDisciplePanelClosed;
     }

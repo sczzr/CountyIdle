@@ -7,16 +7,39 @@ namespace CountyIdle.Systems;
 
 public sealed class WorldSiteLocalMapGeneratorSystem
 {
+    private static readonly HexDirectionMask[] MaskIterationOrder =
+    [
+        HexDirectionMask.East,
+        HexDirectionMask.NorthEast,
+        HexDirectionMask.NorthWest,
+        HexDirectionMask.West,
+        HexDirectionMask.SouthWest,
+        HexDirectionMask.SouthEast
+    ];
+
+    private static readonly HexDirectionMask[] EntryPreferenceOrder =
+    [
+        HexDirectionMask.West,
+        HexDirectionMask.NorthWest,
+        HexDirectionMask.SouthWest,
+        HexDirectionMask.East,
+        HexDirectionMask.NorthEast,
+        HexDirectionMask.SouthEast
+    ];
+
     public TownMapData GenerateSandboxMap(XianxiaSiteData site, XianxiaHexCellData? sourceCell)
     {
         var localMap = Generate(site, sourceCell);
         var townMap = new TownMapData(localMap.Width, localMap.Height);
         var coreCell = new Vector2I(localMap.Width / 2, localMap.Height / 2);
-        var entryCell = new Vector2I(0, localMap.Height / 2);
+        var entryDirection = ResolvePrimaryEntryDirection(site, sourceCell);
+        var entryCell = ResolveBoundaryCell(entryDirection, localMap.Width, localMap.Height, coreCell);
+        var entryFacing = ResolveFacingTowardCore(entryDirection);
 
         foreach (var tile in localMap.Tiles)
         {
             townMap.SetTerrain(tile.Cell.X, tile.Cell.Y, ResolveTownTerrain(tile.TileType));
+            townMap.SetTerrainVisualFamily(tile.Cell.X, tile.Cell.Y, ResolveTerrainVisualFamily(sourceCell, tile.TileType));
             townMap.SetCellCompound(CreateCompound(site, sourceCell, tile, coreCell));
         }
 
@@ -26,7 +49,7 @@ public sealed class WorldSiteLocalMapGeneratorSystem
                 ResolveAnchorType(site.PrimaryType),
                 entryCell,
                 coreCell,
-                TownFacing.East,
+                entryFacing,
                 site.PrimaryType is "Sect" or "ImmortalCity" ? 2 : 1,
                 0,
                 ResolveAnchorLabel(site)));
@@ -62,8 +85,10 @@ public sealed class WorldSiteLocalMapGeneratorSystem
             }
         }
 
+        PaintDirectionalWaterFeatures(site, sourceCell, tiles, coreCell, width, height, random);
+        PaintDirectionalRidges(site, sourceCell, tiles, coreCell, width, height, random);
         PaintCoreArea(site, sourceCell, tiles, coreCell);
-        PaintApproachPath(site, sourceCell, tiles, coreCell, random);
+        PaintApproachPath(site, sourceCell, tiles, coreCell, width, height, random);
         PaintRegionalFeatures(site, sourceCell, tiles, coreCell, random);
 
         var tileList = new WorldSiteLocalTileData[tiles.Count];
@@ -117,25 +142,31 @@ public sealed class WorldSiteLocalMapGeneratorSystem
         Random random)
     {
         var distance = GetDistance(cell, coreCell);
-
-        if (sourceCell?.Water != XianxiaWaterType.None && (cell.X <= 1 || (cell.Y >= coreCell.Y + 2 && cell.X >= coreCell.X + 2)))
-        {
-            return WorldSiteLocalTileType.Water;
-        }
-
-        if (sourceCell != null &&
-            (sourceCell.Biome is XianxiaBiomeType.MistyMountains or XianxiaBiomeType.JadeHighlands or XianxiaBiomeType.SnowPeaks ||
-             sourceCell.Height >= 72) &&
-            (cell.Y <= 1 || (cell.X >= coreCell.X + 2 && cell.Y <= coreCell.Y)))
-        {
-            return WorldSiteLocalTileType.Ridge;
-        }
+        var inheritedVisualFamily = WorldTerrainVisualRules.ResolveWorldVisualFamily(sourceCell);
 
         if (sourceCell != null &&
             sourceCell.Biome is XianxiaBiomeType.BambooValley or XianxiaBiomeType.SacredForest or XianxiaBiomeType.SpiritSwamps &&
             random.NextDouble() < 0.28d)
         {
             return WorldSiteLocalTileType.Forest;
+        }
+
+        if (sourceCell != null &&
+            inheritedVisualFamily == TownTerrainVisualFamily.Spirit &&
+            distance <= 2.8f &&
+            random.NextDouble() < 0.18d)
+        {
+            return WorldSiteLocalTileType.Spirit;
+        }
+
+        if (sourceCell != null &&
+            inheritedVisualFamily == TownTerrainVisualFamily.Rugged &&
+            distance > 2.7f &&
+            random.NextDouble() < 0.08d)
+        {
+            return site.PrimaryType == "Ruin"
+                ? WorldSiteLocalTileType.Hazard
+                : WorldSiteLocalTileType.Ridge;
         }
 
         if (site.PrimaryType == "Wilderness" && distance > 2.6f && random.NextDouble() < 0.12d)
@@ -179,6 +210,8 @@ public sealed class WorldSiteLocalMapGeneratorSystem
         XianxiaHexCellData? sourceCell,
         Dictionary<Vector2I, WorldSiteLocalTileType> tiles,
         Vector2I coreCell,
+        int width,
+        int height,
         Random random)
     {
         var shouldPaintPath =
@@ -191,18 +224,113 @@ public sealed class WorldSiteLocalMapGeneratorSystem
             return;
         }
 
-        var entryY = Math.Clamp(coreCell.Y + random.Next(-1, 2), 1, coreCell.Y + 1);
-        for (var x = 0; x <= coreCell.X; x++)
+        var approachDirections = ExtractDirections(sourceCell?.RoadMask ?? HexDirectionMask.None);
+        if (approachDirections.Count == 0)
         {
-            var cell = new Vector2I(x, entryY);
-            if (!tiles.TryGetValue(cell, out var current) || current == WorldSiteLocalTileType.Water)
+            approachDirections.Add(ResolvePrimaryEntryDirection(site, sourceCell));
+        }
+
+        foreach (var direction in approachDirections)
+        {
+            var boundaryCell = ResolveBoundaryCell(direction, width, height, coreCell);
+            var pathTarget = ResolvePathTarget(direction, width, height, coreCell, random);
+            PaintFeatureLine(tiles, boundaryCell, pathTarget, WorldSiteLocalTileType.Path, 0, CanOverrideWithPath);
+        }
+    }
+
+    private static void PaintDirectionalWaterFeatures(
+        XianxiaSiteData site,
+        XianxiaHexCellData? sourceCell,
+        Dictionary<Vector2I, WorldSiteLocalTileType> tiles,
+        Vector2I coreCell,
+        int width,
+        int height,
+        Random random)
+    {
+        if (sourceCell == null || (sourceCell.Water == XianxiaWaterType.None && sourceCell.RiverMask == HexDirectionMask.None))
+        {
+            return;
+        }
+
+        var waterDirections = ExtractDirections(sourceCell.RiverMask);
+        if (waterDirections.Count == 0)
+        {
+            waterDirections.Add(ResolveStableFallbackDirection(sourceCell, 41));
+        }
+
+        var basinCenters = new List<Vector2I>();
+        foreach (var direction in waterDirections)
+        {
+            var boundaryCell = ResolveBoundaryCell(direction, width, height, coreCell);
+            var waterFocus = ResolveWaterFocus(direction, width, height, coreCell, random);
+            PaintFeatureLine(tiles, boundaryCell, waterFocus, WorldSiteLocalTileType.Water, sourceCell.Water != XianxiaWaterType.None ? 1 : 0);
+            basinCenters.Add(waterFocus);
+        }
+
+        if (sourceCell.Water != XianxiaWaterType.None)
+        {
+            foreach (var basin in basinCenters)
             {
-                continue;
+                PaintFeatureBlob(tiles, basin, 1, WorldSiteLocalTileType.Water);
             }
 
-            tiles[cell] = current is WorldSiteLocalTileType.Settlement or WorldSiteLocalTileType.Spirit
-                ? current
-                : WorldSiteLocalTileType.Path;
+            if (basinCenters.Count >= 2)
+            {
+                var averageX = 0f;
+                var averageY = 0f;
+                foreach (var basin in basinCenters)
+                {
+                    averageX += basin.X;
+                    averageY += basin.Y;
+                }
+
+                var pooledCenter = new Vector2I(
+                    Mathf.RoundToInt(averageX / basinCenters.Count),
+                    Mathf.RoundToInt(averageY / basinCenters.Count));
+                PaintFeatureBlob(tiles, pooledCenter, site.PrimaryType == "Wilderness" ? 2 : 1, WorldSiteLocalTileType.Water);
+            }
+        }
+    }
+
+    private static void PaintDirectionalRidges(
+        XianxiaSiteData site,
+        XianxiaHexCellData? sourceCell,
+        Dictionary<Vector2I, WorldSiteLocalTileType> tiles,
+        Vector2I coreCell,
+        int width,
+        int height,
+        Random random)
+    {
+        if (sourceCell == null)
+        {
+            return;
+        }
+
+        var shouldPaintRidges =
+            sourceCell.CliffMask != HexDirectionMask.None ||
+            sourceCell.Biome is XianxiaBiomeType.MistyMountains or XianxiaBiomeType.JadeHighlands or XianxiaBiomeType.SnowPeaks ||
+            sourceCell.Height >= 72 ||
+            WorldTerrainVisualRules.ResolveWorldVisualFamily(sourceCell) is TownTerrainVisualFamily.Rugged or TownTerrainVisualFamily.Snow;
+        if (!shouldPaintRidges)
+        {
+            return;
+        }
+
+        var ridgeDirections = ExtractDirections(sourceCell.CliffMask);
+        if (ridgeDirections.Count == 0)
+        {
+            ridgeDirections.Add(ResolveStableFallbackDirection(sourceCell, 67));
+        }
+
+        var ridgeTileType = site.PrimaryType == "Ruin" && (sourceCell.Corruption > 0.58f || sourceCell.MonsterThreat > 0.56f)
+            ? WorldSiteLocalTileType.Hazard
+            : WorldSiteLocalTileType.Ridge;
+        foreach (var direction in ridgeDirections)
+        {
+            var boundaryCell = ResolveBoundaryCell(direction, width, height, coreCell);
+            var ridgeFocus = ResolveRidgeFocus(direction, width, height, coreCell, random);
+            PaintFeatureLine(tiles, boundaryCell, ridgeFocus, ridgeTileType, 1);
+            PaintFeatureBlob(tiles, ridgeFocus, 1, ridgeTileType);
         }
     }
 
@@ -213,6 +341,7 @@ public sealed class WorldSiteLocalMapGeneratorSystem
         Vector2I coreCell,
         Random random)
     {
+        var inheritedVisualFamily = WorldTerrainVisualRules.ResolveWorldVisualFamily(sourceCell);
         foreach (var pair in tiles)
         {
             if (pair.Value != WorldSiteLocalTileType.Ground)
@@ -223,6 +352,24 @@ public sealed class WorldSiteLocalMapGeneratorSystem
             if (site.PrimaryType == "Ruin" && (sourceCell?.Corruption > 0.56f || sourceCell?.MonsterThreat > 0.56f) && random.NextDouble() < 0.22d)
             {
                 tiles[pair.Key] = WorldSiteLocalTileType.Hazard;
+                continue;
+            }
+
+            if (sourceCell != null &&
+                inheritedVisualFamily == TownTerrainVisualFamily.Rugged &&
+                random.NextDouble() < 0.15d)
+            {
+                tiles[pair.Key] = site.PrimaryType == "Ruin"
+                    ? WorldSiteLocalTileType.Hazard
+                    : WorldSiteLocalTileType.Ridge;
+                continue;
+            }
+
+            if (sourceCell != null &&
+                inheritedVisualFamily == TownTerrainVisualFamily.Snow &&
+                random.NextDouble() < 0.16d)
+            {
+                tiles[pair.Key] = WorldSiteLocalTileType.Ridge;
                 continue;
             }
 
@@ -237,6 +384,15 @@ public sealed class WorldSiteLocalMapGeneratorSystem
                 random.NextDouble() < 0.22d)
             {
                 tiles[pair.Key] = WorldSiteLocalTileType.Forest;
+                continue;
+            }
+
+            if (sourceCell != null &&
+                inheritedVisualFamily == TownTerrainVisualFamily.Spirit &&
+                GetDistance(pair.Key, coreCell) <= 2.5f &&
+                random.NextDouble() < 0.16d)
+            {
+                tiles[pair.Key] = WorldSiteLocalTileType.Spirit;
             }
         }
     }
@@ -260,7 +416,7 @@ public sealed class WorldSiteLocalMapGeneratorSystem
     {
         var terrainHint = sourceCell == null
             ? "当前使用点位基础语义生成。"
-            : $"基于 {sourceCell.Biome} / {sourceCell.Terrain} / {sourceCell.Water} 的 world hex 语义生成。";
+            : $"基于 {sourceCell.Biome} / {sourceCell.Terrain} / {sourceCell.Water} 的 world hex 语义生成，并继承道路 / 水体 / 高差方向。";
         var focusHint = site.PrimaryType switch
         {
             "Wilderness" => "当前地图偏向探路、采集与遭遇事件。",
@@ -281,6 +437,257 @@ public sealed class WorldSiteLocalMapGeneratorSystem
             WorldSiteLocalTileType.Settlement or WorldSiteLocalTileType.Ruin or WorldSiteLocalTileType.Spirit => TownTerrainType.Courtyard,
             _ => TownTerrainType.Ground
         };
+    }
+
+    private static TownTerrainVisualFamily ResolveTerrainVisualFamily(
+        XianxiaHexCellData? sourceCell,
+        WorldSiteLocalTileType tileType)
+    {
+        return WorldTerrainVisualRules.ResolveSecondaryMapVisualFamily(sourceCell, tileType);
+    }
+
+    private static List<HexDirectionMask> ExtractDirections(HexDirectionMask mask)
+    {
+        var directions = new List<HexDirectionMask>(3);
+        foreach (var direction in MaskIterationOrder)
+        {
+            if ((mask & direction) != HexDirectionMask.None)
+            {
+                directions.Add(direction);
+            }
+        }
+
+        return directions;
+    }
+
+    private static HexDirectionMask ResolvePrimaryEntryDirection(XianxiaSiteData site, XianxiaHexCellData? sourceCell)
+    {
+        if (sourceCell != null && sourceCell.RoadMask != HexDirectionMask.None)
+        {
+            return ResolveDominantDirection(sourceCell.RoadMask);
+        }
+
+        if (sourceCell != null && sourceCell.RiverMask != HexDirectionMask.None)
+        {
+            return Opposite(ResolveDominantDirection(sourceCell.RiverMask));
+        }
+
+        if (sourceCell?.Water != XianxiaWaterType.None)
+        {
+            return Opposite(ResolveStableFallbackDirection(sourceCell, 97));
+        }
+
+        if (sourceCell != null && sourceCell.CliffMask != HexDirectionMask.None)
+        {
+            return Opposite(ResolveDominantDirection(sourceCell.CliffMask));
+        }
+
+        return site.PrimaryType switch
+        {
+            "ImmortalCity" => HexDirectionMask.East,
+            "Market" => HexDirectionMask.West,
+            _ => HexDirectionMask.West
+        };
+    }
+
+    private static HexDirectionMask ResolveDominantDirection(HexDirectionMask mask)
+    {
+        foreach (var direction in EntryPreferenceOrder)
+        {
+            if ((mask & direction) != HexDirectionMask.None)
+            {
+                return direction;
+            }
+        }
+
+        return HexDirectionMask.West;
+    }
+
+    private static HexDirectionMask ResolveStableFallbackDirection(XianxiaHexCellData sourceCell, int salt)
+    {
+        var directions = new[]
+        {
+            HexDirectionMask.West,
+            HexDirectionMask.NorthWest,
+            HexDirectionMask.NorthEast,
+            HexDirectionMask.East,
+            HexDirectionMask.SouthEast,
+            HexDirectionMask.SouthWest
+        };
+        var index = Hash(sourceCell.Coord.Q, sourceCell.Coord.R, salt) % directions.Length;
+        return directions[index];
+    }
+
+    private static Vector2I ResolveBoundaryCell(HexDirectionMask direction, int width, int height, Vector2I coreCell)
+    {
+        var horizontalInset = Math.Max(width / 4, 1);
+        return direction switch
+        {
+            HexDirectionMask.East => new Vector2I(width - 1, coreCell.Y),
+            HexDirectionMask.NorthEast => new Vector2I(Math.Clamp(coreCell.X + horizontalInset, 0, width - 1), 0),
+            HexDirectionMask.NorthWest => new Vector2I(Math.Clamp(coreCell.X - horizontalInset, 0, width - 1), 0),
+            HexDirectionMask.West => new Vector2I(0, coreCell.Y),
+            HexDirectionMask.SouthWest => new Vector2I(Math.Clamp(coreCell.X - horizontalInset, 0, width - 1), height - 1),
+            HexDirectionMask.SouthEast => new Vector2I(Math.Clamp(coreCell.X + horizontalInset, 0, width - 1), height - 1),
+            _ => new Vector2I(0, coreCell.Y)
+        };
+    }
+
+    private static Vector2I ResolvePathTarget(
+        HexDirectionMask direction,
+        int width,
+        int height,
+        Vector2I coreCell,
+        Random random)
+    {
+        var offset = direction switch
+        {
+            HexDirectionMask.East => new Vector2I(2, random.Next(-1, 2)),
+            HexDirectionMask.NorthEast => new Vector2I(1, -2),
+            HexDirectionMask.NorthWest => new Vector2I(-1, -2),
+            HexDirectionMask.West => new Vector2I(-2, random.Next(-1, 2)),
+            HexDirectionMask.SouthWest => new Vector2I(-1, 2),
+            HexDirectionMask.SouthEast => new Vector2I(1, 2),
+            _ => Vector2I.Zero
+        };
+
+        return new Vector2I(
+            Math.Clamp(coreCell.X + offset.X, 0, width - 1),
+            Math.Clamp(coreCell.Y + offset.Y, 0, height - 1));
+    }
+
+    private static Vector2I ResolveWaterFocus(
+        HexDirectionMask direction,
+        int width,
+        int height,
+        Vector2I coreCell,
+        Random random)
+    {
+        var offset = direction switch
+        {
+            HexDirectionMask.East => new Vector2I(2, random.Next(-1, 2)),
+            HexDirectionMask.NorthEast => new Vector2I(2, -2),
+            HexDirectionMask.NorthWest => new Vector2I(-2, -2),
+            HexDirectionMask.West => new Vector2I(-2, random.Next(-1, 2)),
+            HexDirectionMask.SouthWest => new Vector2I(-2, 2),
+            HexDirectionMask.SouthEast => new Vector2I(2, 2),
+            _ => Vector2I.Zero
+        };
+
+        return new Vector2I(
+            Math.Clamp(coreCell.X + offset.X, 0, width - 1),
+            Math.Clamp(coreCell.Y + offset.Y, 0, height - 1));
+    }
+
+    private static Vector2I ResolveRidgeFocus(
+        HexDirectionMask direction,
+        int width,
+        int height,
+        Vector2I coreCell,
+        Random random)
+    {
+        var offset = direction switch
+        {
+            HexDirectionMask.East => new Vector2I(3, random.Next(-1, 2)),
+            HexDirectionMask.NorthEast => new Vector2I(2, -3),
+            HexDirectionMask.NorthWest => new Vector2I(-2, -3),
+            HexDirectionMask.West => new Vector2I(-3, random.Next(-1, 2)),
+            HexDirectionMask.SouthWest => new Vector2I(-2, 3),
+            HexDirectionMask.SouthEast => new Vector2I(2, 3),
+            _ => Vector2I.Zero
+        };
+
+        return new Vector2I(
+            Math.Clamp(coreCell.X + offset.X, 0, width - 1),
+            Math.Clamp(coreCell.Y + offset.Y, 0, height - 1));
+    }
+
+    private static TownFacing ResolveFacingTowardCore(HexDirectionMask direction)
+    {
+        return direction switch
+        {
+            HexDirectionMask.East => TownFacing.West,
+            HexDirectionMask.NorthEast or HexDirectionMask.NorthWest => TownFacing.South,
+            HexDirectionMask.SouthWest or HexDirectionMask.SouthEast => TownFacing.North,
+            _ => TownFacing.East
+        };
+    }
+
+    private static HexDirectionMask Opposite(HexDirectionMask mask)
+    {
+        return mask switch
+        {
+            HexDirectionMask.East => HexDirectionMask.West,
+            HexDirectionMask.NorthEast => HexDirectionMask.SouthWest,
+            HexDirectionMask.NorthWest => HexDirectionMask.SouthEast,
+            HexDirectionMask.West => HexDirectionMask.East,
+            HexDirectionMask.SouthWest => HexDirectionMask.NorthEast,
+            HexDirectionMask.SouthEast => HexDirectionMask.NorthWest,
+            _ => HexDirectionMask.None
+        };
+    }
+
+    private static void PaintFeatureLine(
+        Dictionary<Vector2I, WorldSiteLocalTileType> tiles,
+        Vector2I start,
+        Vector2I end,
+        WorldSiteLocalTileType tileType,
+        int radius = 0,
+        Func<WorldSiteLocalTileType, bool>? canOverride = null)
+    {
+        var steps = Math.Max(Math.Abs(end.X - start.X), Math.Abs(end.Y - start.Y));
+        if (steps <= 0)
+        {
+            PaintFeatureBlob(tiles, start, radius, tileType, canOverride);
+            return;
+        }
+
+        for (var index = 0; index <= steps; index++)
+        {
+            var t = index / (float)steps;
+            var cell = new Vector2I(
+                Mathf.RoundToInt(Mathf.Lerp(start.X, end.X, t)),
+                Mathf.RoundToInt(Mathf.Lerp(start.Y, end.Y, t)));
+            PaintFeatureBlob(tiles, cell, radius, tileType, canOverride);
+        }
+    }
+
+    private static void PaintFeatureBlob(
+        Dictionary<Vector2I, WorldSiteLocalTileType> tiles,
+        Vector2I center,
+        int radius,
+        WorldSiteLocalTileType tileType,
+        Func<WorldSiteLocalTileType, bool>? canOverride = null)
+    {
+        var effectiveRadius = Math.Max(radius, 0);
+        for (var y = center.Y - effectiveRadius; y <= center.Y + effectiveRadius; y++)
+        {
+            for (var x = center.X - effectiveRadius; x <= center.X + effectiveRadius; x++)
+            {
+                var cell = new Vector2I(x, y);
+                if (!tiles.TryGetValue(cell, out var current))
+                {
+                    continue;
+                }
+
+                if (effectiveRadius > 0 && GetDistance(cell, center) > effectiveRadius + 0.15f)
+                {
+                    continue;
+                }
+
+                if (canOverride != null && !canOverride(current))
+                {
+                    continue;
+                }
+
+                tiles[cell] = tileType;
+            }
+        }
+    }
+
+    private static bool CanOverrideWithPath(WorldSiteLocalTileType current)
+    {
+        return current != WorldSiteLocalTileType.Water;
     }
 
     private static TownCellCompoundData CreateCompound(

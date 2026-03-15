@@ -21,6 +21,7 @@ public class EconomySystem
         SectGovernanceRules.EnsureDefaults(state);
         SectRuleTreeRules.EnsureDefaults(state);
         SectPeakSupportRules.EnsureDefaults(state);
+        DiscipleDirectiveRules.EnsureDefaults(state);
 
         var foodMultiplier = Math.Max(state.FoodProductionMultiplier, 1.0);
         var tradeMultiplier = Math.Max(state.TradeProductionMultiplier, 1.0);
@@ -43,6 +44,8 @@ public class EconomySystem
         var supportGoldModifier = SectPeakSupportRules.GetGoldYieldModifier(state);
         var supportContributionModifier = SectPeakSupportRules.GetContributionYieldModifier(state);
         var supportResearchModifier = SectPeakSupportRules.GetResearchYieldModifier(state);
+        var stewardContributionModifier = DiscipleDirectiveRules.GetStewardContributionModifier(state);
+        var stewardAppointmentSnapshot = DiscipleDirectiveRules.BuildStewardAppointmentSnapshot(state);
 
         var foodDeltaRaw = 0.0;
         var goldDeltaRaw = 0.0;
@@ -58,24 +61,28 @@ public class EconomySystem
                 continue;
             }
 
+            var internalExecutionModifier = definition.IsInternalTask
+                ? DiscipleDirectiveRules.GetStewardTaskExecutionModifier(stewardAppointmentSnapshot, definition.TaskType)
+                : 1.0;
+
             if (definition.FoodYieldPerWorker > 0)
             {
-                foodDeltaRaw += effectiveWorkers * definition.FoodYieldPerWorker * foodMultiplier * productionFactor * governanceFoodModifier * quarterFoodModifier * ruleTreeFoodModifier * supportFoodModifier;
+                foodDeltaRaw += effectiveWorkers * definition.FoodYieldPerWorker * foodMultiplier * productionFactor * governanceFoodModifier * quarterFoodModifier * ruleTreeFoodModifier * supportFoodModifier * internalExecutionModifier;
             }
 
             if (definition.GoldYieldPerWorker > 0)
             {
-                goldDeltaRaw += effectiveWorkers * definition.GoldYieldPerWorker * tradeMultiplier * productionFactor * governanceGoldModifier * quarterGoldModifier * supportGoldModifier;
+                goldDeltaRaw += effectiveWorkers * definition.GoldYieldPerWorker * tradeMultiplier * productionFactor * governanceGoldModifier * quarterGoldModifier * supportGoldModifier * internalExecutionModifier;
             }
 
             if (definition.ContributionYieldPerWorker > 0)
             {
-                contributionDeltaRaw += effectiveWorkers * definition.ContributionYieldPerWorker * productionFactor * governanceContributionModifier * quarterContributionModifier * ruleTreeContributionModifier * supportContributionModifier;
+                contributionDeltaRaw += effectiveWorkers * definition.ContributionYieldPerWorker * productionFactor * governanceContributionModifier * quarterContributionModifier * ruleTreeContributionModifier * supportContributionModifier * stewardContributionModifier * internalExecutionModifier;
             }
 
             if (definition.ResearchYieldPerWorker > 0)
             {
-                researchDeltaRaw += effectiveWorkers * definition.ResearchYieldPerWorker * productionFactor * governanceResearchModifier * quarterResearchModifier * ruleTreeResearchModifier * supportResearchModifier;
+                researchDeltaRaw += effectiveWorkers * definition.ResearchYieldPerWorker * productionFactor * governanceResearchModifier * quarterResearchModifier * ruleTreeResearchModifier * supportResearchModifier * internalExecutionModifier;
             }
         }
 

@@ -52,7 +52,7 @@
 | --- | --- | --- | --- | --- |
 | DL-001 | 战略地图配置驱动接入 | IN_PROGRESS | 反哺宗门 | 世界/江陵府外域图由 `data/strategic_maps.json` 驱动渲染，fallback 仍可运行 |
 | DL-002 | 外域历练地图玩法闭环 | TODO | 武装探险 | `ExpeditionMapView` 接入节点、路线风险、遭遇结果并反馈到 `GameState` |
-| DL-003 | 宗门见闻与统计报表实时化 | TODO | 反哺宗门 | 事件 / 报表页显示真实结算数据与历史摘要，不再是静态文案 |
+| DL-003 | 宗门见闻与统计报表实时化 | IN_PROGRESS（一期：见闻报表卷原型） | 反哺宗门 | 右栏纪事可展开为“见闻报表卷”，卷内显示实时警讯、分类筛读近时札记、经营快照、近几次时辰结算回看与季度/年度摘要；后续继续补更长周期统计与分类筛阅 |
 | DL-004 | 职司优先级调配策略 | TODO | 职业分化 | 优先级按钮影响岗位自动回退 / 分配顺序，并有日志可解释 |
 | DL-005 | 核心公式配置化（data 接入） | TODO | 职业分化/反哺 | 产业、经济、战斗关键参数由 `data/*.json` 读取并可回退默认值 |
 | DL-006 | 传承 / 科技树分支化系统 | TODO | 科技涌现 | 从线性 T1/T2/T3 扩展为分支科技树，支持路线差异化 |
@@ -122,6 +122,7 @@
 | DL-079 | UI 表现层 GDScript 第二十九批收尾巡检 | DONE | 反哺宗门 | 对剩余 UI / 地图调度 / 检视链的 `C#` 边界完成最终巡检，仅补做 `MainSectTileInspector.cs` 末端按钮 helper 的非空签名收紧；其余残留已确认应继续保留在 `C#`；`dotnet build .\Finally.sln` 通过 |
 | DL-080 | 卷册弹窗排他与快捷键门禁收口 | DONE | 反哺宗门 | 主界面打开设置卷 / 仓储卷 / 治宗册 / 弟子谱 / 峰令谱 / 留影录时会统一先收起其他卷册弹窗；对应全局快捷键在这些卷册可见时也会统一让行，避免多卷叠层与误触全局操作；`dotnet build .\Finally.sln` 通过 |
 | DL-081 | 双地图兼容页签入口收口 | DONE | 反哺宗门 | 主界面地图页签继续只保留 `山门沙盘 / 世界舆图` 两个可交互入口；历史兼容的 `Prefecture / Event / Report / Expedition` 页签已统一隐藏并禁用，且不再纳入现行点击绑定与双地图主链必需节点；`dotnet build .\Finally.sln` 通过 |
+| DL-082 | 弟子谱交互指令接入（一期/二期/三期） | DONE（三期：执事候选池自动补位） | 职司分化→武装探险→反哺宗门 | 弟子谱可对个体下达 `常制观察 / 外务候补 / 执事培养`，并实际影响历练战力 / 外务回流、内务执行效率与贡献回流；系统会自动为当前内务条目匹配补位执事，且弟子谱 / 治宗册可读取同一结果；支持存档；`dotnet build .\Finally.sln` 通过 |
 
 ### 3.1 DL-019 功能包详情（宗门弟子可视移动）
 
@@ -681,8 +682,10 @@
   - 全格入口阶段：`StrategicMapViewSystem` 现已支持“站点优先、地块回退”的 world hex 点击逻辑；若未命中已生成站点，则会基于当前地块的 `Biome / Terrain / Water / Wonder / Structure` 合成一份可进入的格子级二级地图入口，并直接进入 `SecondaryMapView`；
   - 野外模板阶段：`MainSectTileInspector` 与 `MainWorldSitePanel` 已补 `Wilderness` 分支，世界地图不再只有少数站点能进入二级页，普通野外格也能给出主玩法、产出、风险与筹备动作；
   - 沙盘生成阶段：点击世界格后会先刷新左侧检视器，玩家再通过“前往二级地图”按钮打开 `SecondaryMapView`；该页现已接入 `WorldSiteLocalMapGeneratorSystem`，并复用 `CountyTownMapViewSystem / SectMapViewSystem` 的同形 hex 沙盘视图，会按所选格的类型、地形、水体、奇观、建筑与威胁语义生成不同内容的下层沙盘；
+  - 地貌继承阶段：二级地图 external map 已新增“继承自 world hex 的地形家族”口径；`WorldSiteLocalMapGeneratorSystem` 会继续根据 source world hex 的 `Terrain / Biome / Water / QiDensity / Corruption` 调整 `Ridge / Spirit / Hazard / Water` 分布，`CountyTownMapViewSystem` 则会优先按继承家族复用 `L1_hex_tileset.tres` 的底盘图块，不再只按 `Ground / Courtyard / Water / Road` 粗分类随机取图；
+  - 方向继承阶段：`WorldSiteLocalMapGeneratorSystem` 现已继续把 `RoadMask / RiverMask / CliffMask` 映射到局部沙盘边界方向；道路入口不再固定永远从左侧进入，水体与 ridge / hazard 也会随 world hex 的方向语义变化，入口锚点朝向同步跟随主入口边界调整；
   - 局部检视阶段：`SecondaryMapView` 内生成的局部沙盘现已把 `SelectionSummaryChanged` 回灌到左侧检视器；玩家在二级地图页点选局部 hex 时，会复用山门沙盘同族的检视面板与按钮节奏，清空局部选中后则自动回退到当前世界点位摘要；
-  - 当前边界：二级地图已完成“任意世界格可点选、可看详情、可按格语义生成同形态沙盘、可沿用同族检视习惯”的最小闭环，但仍停留在模板化入口层，尚未为各类型接入独立交互控件、结算或专属场景逻辑；
+  - 当前边界：二级地图已完成“任意世界格可点选、可看详情、可按格语义生成同形态沙盘、并能继承一级地图底盘地貌与主要方向语义”的最小闭环，但仍停留在模板化入口层，尚未为各类型接入独立交互控件、结算或专属场景逻辑；
   - 验证结论：上述阶段接入后，`dotnet build .\Finally.sln` 持续通过。
 - 讨论约束：
   - 二级地图类型要服务飞轮，不做纯景观地图；
@@ -727,7 +730,9 @@
   - 连接层二期：现有道路与水域仍保留过渡性的邻接贴图绘制，但文档主口径已切到“独立道路 / 独立河流”自由摆放方案；
   - 语义阶段：`TownMapGeneratorSystem` 已生成最小可用的 `Ground / Road / Courtyard / Water` terrain 语义，供地图表现层与检视摘要复用；
   - Layer 3 起步阶段：已新增 `FC-20260312-sect-map-layer3-minimal-runtime.md`；`TownMapGeneratorSystem` 现会为临路院域生成最小可用 `Building / ActivityAnchor`，`CountyTownMapViewSystem` 已把 `DrawStructures()` 接入主绘制链路并按 Y 值排序；
-  - 当前边界：世界图当前只切入了基础底盘层，正式国风量产素材、世界图专属高层 overlay 资产、独立山体/树木/塔类资产与 `Layer 4 / Layer 5` 氛围层仍待后续接入。
+  - 二级地图复用阶段：本轮继续把 world hex 到 local sandbox 的底盘分桶统一为共享 `Plain / Spirit / Rugged / Snow / Water` 地形家族规则，`CountyTownMapViewSystem` external map 模式已可优先按继承家族选取 `L1_hex_tileset.tres` 图块；
+  - 局部方向阶段：本轮又继续把 world hex 的 `RoadMask / RiverMask / CliffMask` 收口到 local sandbox 入口、水体与 ridge 的方向继承，减少局部沙盘“同底盘但同朝向模板”的割裂感；
+  - 当前边界：世界图当前只切入了基础底盘层，二级地图虽已继承一级地图地貌口径，但正式国风量产素材、世界图专属高层 overlay 资产、独立山体/树木/塔类资产与 `Layer 4 / Layer 5` 氛围层仍待后续接入。
 - 分阶段建议：
   - 一期：完成文档、目录与命名规范，准备首批基础地块和连接类资产；
   - 二期：接入 `Layer 1 / Layer 2`，先完成地块、道路、河流和法阵拼接；
@@ -1127,6 +1132,20 @@
   - `Main.cs` 中现行地图入口点击绑定只保留 `World / Sect` 两条主链；
   - `Prefecture / Event / Report / Expedition` 兼容按钮继续隐藏且禁用，但不再作为双地图主链的必需节点；
   - `SetMapTab()` 在当前运行版下继续只保证 `World / WorldSite / Sect` 主链稳定，不因为隐藏兼容按钮缺失而提前返回；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.62 DL-082 功能包详情（弟子谱交互指令接入，一期/二期/三期）
+
+- 当前状态：本轮在二期基础上继续补完“弟子谱批注 -> 执事候选池自动补位 -> 治宗册反馈 -> 主循环结算”的第三条玩法链。
+- 目标（玩家价值）：让弟子谱不再只是静态名册，玩家可以直接点定个体弟子的重点培养方向，并在历练、治宗执行反馈、条目级执事补位与内务回流中得到可解释反馈。
+- 飞轮环节：职司分化 → 武装探险 → 反哺宗门。
+- 依赖（前置系统）：`DL-043` 宗门弟子独立属性界面、`CombatSystem`、`EconomySystem`、`SectTaskRules`、`TaskPanel`、`GameLoop`、`GameState` 存档链。
+- 完成标准（DoD）：
+  - 弟子谱中选中弟子后，可下达 `常制观察 / 纳入外务 / 执事培养`；
+  - `GameState` 能保存弟子交互批注，且旧存档仍可读；
+  - `外务候补` 会影响探险战力与外务回流，并在日志中可解释；
+  - `执事培养` 会影响内务执行效率与贡献回流，并在弟子谱详情、治宗册摘要与条目说明中显示当前效果摘要；
+  - 系统会自动从执事培养名册中为内务类条目分配补位执事，且弟子谱与治宗册显示结果一致；
   - `dotnet build .\Finally.sln` 通过。
 
 ## 4. 执行与回写规则

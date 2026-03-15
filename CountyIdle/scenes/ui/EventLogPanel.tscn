@@ -64,12 +64,25 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 10
 
-[node name="PanelTitle" type="Label" parent="PanelContent/MainVBox" unique_id=986258871]
+[node name="TitleRow" type="HBoxContainer" parent="PanelContent/MainVBox" unique_id=1941287649]
 layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="PanelTitle" type="Label" parent="PanelContent/MainVBox/TitleRow" unique_id=986258871]
+layout_mode = 2
+size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
 theme_override_font_sizes/font_size = 22
 text = "天衍峰记事"
-horizontal_alignment = 1
+
+[node name="OpenChronicleButton" type="Button" parent="PanelContent/MainVBox/TitleRow" unique_id=537084225]
+custom_minimum_size = Vector2(88, 28)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.301961, 0.258824, 0.215686, 0.96)
+theme_override_font_sizes/font_size = 12
+toggle_mode = true
+text = "展开卷册"
+flat = true
 
 [node name="TitleRule" type="ColorRect" parent="PanelContent/MainVBox" unique_id=1919532563]
 custom_minimum_size = Vector2(0, 1)

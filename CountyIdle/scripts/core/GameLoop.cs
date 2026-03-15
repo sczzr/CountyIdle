@@ -21,6 +21,7 @@ public partial class GameLoop : Node
     private readonly SectGovernanceSystem _sectGovernanceSystem = new();
     private readonly SectRuleTreeSystem _sectRuleTreeSystem = new();
     private readonly SectPeakSupportSystem _sectPeakSupportSystem = new();
+    private readonly DiscipleDirectiveSystem _discipleDirectiveSystem = new();
     private readonly MapOperationalLinkSystem _mapOperationalLinkSystem = new();
     private readonly ResearchSystem _researchSystem = new();
     private readonly BreedingSystem _breedingSystem = new();
@@ -63,6 +64,7 @@ public partial class GameLoop : Node
         _sectGovernanceSystem.EnsureDefaults(_state);
         _sectRuleTreeSystem.EnsureDefaults(_state);
         _sectPeakSupportSystem.EnsureDefaults(_state);
+        _discipleDirectiveSystem.EnsureDefaults(_state);
         ValidateQuarterDecree(false);
         _minuteAccumulator = Math.Max(_state.GameMinutes % MinutesPerSettlement, 0);
         _secondAccumulator = 0;
@@ -79,6 +81,7 @@ public partial class GameLoop : Node
         _sectGovernanceSystem.EnsureDefaults(_state);
         _sectRuleTreeSystem.EnsureDefaults(_state);
         _sectPeakSupportSystem.EnsureDefaults(_state);
+        _discipleDirectiveSystem.EnsureDefaults(_state);
         ValidateQuarterDecree(false);
         _minuteAccumulator = 0;
         _secondAccumulator = 0;
@@ -317,6 +320,19 @@ public partial class GameLoop : Node
         _eventBus.PublishState(_state.Clone());
     }
 
+    public void SetDiscipleDirective(int discipleId, DiscipleDirectiveType directiveType)
+    {
+        if (!_discipleDirectiveSystem.SetDirective(_state, discipleId, directiveType, out var log))
+        {
+            _eventBus.PublishLog(log);
+            return;
+        }
+
+        SyncTaskOrders();
+        _eventBus.PublishLog(log);
+        _eventBus.PublishState(_state.Clone());
+    }
+
     private void RemoveFromJob(JobType jobType, int amount)
     {
         var currentAssigned = IndustryRules.GetAssigned(_state, jobType);
@@ -419,6 +435,7 @@ public partial class GameLoop : Node
         _sectGovernanceSystem.EnsureDefaults(_state);
         _sectRuleTreeSystem.EnsureDefaults(_state);
         _sectTaskSystem.EnsureDefaults(_state);
+        _discipleDirectiveSystem.EnsureDefaults(_state);
     }
 
     private void ValidateQuarterDecree(bool publishLog)

@@ -12,6 +12,17 @@ public enum TownTerrainType
     Water
 }
 
+public enum TownTerrainVisualFamily
+{
+    Auto,
+    Plain,
+    Spirit,
+    Rugged,
+    Snow,
+    ShallowWater,
+    DeepWater
+}
+
 public enum TownFacing
 {
     North,
@@ -78,6 +89,7 @@ public sealed class TownActivityAnchorData
 public sealed class TownMapData
 {
     private readonly TownTerrainType[,] _terrain;
+    private readonly TownTerrainVisualFamily[,] _terrainVisualFamilies;
     private readonly Dictionary<Vector2I, TownCellCompoundData> _cellCompounds;
 
     public TownMapData(int width, int height)
@@ -85,6 +97,7 @@ public sealed class TownMapData
         Width = Math.Max(width, 1);
         Height = Math.Max(height, 1);
         _terrain = new TownTerrainType[Width, Height];
+        _terrainVisualFamilies = new TownTerrainVisualFamily[Width, Height];
         _cellCompounds = new Dictionary<Vector2I, TownCellCompoundData>();
         Buildings = new List<TownBuildingData>();
         ActivityAnchors = new List<TownActivityAnchorData>();
@@ -94,6 +107,7 @@ public sealed class TownMapData
             for (var y = 0; y < Height; y++)
             {
                 _terrain[x, y] = TownTerrainType.Ground;
+                _terrainVisualFamilies[x, y] = TownTerrainVisualFamily.Auto;
             }
         }
     }
@@ -126,6 +140,21 @@ public sealed class TownMapData
         }
 
         _terrain[x, y] = terrain;
+    }
+
+    public TownTerrainVisualFamily GetTerrainVisualFamily(int x, int y)
+    {
+        return IsInside(x, y) ? _terrainVisualFamilies[x, y] : TownTerrainVisualFamily.Auto;
+    }
+
+    public void SetTerrainVisualFamily(int x, int y, TownTerrainVisualFamily visualFamily)
+    {
+        if (!IsInside(x, y))
+        {
+            return;
+        }
+
+        _terrainVisualFamilies[x, y] = visualFamily;
     }
 
     public void AddBuilding(TownBuildingData building)

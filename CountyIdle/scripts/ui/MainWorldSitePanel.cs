@@ -166,7 +166,7 @@ public partial class Main
             _worldSiteSandboxMapView.SetExternalMap(
                 sandboxMap,
                 $"{site.Label} · 局部沙盘",
-                $"左键点选局部 hex 检视当前二级地图地块。当前依据 {site.PrimaryType} / {site.SecondaryTag} 生成。");
+                $"左键点选局部 hex 检视当前二级地图地块。当前依据 {site.PrimaryType} / {site.SecondaryTag} 与上层 world hex 地貌生成。");
             CallWorldPanelVisualFx("set_world_site_sandbox_visible", true);
         }
         else
@@ -282,7 +282,7 @@ public partial class Main
     {
         var detailHint = sourceCell == null
             ? "当前使用点位基础语义生成下层地图。"
-            : $"当前下层地图将按 {sourceCell.Biome} / {sourceCell.Terrain} / {sourceCell.Water} / 灵气 {sourceCell.QiDensity:0.00} 生成。";
+            : $"当前下层地图将按 {sourceCell.Biome} / {sourceCell.Terrain} / {sourceCell.Water} / 灵气 {sourceCell.QiDensity:0.00} 生成，并继承同族底盘贴图与道路/水体/高差方向。";
 
         var primaryHint = site.PrimaryType switch
         {

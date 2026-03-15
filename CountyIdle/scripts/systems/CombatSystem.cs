@@ -33,12 +33,15 @@ public class CombatSystem
 
         state.ExplorationProgressHours = 0;
         var enemyPower = 9 + state.ExplorationDepth * 1.6;
-        var teamPower = state.ElitePopulation * 0.95 + state.AvgGearScore * 1.1;
+        var outerCandidateCount = DiscipleDirectiveRules.GetDirectiveCount(state, DiscipleDirectiveType.OuterMissionCandidate);
+        var outerMissionTeamPowerBonus = DiscipleDirectiveRules.GetOuterMissionTeamPowerBonus(state);
+        var outerMissionLootModifier = DiscipleDirectiveRules.GetOuterMissionLootModifier(state);
+        var teamPower = state.ElitePopulation * 0.95 + state.AvgGearScore * 1.1 + outerMissionTeamPowerBonus;
         var winChance = Math.Clamp(0.2 + ((teamPower - enemyPower) / 28.0), 0.12, 0.9);
 
         if (_rng.Randf() <= winChance)
         {
-            var goldGain = 18 + state.ExplorationDepth * 3;
+            var goldGain = (int)Math.Round((18 + state.ExplorationDepth * 3) * outerMissionLootModifier);
             var rareGain = 1 + (_rng.Randf() < 0.35 ? 1 : 0);
             var visibleGoldGain = InventoryRules.ApplyDelta(state, nameof(GameState.Gold), goldGain);
             var visibleRareGain = InventoryRules.ApplyDelta(state, nameof(GameState.RareMaterial), rareGain);
@@ -49,7 +52,9 @@ public class CombatSystem
                 state.ExplorationDepth += 1;
             }
 
-            var combatLog = $"探险胜利：获得金币+{visibleGoldGain}，稀有素材+{visibleRareGain}，当前层数 {state.ExplorationDepth}。";
+            var combatLog = outerCandidateCount > 0
+                ? $"探险胜利：外务候补 {outerCandidateCount} 人协力，队伍战力额外 +{outerMissionTeamPowerBonus:0.0}，获得灵石+{visibleGoldGain}，稀有素材+{visibleRareGain}，当前层数 {state.ExplorationDepth}。"
+                : $"探险胜利：获得金币+{visibleGoldGain}，稀有素材+{visibleRareGain}，当前层数 {state.ExplorationDepth}。";
             if (_equipmentSystem.TryResolveExplorationDrop(state, out var gearLog) && !string.IsNullOrWhiteSpace(gearLog))
             {
                 log = $"{combatLog} {gearLog}";
@@ -66,7 +71,9 @@ public class CombatSystem
             state.ElitePopulation -= 1;
         }
 
-        log = "探险受挫：队伍负伤撤退，郡内威胁上升。";
+        log = outerCandidateCount > 0
+            ? "探险受挫：虽有外务候补随行，但此次未能得手，队伍负伤撤退，郡内威胁上升。"
+            : "探险受挫：队伍负伤撤退，郡内威胁上升。";
         return true;
     }
 }

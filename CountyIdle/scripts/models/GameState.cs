@@ -112,6 +112,8 @@ public class GameState
     public Dictionary<string, double> DiscreteInventoryProgress { get; set; } = new();
     public Dictionary<string, int> TaskOrderUnits { get; set; } = new();
     public Dictionary<string, int> TaskResolvedWorkers { get; set; } = new();
+    public Dictionary<int, string> DiscipleDirectives { get; set; } = new();
+    public Dictionary<string, int> FormalStewardAppointments { get; set; } = new();
     public string ActiveDevelopmentDirection { get; set; } = string.Empty;
     public string ActiveSectLaw { get; set; } = string.Empty;
     public string ActiveTalentPlan { get; set; } = string.Empty;
@@ -231,6 +233,8 @@ public class GameState
         clone.DiscreteInventoryProgress = new Dictionary<string, double>(DiscreteInventoryProgress ?? new Dictionary<string, double>());
         clone.TaskOrderUnits = new Dictionary<string, int>(TaskOrderUnits ?? new Dictionary<string, int>());
         clone.TaskResolvedWorkers = new Dictionary<string, int>(TaskResolvedWorkers ?? new Dictionary<string, int>());
+        clone.DiscipleDirectives = new Dictionary<int, string>(DiscipleDirectives ?? new Dictionary<int, string>());
+        clone.FormalStewardAppointments = new Dictionary<string, int>(FormalStewardAppointments ?? new Dictionary<string, int>());
         return clone;
     }
 }

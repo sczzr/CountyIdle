@@ -11,7 +11,8 @@ public partial class Main
                _taskPanel?.Visible == true ||
                _disciplePanel?.Visible == true ||
                _sectOrganizationPanel?.Visible == true ||
-               _saveSlotsPanel?.Visible == true;
+               _saveSlotsPanel?.Visible == true ||
+               _sectChroniclePanel?.Visible == true;
     }
 
     private void CloseBlockingOverlayPopups(Control? except = null)
@@ -44,6 +45,11 @@ public partial class Main
         if (_saveSlotsPanel != null && _saveSlotsPanel.Visible && !ReferenceEquals(_saveSlotsPanel, except))
         {
             _saveSlotsPanel.ClosePanel();
+        }
+
+        if (_sectChroniclePanel != null && _sectChroniclePanel.Visible && !ReferenceEquals(_sectChroniclePanel, except))
+        {
+            _sectChroniclePanel.ClosePanel();
         }
     }
 }

@@ -54,7 +54,13 @@ public partial class DisciplePanel : PopupPanelBase
 	private Label _profileNameLabel = null!;
 	private Label _profileMetaLabel = null!;
 	private Label _profileStatusLabel = null!;
+	private Label _directiveStatusLabel = null!;
+	private Label _directiveEffectLabel = null!;
 	private Label _annotationLabel = null!;
+	private RichTextLabel _fullInfoLabel = null!;
+	private Button _directiveNoneButton = null!;
+	private Button _directiveOuterButton = null!;
+	private Button _directiveStewardButton = null!;
 	private Button _closeButton = null!;
 	private Label _hintLabel = null!;
 	private FlowContainer _traitFlow = null!;
@@ -79,6 +85,8 @@ public partial class DisciplePanel : PopupPanelBase
 	private int _selectedDiscipleId = 1;
 	private FilterMode _filterMode;
 	private SortMode _sortMode;
+
+	public event Action<int, DiscipleDirectiveType>? DirectiveRequested;
 
 	public override void _Ready()
 	{
@@ -120,6 +128,7 @@ public partial class DisciplePanel : PopupPanelBase
 		_state = state.Clone();
 		PopulationRules.EnsureDefaults(_state);
 		SectGovernanceRules.EnsureDefaults(_state);
+		DiscipleDirectiveRules.EnsureDefaults(_state);
 
 		_allProfiles.Clear();
 		_allProfiles.AddRange(DiscipleRosterSystem.BuildRoster(_state));
@@ -158,7 +167,7 @@ public partial class DisciplePanel : PopupPanelBase
 			return PopupStatusMessage!;
 		}
 
-		return "弟子谱会按当前经营态势派生生成名册，用于查看门人属性、培养方向与当前差事；不直接改写小时结算。按 Esc 可收卷。";
+		return "弟子谱会按当前经营态势派生生成名册，用于查看门人属性、培养方向与当前差事；现可将个体纳入外务候补或执事培养，并直接反馈到历练与内务回流。按 Esc 可收卷。";
 	}
 
 	private void BindUiNodes()
@@ -176,6 +185,8 @@ public partial class DisciplePanel : PopupPanelBase
 		_profileNameLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader/ProfileName");
 		_profileMetaLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader/ProfileMeta");
 		_profileStatusLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader/ProfileStatus");
+		_directiveStatusLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveStatus");
+		_directiveEffectLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveEffect");
 		_rootCircleLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader/RootCircle/RootCircleLabel");
 		_radarChart = GetNode<Control>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/RadarCenter/RadarChart");
 		_realmStatusLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/RealmBox/RealmStatus");
@@ -188,6 +199,10 @@ public partial class DisciplePanel : PopupPanelBase
 		_traitFlow = GetNode<FlowContainer>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel/TraitMargin/TraitColumn/TraitFlow");
 		_traitTagTemplate = GetNode<PanelContainer>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel/TraitTagTemplate");
 		_annotationLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/AnnotationPanel/AnnotationMargin/AnnotationColumn/AnnotationText");
+		_fullInfoLabel = GetNode<RichTextLabel>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/FullInfoPanel/FullInfoMargin/FullInfoColumn/FullInfoScroll/FullInfoLabel");
+		_directiveNoneButton = GetNode<Button>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveButtonRow/DirectiveNoneButton");
+		_directiveOuterButton = GetNode<Button>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveButtonRow/DirectiveOuterButton");
+		_directiveStewardButton = GetNode<Button>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveButtonRow/DirectiveStewardButton");
 		_hintLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/HintLabel");
 		_closeButton = GetNode<Button>("Overlay/Wrapper/RootColumn/HeaderPanel/HeaderMargin/HeaderRow/CloseButton");
 		_visualFx = GetNodeOrNull<Node>("VisualFx");
@@ -199,10 +214,16 @@ public partial class DisciplePanel : PopupPanelBase
 		BindMetric("Craft");
 		BindMetric("Mood");
 		BindMetric("HeartState");
+		BindMetric("Combat");
+		BindMetric("Execution");
+		BindMetric("Contribution");
 
 		_filterOption.ItemSelected += OnFilterSelected;
 		_sortOption.ItemSelected += OnSortSelected;
 		_rosterTree.ItemSelected += OnRosterTreeItemSelected;
+		_directiveNoneButton.Pressed += () => RequestDirectiveChange(DiscipleDirectiveType.None);
+		_directiveOuterButton.Pressed += () => RequestDirectiveChange(DiscipleDirectiveType.OuterMissionCandidate);
+		_directiveStewardButton.Pressed += () => RequestDirectiveChange(DiscipleDirectiveType.StewardCandidate);
 		_closeButton.Pressed += ClosePopup;
 
 		_traitTagTemplate.Visible = false;
@@ -249,7 +270,7 @@ public partial class DisciplePanel : PopupPanelBase
 		var direction = SectGovernanceRules.GetActiveDevelopmentDefinition(_state);
 
 		_summaryLabel.Text =
-			$"卷册总录：门人 {_state.Population} · 真传 {_state.ElitePopulation} · 现役 {_state.GetAssignedPopulation()} · 待命 {_state.GetUnassignedPopulation()}";
+			$"卷册总录：门人 {_state.Population} · 真传 {_state.ElitePopulation} · 现役 {_state.GetAssignedPopulation()} · 待命 {_state.GetUnassignedPopulation()} · {DiscipleDirectiveRules.BuildDirectiveSummary(_state)}";
 		_governanceLabel.Text =
 			$"当前治宗：{direction.DisplayName} / {law.DisplayName} / {talentPlan.DisplayName}";
 	}
@@ -305,9 +326,14 @@ public partial class DisciplePanel : PopupPanelBase
 
 	private void RefreshDetail(DiscipleProfile profile)
 	{
+		var identityTag = ResolveIdentityTag(profile);
+		var techniqueTag = ResolveTechniqueTag(profile);
+		var skillTag = ResolveSkillTag(profile);
+		var directiveText = DiscipleDirectiveRules.GetDirectiveDisplayName(profile.DirectiveType);
+
 		_profileNameLabel.Text = profile.Name;
 		_profileMetaLabel.Text =
-			$"骨龄：{profile.Age}  |  籍录：{ResolveRosterPeakTitle(profile)} / {ResolveRosterHallTitle(profile)}  |  职：{profile.DutyDisplayName}  |  谱位：{profile.RankName}";
+			$"身份：{identityTag}  |  功法：{techniqueTag}  |  技艺：{skillTag}\n骨龄：{profile.AgeText}  |  籍录：{ResolveRosterPeakTitle(profile)} / {ResolveRosterHallTitle(profile)}  |  职：{profile.DutyDisplayName}  |  谱位：{profile.RankName}\n交互：{directiveText}";
 		_rootCircleLabel.Text = ResolveRootSummary(profile);
 		_realmStatusLabel.Text = $"修为境界：{profile.RealmName}";
 		_realmProgressBar.Value = ResolveRealmProgress(profile);
@@ -318,8 +344,12 @@ public partial class DisciplePanel : PopupPanelBase
 		_qiSeaHintLabel.Text = $"蓄量：{ResolveQiSeaText(profile)}";
 		_profileStatusLabel.Text =
 			$"当前差事：{profile.CurrentAssignment}\n居所：{profile.ResidenceName}\n关联峰脉：{profile.LinkedPeakSummary}";
+		_directiveStatusLabel.Text = $"当前批注：{directiveText}";
+		_directiveEffectLabel.Text = BuildDirectiveEffectText(profile);
 		_annotationLabel.Text = BuildAnnotation(profile);
+		_fullInfoLabel.Text = BuildFullInfoText(profile, identityTag, techniqueTag, skillTag);
 		RefreshTraits(profile);
+		UpdateDirectiveButtons(profile);
 
 		SetMetric("Insight", profile.Insight);
 		SetMetric("Potential", profile.Potential);
@@ -327,6 +357,9 @@ public partial class DisciplePanel : PopupPanelBase
 		SetMetric("Craft", profile.Craft);
 		SetMetric("Mood", profile.Mood);
 		SetMetric("HeartState", ResolveHeartState(profile));
+		SetMetric("Combat", profile.Combat);
+		SetMetric("Execution", profile.Execution);
+		SetMetric("Contribution", profile.Contribution);
 
 		UpdateRadarChart(
 			("悟性", profile.Insight),
@@ -351,8 +384,12 @@ public partial class DisciplePanel : PopupPanelBase
 		_qiSeaProgressBar.Value = 0;
 		_qiSeaHintLabel.Text = "蓄量：未启";
 		_profileStatusLabel.Text = string.Empty;
+		_directiveStatusLabel.Text = "当前批注：未录";
+		_directiveEffectLabel.Text = "未选中弟子时，无法下达外务候补或执事培养批注。";
 		_annotationLabel.Text = string.Empty;
+		_fullInfoLabel.Text = "[color=#5b4d42]卷中详录暂未展开，请先选中一名弟子。[/color]";
 		RefreshTraits(null);
+		UpdateDirectiveButtons(null);
 
 		SetMetric("Insight", 0);
 		SetMetric("Potential", 0);
@@ -360,6 +397,9 @@ public partial class DisciplePanel : PopupPanelBase
 		SetMetric("Craft", 0);
 		SetMetric("Mood", 0);
 		SetMetric("HeartState", 0);
+		SetMetric("Combat", 0);
+		SetMetric("Execution", 0);
+		SetMetric("Contribution", 0);
 		UpdateRadarChart(
 			("悟性", 0),
 			("潜力", 0),
@@ -433,6 +473,19 @@ public partial class DisciplePanel : PopupPanelBase
 
 		_selectedDiscipleId = discipleId;
 		RefreshDetail(profile);
+	}
+
+	private void RequestDirectiveChange(DiscipleDirectiveType directiveType)
+	{
+		var profile = _visibleProfiles.FirstOrDefault(candidate => candidate.Id == _selectedDiscipleId);
+		if (profile == null)
+		{
+			ShowPopupStatusMessage("当前未选中弟子，无法入卷批注。");
+			return;
+		}
+
+		DirectiveRequested?.Invoke(profile.Id, directiveType);
+		ShowPopupStatusMessage($"已将“{profile.Name}”的卷中批注提请执事层更新。");
 	}
 
 	private bool MatchesFilter(DiscipleProfile profile)
@@ -792,6 +845,141 @@ public partial class DisciplePanel : PopupPanelBase
 			.FirstOrDefault() ?? "气机平和";
 
 		return $"观其气机，{primaryTrait}，骨相与心识相济。现下以“{profile.CurrentAssignment}”为主线，{profile.Note} 若能继续借 {ResolveRosterPeakTitle(profile)} {ResolveRosterHallTitle(profile)} 之务磨砺，则在 {profile.RealmName} 上尚可再进一步。";
+	}
+
+	private static string BuildFullInfoText(DiscipleProfile profile, string identityTag, string techniqueTag, string skillTag)
+	{
+		var secondarySkillTag = ResolveSecondarySkillTag(profile);
+		var eliteText = profile.IsElite ? "已入真传卷" : "未入真传卷";
+		var directiveText = DiscipleDirectiveRules.GetDirectiveDisplayName(profile.DirectiveType);
+		var directiveEffect = DiscipleDirectiveRules.GetDirectiveShortEffect(profile.DirectiveType);
+		var detailLines = new[]
+		{
+			$"[b]卷册编号[/b]：第 {profile.Id} 号",
+			$"[b]姓名[/b]：{profile.Name}",
+			$"[b]身份[/b]：{identityTag}",
+			$"[b]谱位[/b]：{profile.RankName} · {eliteText}",
+			$"[b]骨龄[/b]：{profile.AgeText}",
+			$"[b]修为[/b]：{profile.RealmName}（层级 {profile.RealmTier}）",
+			$"[b]功法[/b]：{techniqueTag}",
+			$"[b]主修技艺[/b]：{skillTag}",
+			$"[b]辅修技艺[/b]：{secondarySkillTag}",
+			$"[b]交互指令[/b]：{directiveText}（{directiveEffect}）",
+			$"[b]职司[/b]：{profile.DutyDisplayName}",
+			$"[b]当前差事[/b]：{profile.CurrentAssignment}",
+			$"[b]居所[/b]：{profile.ResidenceName}",
+			$"[b]关联峰脉[/b]：{profile.LinkedPeakSummary}",
+			$"[b]性情印记[/b]：{profile.TraitSummary}",
+			$"[b]气血 / 心境 / 潜力 / 战力[/b]：{profile.Health} / {profile.Mood} / {profile.Potential} / {profile.Combat}",
+			$"[b]匠艺 / 悟性 / 执行 / 贡献[/b]：{profile.Craft} / {profile.Insight} / {profile.Execution} / {profile.Contribution}",
+			$"[b]培养批注[/b]：{profile.Note}"
+		};
+
+		return string.Join("\n", detailLines);
+	}
+
+	private string BuildDirectiveEffectText(DiscipleProfile profile)
+	{
+		if (profile.AgeBand == DiscipleAgeBand.Seedling)
+		{
+			return "启蒙新苗暂只记录成长，不纳入外务候补或执事培养重点名册。";
+		}
+
+		return DiscipleDirectiveRules.BuildDiscipleDirectiveEffectSummary(_state, profile);
+	}
+
+	private static string ResolveIdentityTag(DiscipleProfile profile)
+	{
+		if (profile.AgeBand == DiscipleAgeBand.Seedling)
+		{
+			return "新苗弟子";
+		}
+
+		if (profile.IsElite)
+		{
+			return "真传弟子";
+		}
+
+		if (profile.AgeBand == DiscipleAgeBand.Elder)
+		{
+			return "守峰执事";
+		}
+
+		if (profile.Potential >= 74)
+		{
+			return "内门弟子";
+		}
+
+		return profile.JobType.HasValue ? "外门弟子" : "候值门人";
+	}
+
+	private static string ResolveTechniqueTag(DiscipleProfile profile)
+	{
+		if (profile.AgeBand == DiscipleAgeBand.Seedling)
+		{
+			return "启蒙·养气篇";
+		}
+
+		return profile.JobType switch
+		{
+			JobType.Farmer => profile.IsElite ? "灵植·归元真诀" : "灵植·归元诀",
+			JobType.Worker => profile.CurrentAssignment.Contains("检修", StringComparison.Ordinal) ? "阵堂·承山诀" : "天工·锻机诀",
+			JobType.Merchant => profile.CurrentAssignment.Contains("商路", StringComparison.Ordinal) ? "外域·行远诀" : "青云·通路诀",
+			JobType.Scholar => profile.CurrentAssignment.Contains("讲法", StringComparison.Ordinal) ? "青云·真诀" : "天机·明衍诀",
+			_ => "待定功法"
+		};
+	}
+
+	private static string ResolveSkillTag(DiscipleProfile profile)
+	{
+		if (profile.AgeBand == DiscipleAgeBand.Seedling)
+		{
+			return "待定技艺";
+		}
+
+		return profile.JobType switch
+		{
+			JobType.Farmer => "灵植",
+			JobType.Worker => profile.CurrentAssignment.Contains("检修", StringComparison.Ordinal) ? "阵法" : "炼器",
+			JobType.Merchant => profile.CurrentAssignment.Contains("商路", StringComparison.Ordinal) ? "御兽" : "傀儡",
+			JobType.Scholar => profile.CurrentAssignment.Contains("讲法", StringComparison.Ordinal) ? "符箓" : "天机",
+			_ => "待定技艺"
+		};
+	}
+
+	private static string ResolveSecondarySkillTag(DiscipleProfile profile)
+	{
+		if (profile.AgeBand == DiscipleAgeBand.Seedling)
+		{
+			return "基础课业";
+		}
+
+		return profile.JobType switch
+		{
+			JobType.Farmer => "医道",
+			JobType.Worker => "阵法",
+			JobType.Merchant => "卜算",
+			JobType.Scholar => "符箓",
+			_ => "基础庶务"
+		};
+	}
+
+	private void UpdateDirectiveButtons(DiscipleProfile? profile)
+	{
+		var directiveType = profile?.DirectiveType ?? DiscipleDirectiveType.None;
+		var allowSpecialDirective = profile != null && profile.AgeBand != DiscipleAgeBand.Seedling;
+
+		_directiveNoneButton.ToggleMode = true;
+		_directiveOuterButton.ToggleMode = true;
+		_directiveStewardButton.ToggleMode = true;
+
+		_directiveNoneButton.ButtonPressed = directiveType == DiscipleDirectiveType.None;
+		_directiveOuterButton.ButtonPressed = directiveType == DiscipleDirectiveType.OuterMissionCandidate;
+		_directiveStewardButton.ButtonPressed = directiveType == DiscipleDirectiveType.StewardCandidate;
+
+		_directiveNoneButton.Disabled = profile == null;
+		_directiveOuterButton.Disabled = !allowSpecialDirective;
+		_directiveStewardButton.Disabled = !allowSpecialDirective;
 	}
 
 	private static string ToChineseProgressText(int percent)

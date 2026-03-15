@@ -118,6 +118,7 @@ public partial class Main : Control
         CreateDisciplePanel();
         CreateSectOrganizationPanel();
         CreateSaveSlotsPanel();
+        CreateSectChroniclePanel();
         BindUiEvents();
         ConfigureLegacyFocusNavigation();
         BindLanternHoverEffects();
@@ -145,6 +146,7 @@ public partial class Main : Control
         UnbindDisciplePanelEvents();
         UnbindSectOrganizationPanelEvents();
         UnbindSaveSlotsPanelEvents();
+        UnbindSectChroniclePanelEvents();
         UnbindSectTileInspectorEvents();
     }
 
@@ -206,6 +208,8 @@ public partial class Main : Control
         _techLabel.Text = $"研修 T{Math.Max(state.TechLevel + 1, 1)}";
         _exploreButton.Text = state.ExplorationEnabled ? "历练中" : "历练";
 
+        CaptureSectChronicleSnapshot(state);
+
         _sectMapRenderer?.RefreshMap(state.Population, state.HousingCapacity, state.ElitePopulation);
         _sectMapRenderer?.RefreshResidents(state);
         _sectMapRenderer?.SetResidentClock(state.GameMinutes, GetCurrentTimeScaleFloat());
@@ -213,6 +217,7 @@ public partial class Main : Control
         RefreshTaskPanelPopup(state);
         RefreshDisciplePanelPopup(state);
         RefreshSectOrganizationPanelPopup(state);
+        RefreshSectChroniclePanelPopup(state);
         HandleAutoSaveFromState(state);
 
         RefreshJobPanels(state);
@@ -427,6 +432,7 @@ private void ConfigureLegacyBackground()
         BindTaskButtonEvent();
         BindDiscipleButtonEvent();
         BindSectOrganizationButtonEvent();
+        BindSectChronicleEntry();
         BindDiscipleMapInspectionEvent();
         BindSectTileInspectorEvents();
 

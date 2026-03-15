@@ -2023,32 +2023,14 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
 
     private static Vector2I[] ResolveWorldTileCoords(XianxiaHexCellData cell)
     {
-        if (cell.Water != XianxiaWaterType.None)
+        return WorldTerrainVisualRules.ResolveWorldVisualFamily(cell) switch
         {
-            return WorldWaterTileCoords;
-        }
-
-        if (IsSnowTerrain(cell.Terrain) || cell.Biome == XianxiaBiomeType.SnowPeaks)
-        {
-            return WorldSnowTileCoords;
-        }
-
-        if (IsMountainCell(cell) ||
-            cell.CliffMask != HexDirectionMask.None ||
-            cell.Biome is XianxiaBiomeType.DesertBadlands or XianxiaBiomeType.VolcanicWastes or XianxiaBiomeType.AncientRuinsLand ||
-            cell.Corruption > 0.58f)
-        {
-            return WorldRuggedTileCoords;
-        }
-
-        if (cell.QiDensity > 0.66f ||
-            cell.Biome is XianxiaBiomeType.BambooValley or XianxiaBiomeType.SacredForest or XianxiaBiomeType.JadeHighlands or XianxiaBiomeType.CrystalFields or XianxiaBiomeType.FloatingIsles ||
-            cell.Terrain is XianxiaTerrainType.SpiritSoil or XianxiaTerrainType.CrystalGround or XianxiaTerrainType.CloudGround)
-        {
-            return WorldSpiritTileCoords;
-        }
-
-        return WorldPlainTileCoords;
+            TownTerrainVisualFamily.DeepWater or TownTerrainVisualFamily.ShallowWater => WorldWaterTileCoords,
+            TownTerrainVisualFamily.Snow => WorldSnowTileCoords,
+            TownTerrainVisualFamily.Rugged => WorldRuggedTileCoords,
+            TownTerrainVisualFamily.Spirit => WorldSpiritTileCoords,
+            _ => WorldPlainTileCoords
+        };
     }
 
     private static Vector2I ToWorldTileCell(HexAxialCoordData coord)

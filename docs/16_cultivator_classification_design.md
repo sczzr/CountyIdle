@@ -229,3 +229,134 @@
 - 禁用“等级/职业高低”描述，统一用“修为/功法/技艺/身份”。
 - 任务门槛由 `修为` 决定，路线倾向由 `功法` 决定，具体胜任度由 `技艺` 决定。
 
+## 17) 现行弟子属性清单（运行版）
+
+本节只整理当前运行版 `DisciplePanel` 可见的弟子属性与来源，不新增规则。弟子名册仍由 `DiscipleRosterSystem` 根据 `GameState` 动态派生，不是存档实体。
+
+### 17.1 基础身份与状态字段（DiscipleProfile）
+
+| 对外名 | 字段 | 说明 |
+| --- | --- | --- |
+| 名称 | `Name` | 名册显示名 |
+| 名册称号 | `RankName` | 新苗/外门/内门/真传/守峰前辈等 |
+| 职司 | `JobType` + `DutyDisplayName` | 阵材/阵务/外事/推演/待命轮值 |
+| 修为 | `RealmName` + `RealmTier` | 当前境界与段位 |
+| 年龄段 | `AgeBand` + `Age` | 新苗期/青年期/盛年期/守峰期 |
+| 真传判定 | `IsElite` | 是否列入真传名册 |
+| 当前差事 | `CurrentAssignment` | 当前主线差事 |
+| 居所 | `ResidenceName` | 驻留或休憩地点 |
+| 峰脉归属 | `LinkedPeakSummary` | 关联峰堂摘要 |
+| 特征词条 | `TraitSummary` | 4 条特征摘要 |
+| 备注 | `Note` | 培养建议或状态提示 |
+
+### 17.2 八维属性（DiscipleProfile -> UI）
+
+| 对外名 | 字段 | 说明 |
+| --- | --- | --- |
+| 气血 | `Health` | 体力与恢复基础 |
+| 心境 | `Mood` | 情绪与稳定度 |
+| 潜力 | `Potential` | 成长上限与天赋倾向 |
+| 战力 | `Combat` | 外务与战备倾向 |
+| 匠艺 | `Craft` | 生产与工器倾向 |
+| 悟性 | `Insight` | 研修与悟道倾向 |
+| 执行 | `Execution` | 执行力与纪律倾向 |
+| 贡献 | `Contribution` | 对宗门的贡献度 |
+
+> UI 显示时会对数值做 `0~100` 的裁切显示，不直接暴露派生公式。
+
+### 17.3 派生展示指标（UI 派生）
+
+| 对外名 | 由哪些字段派生 | 说明 |
+| --- | --- | --- |
+| 心境统合 | `Mood + Execution + Contribution` | 心境综合值，显示为“心境”圆环 |
+| 灵根摘要 | `Potential + JobType` | 五行组合 + 灵根类型 |
+| 修为进度 | `Potential + Insight + Execution + RealmTier` | 修为条与进度文案 |
+| 气海进度 | `Health + Mood + Potential + RealmTier` | 气海条与进度文案 |
+| 战力评语 | `Combat + Execution + Contribution + RealmTier` | 战备标签与提示词 |
+
+### 17.4 弟子谱面板字段映射（当前 UI）
+
+概览与状态区：
+
+| UI 位置 | 文案示例 | 主要来源 |
+| --- | --- | --- |
+| 标题 | `姓名` | `Name` |
+| 概览行 | `身份：{身份} | 功法：{功法} | 技艺：{技艺}` + `骨龄：{AgeText} | 籍录：{峰脉}/{堂口} | 职：{职司} | 谱位：{谱位}` | `ResolveIdentityTag` + `ResolveTechniqueTag` + `ResolveSkillTag` + `AgeText` + `ResolveRosterPeakTitle` + `ResolveRosterHallTitle` + `DutyDisplayName` + `RankName` |
+| 根骨圆签 | `五行组合 + 灵根类型` | `ResolveRootSummary(Potential, JobType)` |
+| 修为条 | `修为境界：{RealmName}` + 进度 | `RealmName` + `ResolveRealmProgress` |
+| 气海条 | `蓄量：{进度}` | `ResolveQiSeaProgress` |
+| 战力印 | `战备评语` | `ResolveCombatSeal/Hint` |
+| 当前差事 | `当前差事/居所/关联峰脉` | `CurrentAssignment` + `ResidenceName` + `LinkedPeakSummary` |
+| 评语 | `观其气机…` | `BuildAnnotation`（含 `TraitSummary/Note`） |
+| 特征 | `4 条特征标签` | `TraitSummary`（不足则 `暂无特征`） |
+| 卷尾详录 | `卷册编号 / 身份 / 功法 / 技艺 / 职司 / 状态 / 全属性` | `DiscipleProfile` 全字段的 UI 派生整理 |
+
+仪表盘与雷达图：
+
+| UI 标签 | 对应字段 |
+| --- | --- |
+| 悟性 | `Insight` |
+| 潜力 | `Potential` |
+| 根骨 | `Health` |
+| 匠艺 | `Craft` |
+| 神魂 | `Mood` |
+| 心境 | `ResolveHeartState`（`Mood + Execution + Contribution`） |
+| 战力 | `Combat` |
+| 执行 | `Execution` |
+| 贡献 | `Contribution` |
+
+> 说明：当前 UI 已显式展示 `身份 / 功法 / 技艺`，并在卷尾详录中补齐当前 `DiscipleProfile` 的完整派生信息；其中功法与技艺仍属于运行时语义派生层，不代表正式存档字段已落盘。
+
+### 17.5 枚举与显示名对照
+
+年龄段（`DiscipleAgeBand`）：
+
+| 枚举 | 文案 |
+| --- | --- |
+| `Seedling` | 新苗期 |
+| `Young` | 青年期 |
+| `Prime` | 盛年期 |
+| `Elder` | 守峰期 |
+
+职司（`JobType` -> `DutyDisplayName`）：
+
+| 类型 | 文案 |
+| --- | --- |
+| `Farmer` | 阵材职司 |
+| `Worker` | 阵务职司 |
+| `Merchant` | 外事职司 |
+| `Scholar` | 推演职司 |
+| `null` | 待命轮值 |
+
+## 18) 现行技能/技艺清单（运行版）
+
+运行版“技艺面板”采用八大修仙技艺（`CraftSkillType`），用于产能与职司能力的统一口径。
+
+| 技艺 | 枚举 | 核心价值 |
+| --- | --- | --- |
+| 灵植 | `SpiritPlant` | 灵药/灵谷生产 |
+| 灵兽 | `SpiritBeast` | 灵兽培育与外务协同 |
+| 炼丹 | `Alchemy` | 供养与恢复 |
+| 炼器 | `Forging` | 装备与法器 |
+| 符箓 | `Talisman` | 战斗法术与爆发 |
+| 阵法 | `Formation` | 宗门防御与区域增益 |
+| 傀儡 | `Golem` | 自动化与采集 |
+| 天机 | `Arcane` | 研修解锁与法门推演 |
+
+### 18.1 技艺阶位显示名（运行版）
+
+| 技艺 | 凡阶 | 灵阶 | 宝阶 | 仙阶 |
+| --- | --- | --- | --- | --- |
+| 灵植 | 灵植凡徒 | 灵植灵士 | 灵植宝师 | 灵植真君 |
+| 灵兽 | 御兽凡徒 | 御兽灵士 | 御兽宝师 | 御兽真君 |
+| 炼丹 | 炼丹凡徒 | 炼丹灵士 | 炼丹宝师 | 炼丹真君 |
+| 炼器 | 炼器凡徒 | 炼器灵士 | 炼器宝师 | 炼器真君 |
+| 符箓 | 符箓凡徒 | 符箓灵士 | 符箓宝师 | 符箓真君 |
+| 阵法 | 阵法凡徒 | 阵法灵士 | 阵法宝师 | 阵法真君 |
+| 傀儡 | 傀儡凡徒 | 傀儡灵士 | 傀儡宝师 | 傀儡真君 |
+| 天机 | 天机凡徒 | 天机灵士 | 天机宝师 | 天机真君 |
+
+> 解锁条件与产能公式以 `docs/02_system_specs.md` 与 `SkillProgressionRules` 为准。
+
+> 剑道/体修/医道/卜算等技艺仍属于后续扩展语义，未进入当前运行版技艺面板。若新增，应同步更新 `CraftSkillType` 与本节清单。
+

@@ -14,6 +14,7 @@ public sealed record DiscipleProfile(
     int Id,
     string Name,
     string RankName,
+    DiscipleDirectiveType DirectiveType,
     JobType? JobType,
     string DutyDisplayName,
     string RealmName,

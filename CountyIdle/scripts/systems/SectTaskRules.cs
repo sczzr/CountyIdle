@@ -167,6 +167,7 @@ public static class SectTaskRules
     public static void EnsureDefaults(GameState state)
     {
         SectGovernanceRules.EnsureDefaults(state);
+        DiscipleDirectiveRules.EnsureDefaults(state);
         var shouldBootstrapOrders = state.TaskOrderUnits == null || state.TaskOrderUnits.Count == 0;
         EnsureTaskDictionaries(state);
         if (shouldBootstrapOrders)
@@ -191,6 +192,7 @@ public static class SectTaskRules
         EnsureTaskDictionaries(state);
         IndustryRules.EnsureDefaults(state);
         PopulationRules.EnsureDefaults(state);
+        DiscipleDirectiveRules.EnsureDefaults(state);
 
         var orderUnits = new Dictionary<SectTaskType, int>(Definitions.Count);
         var requestedWorkers = new Dictionary<SectTaskType, int>(Definitions.Count);
@@ -335,7 +337,7 @@ public static class SectTaskRules
 
     public static string BuildGovernanceExecutionSummary(GameState state)
     {
-        return BuildGovernanceExecutionSummary(BuildResolutionSnapshot(state));
+        return BuildGovernanceExecutionSummary(BuildResolutionSnapshot(state), state);
     }
 
     public static string GetDirectiveLevelSummary(GameState state, SectTaskType taskType)
@@ -347,6 +349,8 @@ public static class SectTaskRules
     {
         var snapshot = BuildResolutionSnapshot(state);
         return BuildDirectiveExecutionText(
+            state,
+            taskType,
             snapshot.RequestedWorkersByTask[taskType],
             snapshot.ResolvedWorkersByTask[taskType]);
     }
@@ -364,7 +368,7 @@ public static class SectTaskRules
             var requested = snapshot.RequestedWorkersByTask[definition.TaskType];
             var resolved = snapshot.ResolvedWorkersByTask[definition.TaskType];
             var levelText = GetDirectiveLevelText(orderUnits);
-            var executionText = BuildDirectiveExecutionText(requested, resolved);
+            var executionText = BuildDirectiveExecutionText(state, definition.TaskType, requested, resolved);
 
             if (orderUnits > 0)
             {
@@ -376,7 +380,7 @@ public static class SectTaskRules
 
         var title = $"{GetJobIcon(jobType)} {GetJobDisplayName(jobType)}";
         var summary = summaryParts.Count > 0
-            ? $"{SectOrganizationRules.GetLinkedPeakSummary(jobType)} · {BuildJobExecutionText(tasks, snapshot)}"
+            ? $"{SectOrganizationRules.GetLinkedPeakSummary(jobType)} · {BuildJobExecutionText(tasks, snapshot, state)}"
             : $"{SectOrganizationRules.GetLinkedPeakSummary(jobType)} · 尚未定调";
         var activeSupport = SectPeakSupportRules.GetActiveDefinition(state);
         var detail =
@@ -399,8 +403,13 @@ public static class SectTaskRules
         var requested = snapshot.RequestedWorkersByTask[taskType];
         var resolved = snapshot.ResolvedWorkersByTask[taskType];
         var levelText = GetDirectiveLevelText(orders);
-        var executionText = BuildDirectiveExecutionText(requested, resolved);
-        return $"{definition.IconGlyph} {definition.DisplayName} · {levelText} · {executionText}";
+        var executionText = BuildDirectiveExecutionText(state, taskType, requested, resolved);
+        var stewardSuffix = definition.IsInternalTask &&
+                            DiscipleDirectiveRules.TryGetStewardAppointment(state, taskType, out var appointment) &&
+                            appointment != null
+            ? $" · 执事：{appointment.DiscipleName}"
+            : string.Empty;
+        return $"{definition.IconGlyph} {definition.DisplayName} · {levelText} · {executionText}{stewardSuffix}";
     }
 
     public static string BuildTaskDetailText(GameState state, SectTaskType taskType)
@@ -411,7 +420,7 @@ public static class SectTaskRules
         var requested = snapshot.RequestedWorkersByTask[taskType];
         var resolved = snapshot.ResolvedWorkersByTask[taskType];
         var levelText = GetDirectiveLevelText(orders);
-        var executionText = BuildDirectiveExecutionText(requested, resolved);
+        var executionText = BuildDirectiveExecutionText(state, taskType, requested, resolved);
         var outputParts = new List<string>(4);
 
         if (definition.FoodYieldPerWorker > 0)
@@ -441,6 +450,22 @@ public static class SectTaskRules
         var ruleTreeSummary = SectRuleTreeRules.BuildActiveRuleSummary(state);
         var governanceText =
             $"宗主职责：决定是否试行、常设、重点或全力推进；具体人手与轮值由执事层按峰内条件自动协调。当前季度法令：{quarterDecree.DisplayName}（{quarterDecree.ShortEffect}）。当前门规纲目：{ruleTreeSummary}。";
+        var stewardExecutionModifier = DiscipleDirectiveRules.GetStewardExecutionModifier(state);
+        var stewardCount = DiscipleDirectiveRules.GetDirectiveCount(state, DiscipleDirectiveType.StewardCandidate);
+        var stewardText = string.Empty;
+        if (definition.IsInternalTask && stewardCount > 0)
+        {
+            if (DiscipleDirectiveRules.TryGetStewardAppointment(state, taskType, out var appointment) && appointment != null)
+            {
+                stewardText =
+                    $"当前代行执事：{appointment.DiscipleName}（执行 {appointment.Execution} / 悟性 {appointment.Insight} / 贡献 {appointment.Contribution}），本条内务执行效率 +{(appointment.ExecutionModifier - 1.0) * 100.0:0.#}%。\n" +
+                    $"执事培养：当前重点名册 {stewardCount} 人，平均补位效率 +{(stewardExecutionModifier - 1.0) * 100.0:0.#}%。\n";
+            }
+            else
+            {
+                stewardText = $"执事培养：当前重点名册 {stewardCount} 人，但本条尚未轮到具体执事补位。\n";
+            }
+        }
 
         return
             $"{definition.Description}\n" +
@@ -448,6 +473,7 @@ public static class SectTaskRules
             $"所属职司：{GetJobDisplayName(definition.JobType)}\n" +
             $"当前侧重：{levelText}\n" +
             $"执事落实：{executionText}\n" +
+            stewardText +
             $"预计作用：{(outputParts.Count > 0 ? string.Join("、", outputParts) : "主要提供组织与内务支撑")}\n" +
             $"{settlementText}\n" +
             $"{governanceText}";
@@ -556,6 +582,30 @@ public static class SectTaskRules
         };
     }
 
+    private static string BuildDirectiveExecutionText(GameState state, SectTaskType taskType, int requestedWorkers, int resolvedWorkers)
+    {
+        var baseText = BuildDirectiveExecutionText(requestedWorkers, resolvedWorkers);
+        var definition = GetDefinition(taskType);
+        if (!definition.IsInternalTask || requestedWorkers <= 0)
+        {
+            return baseText;
+        }
+
+        var stewardCount = DiscipleDirectiveRules.GetDirectiveCount(state, DiscipleDirectiveType.StewardCandidate);
+        var stewardExecutionModifier = DiscipleDirectiveRules.GetStewardExecutionModifier(state);
+        if (stewardCount <= 0 || stewardExecutionModifier <= 1.0001)
+        {
+            return baseText;
+        }
+
+        if (DiscipleDirectiveRules.TryGetStewardAppointment(state, taskType, out var appointment) && appointment != null)
+        {
+            return $"{baseText} · {appointment.DiscipleName}补位";
+        }
+
+        return $"{baseText} · 执事补位";
+    }
+
     private static string BuildDirectiveExecutionText(int requestedWorkers, int resolvedWorkers)
     {
         if (requestedWorkers <= 0)
@@ -582,7 +632,7 @@ public static class SectTaskRules
         return "承压明显";
     }
 
-    private static string BuildGovernanceExecutionSummary(SectTaskResolutionSnapshot snapshot)
+    private static string BuildGovernanceExecutionSummary(SectTaskResolutionSnapshot snapshot, GameState state)
     {
         if (snapshot.TotalOrderUnits <= 0)
         {
@@ -597,22 +647,65 @@ public static class SectTaskRules
         var constrainedCount = Definitions.Count(definition =>
             snapshot.RequestedWorkersByTask[definition.TaskType] > snapshot.ResolvedWorkersByTask[definition.TaskType]);
 
-        return constrainedCount switch
+        var baseText = constrainedCount switch
         {
             0 => "执事层落实稳定",
             <= 2 => "执事层部分受限",
             _ => "执事层整体承压"
         };
+
+        var stewardCount = DiscipleDirectiveRules.GetDirectiveCount(state, DiscipleDirectiveType.StewardCandidate);
+        var stewardExecutionModifier = DiscipleDirectiveRules.GetStewardExecutionModifier(state);
+        if (stewardCount <= 0 || stewardExecutionModifier <= 1.0001)
+        {
+            return baseText;
+        }
+
+        var hasInternalOrders = Definitions.Any(definition =>
+            definition.IsInternalTask &&
+            snapshot.OrderUnits[definition.TaskType] > 0);
+        if (!hasInternalOrders)
+        {
+            return baseText;
+        }
+
+        var appointmentSnapshot = DiscipleDirectiveRules.BuildStewardAppointmentSnapshot(state);
+        if (appointmentSnapshot.TotalAssigned <= 0)
+        {
+            return baseText;
+        }
+
+        return constrainedCount switch
+        {
+            0 => $"{baseText}（{appointmentSnapshot.TotalAssigned} 名执事补位，均效 +{(stewardExecutionModifier - 1.0) * 100.0:0.#}%）",
+            <= 2 => $"{baseText}，但 {appointmentSnapshot.TotalAssigned} 名执事正在补位（均效 +{(stewardExecutionModifier - 1.0) * 100.0:0.#}%）",
+            _ => $"{baseText}，{appointmentSnapshot.TotalAssigned} 名执事正尽力补位（均效 +{(stewardExecutionModifier - 1.0) * 100.0:0.#}%）"
+        };
     }
 
     private static string BuildJobExecutionText(
         IEnumerable<SectTaskDefinition> tasks,
-        SectTaskResolutionSnapshot snapshot)
+        SectTaskResolutionSnapshot snapshot,
+        GameState state)
     {
         var constrained = tasks.Count(definition =>
             snapshot.RequestedWorkersByTask[definition.TaskType] > snapshot.ResolvedWorkersByTask[definition.TaskType]);
+        var baseText = constrained == 0 ? "执事落实稳定" : "执事落实受限";
+        var hasInternalTask = tasks.Any(definition => definition.IsInternalTask && snapshot.OrderUnits[definition.TaskType] > 0);
+        var stewardCount = DiscipleDirectiveRules.GetDirectiveCount(state, DiscipleDirectiveType.StewardCandidate);
+        var stewardExecutionModifier = DiscipleDirectiveRules.GetStewardExecutionModifier(state);
+        if (!hasInternalTask || stewardCount <= 0 || stewardExecutionModifier <= 1.0001)
+        {
+            return baseText;
+        }
 
-        return constrained == 0 ? "执事落实稳定" : "执事落实受限";
+        var appointedCount = tasks.Count(definition =>
+            definition.IsInternalTask &&
+            DiscipleDirectiveRules.TryGetStewardAppointment(state, definition.TaskType, out _));
+
+        return appointedCount > 0
+            ? $"{baseText}（执事补位 {appointedCount} 条）"
+            : $"{baseText}（执事培养待补位）";
     }
 
     private static string GetDirectiveDomainText(SectTaskType taskType)

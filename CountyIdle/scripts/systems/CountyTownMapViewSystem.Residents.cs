@@ -800,6 +800,7 @@ public partial class CountyTownMapViewSystem
             100000 + walkerIndex,
             $"{GetFallbackSurname(walkerIndex)}巡值弟子",
             "外门",
+            DiscipleDirectiveType.None,
             jobType,
             GetFallbackDutyDisplayName(jobType),
             "炼气二层",

@@ -1,11 +1,10 @@
 [gd_scene format=3 uid="uid://cn60pdpci5qpb"]
 
 [ext_resource type="Script" uid="uid://dis2ijq6cro48" path="res://scripts/ui/DisciplePanel.cs" id="1_disciple_panel"]
-[ext_resource type="Script" path="res://scripts/ui/gd/DisciplePanelVisualFx.gd" id="2_disciple_fx"]
-[ext_resource type="Script" path="res://scripts/ui/gd/DiscipleRadarChart.gd" id="3_disciple_radar_fx"]
+[ext_resource type="Script" uid="uid://b6qabkeimxmoc" path="res://scripts/ui/gd/DisciplePanelVisualFx.gd" id="2_disciple_fx"]
+[ext_resource type="Script" uid="uid://cln78okxidums" path="res://scripts/ui/gd/DiscipleRadarChart.gd" id="3_disciple_radar_fx"]
 
 [node name="DisciplePanel" type="Control" unique_id=360497384]
-visible = false
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -15,7 +14,7 @@ grow_vertical = 2
 mouse_filter = 1
 script = ExtResource("1_disciple_panel")
 
-[node name="VisualFx" type="Node" parent="."]
+[node name="VisualFx" type="Node" parent="." unique_id=945309402]
 script = ExtResource("2_disciple_fx")
 
 [node name="Overlay" type="ColorRect" parent="." unique_id=1232459106]
@@ -92,7 +91,7 @@ size_flags_vertical = 3
 theme_override_constants/separation = 0
 
 [node name="LeftPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow" unique_id=766985752]
-custom_minimum_size = Vector2(360, 0)
+custom_minimum_size = Vector2(320, 0)
 layout_mode = 2
 size_flags_vertical = 3
 
@@ -181,13 +180,14 @@ layout_mode = 2
 size_flags_vertical = 3
 color = Color(0.478431, 0.478431, 0.478431, 0.32)
 
-[node name="RightPanel" type="Control" parent="Overlay/Wrapper/RootColumn/BodyRow" unique_id=324070073]
+[node name="RightPanel" type="ScrollContainer" parent="Overlay/Wrapper/RootColumn/BodyRow" unique_id=324070073]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+horizontal_scroll_mode = 0
 
 [node name="RightMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel" unique_id=1842090694]
-layout_mode = 0
+layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/margin_left = 20
@@ -235,6 +235,7 @@ autowrap_mode = 2
 [node name="ProfileMeta" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader" unique_id=392714456]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
+autowrap_mode = 3
 
 [node name="ProfileMetaSpacer" type="Control" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader" unique_id=1734482063]
 layout_mode = 2
@@ -242,19 +243,71 @@ layout_mode = 2
 [node name="ProfileStatus" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader" unique_id=1701864083]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
+autowrap_mode = 3
 
 [node name="ProfileStatusSpacer" type="Control" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader" unique_id=1694858979]
 layout_mode = 2
 
-[node name="DashboardRow" type="HBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn" unique_id=57500561]
+[node name="DirectivePanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn" unique_id=91820417]
+layout_mode = 2
+
+[node name="DirectiveMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel" unique_id=207516341]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 12
+
+[node name="DirectiveColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel/DirectiveMargin" unique_id=911072364]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DirectiveHeader" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel/DirectiveMargin/DirectiveColumn" unique_id=1885738562]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "【弟子交互】"
+
+[node name="DirectiveStatus" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel/DirectiveMargin/DirectiveColumn" unique_id=1818599046]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "当前批注：常制观察"
+
+[node name="DirectiveEffect" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel/DirectiveMargin/DirectiveColumn" unique_id=2139912900]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "弟子批注会在历练与内务回流中生效。"
+autowrap_mode = 3
+
+[node name="DirectiveButtonRow" type="HBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel/DirectiveMargin/DirectiveColumn" unique_id=149550352]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DirectiveNoneButton" type="Button" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveButtonRow" unique_id=1801821726]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "常制观察"
+
+[node name="DirectiveOuterButton" type="Button" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveButtonRow" unique_id=283644835]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "纳入外务"
+
+[node name="DirectiveStewardButton" type="Button" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveButtonRow" unique_id=874263101]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "执事培养"
+
+[node name="DashboardRow" type="HFlowContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn" unique_id=57500561]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/separation = 24
+theme_override_constants/h_separation = 24
+theme_override_constants/v_separation = 24
 
 [node name="FoundationPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow" unique_id=442415935]
-custom_minimum_size = Vector2(420, 0)
+custom_minimum_size = Vector2(320, 0)
 layout_mode = 2
+size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="FoundationMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel" unique_id=687004032]
@@ -277,7 +330,7 @@ text = "先天根基评估"
 custom_minimum_size = Vector2(0, 220)
 layout_mode = 2
 
-[node name="RadarChart" type="Control" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/RadarCenter"]
+[node name="RadarChart" type="Control" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/RadarCenter" unique_id=492688217]
 layout_mode = 2
 mouse_filter = 2
 script = ExtResource("3_disciple_radar_fx")
@@ -286,7 +339,6 @@ script = ExtResource("3_disciple_radar_fx")
 layout_mode = 2
 
 [node name="MetricGrid" type="GridContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter" unique_id=1546340281]
-custom_minimum_size = Vector2(330, 0)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_constants/h_separation = 12
@@ -449,7 +501,86 @@ layout_mode = 2
 text = "0"
 horizontal_alignment = 1
 
+[node name="CombatTile" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid" unique_id=765183012]
+custom_minimum_size = Vector2(96, 78)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="CombatMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/CombatTile" unique_id=84462614]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="CombatColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/CombatTile/CombatMargin" unique_id=2025045516]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CombatTitle" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/CombatTile/CombatMargin/CombatColumn" unique_id=859232917]
+layout_mode = 2
+text = "战力"
+horizontal_alignment = 1
+
+[node name="CombatValue" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/CombatTile/CombatMargin/CombatColumn" unique_id=1759035531]
+layout_mode = 2
+text = "0"
+horizontal_alignment = 1
+
+[node name="ExecutionTile" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid" unique_id=1477775315]
+custom_minimum_size = Vector2(96, 78)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="ExecutionMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/ExecutionTile" unique_id=76499810]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="ExecutionColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/ExecutionTile/ExecutionMargin" unique_id=32980629]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ExecutionTitle" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/ExecutionTile/ExecutionMargin/ExecutionColumn" unique_id=842040977]
+layout_mode = 2
+text = "执行"
+horizontal_alignment = 1
+
+[node name="ExecutionValue" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/ExecutionTile/ExecutionMargin/ExecutionColumn" unique_id=1410367219]
+layout_mode = 2
+text = "0"
+horizontal_alignment = 1
+
+[node name="ContributionTile" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid" unique_id=1275150393]
+custom_minimum_size = Vector2(96, 78)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="ContributionMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/ContributionTile" unique_id=850657335]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="ContributionColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/ContributionTile/ContributionMargin" unique_id=201867124]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ContributionTitle" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/ContributionTile/ContributionMargin/ContributionColumn" unique_id=1928004189]
+layout_mode = 2
+text = "贡献"
+horizontal_alignment = 1
+
+[node name="ContributionValue" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/ContributionTile/ContributionMargin/ContributionColumn" unique_id=930790307]
+layout_mode = 2
+text = "0"
+horizontal_alignment = 1
+
 [node name="CultivationPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow" unique_id=2004348307]
+custom_minimum_size = Vector2(320, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -541,18 +672,18 @@ horizontal_alignment = 1
 [node name="TraitPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn" unique_id=2045313825]
 layout_mode = 2
 
-[node name="TraitTagTemplate" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel"]
+[node name="TraitTagTemplate" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel" unique_id=1849743514]
 visible = false
 layout_mode = 2
 
-[node name="TagMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel/TraitTagTemplate"]
+[node name="TagMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel/TraitTagTemplate" unique_id=1839191827]
 layout_mode = 2
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 4
 
-[node name="TagLabel" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel/TraitTagTemplate/TagMargin"]
+[node name="TagLabel" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel/TraitTagTemplate/TagMargin" unique_id=351918194]
 layout_mode = 2
 text = "特征"
 
@@ -598,6 +729,40 @@ text = "【衍天批注】"
 
 [node name="AnnotationText" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/AnnotationPanel/AnnotationMargin/AnnotationColumn" unique_id=1065459550]
 layout_mode = 2
+
+[node name="FullInfoPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn" unique_id=946533041]
+custom_minimum_size = Vector2(0, 190)
+layout_mode = 2
+
+[node name="FullInfoMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/FullInfoPanel" unique_id=1012623698]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 14
+
+[node name="FullInfoColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/FullInfoPanel/FullInfoMargin" unique_id=383587387]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="FullInfoHeader" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/FullInfoPanel/FullInfoMargin/FullInfoColumn" unique_id=2018006387]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "【卷尾详录】"
+
+[node name="FullInfoScroll" type="ScrollContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/FullInfoPanel/FullInfoMargin/FullInfoColumn" unique_id=840757335]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="FullInfoLabel" type="RichTextLabel" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/FullInfoPanel/FullInfoMargin/FullInfoColumn/FullInfoScroll" unique_id=1752545656]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "[color=#4a3f35]卷中暂未记入详录。[/color]"
+fit_content = true
+scroll_active = false
 
 [node name="FooterDivider" type="ColorRect" parent="Overlay/Wrapper/RootColumn" unique_id=1334632408]
 custom_minimum_size = Vector2(0, 1)

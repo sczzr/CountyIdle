@@ -59,6 +59,7 @@ public static class DiscipleRosterSystem
         var state = sourceState.Clone();
         PopulationRules.EnsureDefaults(state);
         SectGovernanceRules.EnsureDefaults(state);
+        DiscipleDirectiveRules.EnsureDefaults(state);
 
         var population = Math.Max(state.Population, 0);
         if (population <= 0)
@@ -80,6 +81,7 @@ public static class DiscipleRosterSystem
             var jobType = jobAssignments[index];
             var ageBand = ageBands[index];
             var isElite = eliteSet.Contains(index);
+            var directiveType = DiscipleDirectiveRules.GetDirective(state, index + 1);
             var age = ResolveAge(index, ageBand);
             var health = ResolveHealth(index, state, ageBand, isElite);
             var mood = ResolveMood(index, state, law);
@@ -90,16 +92,17 @@ public static class DiscipleRosterSystem
             var execution = ResolveExecution(index, state, jobType, law, mood);
             var contribution = ResolveContribution(index, isElite, execution, law);
             var realmTier = ResolveRealmTier(index, state, jobType, isElite, talentPlan, direction, ageBand);
-            var currentAssignment = ResolveCurrentAssignment(jobType, ageBand, minuteOfDay, isElite);
+            var currentAssignment = ResolveCurrentAssignment(jobType, ageBand, minuteOfDay, isElite, directiveType);
             var residenceName = ResolveResidenceName(jobType, ageBand, isElite);
             var linkedPeakSummary = ResolveLinkedPeakSummary(jobType, ageBand);
             var traitSummary = ResolveTraitSummary(index, jobType, ageBand, talentPlan, law);
-            var note = ResolveNote(jobType, isElite, health, mood, potential, insight, currentAssignment);
+            var note = ResolveNote(jobType, isElite, health, mood, potential, insight, currentAssignment, directiveType);
 
             roster.Add(new DiscipleProfile(
                 index + 1,
                 BuildName(index),
                 ResolveRankName(jobType, ageBand, isElite, potential),
+                directiveType,
                 jobType,
                 ResolveDutyDisplayName(jobType),
                 ResolveRealmName(realmTier),
@@ -481,32 +484,42 @@ public static class DiscipleRosterSystem
         return Math.Clamp(tier, 1, 7);
     }
 
-    private static string ResolveCurrentAssignment(JobType? jobType, DiscipleAgeBand ageBand, int minuteOfDay, bool isElite)
+    private static string ResolveCurrentAssignment(
+        JobType? jobType,
+        DiscipleAgeBand ageBand,
+        int minuteOfDay,
+        bool isElite,
+        DiscipleDirectiveType directiveType)
     {
+        string assignment;
         if (ageBand == DiscipleAgeBand.Seedling)
         {
-            return minuteOfDay switch
+            assignment = minuteOfDay switch
             {
                 < 420 => "卯时温养灵息",
                 < 720 => "启蒙晨课",
                 < 1020 => "随堂观摩与基础差使",
                 _ => "回舍温习与抄录"
             };
+
+            return assignment;
         }
 
         if (minuteOfDay < 300)
         {
-            return isElite ? "夜静行功" : "夜息回舍";
+            assignment = isElite ? "夜静行功" : "夜息回舍";
+            return AppendDirectiveSuffix(assignment, directiveType);
         }
 
         if (minuteOfDay < 480)
         {
-            return isElite ? "晨钟吐纳" : "点卯整队";
+            assignment = isElite ? "晨钟吐纳" : "点卯整队";
+            return AppendDirectiveSuffix(assignment, directiveType);
         }
 
         if (minuteOfDay < 900)
         {
-            return jobType switch
+            assignment = jobType switch
             {
                 JobType.Farmer => "阵材圃轮值",
                 JobType.Worker => "阵枢营造",
@@ -514,11 +527,13 @@ public static class DiscipleRosterSystem
                 JobType.Scholar => "传法院推演",
                 _ => "待命补位"
             };
+
+            return AppendDirectiveSuffix(assignment, directiveType);
         }
 
         if (minuteOfDay < 1140)
         {
-            return jobType switch
+            assignment = jobType switch
             {
                 JobType.Farmer => "巡视地脉与药圃",
                 JobType.Worker => "护山构件检修",
@@ -526,9 +541,12 @@ public static class DiscipleRosterSystem
                 JobType.Scholar => "讲法复盘与校勘",
                 _ => "轮值巡舍"
             };
+
+            return AppendDirectiveSuffix(assignment, directiveType);
         }
 
-        return isElite ? "晚课收束与静修" : "归舍整理与晚修";
+        assignment = isElite ? "晚课收束与静修" : "归舍整理与晚修";
+        return AppendDirectiveSuffix(assignment, directiveType);
     }
 
     private static string ResolveResidenceName(JobType? jobType, DiscipleAgeBand ageBand, bool isElite)
@@ -605,29 +623,36 @@ public static class DiscipleRosterSystem
         int mood,
         int potential,
         int insight,
-        string currentAssignment)
+        string currentAssignment,
+        DiscipleDirectiveType directiveType)
     {
+        string baseNote;
         if (health <= 44)
         {
-            return "近期消耗偏高，建议优先补药养与静修时段。";
+            baseNote = "近期消耗偏高，建议优先补药养与静修时段。";
+            return AppendDirectiveNote(baseNote, directiveType);
         }
 
         if (mood <= 42)
         {
-            return "心绪起伏明显，宜暂缓高压差使，先稳住起居与讲法节奏。";
+            baseNote = "心绪起伏明显，宜暂缓高压差使，先稳住起居与讲法节奏。";
+            return AppendDirectiveNote(baseNote, directiveType);
         }
 
         if (potential >= 82 && insight >= 72)
         {
-            return "具备重点培养价值，适合纳入阵道深造或真传考察名单。";
+            baseNote = "具备重点培养价值，适合纳入阵道深造或真传考察名单。";
+            return AppendDirectiveNote(baseNote, directiveType);
         }
 
         if (isElite)
         {
-            return "当前已列入峰内重点名册，可承担更高阶护山或推演职责。";
+            baseNote = "当前已列入峰内重点名册，可承担更高阶护山或推演职责。";
+            return AppendDirectiveNote(baseNote, directiveType);
         }
 
-        return $"当前以“{currentAssignment}”为主，整体状态平稳，可按既定方略继续历练。";
+        baseNote = $"当前以“{currentAssignment}”为主，整体状态平稳，可按既定方略继续历练。";
+        return AppendDirectiveNote(baseNote, directiveType);
     }
 
     private static string ResolveRankName(JobType? jobType, DiscipleAgeBand ageBand, bool isElite, int potential)
@@ -751,5 +776,29 @@ public static class DiscipleRosterSystem
         {
             list.Add(value);
         }
+    }
+
+    private static string AppendDirectiveSuffix(string assignment, DiscipleDirectiveType directiveType)
+    {
+        return directiveType switch
+        {
+            DiscipleDirectiveType.OuterMissionCandidate => $"{assignment} · 外务候补",
+            DiscipleDirectiveType.StewardCandidate => $"{assignment} · 执事试值",
+            _ => assignment
+        };
+    }
+
+    private static string AppendDirectiveNote(string baseNote, DiscipleDirectiveType directiveType)
+    {
+        var directiveNote = directiveType switch
+        {
+            DiscipleDirectiveType.OuterMissionCandidate => "现已被点为外务候补，历练与商路差使会优先吸纳其表现。",
+            DiscipleDirectiveType.StewardCandidate => "现已被点为执事培养对象，庶务磨砺与内务回流会持续记录其执行表现。",
+            _ => string.Empty
+        };
+
+        return string.IsNullOrWhiteSpace(directiveNote)
+            ? baseNote
+            : $"{baseNote} {directiveNote}";
     }
 }
