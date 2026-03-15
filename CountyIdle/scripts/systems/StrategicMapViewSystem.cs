@@ -28,13 +28,14 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     private const int SettlementBucketSize = 6;
     private const float HexGridFillAlphaEven = 0.08f;
     private const float HexGridFillAlphaOdd = 0.12f;
-    private const float WorldHexSeamPaddingFactor = 0.022f;
-    private const float WorldHexSeamPaddingMin = 0.36f;
-    private const float WorldHexSeamPaddingMax = 1.40f;
-    private const float WorldHexSeamUvInsetPx = 0.90f;
-    private const float WorldHexUnderlayPaddingFactor = 0.020f;
-    private const float WorldHexUnderlayPaddingMin = 0.25f;
-    private const float WorldHexUnderlayPaddingMax = 2.50f;
+    private const float WorldHexSeamPaddingFactor = 0.012f;
+    private const float WorldHexSeamPaddingMin = 0.18f;
+    private const float WorldHexSeamPaddingMax = 0.80f;
+    private const float WorldHexSeamOverdrawScale = 1.0f;
+    private const float WorldHexSeamUvInsetPx = 16.0f;
+    private const float WorldHexUnderlayPaddingFactor = 0.012f;
+    private const float WorldHexUnderlayPaddingMin = 0.20f;
+    private const float WorldHexUnderlayPaddingMax = 1.60f;
     private const string Layer1TileSetPath = "res://assets/ui/tilemap/L1_hex_tileset.tres";
     private const string WorldHexTileClipShaderPath = "res://assets/ui/tilemap/world_hex_tile_clip.gdshader";
     private static readonly Vector2I[] WorldPlainTileCoords =
@@ -706,7 +707,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         }
 
         var hexRadius = Math.Max(_xianxiaWorldHexRadius * unit, 2f);
-        var renderRadius = hexRadius + ResolveWorldSeamPadding(hexRadius);
+        var renderRadius = (hexRadius + ResolveWorldSeamPadding(hexRadius)) * WorldHexSeamOverdrawScale;
         var underlayRadius = renderRadius + ResolveWorldUnderlayPadding(hexRadius);
         var tint = _operationalStyle.TerrainTint;
         foreach (var cell in _xianxiaWorldMap.Cells)
@@ -1435,7 +1436,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         var spanX = Math.Max(maxX - minX, 0.01f);
         var spanY = Math.Max(maxY - minY, 0.01f);
         var scale = 1.82f / Math.Max(spanX, spanY);
-        _xianxiaWorldHexRadius = 0.94f * scale;
+        _xianxiaWorldHexRadius = 0.98f * scale;
 
         foreach (var pair in rawCenters)
         {
@@ -1907,7 +1908,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         var scale = 1.82f / Math.Max(spanX, spanY);
         _xianxiaWorldTileCenterLocal = worldCenter;
         _xianxiaWorldTileLayoutScale = scale;
-        _xianxiaWorldHexRadius = Math.Max(halfHeight * scale, 0.01f);
+        _xianxiaWorldHexRadius = Math.Max(halfHeight * scale * 0.98f, 0.01f);
 
         foreach (var pair in rawCenters)
         {
@@ -1993,6 +1994,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         {
             Shader = shader
         };
+        _worldTerrainClipMaterial.SetShaderParameter("edge_feather", 0.0f);
         return _worldTerrainClipMaterial;
     }
 
@@ -2005,7 +2007,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         }
 
         var hexRadius = Math.Max(_xianxiaWorldHexRadius * unit, 2f);
-        var renderRadius = hexRadius + ResolveWorldSeamPadding(hexRadius);
+        var renderRadius = (hexRadius + ResolveWorldSeamPadding(hexRadius)) * WorldHexSeamOverdrawScale;
         var canvasCenter = ToCanvas(center, unit, normalizedCenter.X, normalizedCenter.Y);
         var hex = BuildHexPolygon(canvasCenter, renderRadius);
         DrawFilledPolygon(hex, new Color(0.96f, 0.93f, 0.78f, 0.10f));
@@ -2061,6 +2063,10 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         return Mathf.Clamp(radius * WorldHexUnderlayPaddingFactor, WorldHexUnderlayPaddingMin, WorldHexUnderlayPaddingMax);
     }
 }
+
+
+
+
 
 
 
