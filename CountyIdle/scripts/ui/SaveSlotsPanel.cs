@@ -10,13 +10,6 @@ namespace CountyIdle.UI;
 
 public partial class SaveSlotsPanel : PopupPanelBase
 {
-    private static readonly Color PaperMainColor = new(0.95f, 0.92f, 0.84f, 1f);
-    private static readonly Color PaperDarkColor = new(0.89f, 0.85f, 0.76f, 1f);
-    private static readonly Color InkMainColor = new(0.17f, 0.15f, 0.13f, 1f);
-    private static readonly Color InkMutedColor = new(0.42f, 0.37f, 0.33f, 1f);
-    private static readonly Color SealRedColor = new(0.65f, 0.16f, 0.16f, 1f);
-    private static readonly Color BorderInkColor = new(0.29f, 0.25f, 0.21f, 1f);
-
     public enum PanelIntent
     {
         Save,
@@ -61,6 +54,7 @@ public partial class SaveSlotsPanel : PopupPanelBase
     private Button _refreshButton = null!;
     private Button _closeButton = null!;
     private Button _footerCloseButton = null!;
+    private Node? _previewVisualFx;
 
     private readonly List<SaveSlotSummary> _allSlots = new();
     private readonly List<SaveSlotSummary> _visibleSlots = new();
@@ -98,8 +92,8 @@ public partial class SaveSlotsPanel : PopupPanelBase
         _refreshButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ActionRowTertiary/RefreshButton");
         _closeButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/HeaderRow/CloseButton");
         _footerCloseButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/FooterRow/CloseFooterButton");
+        _previewVisualFx = GetNodeOrNull<Node>("PreviewVisualFx");
 
-        ApplyScrollStyles();
         InitializeFilterControls();
         InitializePopupHint("CenterLayer/Dialog/Margin/MainColumn/HintLabel");
         BindEvents();
@@ -112,6 +106,7 @@ public partial class SaveSlotsPanel : PopupPanelBase
         ApplyIntentText();
         ApplySlots(slots, preferredSlotKey);
         OpenPopup();
+        CallPreviewVisualFx("pulse_on_select");
     }
 
     public void RefreshSlots(IReadOnlyList<SaveSlotSummary> slots, string? preferredSlotKey = null, string? statusMessage = null)
@@ -175,53 +170,6 @@ public partial class SaveSlotsPanel : PopupPanelBase
         _refreshButton.Pressed += () => RefreshRequested?.Invoke();
         _closeButton.Pressed += ClosePopup;
         _footerCloseButton.Pressed += ClosePopup;
-    }
-
-    private void ApplyScrollStyles()
-    {
-        _dialog.AddThemeStyleboxOverride("panel", CreatePaperStyle());
-        _previewFrame.AddThemeStyleboxOverride("panel", CreateNoteStyle());
-
-        var leftRoller = GetNode<PanelContainer>("CenterLayer/DecorLayer/LeftRoller");
-        var rightRoller = GetNode<PanelContainer>("CenterLayer/DecorLayer/RightRoller");
-        leftRoller.AddThemeStyleboxOverride("panel", CreateRollerStyle());
-        rightRoller.AddThemeStyleboxOverride("panel", CreateRollerStyle());
-
-        var titleLabel = GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/HeaderRow/TitleLabel");
-        titleLabel.AddThemeFontSizeOverride("font_size", 26);
-        titleLabel.AddThemeColorOverride("font_color", InkMainColor);
-
-        _modeLabel.AddThemeFontSizeOverride("font_size", 14);
-        _modeLabel.AddThemeColorOverride("font_color", SealRedColor);
-        _slotListTitle.AddThemeFontSizeOverride("font_size", 16);
-        _slotListTitle.AddThemeColorOverride("font_color", InkMainColor);
-        _slotDetailLabel.AddThemeColorOverride("font_color", InkMainColor);
-        _previewHintLabel.AddThemeColorOverride("font_color", InkMutedColor);
-        _previewHintLabel.AddThemeFontSizeOverride("font_size", 13);
-
-        foreach (var label in new[]
-                 {
-                     GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/DetailTitle"),
-                     GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/NameRow/SlotNameLabel")
-                 })
-        {
-            label.AddThemeFontSizeOverride("font_size", 15);
-            label.AddThemeColorOverride("font_color", InkMainColor);
-        }
-
-        ApplyCloseButtonStyle(_closeButton);
-        ApplyInkButtonStyle(_footerCloseButton, false);
-        ApplyInkButtonStyle(_saveSelectedButton, false);
-        ApplyInkButtonStyle(_loadSelectedButton, false);
-        ApplyInkButtonStyle(_createSlotButton, false);
-        ApplyInkButtonStyle(_renameSlotButton, false);
-        ApplyInkButtonStyle(_copySlotButton, false);
-        ApplyInkButtonStyle(_deleteSlotButton, true);
-        ApplyInkButtonStyle(_refreshButton, false);
-        ApplyFieldStyle(_filterOptionButton);
-        ApplyFieldStyle(_sortOptionButton);
-        ApplyLineEditStyle(_slotNameEdit);
-        ApplyItemListStyle(_slotList);
     }
 
     private void ApplyIntentText()
@@ -301,6 +249,7 @@ public partial class SaveSlotsPanel : PopupPanelBase
         _slotNameEdit.Text = slot.SlotName;
         _slotNameEdit.CaretColumn = _slotNameEdit.Text.Length;
         UpdatePreviewDisplay(slot);
+        CallPreviewVisualFx("pulse_on_select");
     }
 
     private string BuildSlotListText(SaveSlotSummary slot)
@@ -547,12 +496,14 @@ public partial class SaveSlotsPanel : PopupPanelBase
         {
             _previewTexture.Texture = previewTexture;
             _previewHintLabel.Visible = false;
+            CallPreviewVisualFx("transition_to_preview");
             return;
         }
 
         _previewTexture.Texture = null;
         _previewHintLabel.Text = "暂无线索留影。待卷册写成后，会在此显出当时景象。";
         _previewHintLabel.Visible = true;
+        CallPreviewVisualFx("transition_to_empty");
     }
 
     private void ClearPreviewDisplay()
@@ -562,6 +513,12 @@ public partial class SaveSlotsPanel : PopupPanelBase
             ? "暂无线索留影。待任意卷册写成后，会在此显出当时景象。"
             : "当前所筛卷册暂无可阅留影。";
         _previewHintLabel.Visible = true;
+        CallPreviewVisualFx("transition_to_empty");
+    }
+
+    private void CallPreviewVisualFx(string methodName, params Variant[] args)
+    {
+        _previewVisualFx?.Call(methodName, args);
     }
 
     private static bool TryLoadPreviewTexture(SaveSlotSummary slot, out Texture2D? previewTexture)
@@ -604,174 +561,4 @@ public partial class SaveSlotsPanel : PopupPanelBase
         return string.Equals(slot.SlotKey, "default", StringComparison.Ordinal) || slot.IsAutosave;
     }
 
-    private static void ApplyInkButtonStyle(Button button, bool destructive)
-    {
-        button.Flat = true;
-        button.Alignment = HorizontalAlignment.Left;
-        button.AddThemeFontSizeOverride("font_size", 14);
-        button.AddThemeStyleboxOverride("normal", CreateOrderButtonStyle(destructive, false));
-        button.AddThemeStyleboxOverride("hover", CreateOrderButtonStyle(destructive, true));
-        button.AddThemeStyleboxOverride("pressed", CreateOrderButtonStyle(destructive, true));
-        button.AddThemeStyleboxOverride("disabled", CreateOrderButtonStyle(false, false, true));
-        button.AddThemeColorOverride("font_color", destructive ? SealRedColor : InkMainColor);
-        button.AddThemeColorOverride("font_hover_color", PaperMainColor);
-        button.AddThemeColorOverride("font_pressed_color", PaperMainColor);
-        button.AddThemeColorOverride("font_disabled_color", InkMutedColor);
-    }
-
-    private static void ApplyFieldStyle(BaseButton button)
-    {
-        button.AddThemeStyleboxOverride("normal", CreateFieldStyle(false));
-        button.AddThemeStyleboxOverride("hover", CreateFieldStyle(true));
-        button.AddThemeStyleboxOverride("pressed", CreateFieldStyle(true));
-        button.AddThemeStyleboxOverride("focus", CreateFieldStyle(true));
-        button.AddThemeFontSizeOverride("font_size", 13);
-        button.AddThemeColorOverride("font_color", InkMainColor);
-        button.AddThemeColorOverride("font_hover_color", InkMainColor);
-        button.AddThemeColorOverride("font_pressed_color", InkMainColor);
-    }
-
-    private static void ApplyLineEditStyle(LineEdit lineEdit)
-    {
-        lineEdit.AddThemeStyleboxOverride("normal", CreateFieldStyle(false));
-        lineEdit.AddThemeStyleboxOverride("focus", CreateFieldStyle(true));
-        lineEdit.AddThemeStyleboxOverride("read_only", CreateFieldStyle(false));
-        lineEdit.AddThemeColorOverride("font_color", InkMainColor);
-        lineEdit.AddThemeColorOverride("font_placeholder_color", InkMutedColor);
-        lineEdit.AddThemeConstantOverride("minimum_character_width", 12);
-    }
-
-    private static void ApplyItemListStyle(ItemList itemList)
-    {
-        itemList.AddThemeStyleboxOverride("panel", CreateNoteStyle());
-        itemList.AddThemeStyleboxOverride("focus", CreateFieldStyle(true));
-        itemList.AddThemeStyleboxOverride("cursor", CreateSelectionStyle());
-        itemList.AddThemeStyleboxOverride("cursor_unfocused", CreateSelectionStyle());
-        itemList.AddThemeColorOverride("font_color", InkMainColor);
-        itemList.AddThemeColorOverride("font_selected_color", PaperMainColor);
-        itemList.AddThemeColorOverride("guide_color", new Color(BorderInkColor.R, BorderInkColor.G, BorderInkColor.B, 0.25f));
-        itemList.AddThemeConstantOverride("h_separation", 8);
-        itemList.AddThemeConstantOverride("v_separation", 6);
-    }
-
-    private static void ApplyCloseButtonStyle(Button button)
-    {
-        button.Flat = true;
-        button.Alignment = HorizontalAlignment.Center;
-        button.AddThemeFontSizeOverride("font_size", 22);
-        button.AddThemeStyleboxOverride("normal", CreateTransparentStyle());
-        button.AddThemeStyleboxOverride("hover", CreateTransparentStyle());
-        button.AddThemeStyleboxOverride("pressed", CreateTransparentStyle());
-        button.AddThemeColorOverride("font_color", InkMainColor);
-        button.AddThemeColorOverride("font_hover_color", SealRedColor);
-        button.AddThemeColorOverride("font_pressed_color", SealRedColor);
-    }
-
-    private static StyleBoxFlat CreatePaperStyle()
-    {
-        return new StyleBoxFlat
-        {
-            BgColor = PaperMainColor,
-            BorderWidthLeft = 1,
-            BorderWidthTop = 1,
-            BorderWidthRight = 1,
-            BorderWidthBottom = 1,
-            BorderColor = new Color(0.48f, 0.42f, 0.35f, 0.45f),
-            ShadowColor = new Color(0f, 0f, 0f, 0.35f),
-            ShadowSize = 10
-        };
-    }
-
-    private static StyleBoxFlat CreateRollerStyle()
-    {
-        return new StyleBoxFlat
-        {
-            BgColor = new Color(0.29f, 0.19f, 0.13f, 1f),
-            BorderWidthLeft = 1,
-            BorderWidthTop = 1,
-            BorderWidthRight = 1,
-            BorderWidthBottom = 1,
-            BorderColor = new Color(0.14f, 0.09f, 0.05f, 1f)
-        };
-    }
-
-    private static StyleBoxFlat CreateNoteStyle()
-    {
-        return new StyleBoxFlat
-        {
-            BgColor = PaperDarkColor,
-            BorderWidthLeft = 1,
-            BorderWidthTop = 1,
-            BorderWidthRight = 1,
-            BorderWidthBottom = 1,
-            BorderColor = new Color(0.64f, 0.58f, 0.50f, 1f)
-        };
-    }
-
-    private static StyleBoxFlat CreateFieldStyle(bool focused)
-    {
-        return new StyleBoxFlat
-        {
-            BgColor = new Color(PaperMainColor.R, PaperMainColor.G, PaperMainColor.B, focused ? 0.75f : 0.35f),
-            BorderWidthLeft = 1,
-            BorderWidthTop = 1,
-            BorderWidthRight = 1,
-            BorderWidthBottom = 1,
-            BorderColor = focused ? SealRedColor : BorderInkColor,
-            ContentMarginLeft = 10,
-            ContentMarginTop = 8,
-            ContentMarginRight = 10,
-            ContentMarginBottom = 8
-        };
-    }
-
-    private static StyleBoxFlat CreateOrderButtonStyle(bool destructive, bool inverted, bool disabled = false)
-    {
-        var border = disabled
-            ? InkMutedColor
-            : destructive
-                ? SealRedColor
-                : BorderInkColor;
-        var background = inverted && !disabled
-            ? (destructive ? SealRedColor : InkMainColor)
-            : new Color(PaperMainColor.R, PaperMainColor.G, PaperMainColor.B, 0f);
-
-        return new StyleBoxFlat
-        {
-            BgColor = background,
-            BorderWidthLeft = 1,
-            BorderWidthTop = 1,
-            BorderWidthRight = 1,
-            BorderWidthBottom = 1,
-            BorderColor = border,
-            ContentMarginLeft = 12,
-            ContentMarginTop = 10,
-            ContentMarginRight = 12,
-            ContentMarginBottom = 10
-        };
-    }
-
-    private static StyleBoxFlat CreateSelectionStyle()
-    {
-        return new StyleBoxFlat
-        {
-            BgColor = InkMainColor,
-            BorderWidthLeft = 0,
-            BorderWidthTop = 0,
-            BorderWidthRight = 0,
-            BorderWidthBottom = 0
-        };
-    }
-
-    private static StyleBoxFlat CreateTransparentStyle()
-    {
-        return new StyleBoxFlat
-        {
-            BgColor = new Color(0f, 0f, 0f, 0f),
-            BorderWidthLeft = 0,
-            BorderWidthTop = 0,
-            BorderWidthRight = 0,
-            BorderWidthBottom = 0
-        };
-    }
 }

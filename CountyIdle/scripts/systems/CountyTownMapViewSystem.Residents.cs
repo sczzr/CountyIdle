@@ -114,6 +114,11 @@ public partial class CountyTownMapViewSystem
 
         if (needsUpdate)
         {
+            if (_hoveredCell != null)
+            {
+                RefreshHoverVisual();
+            }
+
             QueueRedraw();
         }
     }

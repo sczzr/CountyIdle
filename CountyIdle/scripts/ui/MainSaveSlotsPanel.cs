@@ -33,11 +33,13 @@ public partial class Main
 
     private void OpenSaveSlotsPanelForSave()
     {
+        CloseBlockingOverlayPopups(_saveSlotsPanel);
         _saveSlotsPanel?.Open(_saveSystem.ListSlots(), SaveSlotsPanel.PanelIntent.Save, _saveSystem.DefaultSlotKey);
     }
 
     private void OpenSaveSlotsPanelForLoad()
     {
+        CloseBlockingOverlayPopups(_saveSlotsPanel);
         _saveSlotsPanel?.Open(_saveSystem.ListSlots(), SaveSlotsPanel.PanelIntent.Load);
     }
 

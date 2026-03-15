@@ -93,6 +93,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     private ShaderMaterial? _worldTerrainClipMaterial;
     private int _worldLayer1SourceId = -1;
     private Label? _titleLabel;
+    private Node? _toneFx;
     private float _zoom = 1.0f;
     private float _targetZoom = 1.0f;
     private float _zoomVelocity;
@@ -127,6 +128,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     {
         ClipContents = true;
         _titleLabel = GetNodeOrNull<Label>("Label");
+        _toneFx = GetNodeOrNull<Node>("ToneFx");
         LoadAtlases();
         EnsureWorldTerrainLayerInfrastructure();
         if (_mode == StrategicMapMode.World)
@@ -302,11 +304,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     public void RefreshOperationalState(MapViewStyle style)
     {
         _operationalStyle = style ?? new MapViewStyle();
-        if (_titleLabel != null)
-        {
-            _titleLabel.Modulate = _operationalStyle.AccentColor;
-        }
-
+        CallToneFx("apply_title_tone", _operationalStyle.AccentColor);
         UpdateTitle();
         UpdateWorldTerrainLayerLayout();
         QueueRedraw();
@@ -488,7 +486,12 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         _titleLabel.HorizontalAlignment = HorizontalAlignment.Left;
         _titleLabel.VerticalAlignment = VerticalAlignment.Center;
         _titleLabel.Position = new Vector2(12f, 10f);
-        _titleLabel.Modulate = new Color(0.93f, 0.90f, 0.80f, 1f);
+        CallToneFx("apply_title_tone", _operationalStyle.AccentColor);
+    }
+
+    private void CallToneFx(string methodName, params Variant[] args)
+    {
+        _toneFx?.Call(methodName, args);
     }
 
     private void UpdateTitle()
@@ -1814,7 +1817,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         var center = (new Rect2(mapRect.Position + _panOffset, mapRect.Size)).GetCenter();
         var scale = _xianxiaWorldTileLayoutScale * unit;
         _worldTerrainTileLayer.Visible = true;
-        _worldTerrainTileLayer.Modulate = _operationalStyle.TerrainTint;
+        CallToneFx("apply_terrain_tint", _operationalStyle.TerrainTint);
         _worldTerrainTileLayer.Scale = Vector2.One * scale;
         _worldTerrainTileLayer.Position = center - (_xianxiaWorldTileCenterLocal * scale);
     }

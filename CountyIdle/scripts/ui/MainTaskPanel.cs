@@ -53,6 +53,7 @@ public partial class Main
             return;
         }
 
+        CloseBlockingOverlayPopups(_taskPanel);
         _taskPanel.Open(_gameLoop.State.Clone());
     }
 
@@ -63,6 +64,7 @@ public partial class Main
             return;
         }
 
+        CloseBlockingOverlayPopups(_taskPanel);
         _taskPanel.Open(_gameLoop.State.Clone(), SectTaskRules.GetPrimaryTaskForJob(jobType));
     }
 

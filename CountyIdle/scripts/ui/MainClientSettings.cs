@@ -45,6 +45,7 @@ public partial class Main
 
     private void OpenSettingsPanel()
     {
+        CloseBlockingOverlayPopups(_settingsPanel);
         _settingsPanel?.Open(_clientSettings.Clone());
     }
 

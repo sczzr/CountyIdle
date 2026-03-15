@@ -127,6 +127,8 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
     private TownMapData? _mapData;
     private Button _regenerateButton = null!;
     private Label _mapHintLabel = null!;
+    private Node2D? _hoverFx;
+    private Node? _toneFx;
     private HexAtlas5x4? _geographyAtlas;
     private TileSet? _layer1TileSet;
     private Texture2D? _wallBrightTexture;
@@ -147,6 +149,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
     private MapViewStyle _operationalStyle = new();
     private TownActivityAnchorData? _selectedActivityAnchor;
     private Vector2I? _selectedCell;
+    private Vector2I? _hoveredCell;
     private int? _selectedResidentDiscipleId;
     private bool _usesExternalMap;
     private string _externalMapTitle = string.Empty;
@@ -170,6 +173,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         _selectedCell = null;
         _selectedResidentDiscipleId = null;
         _residentWalkers.Clear();
+        ClearHoverState();
 
         if (_regenerateButton != null)
         {
@@ -206,6 +210,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         _selectedCell = null;
         _selectedResidentDiscipleId = null;
         _residentWalkers.Clear();
+        ClearHoverState();
         NotifySelectionSummaryChanged();
         QueueRedraw();
     }
@@ -216,6 +221,8 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
 
         _regenerateButton = GetNode<Button>("RegenerateButton");
         _mapHintLabel = GetNode<Label>("MapHintLabel");
+        _hoverFx = GetNodeOrNull<Node2D>("HoverFx");
+        _toneFx = GetNodeOrNull<Node>("ToneFx");
 
         _regenerateButton.Pressed += OnRegeneratePressed;
         LoadTextures();
@@ -228,6 +235,12 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
 
     public override void _GuiInput(InputEvent @event)
     {
+        if (@event is InputEventMouseMotion mouseMotion)
+        {
+            UpdateHoverState(mouseMotion.Position);
+            return;
+        }
+
         if (@event is not InputEventMouseButton mouseButton || !mouseButton.Pressed)
         {
             return;
@@ -266,6 +279,11 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         if (what == NotificationResized)
         {
             QueueRedraw();
+            RefreshHoverVisual();
+        }
+        else if (what == NotificationMouseExit)
+        {
+            ClearHoverState();
         }
     }
 
@@ -444,8 +462,10 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         _mapData = _generator.Generate(_populationHint, _housingHint, _eliteHint, _layoutSeed);
         _selectedActivityAnchor = null;
         _selectedCell = null;
+        _hoveredCell = null;
         _selectedResidentDiscipleId = null;
         _residentWalkers.Clear();
+        ClearHoverState();
         UpdateMapHint();
         QueueRedraw();
     }
@@ -458,6 +478,8 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
             {
                 _mapHintLabel.Text = string.Empty;
             }
+
+            CallToneFx("reset_hint_tone");
             return;
         }
 
@@ -472,8 +494,13 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
             : $"{_operationalStyle.HintText}\n{interactionLine}";
 
         _mapHintLabel.Text = $"{summaryLine}\n{operationalLine}";
-        _mapHintLabel.Modulate = _operationalStyle.AccentColor;
+        CallToneFx("apply_hint_tone", _operationalStyle.AccentColor);
         NotifySelectionSummaryChanged();
+    }
+
+    private void CallToneFx(string methodName, params Variant[] args)
+    {
+        _toneFx?.Call(methodName, args);
     }
 
     private Vector2 CalculateMapOrigin(TownMapData mapData)
@@ -596,6 +623,52 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         }
 
         return null;
+    }
+
+    private void UpdateHoverState(Vector2 localPosition)
+    {
+        if (_mapData == null)
+        {
+            ClearHoverState();
+            return;
+        }
+
+        var origin = CalculateMapOrigin(_mapData);
+        if (PickActivityAnchorAt(localPosition, origin) != null)
+        {
+            ClearHoverState();
+            return;
+        }
+
+        var hoveredCell = PickCellAt(localPosition, origin);
+        if (hoveredCell == _hoveredCell)
+        {
+            return;
+        }
+
+        _hoveredCell = hoveredCell;
+        RefreshHoverVisual();
+    }
+
+    private void RefreshHoverVisual()
+    {
+        if (_hoverFx == null || _mapData == null || _hoveredCell == null)
+        {
+            _hoverFx?.Call("hide_hover");
+            return;
+        }
+
+        var origin = CalculateMapOrigin(_mapData);
+        var center = GetTownCellCenter(_hoveredCell.Value, origin);
+        var polygon = CreateHex(center, GetScaledHexRadius() * 0.99f);
+
+        _hoverFx.Call("show_hover", polygon, "default");
+    }
+
+    private void ClearHoverState()
+    {
+        _hoveredCell = null;
+        _hoverFx?.Call("hide_hover");
     }
 
     private bool ShouldDrawTerrainDetails()
@@ -1570,5 +1643,4 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
 }
 
 internal readonly record struct Layer1TileVariant(int SourceId, Vector2I AtlasCoords, int AlternativeTile);
-
 

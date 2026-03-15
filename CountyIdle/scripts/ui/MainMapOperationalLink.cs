@@ -50,11 +50,7 @@ public partial class Main
         state ??= _gameLoop?.State;
         if (state == null)
         {
-            if (_mapDirectiveRow != null)
-            {
-                _mapDirectiveRow.Visible = false;
-            }
-
+            ResetMapDirectiveRowPresentation();
             return;
         }
 
@@ -71,17 +67,28 @@ public partial class Main
         _mapDirectiveRow.Visible = snapshot.ShowDirectiveRow;
         if (!_mapDirectiveRow.Visible)
         {
+            ResetMapDirectiveRowPresentation();
             return;
         }
 
         _mapStatusLabel.Text = snapshot.ActiveStatusText;
-        _mapStatusLabel.Modulate = snapshot.ActiveStatusColor;
 
         _mapPrimaryDirectiveAction = snapshot.PrimaryChoice.Action;
         _mapSecondaryDirectiveAction = snapshot.SecondaryChoice.Action;
 
         ApplyDirectiveChoice(_mapPrimaryActionButton, snapshot.PrimaryChoice);
         ApplyDirectiveChoice(_mapSecondaryActionButton, snapshot.SecondaryChoice);
+        CallWorldPanelVisualFx("apply_map_directive_tone", snapshot.ActiveStatusColor, snapshot.PrimaryChoice.Enabled, snapshot.SecondaryChoice.Enabled, snapshot.ShowDirectiveRow);
+    }
+
+    private void ResetMapDirectiveRowPresentation()
+    {
+        if (_mapDirectiveRow != null)
+        {
+            _mapDirectiveRow.Visible = false;
+        }
+
+        CallWorldPanelVisualFx("reset_map_directive_tone");
     }
 
     private void ExecuteMapDirective(MapDirectiveAction action)

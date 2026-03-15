@@ -1,6 +1,8 @@
 [gd_scene format=3 uid="uid://cn60pdpci5qpb"]
 
 [ext_resource type="Script" uid="uid://dis2ijq6cro48" path="res://scripts/ui/DisciplePanel.cs" id="1_disciple_panel"]
+[ext_resource type="Script" path="res://scripts/ui/gd/DisciplePanelVisualFx.gd" id="2_disciple_fx"]
+[ext_resource type="Script" path="res://scripts/ui/gd/DiscipleRadarChart.gd" id="3_disciple_radar_fx"]
 
 [node name="DisciplePanel" type="Control" unique_id=360497384]
 visible = false
@@ -12,6 +14,9 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
 script = ExtResource("1_disciple_panel")
+
+[node name="VisualFx" type="Node" parent="."]
+script = ExtResource("2_disciple_fx")
 
 [node name="Overlay" type="ColorRect" parent="." unique_id=1232459106]
 layout_mode = 1
@@ -271,6 +276,11 @@ text = "先天根基评估"
 [node name="RadarCenter" type="CenterContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn" unique_id=1275796685]
 custom_minimum_size = Vector2(0, 220)
 layout_mode = 2
+
+[node name="RadarChart" type="Control" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/RadarCenter"]
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("3_disciple_radar_fx")
 
 [node name="StatsCenter" type="CenterContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn" unique_id=696345356]
 layout_mode = 2

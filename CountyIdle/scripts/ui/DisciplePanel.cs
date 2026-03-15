@@ -9,12 +9,10 @@ namespace CountyIdle.UI;
 
 public partial class DisciplePanel : PopupPanelBase
 {
-	private static readonly Color PaperBackgroundColor = new(0.956f, 0.945f, 0.918f, 1f);
 	private static readonly Color InkBlackColor = new(0.173f, 0.173f, 0.173f, 1f);
 	private static readonly Color InkGrayColor = new(0.478f, 0.478f, 0.478f, 1f);
 	private static readonly Color CinnabarColor = new(0.651f, 0.192f, 0.165f, 1f);
 	private static readonly Color CeladonColor = new(0.439f, 0.553f, 0.506f, 1f);
-	private static readonly Color BorderGoldColor = new(0.773f, 0.627f, 0.349f, 1f);
 	private const string MetricGridPath =
 		"Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid";
 
@@ -69,11 +67,12 @@ public partial class DisciplePanel : PopupPanelBase
 	private Label _combatSealHintLabel = null!;
 	private ProgressBar _qiSeaProgressBar = null!;
 	private Label _qiSeaHintLabel = null!;
-	private DiscipleRadarChart _radarChart = null!;
+	private Control _radarChart = null!;
 	private readonly Dictionary<string, MetricBinding> _metrics = new();
 	private readonly List<DiscipleProfile> _allProfiles = new();
 	private readonly List<DiscipleProfile> _visibleProfiles = new();
 	private readonly Dictionary<int, TreeItem> _rosterItems = new();
+	private Node? _visualFx;
 	private bool _uiBound;
 
 	private GameState _state = new();
@@ -85,8 +84,6 @@ public partial class DisciplePanel : PopupPanelBase
 	{
 		BindUiNodes();
 		InitializeFilterControls();
-		ApplyUiStyles();
-		EnsureDynamicWidgets();
 		InitializePopupHint(_hintLabel);
 		Hide();
 	}
@@ -110,6 +107,12 @@ public partial class DisciplePanel : PopupPanelBase
 	{
 		RefreshState(state, preferredDiscipleId, preferredJobType);
 		OpenPopup();
+		CallVisualFx("play_open");
+	}
+
+	public void ClosePanel()
+	{
+		ClosePopup();
 	}
 
 	public void RefreshState(GameState state, int? preferredDiscipleId = null, JobType? preferredJobType = null)
@@ -174,7 +177,7 @@ public partial class DisciplePanel : PopupPanelBase
 		_profileMetaLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader/ProfileMeta");
 		_profileStatusLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader/ProfileStatus");
 		_rootCircleLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader/RootCircle/RootCircleLabel");
-		_radarChart = GetNodeOrNull<DiscipleRadarChart>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/RadarCenter/RadarChart") ?? new DiscipleRadarChart();
+		_radarChart = GetNode<Control>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/RadarCenter/RadarChart");
 		_realmStatusLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/RealmBox/RealmStatus");
 		_realmProgressBar = GetNode<ProgressBar>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/RealmBox/RealmProgress");
 		_realmProgressHintLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/RealmBox/RealmHint");
@@ -187,6 +190,7 @@ public partial class DisciplePanel : PopupPanelBase
 		_annotationLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/AnnotationPanel/AnnotationMargin/AnnotationColumn/AnnotationText");
 		_hintLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/HintLabel");
 		_closeButton = GetNode<Button>("Overlay/Wrapper/RootColumn/HeaderPanel/HeaderMargin/HeaderRow/CloseButton");
+		_visualFx = GetNodeOrNull<Node>("VisualFx");
 
 		_metrics.Clear();
 		BindMetric("Insight");
@@ -236,182 +240,6 @@ public partial class DisciplePanel : PopupPanelBase
 
 		_filterOption.Select((int)_filterMode);
 		_sortOption.Select((int)_sortMode);
-	}
-
-	private void EnsureDynamicWidgets()
-	{
-		var radarParent = GetNode<Control>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/RadarCenter");
-		if (_radarChart.GetParent() == null)
-		{
-			radarParent.AddChild(_radarChart);
-		}
-	}
-
-	private void ApplyUiStyles()
-	{
-		var wrapper = GetNode<PanelContainer>("Overlay/Wrapper");
-		wrapper.AddThemeStyleboxOverride("panel", CreatePaperStyle());
-
-		var headerPanel = GetNode<PanelContainer>("Overlay/Wrapper/RootColumn/HeaderPanel");
-		headerPanel.AddThemeStyleboxOverride(
-			"panel",
-			CreateInsetPaperStyle(
-				new Color(PaperBackgroundColor.R, PaperBackgroundColor.G, PaperBackgroundColor.B, 0.78f),
-				new Color(InkGrayColor, 0.45f)));
-
-		var leftPanel = GetNode<PanelContainer>("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel");
-		leftPanel.AddThemeStyleboxOverride(
-			"panel",
-			CreateInsetPaperStyle(
-				new Color(PaperBackgroundColor.R, PaperBackgroundColor.G, PaperBackgroundColor.B, 0.32f),
-				new Color(InkGrayColor, 0.25f)));
-
-		var summaryPanel = GetNode<PanelContainer>("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/SummaryPanel");
-		summaryPanel.AddThemeStyleboxOverride(
-			"panel",
-			CreateInsetPaperStyle(
-				new Color(PaperBackgroundColor, 0.58f),
-				new Color(InkGrayColor, 0.35f)));
-
-		var filterPanel = GetNode<PanelContainer>("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/FilterPanel");
-		filterPanel.AddThemeStyleboxOverride(
-			"panel",
-			CreateInsetPaperStyle(
-				new Color(PaperBackgroundColor, 0.46f),
-				new Color(InkGrayColor, 0.32f)));
-
-		var rosterFrame = GetNode<PanelContainer>("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/RosterFrame");
-		rosterFrame.AddThemeStyleboxOverride(
-			"panel",
-			CreateInsetPaperStyle(
-				new Color(PaperBackgroundColor, 0.62f),
-				new Color(InkGrayColor, 0.30f)));
-
-		var profilePanel = GetNode<PanelContainer>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel");
-		profilePanel.AddThemeStyleboxOverride(
-			"panel",
-			CreateInsetPaperStyle(
-				new Color(PaperBackgroundColor, 0.62f),
-				new Color(InkGrayColor, 0.35f)));
-
-		var rootCircle = GetNode<PanelContainer>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader/RootCircle");
-		rootCircle.AddThemeStyleboxOverride(
-			"panel",
-			CreateCircleStyle(
-				new Color(1f, 1f, 1f, 0f),
-				CinnabarColor));
-
-		_profileNameLabel.AddThemeFontSizeOverride("font_size", 26);
-		_profileNameLabel.AddThemeColorOverride("font_color", InkBlackColor);
-		_profileMetaLabel.AddThemeFontSizeOverride("font_size", 12);
-		_profileMetaLabel.AddThemeColorOverride("font_color", InkGrayColor);
-		_profileStatusLabel.AddThemeFontSizeOverride("font_size", 12);
-		_profileStatusLabel.AddThemeColorOverride("font_color", InkBlackColor);
-		_rootCircleLabel.AddThemeFontSizeOverride("font_size", 12);
-		_rootCircleLabel.AddThemeColorOverride("font_color", CinnabarColor);
-
-		var foundationPanel = GetNode<PanelContainer>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel");
-		foundationPanel.AddThemeStyleboxOverride(
-			"panel",
-			CreateInsetPaperStyle(
-				new Color(0f, 0f, 0f, 0.03f),
-				new Color(0.74f, 0.68f, 0.60f, 1f)));
-
-		ApplyMetricTileStyle("Insight");
-		ApplyMetricTileStyle("Potential");
-		ApplyMetricTileStyle("Health");
-		ApplyMetricTileStyle("Craft");
-		ApplyMetricTileStyle("Mood");
-		ApplyMetricTileStyle("HeartState");
-
-		var cultivationPanel = GetNode<PanelContainer>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel");
-		cultivationPanel.AddThemeStyleboxOverride(
-			"panel",
-			CreateInsetPaperStyle(
-				new Color(0f, 0f, 0f, 0.02f),
-				new Color(0.78f, 0.71f, 0.61f, 1f)));
-
-		var traitPanel = GetNode<PanelContainer>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel");
-		traitPanel.AddThemeStyleboxOverride(
-			"panel",
-			CreateInsetPaperStyle(
-				new Color(0f, 0f, 0f, 0.02f),
-				new Color(0.78f, 0.71f, 0.61f, 1f)));
-
-		var annotationPanel = GetNode<PanelContainer>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/AnnotationPanel");
-		annotationPanel.AddThemeStyleboxOverride(
-			"panel",
-			CreateInsetPaperStyle(
-				new Color(0.97f, 0.96f, 0.94f, 1f),
-				new Color(0.56f, 0.48f, 0.37f, 0.95f),
-				2));
-
-		var combatTag = GetNode<PanelContainer>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/CombatTag");
-		combatTag.AddThemeStyleboxOverride("panel", CreateCombatTagStyle());
-
-		_summaryLabel.AddThemeFontSizeOverride("font_size", 12);
-		_summaryLabel.AddThemeColorOverride("font_color", InkBlackColor);
-		_governanceLabel.AddThemeFontSizeOverride("font_size", 11);
-		_governanceLabel.AddThemeColorOverride("font_color", InkGrayColor);
-
-		_realmStatusLabel.AddThemeFontSizeOverride("font_size", 13);
-		_realmStatusLabel.AddThemeColorOverride("font_color", InkBlackColor);
-		_realmProgressHintLabel.AddThemeFontSizeOverride("font_size", 11);
-		_realmProgressHintLabel.AddThemeColorOverride("font_color", InkGrayColor);
-		_realmProgressHintLabel.HorizontalAlignment = HorizontalAlignment.Right;
-
-		_qiSeaHintLabel.AddThemeFontSizeOverride("font_size", 11);
-		_qiSeaHintLabel.AddThemeColorOverride("font_color", InkGrayColor);
-		_qiSeaHintLabel.HorizontalAlignment = HorizontalAlignment.Right;
-
-		_combatSealLabel.AddThemeFontSizeOverride("font_size", 22);
-		_combatSealLabel.AddThemeColorOverride("font_color", CinnabarColor);
-		_combatSealLabel.HorizontalAlignment = HorizontalAlignment.Center;
-		_combatSealHintLabel.AddThemeFontSizeOverride("font_size", 12);
-		_combatSealHintLabel.AddThemeColorOverride("font_color", InkGrayColor);
-		_combatSealHintLabel.HorizontalAlignment = HorizontalAlignment.Center;
-
-		_annotationLabel.AddThemeFontSizeOverride("font_size", 13);
-		_annotationLabel.AddThemeColorOverride("font_color", new Color(0.25f, 0.25f, 0.25f, 1f));
-
-		_hintLabel.AddThemeFontSizeOverride("font_size", 11);
-		_hintLabel.AddThemeColorOverride("font_color", InkGrayColor);
-
-		_closeButton.AddThemeFontSizeOverride("font_size", 22);
-		_closeButton.AddThemeStyleboxOverride("normal", CreateTransparentStyle());
-		_closeButton.AddThemeStyleboxOverride("hover", CreateTransparentStyle());
-		_closeButton.AddThemeStyleboxOverride("pressed", CreateTransparentStyle());
-		_closeButton.AddThemeStyleboxOverride("focus", CreateTransparentStyle());
-		_closeButton.AddThemeColorOverride("font_color", InkBlackColor);
-		_closeButton.AddThemeColorOverride("font_hover_color", CinnabarColor);
-		_closeButton.AddThemeColorOverride("font_pressed_color", CinnabarColor);
-
-		StylePaperOptionButton(_filterOption);
-		StylePaperOptionButton(_sortOption);
-		StyleRosterTree(_rosterTree);
-		StyleInkProgressBar(_realmProgressBar, InkBlackColor, new Color(0.91f, 0.89f, 0.84f, 1f));
-		StyleInkProgressBar(_qiSeaProgressBar, CeladonColor, new Color(0.91f, 0.89f, 0.84f, 1f));
-	}
-
-	private void ApplyMetricTileStyle(string key)
-	{
-		var tilePath = $"{MetricGridPath}/{key}Tile";
-		var tile = GetNode<PanelContainer>(tilePath);
-		tile.AddThemeStyleboxOverride(
-			"panel",
-			CreateInsetPaperStyle(
-				new Color(0f, 0f, 0f, 0.03f),
-				new Color(InkGrayColor, 0.26f)));
-
-		var titleLabel = GetNode<Label>($"{tilePath}/{key}Margin/{key}Column/{key}Title");
-		titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
-		titleLabel.AddThemeFontSizeOverride("font_size", 12);
-		titleLabel.AddThemeColorOverride("font_color", InkGrayColor);
-
-		var valueLabel = GetNode<Label>($"{tilePath}/{key}Margin/{key}Column/{key}Value");
-		valueLabel.HorizontalAlignment = HorizontalAlignment.Center;
-		valueLabel.AddThemeFontSizeOverride("font_size", 20);
-		valueLabel.AddThemeColorOverride("font_color", InkBlackColor);
 	}
 
 	private void RefreshSummary()
@@ -500,13 +328,14 @@ public partial class DisciplePanel : PopupPanelBase
 		SetMetric("Mood", profile.Mood);
 		SetMetric("HeartState", ResolveHeartState(profile));
 
-		_radarChart.SetStats(
+		UpdateRadarChart(
 			("悟性", profile.Insight),
 			("潜力", profile.Potential),
 			("根骨", profile.Health),
 			("匠艺", profile.Craft),
 			("神魂", profile.Mood),
 			("心境", ResolveHeartState(profile)));
+		CallVisualFx("transition_profile_card");
 	}
 
 	private void ClearDetail()
@@ -531,13 +360,14 @@ public partial class DisciplePanel : PopupPanelBase
 		SetMetric("Craft", 0);
 		SetMetric("Mood", 0);
 		SetMetric("HeartState", 0);
-		_radarChart.SetStats(
+		UpdateRadarChart(
 			("悟性", 0),
 			("潜力", 0),
 			("根骨", 0),
 			("匠艺", 0),
 			("神魂", 0),
 			("心境", 0));
+		CallVisualFx("transition_profile_card");
 	}
 
 	private void RefreshTraits(DiscipleProfile? profile)
@@ -569,6 +399,7 @@ public partial class DisciplePanel : PopupPanelBase
 		_filterMode = (FilterMode)(int)index;
 		RebuildDiscipleList();
 		RefreshPopupHint();
+		CallVisualFx("pulse_roster_refresh");
 	}
 
 	private void OnSortSelected(long index)
@@ -576,6 +407,7 @@ public partial class DisciplePanel : PopupPanelBase
 		_sortMode = (SortMode)(int)index;
 		RebuildDiscipleList();
 		RefreshPopupHint();
+		CallVisualFx("pulse_roster_refresh");
 	}
 
 	private void OnRosterTreeItemSelected()
@@ -654,6 +486,26 @@ public partial class DisciplePanel : PopupPanelBase
 		return compare != 0 ? compare : leftId.CompareTo(rightId);
 	}
 
+	private void CallVisualFx(string methodName, params Variant[] args)
+	{
+		_visualFx?.Call(methodName, args);
+	}
+
+	private void UpdateRadarChart(params (string Label, int Value)[] stats)
+	{
+		var payload = new Godot.Collections.Array();
+		foreach (var (label, value) in stats)
+		{
+			payload.Add(new Godot.Collections.Dictionary
+			{
+				{ "label", label },
+				{ "value", value }
+			});
+		}
+
+		_radarChart.Call("set_stats", payload);
+	}
+
 	private string BuildListText(DiscipleProfile profile)
 	{
 		var entrySuffix = profile.IsElite ? "真传" : profile.RankName;
@@ -669,26 +521,7 @@ public partial class DisciplePanel : PopupPanelBase
 
 		var clamped = Math.Clamp(value, 0, 100);
 		binding.ValueLabel.Text = clamped.ToString();
-
-		var color = clamped switch
-		{
-			>= 85 => CinnabarColor,
-			>= 65 => InkBlackColor,
-			>= 45 => CeladonColor,
-			_ => InkGrayColor
-		};
-		binding.ValueLabel.AddThemeColorOverride("font_color", color);
-	}
-
-	private static void StylePaperOptionButton(OptionButton optionButton)
-	{
-		optionButton.CustomMinimumSize = new Vector2(180, 0);
-		optionButton.AddThemeFontSizeOverride("font_size", 12);
-		optionButton.AddThemeStyleboxOverride("normal", CreatePaperButtonStyle());
-		optionButton.AddThemeStyleboxOverride("hover", CreatePaperButtonStyle(new Color(CinnabarColor, 0.08f)));
-		optionButton.AddThemeStyleboxOverride("pressed", CreatePaperButtonStyle(new Color(CinnabarColor, 0.14f)));
-		optionButton.AddThemeStyleboxOverride("focus", CreatePaperButtonStyle(new Color(CinnabarColor, 0.08f)));
-		optionButton.AddThemeColorOverride("font_color", InkBlackColor);
+		CallVisualFx("apply_metric_value_tone", binding.ValueLabel, clamped);
 	}
 
 	private IEnumerable<IGrouping<string, DiscipleProfile>> BuildPeakSections(IEnumerable<DiscipleProfile> profiles)
@@ -869,191 +702,16 @@ public partial class DisciplePanel : PopupPanelBase
 		};
 	}
 
-	private static void StyleRosterTree(Tree tree)
-	{
-		tree.AddThemeColorOverride("font_color", InkBlackColor);
-		tree.AddThemeColorOverride("font_selected_color", CinnabarColor);
-		tree.AddThemeColorOverride("guide_color", new Color(InkGrayColor, 0.45f));
-		tree.AddThemeColorOverride("relationship_line_color", new Color(InkGrayColor, 0.35f));
-		tree.AddThemeStyleboxOverride(
-			"selected",
-			CreateInsetPaperStyle(
-				new Color(CinnabarColor, 0.08f),
-				new Color(CinnabarColor, 0.45f)));
-		tree.AddThemeStyleboxOverride(
-			"selected_focus",
-			CreateInsetPaperStyle(
-				new Color(CinnabarColor, 0.12f),
-				new Color(CinnabarColor, 0.65f)));
-		tree.AddThemeStyleboxOverride(
-			"cursor",
-			CreateInsetPaperStyle(
-				new Color(CinnabarColor, 0.08f),
-				new Color(CinnabarColor, 0.45f)));
-		tree.AddThemeStyleboxOverride(
-			"cursor_unfocused",
-			CreateInsetPaperStyle(
-				new Color(CinnabarColor, 0.05f),
-				new Color(CinnabarColor, 0.25f)));
-		tree.AddThemeStyleboxOverride(
-			"panel",
-			CreateInsetPaperStyle(
-				new Color(PaperBackgroundColor, 0.08f),
-				new Color(InkGrayColor, 0.18f)));
-	}
-
 	private PanelContainer CreateTraitTag(string text)
 	{
 		var panel = (PanelContainer)_traitTagTemplate.Duplicate();
 		panel.Visible = true;
-		panel.AddThemeStyleboxOverride(
-			"panel",
-			CreateInsetPaperStyle(
-				new Color(CinnabarColor, 0.03f),
-				new Color(CinnabarColor, 0.75f)));
 
 		var label = panel.GetNode<Label>("TagMargin/TagLabel");
 		label.Text = text;
-		label.AddThemeFontSizeOverride("font_size", 12);
-		label.AddThemeColorOverride("font_color", CinnabarColor);
+		CallVisualFx("style_trait_tag", panel, label);
 
 		return panel;
-	}
-
-	private static StyleBoxFlat CreateInsetPaperStyle(Color color, Color borderColor, int borderWidth = 1)
-	{
-		return new StyleBoxFlat
-		{
-			BgColor = color,
-			BorderWidthLeft = borderWidth,
-			BorderWidthTop = borderWidth,
-			BorderWidthRight = borderWidth,
-			BorderWidthBottom = borderWidth,
-			BorderColor = borderColor,
-			CornerRadiusTopLeft = 0,
-			CornerRadiusTopRight = 0,
-			CornerRadiusBottomRight = 0,
-			CornerRadiusBottomLeft = 0
-		};
-	}
-
-	private static StyleBoxFlat CreatePaperStyle()
-	{
-		return new StyleBoxFlat
-		{
-			BgColor = PaperBackgroundColor,
-			BorderWidthLeft = 1,
-			BorderWidthTop = 1,
-			BorderWidthRight = 1,
-			BorderWidthBottom = 1,
-			BorderColor = new Color(0.48f, 0.42f, 0.35f, 0.45f),
-			ShadowColor = new Color(0f, 0f, 0f, 0.35f),
-			ShadowSize = 10
-		};
-	}
-
-	private static StyleBoxFlat CreateRollerStyle()
-	{
-		return new StyleBoxFlat
-		{
-			BgColor = new Color(0.29f, 0.19f, 0.13f, 1f),
-			BorderWidthLeft = 1,
-			BorderWidthTop = 1,
-			BorderWidthRight = 1,
-			BorderWidthBottom = 1,
-			BorderColor = new Color(0.14f, 0.09f, 0.05f, 1f)
-		};
-	}
-
-	private static StyleBoxFlat CreateCircleStyle(Color background, Color borderColor)
-	{
-		return new StyleBoxFlat
-		{
-			BgColor = background,
-			BorderWidthLeft = 2,
-			BorderWidthTop = 2,
-			BorderWidthRight = 2,
-			BorderWidthBottom = 2,
-			BorderColor = borderColor,
-			CornerRadiusTopLeft = 999,
-			CornerRadiusTopRight = 999,
-			CornerRadiusBottomRight = 999,
-			CornerRadiusBottomLeft = 999
-		};
-	}
-
-	private static StyleBoxFlat CreatePaperButtonStyle(Color? color = null)
-	{
-		return new StyleBoxFlat
-		{
-			BgColor = color ?? new Color(1f, 1f, 1f, 0.03f),
-			BorderWidthLeft = 1,
-			BorderWidthTop = 1,
-			BorderWidthRight = 1,
-			BorderWidthBottom = 1,
-			BorderColor = new Color(InkGrayColor, 0.45f),
-			CornerRadiusTopLeft = 0,
-			CornerRadiusTopRight = 0,
-			CornerRadiusBottomRight = 0,
-			CornerRadiusBottomLeft = 0,
-			ContentMarginLeft = 12,
-			ContentMarginTop = 6,
-			ContentMarginRight = 12,
-			ContentMarginBottom = 6
-		};
-	}
-
-	private static StyleBoxFlat CreateCombatTagStyle()
-	{
-		return new StyleBoxFlat
-		{
-			BgColor = new Color(CinnabarColor, 0.03f),
-			BorderWidthLeft = 2,
-			BorderWidthTop = 2,
-			BorderWidthRight = 2,
-			BorderWidthBottom = 2,
-			BorderColor = CinnabarColor
-		};
-	}
-
-	private static StyleBoxFlat CreateTransparentStyle()
-	{
-		return new StyleBoxFlat
-		{
-			BgColor = new Color(1f, 1f, 1f, 0f),
-			BorderWidthLeft = 0,
-			BorderWidthTop = 0,
-			BorderWidthRight = 0,
-			BorderWidthBottom = 0
-		};
-	}
-
-	private static void StyleInkProgressBar(ProgressBar progressBar, Color fillColor, Color backgroundColor)
-	{
-		progressBar.AddThemeStyleboxOverride("fill", CreateProgressFillStyle(fillColor));
-		progressBar.AddThemeStyleboxOverride("background", CreateProgressBarStyle(backgroundColor));
-		progressBar.CustomMinimumSize = new Vector2(0, 14);
-	}
-
-	private static StyleBoxFlat CreateProgressBarStyle(Color backgroundColor)
-	{
-		return new StyleBoxFlat
-		{
-			BgColor = backgroundColor,
-			BorderWidthLeft = 1,
-			BorderWidthTop = 1,
-			BorderWidthRight = 1,
-			BorderWidthBottom = 1,
-			BorderColor = InkGrayColor
-		};
-	}
-
-	private static StyleBoxFlat CreateProgressFillStyle(Color fillColor)
-	{
-		return new StyleBoxFlat
-		{
-			BgColor = fillColor
-		};
 	}
 
 	private static int ResolveHeartState(DiscipleProfile profile)
@@ -1145,150 +803,4 @@ public partial class DisciplePanel : PopupPanelBase
 		return ones == 0 ? $"{numerals[tens]}成" : $"{numerals[tens]}成{numerals[ones]}分";
 	}
 
-	private sealed partial class DiscipleRadarChart : Control
-	{
-		private readonly List<(string Label, int Value)> _stats = new();
-		private readonly List<Label> _axisLabels = new();
-
-		public DiscipleRadarChart()
-		{
-			CustomMinimumSize = new Vector2(320, 320);
-			MouseFilter = Control.MouseFilterEnum.Ignore;
-			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-		}
-
-		public void SetStats(params (string Label, int Value)[] stats)
-		{
-			_stats.Clear();
-			_stats.AddRange(stats);
-			EnsureLabels();
-			LayoutLabels();
-			QueueRedraw();
-		}
-
-		public override void _Notification(int what)
-		{
-			if (what == NotificationResized)
-			{
-				LayoutLabels();
-				QueueRedraw();
-			}
-		}
-
-		public override void _Draw()
-		{
-			if (_stats.Count < 3)
-			{
-				return;
-			}
-
-			var center = Size / 2f;
-			var radius = Math.Min(Size.X, Size.Y) * 0.30f;
-			var directions = BuildDirections(_stats.Count);
-
-			DrawCircle(center, radius * 1.04f, new Color(0.12f, 0.10f, 0.08f, 0.02f));
-
-			for (var ring = 1; ring <= 5; ring++)
-			{
-				var ringFactor = ring / 5f;
-				var ringPoints = directions
-					.Select(direction => center + (direction * radius * ringFactor))
-					.ToArray();
-				DrawPolyline(ToClosedLoop(ringPoints), new Color(0.48f, 0.48f, 0.45f, 0.35f), 1.2f, true);
-			}
-
-			foreach (var direction in directions)
-			{
-				DrawLine(center, center + (direction * radius), new Color(0.46f, 0.45f, 0.42f, 0.42f), 1f, true);
-			}
-
-			var dataPoints = directions
-				.Select((direction, index) =>
-					center + (direction * radius * (Math.Clamp(_stats[index].Value, 0, 100) / 100f)))
-				.ToArray();
-
-			DrawColoredPolygon(dataPoints, new Color(0.12f, 0.11f, 0.10f, 0.05f));
-			DrawPolyline(ToClosedLoop(dataPoints), new Color(0.18f, 0.18f, 0.18f, 0.92f), 2f, true);
-
-			foreach (var point in dataPoints)
-			{
-				DrawCircle(point, 3.2f, new Color(0.18f, 0.18f, 0.18f, 0.88f));
-			}
-		}
-
-		private void EnsureLabels()
-		{
-			while (_axisLabels.Count < _stats.Count)
-			{
-				var label = new Label
-				{
-					HorizontalAlignment = HorizontalAlignment.Center,
-					VerticalAlignment = VerticalAlignment.Center,
-					MouseFilter = Control.MouseFilterEnum.Ignore
-				};
-				label.AddThemeFontSizeOverride("font_size", 12);
-				label.AddThemeColorOverride("font_color", InkGrayColor);
-				AddChild(label);
-				_axisLabels.Add(label);
-			}
-
-			for (var index = 0; index < _axisLabels.Count; index++)
-			{
-				var label = _axisLabels[index];
-				if (index < _stats.Count)
-				{
-					label.Text = _stats[index].Label;
-					label.Visible = true;
-				}
-				else
-				{
-					label.Visible = false;
-				}
-			}
-		}
-
-		private void LayoutLabels()
-		{
-			if (_stats.Count == 0)
-			{
-				return;
-			}
-
-			var center = Size / 2f;
-			var radius = Math.Min(Size.X, Size.Y) * 0.38f;
-			var directions = BuildDirections(_stats.Count);
-
-			for (var index = 0; index < _stats.Count; index++)
-			{
-				var label = _axisLabels[index];
-				label.Size = label.GetCombinedMinimumSize();
-				var position = center + (directions[index] * radius) - (label.Size / 2f);
-				label.Position = position;
-			}
-		}
-
-		private static Vector2[] BuildDirections(int count)
-		{
-			var directions = new Vector2[count];
-			for (var index = 0; index < count; index++)
-			{
-				var angle = (-Mathf.Pi / 2f) + (Mathf.Tau * index / count);
-				directions[index] = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
-			}
-
-			return directions;
-		}
-
-		private static Vector2[] ToClosedLoop(IReadOnlyList<Vector2> points)
-		{
-			var result = new Vector2[points.Count + 1];
-			for (var index = 0; index < points.Count; index++)
-			{
-				result[index] = points[index];
-			}
-
-			result[^1] = points[0];
-			return result;
-		}
-	}
 }

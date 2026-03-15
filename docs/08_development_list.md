@@ -98,6 +98,31 @@
 | DL-048 | 世界格二级地图分层与入口系统 | IN_PROGRESS（运行时八期：局部检视闭环） | 反哺宗门→产业涌现→武装探险 | 世界地图任意 hex 点选后都会先在左侧刷新该格详情；玩家通过进入按钮可打开 `SecondaryMapView`，并基于该格的 `Biome / Terrain / Water / Wonder / Structure / QiDensity / Corruption / MonsterThreat / Fertility` 生成一张与山门沙盘同形的下一层 hex 沙盘；局部沙盘点选后会继续复用左侧检视器与缩放链路，未选中局部 hex 时则回退显示世界点位摘要；已有站点继续沿用原生 `PrimaryType / SecondaryTag / RegionId / RarityTier / UnlockTier`，非站点格则回退生成格子级入口语义；`Wilderness` 已进入点击链路与占位页模板，后续继续细化专属模板与真实玩法 |
 | DL-049 | 地图素材生产规格与分层资产流水线 | IN_PROGRESS（运行时四期：世界图底盘回收到 hex polygon 投影） | 反哺宗门→产业涌现→武装探险 | 已形成正式地图素材规格文档，并新增 L1-L5 绘制实施方案；当前宗门图已接入 `Layer 1` atlas manifest、`Layer 2` decal / connector 链路，并进一步补上 `Layer 3` 最小运行时闭环；世界图基础地块现继续复用 `L1_hex_tileset.tres`，但正式运行时底盘已回收到 hex polygon 投 atlas 区域的绘制方式，避免 `TileMapLayer` 方片排布产生白缝，后续可继续扩到正式国风地块、宗门图立体物件、世界图高层 overlay 与二级地图 |
 | DL-050 | 三相治宗循环重设计（季度战略相位 + 双层时间制） | TODO（文档重设计中） | 门人生息→产业供养→传承研修→职司分化→武装历练→反哺宗门 | 将玩法主循环收口为“季度立纲 -> 月度筹划 -> 小时结算”三相节奏，并补入“细时间运转 + 长时间岁月感”的双层时间制；完成 `docs/01` 重写、`docs/02` 可执行规格补充、`feature-card + change-proposal` 归档，并给出首批可实现工单 |
+| DL-057 | UI 表现层 GDScript 第七批拆分 | DONE | 反哺宗门 | `TaskPanelVisualFx.gd` 与 `SettingsPanelVisualFx.gd` 已承接治宗册 / 机宜卷的静态主题覆盖；`TaskPanel.cs` / `SettingsPanel.cs` 仅保留权威逻辑与输入处理；`dotnet build .\Finally.sln` 通过 |
+| DL-058 | UI 表现层 GDScript 第八批拆分 | DONE | 反哺宗门 | `DisciplePanelVisualFx.gd` 与 `SectOrganizationPanelVisualFx.gd` 已承接弟子谱 / 峰令谱的静态主题覆盖与动态卡片外观；`DisciplePanel.cs` / `SectOrganizationPanel.cs` 仅保留权威逻辑与输入处理；`dotnet build .\Finally.sln` 通过 |
+| DL-059 | UI 表现层 GDScript 第九批拆分 | DONE | 反哺宗门 | `SavePreviewCrossfade.gd` 与 `WorldPanelVisualFx.gd` 已承接留影录 / 二级地图页的静态主题覆盖与 world-site sandbox 壳层外观；`SaveSlotsPanel.cs` / `MainWorldSitePanel.cs` 仅保留权威逻辑、地图数据与输入处理；`dotnet build .\Finally.sln` 通过 |
+| DL-060 | UI 表现层 GDScript 第十批回收 | DONE | 反哺宗门 | `TaskPanel.cs` 与 `DisciplePanel.cs` 中已迁移到 `GDScript` 的历史静态样式 helper 已清理回收；两者进一步收口到权威逻辑、数据刷新与输入处理；`dotnet build .\Finally.sln` 通过 |
+| DL-061 | UI 表现层 GDScript 第十一批拆分 | DONE | 反哺宗门 | `WarehousePanelTransition.gd` 已承接仓储卷的静态主题、页签选中态、库容负载色调与资源卡片纯视觉样式；`WarehousePanel.cs` 仅保留库存数据、按钮事件与提示文本逻辑；`dotnet build .\Finally.sln` 通过 |
+| DL-062 | UI 表现层 GDScript 第十二批拆分 | DONE | 反哺宗门 | 新增 `TileInspectorVisualFx.gd` 承接左侧地块检视器的世界层 / 本地层纯视觉 tone 切换；`MainSectTileInspector.cs` 仅保留按钮绑定、描述文案、badge 语义与规则判断；`dotnet build .\Finally.sln` 通过 |
+| DL-063 | UI 表现层 GDScript 第十三批拆分 | DONE | 反哺宗门 | 新增 `DiscipleRadarChart.gd` 承接弟子谱雷达图绘制与标签布局；`DisciplePanel.cs` 不再内嵌自绘雷达图实现，仅保留名册数据、筛选排序与详情文案；`dotnet build .\Finally.sln` 通过 |
+| DL-064 | UI 表现层 GDScript 第十四批拆分 | DONE | 反哺宗门 | `DisciplePanelVisualFx.gd` 已承接弟子谱剩余的指标值颜色切换与 trait tag 纯视觉样式；`DisciplePanel.cs` 进一步收口到名册数据、筛选排序与详情文案；`dotnet build .\Finally.sln` 通过 |
+| DL-065 | UI 表现层 GDScript 第十五批拆分 | DONE | 反哺宗门 | `WorldPanel.tscn` 已正式包含 `GeneratedSecondarySandboxView` shell 与必要子节点，`MainWorldSitePanel.cs` 不再运行时动态 new sandbox shell；world-site 数据绑定与入口行为仍留在 `C#`，`dotnet build .\Finally.sln` 通过 |
+| DL-066 | UI 表现层 GDScript 第十六批拆分 | DONE | 反哺宗门 | `WorldPanelVisualFx.gd` 已承接 `MapDirectiveRow` 的状态字色调与调度按钮强调样式；`MainMapOperationalLink.cs` 不再直接承担 `MapStatusLabel` 颜色表现逻辑，仅保留地图态势快照、按钮动作与文本绑定；`dotnet build .\Finally.sln` 通过 |
+| DL-067 | UI 表现层 GDScript 第十七批拆分 | DONE | 反哺宗门 | `StrategicMapPanelToneFx.gd` 与 `CountyTownMapHintFx.gd` 已承接世界图 / 外域图标题与山门图 `MapHintLabel` 的地图态势色调；`StrategicMapViewSystem.cs` / `CountyTownMapViewSystem.cs` 不再直接承担这些 label 的表现层着色，仅保留地图态势快照、标题文案与地图绘制；`dotnet build .\Finally.sln` 通过 |
+| DL-068 | UI 表现层 GDScript 第十八批回收 | DONE | 反哺宗门 | `Main.cs` 中已不再接入现行布局链路的 `job-row / priority` 视觉 helper、未接线字典与选中样式残留已清理回收；主界面继续仅保留峰脉摘要、地图调度、面板入口与现行运行链；`dotnet build .\Finally.sln` 通过 |
+| DL-069 | UI 表现层 GDScript 第十九批拆分 | DONE | 反哺宗门 | `StrategicMapPanelToneFx.gd` 已承接世界图 `WorldTerrainTileLayer` 的地图态势 tint；`StrategicMapViewSystem.cs` 不再直接承担该 tile layer 的纯表现层着色，仅保留可见性、位置、缩放与地图绘制；`dotnet build .\Finally.sln` 通过 |
+| DL-070 | UI 表现层 scene-side 第二十批回收 | DONE | 反哺宗门 | 主界面背景 `TextureRect` 的静态视觉布局参数已回收到 `Main.tscn`；`Main.cs` 不再在运行时重复设置背景显隐 / 拉伸 / 层级 / 默认色调或维护冗余 resize 校正逻辑；`dotnet build .\Finally.sln` 通过 |
+| DL-071 | UI 表现层 GDScript 第二十一批拆分 | DONE | 反哺宗门 | `SectOrganizationPanelVisualFx.gd` 已承接峰令谱动态峰脉导航卡 / 职司卡的交互光标与三类动态卡片的内间距壳层；`SectOrganizationPanel.cs` 仅保留动态卡片生成、输入与业务刷新；`dotnet build .\Finally.sln` 通过 |
+| DL-072 | UI 表现层 GDScript 第二十二批拆分 | DONE | 反哺宗门 | `SectOrganizationPanelVisualFx.gd` 已承接峰令谱三类动态卡片 `MarginContainer` 的统一留白壳层；`SectOrganizationPanel.cs` 不再直接写入这些卡片的纯视觉内边距常量；`dotnet build .\Finally.sln` 通过 |
+| DL-073 | UI 表现层 GDScript 第二十三批回收 | DONE | 反哺宗门 | `SectOrganizationPanel.cs` 中已收口到 `VisualFx` 单向边界后的冗余 `CreateMarginContainer()` helper 与分散 `_visualFx?.Call(...)` 残留已清理回收；面板继续仅保留动态卡片生成、输入与业务刷新；`dotnet build .\Finally.sln` 通过 |
+| DL-074 | UI 表现层 GDScript 第二十四批回收 | DONE | 反哺宗门 | `SectOrganizationPanel.cs` 中对 `apply_theme_styles` 的重复初始化调用已清理回收，初始主题改由 `SectOrganizationPanelVisualFx.gd` 的 `_ready()` 单点承接；面板继续仅保留动态卡片生成、输入与业务刷新；`dotnet build .\Finally.sln` 通过 |
+| DL-075 | UI 表现层 GDScript 第二十五批回收 | DONE | 反哺宗门 | `DisciplePanel.cs`、`SaveSlotsPanel.cs`、`SettingsPanel.cs`、`TaskPanel.cs` 与 `WarehousePanel.cs` 中重复的初始主题调用已清理回收，统一改由各自 `VisualFx.gd` 的 `_ready()` 单点承接；对应面板继续仅保留数据、输入与业务刷新；`dotnet build .\Finally.sln` 通过 |
+| DL-076 | UI 表现层 GDScript 第二十六批回收 | DONE | 反哺宗门 | `MainWorldSitePanel.cs` 中 world-site 主题初始化的重复调用已清理回收，统一改由 `WorldPanelVisualFx.gd` 的 `_ready()` 单点承接；主脚本继续仅保留 world-site 数据绑定、入口行为与 sandbox 注入；`dotnet build .\Finally.sln` 通过 |
+| DL-077 | UI 表现层 GDScript 第二十七批回收 | DONE | 反哺宗门 | `MainMapOperationalLink.cs` 中地图调度条在“无状态 / 行隐藏”分支下共享的收尾逻辑已回收到单一 helper，继续明确 `C#` 只负责状态分支与对 `WorldPanelVisualFx.gd` 的单向 reset 调用；`dotnet build .\Finally.sln` 通过 |
+| DL-078 | UI 表现层 GDScript 第二十八批回收 | DONE | 反哺宗门 | `MainSectTileInspector.cs` 中三类按钮绑定的薄壳 setter 与 disabled binding 构造重复已收口到统一 helper，继续明确 `C#` 仅保留检视摘要、动作语义与对 `TileInspectorVisualFx.gd` 的单向 tone 调用；`dotnet build .\Finally.sln` 通过 |
+| DL-079 | UI 表现层 GDScript 第二十九批收尾巡检 | DONE | 反哺宗门 | 对剩余 UI / 地图调度 / 检视链的 `C#` 边界完成最终巡检，仅补做 `MainSectTileInspector.cs` 末端按钮 helper 的非空签名收紧；其余残留已确认应继续保留在 `C#`；`dotnet build .\Finally.sln` 通过 |
+| DL-080 | 卷册弹窗排他与快捷键门禁收口 | DONE | 反哺宗门 | 主界面打开设置卷 / 仓储卷 / 治宗册 / 弟子谱 / 峰令谱 / 留影录时会统一先收起其他卷册弹窗；对应全局快捷键在这些卷册可见时也会统一让行，避免多卷叠层与误触全局操作；`dotnet build .\Finally.sln` 通过 |
+| DL-081 | 双地图兼容页签入口收口 | DONE | 反哺宗门 | 主界面地图页签继续只保留 `山门沙盘 / 世界舆图` 两个可交互入口；历史兼容的 `Prefecture / Event / Report / Expedition` 页签已统一隐藏并禁用，且不再纳入现行点击绑定与双地图主链必需节点；`dotnet build .\Finally.sln` 通过 |
 
 ### 3.1 DL-019 功能包详情（宗门弟子可视移动）
 
@@ -727,6 +752,384 @@
   - 一期（文档）：收口“季度立纲 -> 月度筹划 -> 小时结算”的规则、指标与观测点，并写清双层时间制的正式口径；
   - 二期（实现）：在不破坏现有细时间与小时结算兼容性的前提下，评估是否将细时间口径正式收口为更明确的运行基线，并同步接入 `日 / 月 / 季` 推进层；正式裁定需先回写 `docs/02_system_specs.md`；
   - 三期（扩展）：把职司转任、英雄实体与护山压力接到同一战略相位与长时间推进链。
+
+### 3.31 DL-051 功能包详情（UI 表现层 GDScript 首批拆分）
+
+- 当前状态：已完成一期接入，首批 3 个表现脚本已落到仓储卷、留影录与山门 hex hover。
+- 目标（玩家价值）：在不改动核心公式、小时结算和存档格式的前提下，建立 `C# 管规则 / GDScript 管表现` 的最小闭环，让界面与地图反馈更顺手。
+- 飞轮环节：反哺宗门（本次只重构表现层与操作节奏，不改人口分配、产业结算或存档结构）。
+- 依赖（前置系统）：`DL-016` 专用仓库管理界面、`DL-025` 多存档槽管理界面、`DL-047` 天衍峰院域坊局与全格检视系统。
+- 完成标准（DoD）：
+  - `WarehousePanel` 已将开场与分页切换表现下放到 `WarehousePanelTransition.gd`；
+  - `SaveSlotsPanel` 已将预览区切换与选中脉冲表现下放到 `SavePreviewCrossfade.gd`；
+  - `CountyTownMapViewSystem` 已将 hex hover 高亮下放到 `HexHoverHighlight.gd`，并保持缩放 / 平移后位置正确；
+  - `GDScript` 不直接修改 `GameState`、存档与核心公式；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.32 DL-052 功能包详情（UI 表现层 GDScript 第二批拆分）
+
+- 当前状态：本轮完成 `TaskPanel / DisciplePanel / WorldPanel` 三处纯表现层下放。
+- 目标（玩家价值）：继续稳住 `C# 管规则 / GDScript 管表现` 的边界，让治宗册、弟子谱和中部地图切页在不改权威逻辑的前提下更顺手。
+- 飞轮环节：反哺宗门（本次只重构表现层与操作节奏，不改人口、治理结算、地图生成与存档结构）。
+- 依赖（前置系统）：`DL-019` 治宗册 UI、`DL-028` 弟子谱与宗门组织谱、`DL-047` 天衍峰院域坊局与全格检视系统、`DL-051` UI 表现层 GDScript 首批拆分。
+- 完成标准（DoD）：
+  - `TaskPanel` 已将开场、页签切换与庶务详情反馈下放到 `TaskPanelVisualFx.gd`；
+  - `DisciplePanel` 已将开场、筛选刷新与详情切换反馈下放到 `DisciplePanelVisualFx.gd`；
+  - `WorldPanel` 已将中部地图页签切换与二级地图检视脉冲反馈下放到 `WorldPanelVisualFx.gd`；
+  - `GDScript` 不直接修改 `GameState`、地图选择、存档与核心公式；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.33 DL-053 功能包详情（UI 表现层 GDScript 第三批拆分）
+
+- 当前状态：本轮完成 `SettingsPanel / SectOrganizationPanel / Main 顶部地图标签栏` 三处纯表现层下放。
+- 目标（玩家价值）：继续稳住 `C# 管规则 / GDScript 管表现` 的边界，让设置卷、宗门组织谱与中部地图顶部标签切换在不改权威逻辑的前提下更顺手。
+- 飞轮环节：反哺宗门（本次只重构表现层与操作节奏，不改设置持久化、治理结算、地图生成与存档结构）。
+- 依赖（前置系统）：`DL-021` 客户端设置面板、`DL-028` 弟子谱与宗门组织谱、`DL-051` UI 表现层 GDScript 首批拆分、`DL-052` UI 表现层 GDScript 第二批拆分。
+- 完成标准（DoD）：
+  - `SettingsPanel` 已将开场与录键高亮反馈下放到 `SettingsPanelVisualFx.gd`；
+  - `SectOrganizationPanel` 已将开场、峰脉切换与职司卡切换反馈下放到 `SectOrganizationPanelVisualFx.gd`；
+  - `Main` 中部地图顶部标签栏已将按钮行强调反馈下放到 `MainTopTabVisualFx.gd`；
+  - `GDScript` 不直接修改客户端设置持久化、地图选择、宗门规则与核心公式；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.34 DL-054 功能包详情（UI 表现层 GDScript 第四批拆分）
+
+- 当前状态：本轮完成 `BottomBar` 两套场景的底栏按钮 hover / focus 灯笼强调反馈下放。
+- 目标（玩家价值）：继续稳住 `C# 管规则 / GDScript 管表现` 的边界，让主界面底栏快捷键、倍速键与存读设按钮的划过反馈从 `Main.cs` 脱钩，后续底栏视觉迭代可在场景侧独立推进。
+- 飞轮环节：反哺宗门（本次只重构表现层与操作节奏，不改倍速状态、存读档流程、客户端设置与存档结构）。
+- 依赖（前置系统）：`DL-018` 快捷键配置系统、`DL-025` 多存档槽管理界面、`DL-051` UI 表现层 GDScript 首批拆分、`DL-053` UI 表现层 GDScript 第三批拆分。
+- 完成标准（DoD）：
+  - `BottomBar.tscn` 已将快捷键、倍速键与存读设按钮的 hover / focus 灯笼强调反馈下放到 `BottomBarLanternFx.gd`；
+  - `figma/BottomBar.tscn` 已复用同一份 `BottomBarLanternFx.gd`；
+  - `Main.cs` 已不再为 `BottomBar` 内按钮直接管理 hover tween，仅保留业务点击绑定；
+  - `GDScript` 不直接修改倍速、存档流程、客户端设置与核心公式；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.35 DL-055 功能包详情（UI 表现层 GDScript 第五批拆分）
+
+- 当前状态：本轮完成 `Main.cs` 剩余全局按钮 hover / focus 灯笼反馈下放。
+- 目标（玩家价值）：继续稳住 `C# 管规则 / GDScript 管表现` 的边界，让主界面顶部、左右侧与弹出卷册中的按钮 hover / focus 反馈不再由 `Main.cs` 直接维护，后续视觉微调可在场景侧独立推进。
+- 飞轮环节：反哺宗门（本次只重构表现层与操作节奏，不改地图切换、倍速状态、存读档流程、客户端设置与存档结构）。
+- 依赖（前置系统）：`DL-021` 客户端设置面板、`DL-025` 多存档槽管理界面、`DL-051` UI 表现层 GDScript 首批拆分、`DL-054` UI 表现层 GDScript 第四批拆分。
+- 完成标准（DoD）：
+  - `Main.tscn` 已挂接 `MainLanternFx.gd`；
+  - 主界面非底栏按钮的 hover / focus 灯笼反馈已由 `MainLanternFx.gd` 统一承接；
+  - `OptionButton` popup 的表现样式、位置对齐与 hover 锁定已迁到 `GDScript`；
+  - `Main.cs` 已不再直接持有 hover tween / hover 音效状态；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.36 DL-056 功能包详情（UI 表现层 GDScript 第六批拆分）
+
+- 当前状态：本轮完成 `SaveSlotsPanel` 右侧详情列空态 / 预览态过渡继续下放。
+- 目标（玩家价值）：继续稳住 `C# 管规则 / GDScript 管表现` 的边界，让留影录切换卷册时，预览框、详情文本、题名行与按钮行形成统一过渡，而不是只切图片。
+- 飞轮环节：反哺宗门（本次只重构表现层与操作节奏，不改卷册筛选 / 排序、存读写、命名与存档结构）。
+- 依赖（前置系统）：`DL-025` 多存档槽管理界面、`DL-051` UI 表现层 GDScript 首批拆分、`DL-055` UI 表现层 GDScript 第五批拆分。
+- 完成标准（DoD）：
+  - `SavePreviewCrossfade.gd` 已扩展到承接右侧详情列的空态 / 预览态过渡；
+  - 切换卷册时，预览框、详情文本、题名行与主按钮行会形成统一过渡；
+  - `SaveSlotsPanel.cs` 不新增业务判断下放到 `GDScript`；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.37 DL-057 功能包详情（UI 表现层 GDScript 第七批拆分）
+
+- 当前状态：本轮完成 `TaskPanel / SettingsPanel` 的静态主题覆盖继续下放。
+- 目标（玩家价值）：继续稳住 `C# 管规则 / GDScript 管表现` 的边界，让治宗册与机宜卷的书卷样式、字段皮肤与按钮外观不再由面板业务脚本直接维护。
+- 飞轮环节：反哺宗门（本次只重构表现层与操作节奏，不改治宗规则、客户端设置持久化、地图选择与存档结构）。
+- 依赖（前置系统）：`DL-018` 快捷键配置系统、`DL-021` 宗主治理中枢界面、`DL-052` UI 表现层 GDScript 第二批拆分、`DL-053` UI 表现层 GDScript 第三批拆分。
+- 完成标准（DoD）：
+  - `TaskPanelVisualFx.gd` 已承接治宗册的书卷框、摘要卡、胶囊、箭头键、庶务列表与关闭钮的静态主题覆盖；
+  - `SettingsPanelVisualFx.gd` 已承接机宜卷的纸面、滚轴、字段框、滑条、动作按钮与快捷键按钮的静态主题覆盖；
+  - `TaskPanel.cs` / `SettingsPanel.cs` 仅保留权威逻辑、输入处理与 `C# -> GDScript` 单向调用；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.38 DL-058 功能包详情（UI 表现层 GDScript 第八批拆分）
+
+- 当前状态：本轮完成 `DisciplePanel / SectOrganizationPanel` 的静态主题覆盖继续下放。
+- 目标（玩家价值）：继续稳住 `C# 管规则 / GDScript 管表现` 的边界，让弟子谱与峰令谱的书卷样式、筛选控件、卡片外观与动态导航选中态不再由面板业务脚本直接维护。
+- 飞轮环节：反哺宗门（本次只重构表现层与操作节奏，不改弟子属性判定、峰脉协同逻辑、治理入口事件与地图选择结构）。
+- 依赖（前置系统）：`DL-039` 宗门组织谱系展示、`DL-043` 宗门弟子独立属性界面、`DL-052` UI 表现层 GDScript 第二批拆分、`DL-053` UI 表现层 GDScript 第三批拆分、`DL-057` UI 表现层 GDScript 第七批拆分。
+- 完成标准（DoD）：
+  - `DisciplePanelVisualFx.gd` 已承接弟子谱的书卷主框、筛选控件、名册树、指标格与进度条的静态主题覆盖；
+  - `SectOrganizationPanelVisualFx.gd` 已承接峰令谱的书卷主框、动作按钮、动态峰脉导航卡与职司卡的样式与选中态外观；
+  - `DisciplePanel.cs` / `SectOrganizationPanel.cs` 仅保留权威逻辑、输入处理与 `C# -> GDScript` 单向调用；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.39 DL-059 功能包详情（UI 表现层 GDScript 第九批拆分）
+
+- 当前状态：本轮完成 `SaveSlotsPanel / MainWorldSitePanel` 的静态主题覆盖与 world-site sandbox 壳层表现继续下放。
+- 目标（玩家价值）：继续稳住 `C# 管规则 / GDScript 管表现` 的边界，让留影录与二级地图页的书卷样式、字段皮肤、预览区外观与 world-site sandbox 壳层不再由面板业务脚本直接维护。
+- 飞轮环节：反哺宗门（本次只重构表现层与操作节奏，不改卷册筛选 / 排序、存读写、world-site 数据生成、地图选择与存档结构）。
+- 依赖（前置系统）：`DL-025` 多存档槽管理界面、`DL-048` 世界格二级地图分层与入口系统、`DL-056` UI 表现层 GDScript 第六批拆分、`DL-058` UI 表现层 GDScript 第八批拆分。
+- 完成标准（DoD）：
+  - `SavePreviewCrossfade.gd` 已承接留影录的纸面、滚轴、按钮、筛选框、命名框与卷册列表的静态主题覆盖；
+  - `WorldPanelVisualFx.gd` 已承接二级地图页的 world-site summary card、标题色调与 sandbox 壳层主题覆盖；
+  - `SaveSlotsPanel.cs` / `MainWorldSitePanel.cs` 仅保留权威逻辑、地图数据与 `C# -> GDScript` 单向调用；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.40 DL-060 功能包详情（UI 表现层 GDScript 第十批回收）
+
+- 当前状态：本轮完成 `TaskPanel / DisciplePanel` 的历史静态样式残留回收清理。
+- 目标（玩家价值）：在前几批已把静态主题迁到 `GDScript` 的基础上，继续清掉 `TaskPanel.cs` 与 `DisciplePanel.cs` 中不再走正式运行路径的历史样式 helper，让后续维护更明确、更不易误改。
+- 飞轮环节：反哺宗门（本次只做代码瘦身与边界回收，不改治宗规则、弟子属性、存档结构与小时结算）。
+- 依赖（前置系统）：`DL-057` UI 表现层 GDScript 第七批拆分、`DL-058` UI 表现层 GDScript 第八批拆分。
+- 完成标准（DoD）：
+  - `TaskPanel.cs` 中已迁移到 `GDScript` 的旧样式工厂与废弃运行时构建代码已清理，页签字体选中态改由 `TaskPanelVisualFx.gd` 统一承接；
+  - `DisciplePanel.cs` 中已迁移到 `GDScript` 的旧静态样式 helper 已清理，仅保留必要的动态 trait tag 样式与权威逻辑；
+  - 两个面板继续只保留权威逻辑、输入处理、数据刷新与 `C# -> GDScript` 单向调用；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.41 DL-061 功能包详情（UI 表现层 GDScript 第十一批拆分）
+
+- 当前状态：本轮完成 `WarehousePanel` 剩余静态主题与资源卡片纯视觉样式继续下放。
+- 目标（玩家价值）：继续稳住 `C# 管规则 / GDScript 管表现` 的边界，让仓储卷的书卷皮肤、页签选中态、库容告警色调与资源卡片外观不再由业务脚本直接维护。
+- 飞轮环节：反哺宗门（本次只重构表现层与操作节奏，不改库存结算、建筑批复、材料规则与存档结构）。
+- 依赖（前置系统）：`DL-016` 专用仓库管理界面、`DL-051` UI 表现层 GDScript 首批拆分、`DL-060` UI 表现层 GDScript 第十批回收。
+- 完成标准（DoD）：
+  - `WarehousePanelTransition.gd` 已承接仓储卷的静态主题覆盖、页签选中态与库容负载纯视觉色调；
+  - 资源卡片的卡片 / token / 字号 / 颜色与空满态透明度已由 `WarehousePanelTransition.gd` 承接；
+  - `WarehousePanel.cs` 仅保留库存数据刷新、按钮事件、文案拼装与 `C# -> GDScript` 单向调用；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.42 DL-062 功能包详情（UI 表现层 GDScript 第十二批拆分）
+
+- 当前状态：本轮完成 `MainSectTileInspector` 左侧检视器纯视觉 tone 切换继续下放。
+- 目标（玩家价值）：继续稳住 `C# 管规则 / GDScript 管表现` 的边界，让世界点位与山门地块检视器的标题、副标题、徽签与状态值配色不再由业务逻辑代码直接维护。
+- 飞轮环节：反哺宗门（本次只重构表现层，不改点位说明、坊局规则、按钮动作与地图进入逻辑）。
+- 依赖（前置系统）：`DL-047` 天衍峰院域坊局与全格检视系统、`DL-048` 世界格二级地图分层与入口系统、`DL-059` UI 表现层 GDScript 第九批拆分、`DL-061` UI 表现层 GDScript 第十一批拆分。
+- 完成标准（DoD）：
+  - `TileInspectorVisualFx.gd` 已承接左侧检视器在世界层 / 本地层的纯配色落点；
+  - `MainSectTileInspector.cs` 不再直接承担世界点位 / 本地地块检视器的纯 `AddThemeColorOverride` 色调切换；
+  - `MainSectTileInspector.cs` 仍保留按钮绑定、描述文案、badge 语义与规则判断；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.43 DL-063 功能包详情（UI 表现层 GDScript 第十三批拆分）
+
+- 当前状态：本轮完成 `DisciplePanel` 雷达图展示控件继续下放。
+- 目标（玩家价值）：继续稳住 `C# 管规则 / GDScript 管表现` 的边界，让弟子谱右侧雷达图的自绘与标签布局不再由业务脚本直接维护。
+- 飞轮环节：反哺宗门（本次只重构展示控件，不改弟子生成、筛选排序、属性数值与文案解释）。
+- 依赖（前置系统）：`DL-043` 宗门弟子独立属性界面、`DL-058` UI 表现层 GDScript 第八批拆分、`DL-060` UI 表现层 GDScript 第十批回收。
+- 完成标准（DoD）：
+  - `DiscipleRadarChart.gd` 已承接弟子谱雷达图的环线、轴线、数据多边形与轴标签布局；
+  - `DisciplePanel.tscn` 已挂接正式 `RadarChart` 节点；
+  - `DisciplePanel.cs` 不再内嵌雷达图自绘控件实现，仅保留属性数据整理与单向调用；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.44 DL-064 功能包详情（UI 表现层 GDScript 第十四批拆分）
+
+- 当前状态：本轮完成 `DisciplePanel` 剩余小块纯视觉 helper 继续下放。
+- 目标（玩家价值）：继续稳住 `C# 管规则 / GDScript 管表现` 的边界，让弟子谱中的指标值颜色切换与 trait 标签外观不再由业务脚本直接维护。
+- 飞轮环节：反哺宗门（本次只回收展示层残留，不改弟子 roster 生成、筛选排序、属性数值与文案解释）。
+- 依赖（前置系统）：`DL-058` UI 表现层 GDScript 第八批拆分、`DL-060` UI 表现层 GDScript 第十批回收、`DL-063` UI 表现层 GDScript 第十三批拆分。
+- 完成标准（DoD）：
+  - `DisciplePanelVisualFx.gd` 已承接弟子谱剩余的指标值 tone 与 trait tag 皮肤；
+  - `DisciplePanel.cs` 不再直接承担这些纯视觉的 `AddThemeColorOverride` / `StyleBoxFlat` 代码；
+  - `DisciplePanel.cs` 仍保留名册数据整理、筛选排序和详情文案；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.45 DL-065 功能包详情（UI 表现层 GDScript 第十五批拆分）
+
+- 当前状态：本轮完成 `MainWorldSitePanel` 中 sandbox shell 的结构回收。
+- 目标（玩家价值）：继续稳住 `C# 管规则 / GDScript 或场景 管表现` 的边界，让二级地图页的局部沙盘壳层结构不再由业务代码运行时动态拼装。
+- 飞轮环节：反哺宗门（本次只回收表现层结构，不改 world-site 数据生成、入口文案、按钮行为与局部地图规则）。
+- 依赖（前置系统）：`DL-048` 世界格二级地图分层与入口系统、`DL-059` UI 表现层 GDScript 第九批拆分、`DL-062` UI 表现层 GDScript 第十二批拆分。
+- 完成标准（DoD）：
+  - `WorldPanel.tscn` 已正式包含 `GeneratedSecondarySandboxView`、`MapHintLabel`、`RegenerateButton`；
+  - `MainWorldSitePanel.cs` 不再运行时动态 new sandbox shell 并插入布局；
+  - 二级地图页仍可对 sandbox 调用 `SetExternalMap` / `ClearExternalMap`；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.46 DL-066 功能包详情（UI 表现层 GDScript 第十六批拆分）
+
+- 当前状态：本轮完成地图页底部 `MapDirectiveRow` 的纯视觉 tone 继续下放。
+- 目标（玩家价值）：继续稳住 `C# 管规则 / GDScript 管表现` 的边界，让世界图 / 外域 / 山门地图页底部调度条的状态字色调与调度按钮强调样式不再由业务代码直接维护。
+- 飞轮环节：反哺宗门（本次只重构地图页表现层，不改地图态势评分、调度指令成本收益、按钮动作与日志结果）。
+- 依赖（前置系统）：`DL-013` 地图与经营状态联动、`DL-059` UI 表现层 GDScript 第九批拆分、`DL-065` UI 表现层 GDScript 第十五批拆分。
+- 完成标准（DoD）：
+  - `WorldPanelVisualFx.gd` 已承接 `MapDirectiveRow` 的状态字色调切换与两枚调度按钮的强调样式；
+  - `MainMapOperationalLink.cs` 不再直接以 `_mapStatusLabel.Modulate` 之类的表现代码控制地图调度条色调；
+  - 地图态势快照、按钮文案 / tooltip / 禁用逻辑与指令执行结果仍全部保留在 `C#`；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.47 DL-067 功能包详情（UI 表现层 GDScript 第十七批拆分）
+
+- 当前状态：本轮完成世界图 / 外域图标题与山门图 `MapHintLabel` 的地图态势色调继续下放。
+- 目标（玩家价值）：继续稳住 `C# 管规则 / GDScript 管表现` 的边界，让两类地图视图中随态势变化的标题 / 提示色调不再由地图绘制脚本直接维护。
+- 飞轮环节：反哺宗门（本次只重构地图表现层，不改地图生成、态势评分、标题文案、局部检视与缩放 / 拖拽规则）。
+- 依赖（前置系统）：`DL-013` 地图与经营状态联动、`DL-066` UI 表现层 GDScript 第十六批拆分、`DL-049` 地图素材生产规格与分层资产流水线。
+- 完成标准（DoD）：
+  - `StrategicMapPanelToneFx.gd` 已承接 `WorldMapView` / `PrefectureMapView` 标题 label 的地图态势色调；
+  - `CountyTownMapHintFx.gd` 已承接 `CountyTownMapView/MapHintLabel` 的地图态势色调；
+  - `StrategicMapViewSystem.cs` / `CountyTownMapViewSystem.cs` 不再直接使用对应 label 的 `Modulate` 表现代码；
+  - 地图态势快照、标题文本、提示文本与地图绘制仍全部保留在 `C#`；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.48 DL-068 功能包详情（UI 表现层 GDScript 第十八批回收）
+
+- 当前状态：本轮完成 `Main.cs` 中旧 `job-row / priority` 视觉残留的历史回收清理。
+- 目标（玩家价值）：在前几批已把主界面活跃链路的视觉逻辑迁到 `GDScript` 或场景侧后，继续清掉 `Main.cs` 中已不再接入现行布局链路的旧 `job-row` 选中样式、priority helper 与未接线字典残留，降低后续误改和误判成本。
+- 飞轮环节：反哺宗门（本次只做历史代码回收，不改峰脉摘要、地图调度、面板入口、治理规则、存档结构与小时结算）。
+- 依赖（前置系统）：`DL-053` UI 表现层 GDScript 第三批拆分、`DL-060` UI 表现层 GDScript 第十批回收、`DL-067` UI 表现层 GDScript 第十七批拆分。
+- 完成标准（DoD）：
+  - `Main.cs` 中已不再接线的 `_jobPriorityButtons`、`_jobRowBaseStyles` 及对应 helper 已回收；
+  - `Main.cs` 中旧 `job-row` 选中样式与 priority 文字应用不再残留；
+  - 主界面继续仅保留现行峰脉摘要、地图调度、面板入口与实际运行链逻辑；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.49 DL-069 功能包详情（UI 表现层 GDScript 第十九批拆分）
+
+- 当前状态：本轮完成世界图 `WorldTerrainTileLayer` 的地图态势 tint 继续下放。
+- 目标（玩家价值）：继续稳住 `C# 管规则 / GDScript 管表现` 的边界，让世界图底盘 layer 随态势变化的纯视觉 tint 不再由地图绘制脚本直接维护。
+- 飞轮环节：反哺宗门（本次只重构世界图表现层，不改 world map 生成、hex 投影、缩放 / 平移、点选逻辑与态势评分）。
+- 依赖（前置系统）：`DL-049` 地图素材生产规格与分层资产流水线、`DL-067` UI 表现层 GDScript 第十七批拆分、`DL-068` UI 表现层 GDScript 第十八批回收。
+- 完成标准（DoD）：
+  - `StrategicMapPanelToneFx.gd` 已承接 `WorldTerrainTileLayer` 的地图态势 tint；
+  - `StrategicMapViewSystem.cs` 不再直接以 `_worldTerrainTileLayer.Modulate` 控制该 layer 的纯视觉着色；
+  - 世界图 tile layer 的可见性、位置、缩放与地图绘制仍全部保留在 `C#`；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.50 DL-070 功能包详情（UI 表现层 scene-side 第二十批回收）
+
+- 当前状态：本轮完成主界面背景 `TextureRect` 静态视觉布局参数的场景侧回收。
+- 目标（玩家价值）：继续稳住“`C#` 只管运行逻辑，静态 UI 表现优先回收到 scene / `GDScript`”的边界，让主界面背景的默认显隐、拉伸、层级和默认色调不再由运行时代码重复维护。
+- 飞轮环节：反哺宗门（本次只做背景表现层回收，不改背景资源加载 fallback、Figma/Legacy 布局切换、存档结构与小时结算）。
+- 依赖（前置系统）：`DL-053` UI 表现层 GDScript 第三批拆分、`DL-068` UI 表现层 GDScript 第十八批回收。
+- 完成标准（DoD）：
+  - `Main.tscn` 已直接承接背景 `TextureRect` 的 `expand_mode / stretch_mode / z_index / self_modulate` 静态参数；
+  - `Main.cs` 不再运行时重复设置这些静态视觉参数；
+  - 与背景 full-rect 锚定重复等价的 resize 绑定逻辑已清理；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.51 DL-071 功能包详情（UI 表现层 GDScript 第二十一批拆分）
+
+- 当前状态：本轮完成峰令谱动态卡片壳层中仍留在 `C#` 的交互光标与内间距外观下放。
+- 目标（玩家价值）：继续稳住 `C# 管规则 / GDScript 管表现` 的边界，让 `SectOrganizationPanel` 动态生成的峰脉导航卡 / 职司卡的交互光标与三类动态卡片的内部间距不再由业务脚本直接维护。
+- 飞轮环节：反哺宗门（本次只重构峰令谱表现层，不改峰脉协同规则、治理入口、卷册状态提示与输入判定）。
+- 依赖（前置系统）：`DL-058` UI 表现层 GDScript 第八批拆分、`DL-068` UI 表现层 GDScript 第十八批回收、`DL-070` UI 表现层 scene-side 第二十批回收。
+- 完成标准（DoD）：
+  - `SectOrganizationPanelVisualFx.gd` 已承接动态峰脉导航卡 / 职司卡的 `mouse_default_cursor_shape`，并统一承接峰脉导航卡 / 职司卡 / 部门卡的 `VBoxContainer` 内间距壳层配置；
+  - `SectOrganizationPanel.cs` 不再直接设置这些动态卡片的纯视觉 shell 参数；
+  - 动态卡片生成、点击输入、峰脉协同逻辑与治理入口仍全部保留在 `C#`；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.52 DL-072 功能包详情（UI 表现层 GDScript 第二十二批拆分）
+
+- 当前状态：本轮完成峰令谱动态卡片 `MarginContainer` 留白壳层中仍留在 `C#` 的常量配置下放。
+- 目标（玩家价值）：继续稳住 `C# 管规则 / GDScript 管表现` 的边界，让 `SectOrganizationPanel` 动态生成的峰脉导航卡 / 职司卡 / 部门卡的统一内边距不再由业务脚本直接维护。
+- 飞轮环节：反哺宗门（本次只重构峰令谱表现层，不改峰脉协同规则、治理入口、点击输入与提示文案）。
+- 依赖（前置系统）：`DL-058` UI 表现层 GDScript 第八批拆分、`DL-071` UI 表现层 GDScript 第二十一批拆分。
+- 完成标准（DoD）：
+  - `SectOrganizationPanelVisualFx.gd` 已承接三类动态卡片 `MarginContainer` 的统一 `margin_left / margin_top / margin_right / margin_bottom` 留白配置；
+  - `SectOrganizationPanel.cs` 不再直接以 `AddThemeConstantOverride` 写入这些动态卡片的纯视觉内边距；
+  - 动态卡片生成、点击输入、峰脉协同逻辑与治理入口仍全部保留在 `C#`；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.53 DL-073 功能包详情（UI 表现层 GDScript 第二十三批回收）
+
+- 当前状态：本轮完成 `SectOrganizationPanel.cs` 中已在前两批收口后退化为薄壳的表现层 helper 回收。
+- 目标（玩家价值）：在峰令谱动态卡片的光标、内间距与留白都已迁到 `GDScript` 之后，继续清理 `SectOrganizationPanel.cs` 中冗余的 `CreateMarginContainer()` 包装与分散 `VisualFx` 调用写法，降低后续误改成本。
+- 飞轮环节：反哺宗门（本次只做历史/冗余代码回收，不改峰脉协同规则、治理入口、点击输入、提示文案与选中态判定）。
+- 依赖（前置系统）：`DL-071` UI 表现层 GDScript 第二十一批拆分、`DL-072` UI 表现层 GDScript 第二十二批拆分。
+- 完成标准（DoD）：
+  - `SectOrganizationPanel.cs` 不再保留仅返回 `new MarginContainer()` 的薄壳 helper；
+  - `SectOrganizationPanel.cs` 中面向表现层的单向调用已统一经由 `CallVisualFx(...)` 收口，不再在活跃链路上分散直接写 `_visualFx?.Call(...)`；
+  - 动态卡片生成、点击输入、峰脉协同逻辑与治理入口仍全部保留在 `C#`；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.54 DL-074 功能包详情（UI 表现层 GDScript 第二十四批回收）
+
+- 当前状态：本轮完成峰令谱初始主题应用链中的重复触发回收。
+- 目标（玩家价值）：在 `SectOrganizationPanelVisualFx.gd` 已于 `_ready()` 内承接初始主题应用后，继续清理 `SectOrganizationPanel.cs` 中重复调用 `apply_theme_styles` 的残留，减少无意义重复覆盖与后续误判成本。
+- 飞轮环节：反哺宗门（本次只做初始化回收，不改峰脉协同规则、治理入口、点击输入、提示文案、动态卡片结构与选中态判定）。
+- 依赖（前置系统）：`DL-058` UI 表现层 GDScript 第八批拆分、`DL-073` UI 表现层 GDScript 第二十三批回收。
+- 完成标准（DoD）：
+  - `SectOrganizationPanel.cs` 不再在 `_Ready()` 中重复触发 `apply_theme_styles`；
+  - 峰令谱初始主题应用继续由 `SectOrganizationPanelVisualFx.gd` 的 `_ready()` 单点承接；
+  - 动态卡片生成、点击输入、峰脉协同逻辑与治理入口仍全部保留在 `C#`；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.55 DL-075 功能包详情（UI 表现层 GDScript 第二十五批回收）
+
+- 当前状态：本轮完成多卷册面板中重复初始主题应用的统一回收。
+- 目标（玩家价值）：在弟子谱、留影录、机宜卷、治宗册与仓储卷都已由各自 `VisualFx.gd` 在 `_ready()` 承接主题应用后，继续清理 `C#` 面板脚本中的重复 `apply_theme_styles` 触发，减少双端重复覆盖与后续误判成本。
+- 飞轮环节：反哺宗门（本次只做初始化回收，不改弟子名册、存读档流程、快捷键设定、治理规则、仓储数据与按钮行为）。
+- 依赖（前置系统）：`DL-057` UI 表现层 GDScript 第七批拆分、`DL-058` UI 表现层 GDScript 第八批拆分、`DL-059` UI 表现层 GDScript 第九批拆分、`DL-061` UI 表现层 GDScript 第十一批拆分、`DL-074` UI 表现层 GDScript 第二十四批回收。
+- 完成标准（DoD）：
+  - `DisciplePanel.cs`、`SaveSlotsPanel.cs`、`SettingsPanel.cs`、`TaskPanel.cs` 与 `WarehousePanel.cs` 不再在 `_Ready()` 中重复触发 `apply_theme_styles`；
+  - 对应初始主题应用继续由 `DisciplePanelVisualFx.gd`、`SavePreviewCrossfade.gd`、`SettingsPanelVisualFx.gd`、`TaskPanelVisualFx.gd`、`WarehousePanelTransition.gd` 的 `_ready()` 单点承接；
+  - 各面板的数据刷新、点击输入、按钮行为与业务逻辑仍全部保留在 `C#`；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.56 DL-076 功能包详情（UI 表现层 GDScript 第二十六批回收）
+
+- 当前状态：本轮完成二级地图页 world-site 主题初始化链中的重复触发回收。
+- 目标（玩家价值）：在 `WorldPanelVisualFx.gd` 已于 `_ready()` 中承接 world-site 主题应用后，继续清理 `MainWorldSitePanel.cs` 中重复调用 `apply_world_site_theme_styles` 的残留，减少双端重复覆盖与后续误判成本。
+- 飞轮环节：反哺宗门（本次只做初始化回收，不改 world-site 数据绑定、入口按钮行为、secondary sandbox 注入、地图选择链与局部检视逻辑）。
+- 依赖（前置系统）：`DL-059` UI 表现层 GDScript 第九批拆分、`DL-065` UI 表现层 GDScript 第十五批拆分、`DL-075` UI 表现层 GDScript 第二十五批回收。
+- 完成标准（DoD）：
+  - `MainWorldSitePanel.cs` 不再在绑定 world-site 面板节点时重复触发 `apply_world_site_theme_styles`；
+  - world-site 初始主题应用继续由 `WorldPanelVisualFx.gd` 的 `_ready()` 单点承接；
+  - world-site 数据绑定、按钮输入、sandbox 注入与左侧检视反馈仍全部保留在 `C#`；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.57 DL-077 功能包详情（UI 表现层 GDScript 第二十七批回收）
+
+- 当前状态：本轮完成地图调度条收尾分支里的重复 reset 逻辑回收。
+- 目标（玩家价值）：在 `WorldPanelVisualFx.gd` 已承接地图调度条 tone reset 的前提下，继续清理 `MainMapOperationalLink.cs` 中“无状态 / 行隐藏”两处重复的收尾逻辑，让地图调度条主链更明确地只保留状态判断与单向调用。
+- 飞轮环节：反哺宗门（本次只做历史/冗余代码回收，不改地图态势快照、按钮动作、tooltip 文案、指令执行结果与地图运营规则）。
+- 依赖（前置系统）：`DL-066` UI 表现层 GDScript 第十六批拆分、`DL-076` UI 表现层 GDScript 第二十六批回收。
+- 完成标准（DoD）：
+  - `MainMapOperationalLink.cs` 中地图调度条在“无状态 / 行隐藏”两处重复的 reset 分支已统一经由单一 helper 收口；
+  - `C#` 继续仅保留地图态势快照、按钮绑定、状态判断与对 `WorldPanelVisualFx.gd` 的单向调用；
+  - `WorldPanelVisualFx.gd` 承接的地图调度条 tone reset 语义保持不变；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.58 DL-078 功能包详情（UI 表现层 GDScript 第二十八批回收）
+
+- 当前状态：本轮完成左侧地块检视器按钮绑定薄壳与 disabled binding 重复构造的收尾回收。
+- 目标（玩家价值）：在 `MainSectTileInspector.cs` 已清晰保持“检视摘要 / 动作语义 / VisualFx tone 调用”边界的前提下，继续收口三类按钮绑定 setter 与 `TileInspectorAction.None` 的重复构造，降低后续误改成本。
+- 飞轮环节：反哺宗门（本次只做历史/冗余代码回收，不改 world-site / 山门地块检视文案、按钮动作、tooltip 文本、地块切换链与地图运营规则）。
+- 依赖（前置系统）：`DL-062` UI 表现层 GDScript 第十二批拆分、`DL-077` UI 表现层 GDScript 第二十七批回收。
+- 完成标准（DoD）：
+  - `MainSectTileInspector.cs` 中三类按钮动作写入已统一经由单一 helper 收口，不再保留三组薄壳 setter；
+  - `MainSectTileInspector.cs` 中 `TileInspectorAction.None` 的 disabled binding 重复构造已统一经由 helper 收口；
+  - 左侧检视器的摘要文案、按钮动作、tooltip、动作 hint 与 `TileInspectorVisualFx.gd` tone 调用语义保持不变；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.59 DL-079 功能包详情（UI 表现层 GDScript 第二十九批收尾巡检）
+
+- 当前状态：本轮完成 UI 表现层 `C# -> GDScript / scene-side` 拆分线的最终巡检与尾差回收。
+- 目标（玩家价值）：在连续二十八批边界回收后，正式确认剩余 UI `C#` 代码哪些仍可安全收口、哪些应继续保留为权威逻辑或运行时边界，避免为凑拆分而误伤 tooltip、`Visible` 业务切换、地图渲染 authority 与数据绑定链。
+- 飞轮环节：反哺宗门（本次只做边界收尾与历史/冗余代码清理，不改检视摘要、地图调度、world-site 入口、卷册数据刷新、地图绘制或小时结算规则）。
+- 依赖（前置系统）：`DL-062` UI 表现层 GDScript 第十二批拆分、`DL-066` UI 表现层 GDScript 第十六批拆分、`DL-075` UI 表现层 GDScript 第二十五批回收、`DL-076` UI 表现层 GDScript 第二十六批回收、`DL-077` UI 表现层 GDScript 第二十七批回收、`DL-078` UI 表现层 GDScript 第二十八批回收。
+- 完成标准（DoD）：
+  - 已复核 `MainMapOperationalLink.cs`、`MainSectTileInspector.cs`、`MainWorldSitePanel.cs`、`DisciplePanel.cs`、`SaveSlotsPanel.cs`、`SettingsPanel.cs`、`TaskPanel.cs`、`WarehousePanel.cs` 与 `SectOrganizationPanel.cs` 的剩余边界；
+  - `MainSectTileInspector.cs` 中最终仍保留的按钮 helper 已收紧为非空 `Button` 签名，不再维持无效的 nullable 防御；
+  - 经巡检确认 tooltip 文案、`Visible` 业务切换、地图 layer 可见性/缩放、world-site 数据绑定、调度按钮禁用判定与地图绘制 authority 继续保留在 `C#`，不再强行下放；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.60 DL-080 功能包详情（卷册弹窗排他与快捷键门禁收口）
+
+- 当前状态：本轮完成主界面卷册弹窗排他策略与全局快捷键门禁的统一收口。
+- 目标（玩家价值）：让设置卷、仓储卷、治宗册、弟子谱、峰令谱与留影录在主界面只维持单卷展开，避免多卷叠层；同时在阅读这些卷册时，不会误触全局设置、仓储、速录、速启、速归或倍率入口。
+- 飞轮环节：反哺宗门（本次只修复 UI 交互秩序，不改治理规则、仓储数据、弟子属性、存档结构、地图逻辑与小时结算）。
+- 依赖（前置系统）：`DL-016` 专用仓库管理界面、`DL-018` 快捷键配置系统、`DL-021` 岗位面板进程化交互、`DL-025` 多存档槽管理界面、`DL-043` 宗门弟子独立属性界面、`DL-039` 宗门组织谱系展示。
+- 完成标准（DoD）：
+  - 主界面经由按钮或共享入口打开 `设置卷 / 仓储卷 / 治宗册 / 弟子谱 / 峰令谱 / 留影录` 时，都会先统一收起其他已打开卷册，再打开目标卷册；
+  - 上述卷册任一可见时，`MainShortcutBindings.cs` 中的全局快捷键默认让行，不再继续触发设置、仓储、探险、倍率、速录、速启与速归入口；
+  - 各卷册仍保留自身 `Esc` 收卷、关闭按钮、打开事件与快捷按钮 pressed 状态联动；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.61 DL-081 功能包详情（双地图兼容页签入口收口）
+
+- 当前状态：本轮完成主界面历史兼容地图页签从现行双地图主链中的收口。
+- 目标（玩家价值）：让主界面的地图入口与 `DL-027` 当前裁定一致，明确只保留 `山门沙盘 / 世界舆图` 两个现行入口，不再让 `Prefecture / Event / Report / Expedition` 这些历史兼容页签继续混入点击绑定与主链必需节点判断。
+- 飞轮环节：反哺宗门（本次只做主界面入口收口，不改世界图、山门图、二级地图、历史 fallback 容器与地图渲染链）。
+- 依赖（前置系统）：`DL-027` 双地图布局、`DL-048` 世界格二级地图分层与入口系统、`DL-080` 卷册弹窗排他与快捷键门禁收口。
+- 完成标准（DoD）：
+  - `Main.cs` 中现行地图入口点击绑定只保留 `World / Sect` 两条主链；
+  - `Prefecture / Event / Report / Expedition` 兼容按钮继续隐藏且禁用，但不再作为双地图主链的必需节点；
+  - `SetMapTab()` 在当前运行版下继续只保证 `World / WorldSite / Sect` 主链稳定，不因为隐藏兼容按钮缺失而提前返回；
+  - `dotnet build .\Finally.sln` 通过。
 
 ## 4. 执行与回写规则
 

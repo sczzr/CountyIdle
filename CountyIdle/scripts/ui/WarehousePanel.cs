@@ -63,18 +63,6 @@ public partial class WarehousePanel : PopupPanelBase
 		public Label AmountLabel { get; }
 	}
 
-	private static readonly Color PaperMainColor = new(0.95f, 0.92f, 0.84f, 1f);
-	private static readonly Color PaperDarkColor = new(0.89f, 0.85f, 0.76f, 1f);
-	private static readonly Color InkMainColor = new(0.17f, 0.15f, 0.13f, 1f);
-	private static readonly Color InkMutedColor = new(0.42f, 0.37f, 0.33f, 1f);
-	private static readonly Color SealRedColor = new(0.65f, 0.16f, 0.16f, 1f);
-	private static readonly Color BorderNormalColor = new(0.29f, 0.25f, 0.21f, 1f);
-	private static readonly Color AccentGoldColor = new(0.72f, 0.53f, 0.04f, 1f);
-	private static readonly Color AccentBlueColor = new(0.19f, 0.33f, 0.54f, 1f);
-	private static readonly Color DangerColor = SealRedColor;
-	private static readonly Color WarningColor = new(0.72f, 0.53f, 0.04f, 1f);
-	private static readonly Color ActiveSlotModulate = Colors.White;
-	private static readonly Color InactiveSlotModulate = new(1f, 1f, 1f, 0.45f);
 	private const float InventoryCardMinWidth = 240f;
 	private const int InventoryMinColumns = 2;
 	private const int InventoryMaxColumns = 6;
@@ -110,15 +98,6 @@ public partial class WarehousePanel : PopupPanelBase
 		new(nameof(GameState.ConstructionMaterials), MaterialSemanticRules.GetDisplayName(nameof(GameState.ConstructionMaterials)), "🏗", MaterialSemanticRules.GetDescription(nameof(GameState.ConstructionMaterials)), new Color(0.85f, 0.52f, 0.38f), ResourceGroup.Crafted, "res://assets/ui/materials/construction_materials.png")
 	];
 
-	private PanelContainer _paperPanel = null!;
-	private PanelContainer _statusSection = null!;
-	private Panel _capacityBarFrame = null!;
-	private ProgressBar _capacityBar = null!;
-	private TextureRect _capacityTickOverlay = null!;
-	private PanelContainer _leftRoller = null!;
-	private PanelContainer _rightRoller = null!;
-	private PanelContainer _chainInfoFrame = null!;
-	private Label _warningStampLabel = null!;
 	private Label _hintLabel = null!;
 	private Label _warehouseStatusValue = null!;
 	private Label _capacityValueLabel = null!;
@@ -140,7 +119,7 @@ public partial class WarehousePanel : PopupPanelBase
 	private Button _buildMasonryChainButton = null!;
 	private Button _buildMedicinalChainButton = null!;
 	private Button _buildFiberChainButton = null!;
-	private readonly Dictionary<InventoryTab, Button> _tabButtons = new();
+	private Node? _visualFx;
 	private readonly List<ResourceSlotBinding> _slotBindings = new();
 	private readonly Dictionary<string, Texture2D?> _textureCache = new();
 	private InventoryTab _activeTab = InventoryTab.All;
@@ -158,15 +137,6 @@ public partial class WarehousePanel : PopupPanelBase
 
 	public override void _Ready()
 	{
-		_paperPanel = GetNode<PanelContainer>("CenterLayer/LedgerWrapper/FrameRow/Paper");
-		_leftRoller = GetNode<PanelContainer>("CenterLayer/LedgerWrapper/FrameRow/LeftRoller");
-		_rightRoller = GetNode<PanelContainer>("CenterLayer/LedgerWrapper/FrameRow/RightRoller");
-		_statusSection = GetNode<PanelContainer>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection");
-		_capacityBarFrame = GetNode<Panel>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/CapacityBarFrame");
-		_capacityBar = GetNode<ProgressBar>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/CapacityBarFrame/CapacityBar");
-		_capacityTickOverlay = GetNode<TextureRect>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/CapacityBarFrame/CapacityTickOverlay");
-		_chainInfoFrame = GetNode<PanelContainer>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection/ChainInfoFrame");
-		_warningStampLabel = GetNode<Label>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/StatusRow/WarningStampLabel");
 		_hintLabel = GetNode<Label>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/StatusRow/StatusTextColumn/HintLabel");
 		_warehouseStatusValue = GetNode<Label>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/StatusRow/StatusTextColumn/WarehouseStatusValue");
 		_capacityValueLabel = GetNode<Label>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/StatusRow/CapacityValueLabel");
@@ -188,16 +158,12 @@ public partial class WarehousePanel : PopupPanelBase
 		_buildMasonryChainButton = GetNode<Button>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection/BuildMasonryChainButton");
 		_buildMedicinalChainButton = GetNode<Button>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection/BuildMedicinalChainButton");
 		_buildFiberChainButton = GetNode<Button>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection/BuildFiberChainButton");
-
-		_tabButtons[InventoryTab.All] = _allTabButton;
-		_tabButtons[InventoryTab.Basic] = _basicTabButton;
-		_tabButtons[InventoryTab.Materials] = _materialsTabButton;
-		_tabButtons[InventoryTab.Crafted] = _craftedTabButton;
+		_visualFx = GetNodeOrNull<Node>("VisualFx");
 
 		_resourceSlotTemplate.Visible = false;
 
-		ApplyStaticStyles();
 		BuildInventoryGrid();
+		RefreshTabStyles();
 		UpdateInventoryColumns();
 		InitializePopupHint(_hintLabel);
 		BindEvents();
@@ -209,6 +175,12 @@ public partial class WarehousePanel : PopupPanelBase
 		RefreshState(state);
 		UpdateInventoryColumns();
 		OpenPopup();
+		CallVisualFx("play_open");
+	}
+
+	public void ClosePanel()
+	{
+		ClosePopup();
 	}
 
 	public override void _Process(double delta)
@@ -248,72 +220,10 @@ public partial class WarehousePanel : PopupPanelBase
 		_capacityValueLabel.Text = $"已占 {used:0} / {capacity:0}";
 		_capacityValueLabel.TooltipText = $"剩余容量 {Math.Max(capacity - used, 0):0}";
 
-		UpdateCapacityVisual(_warehouseLoadRate);
+		CallVisualFx("apply_capacity_visual", _warehouseLoadRate);
 		RefreshInventoryState(state);
 		RefreshActionButtons(state);
 		RefreshPopupHint();
-	}
-
-	private void ApplyStaticStyles()
-	{
-		_paperPanel.AddThemeStyleboxOverride("panel", CreatePaperStyle());
-		_leftRoller.AddThemeStyleboxOverride("panel", CreateRollerStyle());
-		_rightRoller.AddThemeStyleboxOverride("panel", CreateRollerStyle());
-		_statusSection.AddThemeStyleboxOverride("panel", CreateWarningPanelStyle());
-		_capacityBarFrame.AddThemeStyleboxOverride("panel", CreateCapacityFrameStyle(SealRedColor));
-		_capacityBar.AddThemeStyleboxOverride("background", CreateCapacityBarBackgroundStyle());
-		_capacityBar.AddThemeStyleboxOverride("fill", CreateCapacityBarFillStyle(SealRedColor));
-		_capacityBar.ShowPercentage = false;
-		_capacityBar.MinValue = 0;
-		_capacityBar.MaxValue = 100;
-		_capacityBar.Value = 0;
-		_capacityTickOverlay.Texture = CreateCapacityTickTexture();
-		_capacityTickOverlay.StretchMode = TextureRect.StretchModeEnum.Tile;
-		_capacityTickOverlay.TextureFilter = CanvasItem.TextureFilterEnum.Nearest;
-		_capacityTickOverlay.Modulate = new Color(0.2f, 0.17f, 0.13f, 0.22f);
-		_chainInfoFrame.AddThemeStyleboxOverride("panel", CreateNoteStyle());
-
-		var titleLabel = GetNode<Label>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/HeaderRow/TitleGroup/TitleLabel");
-		titleLabel.AddThemeFontSizeOverride("font_size", 26);
-		titleLabel.AddThemeColorOverride("font_color", InkMainColor);
-
-		var subtitleLabel = GetNode<Label>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/HeaderRow/TitleGroup/SubtitleLabel");
-		subtitleLabel.AddThemeFontSizeOverride("font_size", 14);
-		subtitleLabel.AddThemeColorOverride("font_color", InkMutedColor);
-
-		_warningStampLabel.Rotation = -0.08f;
-		_warningStampLabel.AddThemeFontSizeOverride("font_size", 14);
-		_warningStampLabel.AddThemeColorOverride("font_color", SealRedColor);
-		_hintLabel.AddThemeFontSizeOverride("font_size", 14);
-		_warehouseStatusValue.AddThemeFontSizeOverride("font_size", 12);
-		_warehouseStatusValue.AddThemeColorOverride("font_color", InkMutedColor);
-		_capacityValueLabel.AddThemeFontSizeOverride("font_size", 20);
-		_capacityValueLabel.AddThemeColorOverride("font_color", InkMainColor);
-		_tierZeroChainStatusValue.AddThemeFontSizeOverride("font_size", 13);
-		_tierZeroChainStatusValue.AddThemeColorOverride("font_color", InkMainColor);
-
-		foreach (var label in new[]
-				 {
-					 GetNode<Label>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ManufactureSection/ManufactureTitle"),
-					 GetNode<Label>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/BuildSection/BuildTitle"),
-					 GetNode<Label>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection/ChainTitle")
-				 })
-		{
-			label.AddThemeFontSizeOverride("font_size", 18);
-			label.AddThemeColorOverride("font_color", InkMainColor);
-		}
-
-		ApplyCloseButtonStyle(_closeButton);
-		ApplyOrderButtonStyle(_lockedForgeButton, true);
-		ApplyActionButtonStyle(_upgradeButton);
-		ApplyActionButtonStyle(_craftToolsButton);
-		ApplyActionButtonStyle(_buildWorkshopButton);
-		ApplyActionButtonStyle(_buildAdministrationButton);
-		ApplyActionButtonStyle(_buildForestryChainButton);
-		ApplyActionButtonStyle(_buildMasonryChainButton);
-		ApplyActionButtonStyle(_buildMedicinalChainButton);
-		ApplyActionButtonStyle(_buildFiberChainButton);
-		RefreshTabStyles();
 	}
 
 	private void BindEvents()
@@ -363,14 +273,18 @@ public partial class WarehousePanel : PopupPanelBase
 		{
 			RefreshInventoryState(_latestState);
 		}
+
+		CallVisualFx("play_tab_switch", tab.ToString());
+	}
+
+	private void CallVisualFx(string methodName, params Variant[] args)
+	{
+		_visualFx?.Call(methodName, args);
 	}
 
 	private void RefreshTabStyles()
 	{
-		foreach (var (tab, button) in _tabButtons)
-		{
-			ApplyTabButtonStyle(button, tab == _activeTab);
-		}
+		CallVisualFx("apply_tab_button_state", _activeTab.ToString());
 	}
 
 	private void UpdateInventoryColumns()
@@ -419,13 +333,16 @@ public partial class WarehousePanel : PopupPanelBase
 			var amount = InventoryRules.GetVisibleAmount(state, binding.Definition.InventoryKey);
 			var hasAmount = amount > 0;
 			binding.AmountLabel.Text = amount.ToString("N0");
-			binding.Card.Modulate = hasAmount ? ActiveSlotModulate : InactiveSlotModulate;
-			binding.Token.Modulate = hasAmount ? ActiveSlotModulate : new Color(1f, 1f, 1f, 0.62f);
-			binding.TokenGlyph.Modulate = hasAmount ? ActiveSlotModulate : new Color(1f, 1f, 1f, 0.7f);
-			binding.NameLabel.Modulate = hasAmount ? ActiveSlotModulate : new Color(1f, 1f, 1f, 0.62f);
-			binding.TypeLabel.Modulate = hasAmount ? ActiveSlotModulate : new Color(1f, 1f, 1f, 0.5f);
-			binding.AmountLabel.Modulate = hasAmount ? ActiveSlotModulate : new Color(1f, 1f, 1f, 0.7f);
 			binding.Card.TooltipText = $"{binding.Definition.DisplayName} × {amount:N0}\n{binding.Definition.Description}";
+			CallVisualFx(
+				"apply_resource_slot_state",
+				binding.Card,
+				binding.Token,
+				binding.TokenGlyph,
+				binding.NameLabel,
+				binding.TypeLabel,
+				binding.AmountLabel,
+				hasAmount);
 		}
 	}
 
@@ -459,7 +376,6 @@ public partial class WarehousePanel : PopupPanelBase
 	{
 		var card = (PanelContainer)_resourceSlotTemplate.Duplicate();
 		card.Visible = true;
-		card.AddThemeStyleboxOverride("panel", CreateSlotStyle());
 
 		var token = card.GetNode<PanelContainer>("SlotMargin/SlotRow/Token");
 		var tokenCenter = card.GetNode<CenterContainer>("SlotMargin/SlotRow/Token/TokenCenter");
@@ -468,25 +384,23 @@ public partial class WarehousePanel : PopupPanelBase
 		var typeLabel = card.GetNode<Label>("SlotMargin/SlotRow/InfoColumn/TypeLabel");
 		var amountLabel = card.GetNode<Label>("SlotMargin/SlotRow/AmountLabel");
 
-		token.AddThemeStyleboxOverride("panel", CreateTokenStyle(slot.AccentColor));
-
 		tokenCenter.MouseFilter = MouseFilterEnum.Ignore;
 		tokenGlyph.MouseFilter = MouseFilterEnum.Ignore;
 		tokenGlyph.Text = GetTokenGlyph(slot);
-		tokenGlyph.AddThemeFontSizeOverride("font_size", 20);
-		tokenGlyph.AddThemeColorOverride("font_color", PaperMainColor);
 
 		nameLabel.Text = slot.DisplayName;
-		nameLabel.AddThemeFontSizeOverride("font_size", 17);
-		nameLabel.AddThemeColorOverride("font_color", InkMainColor);
-
 		typeLabel.Text = GetGroupLabel(slot.Group);
-		typeLabel.AddThemeFontSizeOverride("font_size", 11);
-		typeLabel.AddThemeColorOverride("font_color", InkMutedColor);
-
 		amountLabel.Text = "0";
-		amountLabel.AddThemeFontSizeOverride("font_size", 24);
-		amountLabel.AddThemeColorOverride("font_color", InkMainColor);
+
+		CallVisualFx(
+			"style_resource_slot",
+			card,
+			token,
+			tokenGlyph,
+			nameLabel,
+			typeLabel,
+			amountLabel,
+			slot.AccentColor);
 
 		_slotBindings.Add(new ResourceSlotBinding(slot, card, token, tokenGlyph, nameLabel, typeLabel, amountLabel));
 		return card;
@@ -529,84 +443,6 @@ public partial class WarehousePanel : PopupPanelBase
 		};
 	}
 
-	private void UpdateCapacityVisual(double loadRate)
-	{
-		var accent = loadRate >= 90.0
-			? DangerColor
-			: loadRate >= 70.0
-				? WarningColor
-				: AccentBlueColor;
-
-		var background = loadRate >= 90.0
-			? new Color(SealRedColor.R, SealRedColor.G, SealRedColor.B, 0.06f)
-			: loadRate >= 70.0
-				? new Color(AccentGoldColor.R, AccentGoldColor.G, AccentGoldColor.B, 0.06f)
-				: new Color(0f, 0f, 0f, 0.02f);
-
-		_statusSection.AddThemeStyleboxOverride("panel", CreateWarningPanelStyle(background, accent));
-		_capacityBarFrame.AddThemeStyleboxOverride("panel", CreateCapacityFrameStyle(accent));
-		_capacityBar.AddThemeStyleboxOverride("fill", CreateCapacityBarFillStyle(accent));
-		_capacityBar.Value = Math.Clamp(loadRate, 0.0, 100.0);
-		_warningStampLabel.Text = loadRate switch
-		{
-			>= 100.0 => "满溢",
-			>= 90.0 => "将满",
-			>= 70.0 => "偏满",
-			_ => "安储"
-		};
-		_hintLabel.AddThemeColorOverride("font_color", accent);
-		_warningStampLabel.AddThemeColorOverride("font_color", accent);
-		_capacityValueLabel.AddThemeColorOverride("font_color", loadRate >= 90.0 ? InkMainColor : accent);
-	}
-
-	private void ApplyTabButtonStyle(Button button, bool active)
-	{
-		button.Flat = true;
-		button.Alignment = HorizontalAlignment.Center;
-		button.AddThemeFontSizeOverride("font_size", 16);
-		button.AddThemeStyleboxOverride("normal", CreateTabStyle(active));
-		button.AddThemeStyleboxOverride("hover", CreateTabStyle(true));
-		button.AddThemeStyleboxOverride("pressed", CreateTabStyle(true));
-		button.AddThemeStyleboxOverride("disabled", CreateTabStyle(false));
-		button.AddThemeColorOverride("font_color", active ? InkMainColor : InkMutedColor);
-		button.AddThemeColorOverride("font_hover_color", InkMainColor);
-		button.AddThemeColorOverride("font_pressed_color", InkMainColor);
-		button.AddThemeColorOverride("font_disabled_color", new Color(InkMutedColor.R, InkMutedColor.G, InkMutedColor.B, 0.7f));
-	}
-
-	private static void ApplyActionButtonStyle(Button button)
-	{
-		ApplyOrderButtonStyle(button, false);
-	}
-
-	private static void ApplyOrderButtonStyle(Button button, bool locked)
-	{
-		button.Flat = true;
-		button.Alignment = HorizontalAlignment.Left;
-		button.AddThemeFontSizeOverride("font_size", 15);
-		button.AddThemeStyleboxOverride("normal", CreateOrderButtonStyle(locked));
-		button.AddThemeStyleboxOverride("hover", CreateOrderButtonHoverStyle(locked));
-		button.AddThemeStyleboxOverride("pressed", CreateOrderButtonHoverStyle(locked));
-		button.AddThemeStyleboxOverride("disabled", CreateOrderButtonStyle(true));
-		button.AddThemeColorOverride("font_color", locked ? InkMutedColor : InkMainColor);
-		button.AddThemeColorOverride("font_hover_color", locked ? InkMutedColor : PaperMainColor);
-		button.AddThemeColorOverride("font_pressed_color", locked ? InkMutedColor : PaperMainColor);
-		button.AddThemeColorOverride("font_disabled_color", InkMutedColor);
-	}
-
-	private static void ApplyCloseButtonStyle(Button button)
-	{
-		button.Flat = true;
-		button.Alignment = HorizontalAlignment.Center;
-		button.AddThemeFontSizeOverride("font_size", 24);
-		button.AddThemeStyleboxOverride("normal", CreateTransparentStyle());
-		button.AddThemeStyleboxOverride("hover", CreateTransparentStyle());
-		button.AddThemeStyleboxOverride("pressed", CreateTransparentStyle());
-		button.AddThemeColorOverride("font_color", InkMainColor);
-		button.AddThemeColorOverride("font_hover_color", SealRedColor);
-		button.AddThemeColorOverride("font_pressed_color", SealRedColor);
-	}
-
 	private Texture2D? TryLoadTexture(string? texturePath)
 	{
 		if (string.IsNullOrWhiteSpace(texturePath))
@@ -628,265 +464,6 @@ public partial class WarehousePanel : PopupPanelBase
 	{
 		ShowPopupStatusMessage(statusMessage);
 		requestedAction?.Invoke();
-	}
-
-	private static StyleBoxFlat CreatePaperStyle()
-	{
-		return new StyleBoxFlat
-		{
-			BgColor = PaperMainColor,
-			BorderWidthLeft = 1,
-			BorderWidthTop = 1,
-			BorderWidthRight = 1,
-			BorderWidthBottom = 1,
-			BorderColor = new Color(0.48f, 0.42f, 0.35f, 0.45f),
-			CornerRadiusTopLeft = 2,
-			CornerRadiusTopRight = 2,
-			CornerRadiusBottomRight = 2,
-			CornerRadiusBottomLeft = 2,
-			ShadowColor = new Color(0f, 0f, 0f, 0.35f),
-			ShadowSize = 12
-		};
-	}
-
-	private static StyleBoxFlat CreateRollerStyle()
-	{
-		return new StyleBoxFlat
-		{
-			BgColor = new Color(0.29f, 0.19f, 0.13f, 1f),
-			BorderWidthLeft = 1,
-			BorderWidthTop = 1,
-			BorderWidthRight = 1,
-			BorderWidthBottom = 1,
-			BorderColor = new Color(0.14f, 0.09f, 0.05f, 1f),
-			CornerRadiusTopLeft = 0,
-			CornerRadiusTopRight = 0,
-			CornerRadiusBottomRight = 0,
-			CornerRadiusBottomLeft = 0
-		};
-	}
-
-	private static StyleBoxFlat CreateWarningPanelStyle(Color? backgroundColor = null, Color? borderColor = null)
-	{
-		return new StyleBoxFlat
-		{
-			BgColor = backgroundColor ?? new Color(SealRedColor.R, SealRedColor.G, SealRedColor.B, 0.06f),
-			BorderWidthLeft = 1,
-			BorderWidthTop = 1,
-			BorderWidthRight = 1,
-			BorderWidthBottom = 1,
-			BorderColor = borderColor ?? SealRedColor,
-			CornerRadiusTopLeft = 0,
-			CornerRadiusTopRight = 0,
-			CornerRadiusBottomRight = 0,
-			CornerRadiusBottomLeft = 0
-		};
-	}
-
-	private static StyleBoxFlat CreateNoteStyle()
-	{
-		return new StyleBoxFlat
-		{
-			BgColor = PaperDarkColor,
-			BorderWidthLeft = 1,
-			BorderWidthTop = 1,
-			BorderWidthRight = 1,
-			BorderWidthBottom = 1,
-			BorderColor = new Color(0.64f, 0.58f, 0.50f, 1f),
-			CornerRadiusTopLeft = 0,
-			CornerRadiusTopRight = 0,
-			CornerRadiusBottomRight = 0,
-			CornerRadiusBottomLeft = 0
-		};
-	}
-
-	private static StyleBoxFlat CreateTabStyle(bool active)
-	{
-		return new StyleBoxFlat
-		{
-			BgColor = active ? PaperDarkColor : new Color(PaperMainColor.R, PaperMainColor.G, PaperMainColor.B, 0f),
-			BorderWidthLeft = 1,
-			BorderWidthTop = 1,
-			BorderWidthRight = 1,
-			BorderWidthBottom = active ? 0 : 0,
-			BorderColor = active ? BorderNormalColor : new Color(0f, 0f, 0f, 0f),
-			CornerRadiusTopLeft = 0,
-			CornerRadiusTopRight = 0,
-			CornerRadiusBottomRight = 0,
-			CornerRadiusBottomLeft = 0,
-			ContentMarginLeft = 12,
-			ContentMarginTop = 8,
-			ContentMarginRight = 12,
-			ContentMarginBottom = 8
-		};
-	}
-
-	private static StyleBoxFlat CreateSlotStyle()
-	{
-		return new StyleBoxFlat
-		{
-			BgColor = new Color(PaperMainColor.R, PaperMainColor.G, PaperMainColor.B, 0.32f),
-			BorderWidthLeft = 1,
-			BorderWidthTop = 1,
-			BorderWidthRight = 1,
-			BorderWidthBottom = 1,
-			BorderColor = new Color(BorderNormalColor.R, BorderNormalColor.G, BorderNormalColor.B, 0.55f),
-			CornerRadiusTopLeft = 2,
-			CornerRadiusTopRight = 2,
-			CornerRadiusBottomRight = 2,
-			CornerRadiusBottomLeft = 2
-		};
-	}
-
-	private static StyleBoxFlat CreateTokenStyle(Color accentColor)
-	{
-		return new StyleBoxFlat
-		{
-			BgColor = new Color(accentColor.R, accentColor.G, accentColor.B, 0.95f),
-			BorderWidthLeft = 1,
-			BorderWidthTop = 1,
-			BorderWidthRight = 1,
-			BorderWidthBottom = 1,
-			BorderColor = new Color(0.12f, 0.1f, 0.08f, 0.85f),
-			CornerRadiusTopLeft = 6,
-			CornerRadiusTopRight = 6,
-			CornerRadiusBottomRight = 6,
-			CornerRadiusBottomLeft = 6,
-			ShadowColor = new Color(0f, 0f, 0f, 0.35f),
-			ShadowSize = 6
-		};
-	}
-
-	private static StyleBoxFlat CreateCapacityFrameStyle(Color accentColor)
-	{
-		return new StyleBoxFlat
-		{
-			BgColor = new Color(PaperDarkColor.R, PaperDarkColor.G, PaperDarkColor.B, 0.35f),
-			BorderWidthLeft = 1,
-			BorderWidthTop = 1,
-			BorderWidthRight = 1,
-			BorderWidthBottom = 1,
-			BorderColor = new Color(accentColor.R, accentColor.G, accentColor.B, 0.9f),
-			CornerRadiusTopLeft = 0,
-			CornerRadiusTopRight = 0,
-			CornerRadiusBottomRight = 0,
-			CornerRadiusBottomLeft = 0
-		};
-	}
-
-	private static StyleBoxFlat CreateCapacityBarBackgroundStyle()
-	{
-		return new StyleBoxFlat
-		{
-			BgColor = new Color(PaperDarkColor.R, PaperDarkColor.G, PaperDarkColor.B, 0.55f),
-			BorderWidthLeft = 0,
-			BorderWidthTop = 0,
-			BorderWidthRight = 0,
-			BorderWidthBottom = 0
-		};
-	}
-
-	private static StyleBoxFlat CreateCapacityBarFillStyle(Color accentColor)
-	{
-		return new StyleBoxFlat
-		{
-			BgColor = accentColor,
-			BorderWidthLeft = 0,
-			BorderWidthTop = 0,
-			BorderWidthRight = 0,
-			BorderWidthBottom = 0
-		};
-	}
-
-	private static Texture2D CreateCapacityTickTexture()
-	{
-		const int width = 12;
-		const int height = 6;
-		var image = Image.Create(width, height, false, Image.Format.Rgba8);
-		image.Fill(new Color(0f, 0f, 0f, 0f));
-
-		for (var y = 0; y < height; y++)
-		{
-			image.SetPixel(width - 1, y, new Color(0f, 0f, 0f, 0.35f));
-		}
-
-		return ImageTexture.CreateFromImage(image);
-	}
-
-	private static StyleBoxFlat CreateIconFrameStyle()
-	{
-		return new StyleBoxFlat
-		{
-			BgColor = PaperMainColor,
-			BorderWidthLeft = 1,
-			BorderWidthTop = 1,
-			BorderWidthRight = 1,
-			BorderWidthBottom = 1,
-			BorderColor = BorderNormalColor,
-			CornerRadiusTopLeft = 0,
-			CornerRadiusTopRight = 0,
-			CornerRadiusBottomRight = 0,
-			CornerRadiusBottomLeft = 0
-		};
-	}
-
-	private static StyleBoxFlat CreateOrderButtonStyle(bool locked)
-	{
-		return new StyleBoxFlat
-		{
-			BgColor = new Color(PaperMainColor.R, PaperMainColor.G, PaperMainColor.B, 0f),
-			BorderWidthLeft = 1,
-			BorderWidthTop = 1,
-			BorderWidthRight = 1,
-			BorderWidthBottom = 1,
-			BorderColor = locked ? new Color(InkMutedColor.R, InkMutedColor.G, InkMutedColor.B, 0.65f) : InkMainColor,
-			CornerRadiusTopLeft = 0,
-			CornerRadiusTopRight = 0,
-			CornerRadiusBottomRight = 0,
-			CornerRadiusBottomLeft = 0,
-			ContentMarginLeft = 14,
-			ContentMarginTop = 12,
-			ContentMarginRight = 14,
-			ContentMarginBottom = 12
-		};
-	}
-
-	private static StyleBoxFlat CreateOrderButtonHoverStyle(bool locked)
-	{
-		if (locked)
-		{
-			return CreateOrderButtonStyle(true);
-		}
-
-		return new StyleBoxFlat
-		{
-			BgColor = InkMainColor,
-			BorderWidthLeft = 1,
-			BorderWidthTop = 1,
-			BorderWidthRight = 1,
-			BorderWidthBottom = 1,
-			BorderColor = InkMainColor,
-			CornerRadiusTopLeft = 0,
-			CornerRadiusTopRight = 0,
-			CornerRadiusBottomRight = 0,
-			CornerRadiusBottomLeft = 0,
-			ContentMarginLeft = 14,
-			ContentMarginTop = 12,
-			ContentMarginRight = 14,
-			ContentMarginBottom = 12
-		};
-	}
-
-	private static StyleBoxFlat CreateTransparentStyle()
-	{
-		return new StyleBoxFlat
-		{
-			BgColor = new Color(0f, 0f, 0f, 0f),
-			BorderWidthLeft = 0,
-			BorderWidthTop = 0,
-			BorderWidthRight = 0,
-			BorderWidthBottom = 0
-		};
 	}
 
 	private static string ToChineseTier(int value)

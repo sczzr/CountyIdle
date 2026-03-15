@@ -13,7 +13,7 @@ public partial class Main
             return;
         }
 
-        if (_settingsPanel?.Visible == true || _warehousePanel?.Visible == true || _saveSlotsPanel?.Visible == true)
+        if (IsBlockingOverlayPopupOpen())
         {
             return;
         }
@@ -37,7 +37,7 @@ public partial class Main
             return;
         }
 
-        if (_settingsPanel?.Visible == true || _warehousePanel?.Visible == true || _saveSlotsPanel?.Visible == true)
+        if (IsBlockingOverlayPopupOpen())
         {
             return;
         }

@@ -130,10 +130,11 @@ public partial class Main
             _worldSitePanelActionButton.Disabled = true;
             if (_worldSiteSandboxMapView != null)
             {
-                _worldSiteSandboxMapView.Visible = false;
                 _worldSiteSandboxMapView.ClearExternalMap();
+                CallWorldPanelVisualFx("set_world_site_sandbox_visible", false);
             }
-            ApplyWorldSitePanelTone("world");
+            CallWorldPanelVisualFx("apply_world_site_tone", "world");
+            CallWorldPanelVisualFx("pulse_world_site_panel");
             return;
         }
 
@@ -161,13 +162,14 @@ public partial class Main
         _worldSitePanelActionButton.Disabled = false;
         if (_worldSiteSandboxMapView != null)
         {
-            _worldSiteSandboxMapView.Visible = true;
             _worldSiteSandboxMapView.SetExternalMap(
                 sandboxMap,
                 $"{site.Label} · 局部沙盘",
                 $"左键点选局部 hex 检视当前二级地图地块。当前依据 {site.PrimaryType} / {site.SecondaryTag} 生成。");
+            CallWorldPanelVisualFx("set_world_site_sandbox_visible", true);
         }
-        ApplyWorldSitePanelTone(site.PrimaryType);
+        CallWorldPanelVisualFx("apply_world_site_tone", site.PrimaryType);
+        CallWorldPanelVisualFx("pulse_world_site_panel");
     }
 
     private void OnWorldSiteSandboxSelectionSummaryChanged(TownMapSelectionSummary summary)
@@ -188,52 +190,13 @@ public partial class Main
 
     private void EnsureWorldSiteSandboxMapView()
     {
-        if (_worldSitePanelRootVBox == null)
+        _worldSiteSandboxMapView = GetNodeOrNull<SectMapViewSystem>($"{CenterMapPagesPath}/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/GeneratedSecondarySandboxView");
+        if (_worldSiteSandboxMapView == null)
         {
             return;
         }
 
-        _worldSiteSandboxMapView = _worldSitePanelRootVBox.GetNodeOrNull<SectMapViewSystem>("GeneratedSecondarySandboxView");
-        if (_worldSiteSandboxMapView != null)
-        {
-            return;
-        }
-
-        _worldSiteSandboxMapView = new SectMapViewSystem
-        {
-            Name = "GeneratedSecondarySandboxView",
-            CustomMinimumSize = new Vector2(0f, 320f),
-            SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-            SizeFlagsVertical = Control.SizeFlags.ExpandFill,
-            Visible = false
-        };
-        _worldSiteSandboxMapView.AddThemeStyleboxOverride("panel", new StyleBoxFlat
-        {
-            BgColor = new Color(0.94902f, 0.92549f, 0.862745f, 0.12f),
-            BorderWidthLeft = 1,
-            BorderWidthTop = 1,
-            BorderWidthRight = 1,
-            BorderWidthBottom = 1,
-            BorderColor = new Color(0.270588f, 0.231373f, 0.192157f, 0.34f)
-        });
-        _worldSiteSandboxMapView.AddChild(new Label
-        {
-            Name = "MapHintLabel",
-            Visible = false,
-            ThemeTypeVariation = "Label"
-        });
-        _worldSiteSandboxMapView.AddChild(new Button
-        {
-            Name = "RegenerateButton",
-            Visible = false
-        });
-        _worldSitePanelRootVBox.AddChild(_worldSiteSandboxMapView);
-
-        var templateGrid = _worldSitePanelRootVBox.GetNodeOrNull<GridContainer>("TemplateGrid");
-        if (templateGrid != null)
-        {
-            _worldSitePanelRootVBox.MoveChild(_worldSiteSandboxMapView, templateGrid.GetIndex());
-        }
+        CallWorldPanelVisualFx("style_world_site_sandbox_shell", _worldSiteSandboxMapView);
     }
 
     private void OpenSelectedWorldSitePanel()
@@ -319,32 +282,6 @@ public partial class Main
             _ => "当前占位页后续将承接该点位的专属二级地图。"
         };
         return $"{detailHint}{primaryHint}";
-    }
-
-    private void ApplyWorldSitePanelTone(string primaryType)
-    {
-        if (_worldSitePanelTitleLabel == null ||
-            _worldSitePanelSubtitleLabel == null ||
-            _worldSitePanelActionButton == null)
-        {
-            return;
-        }
-
-        var accent = primaryType switch
-        {
-            "Sect" => new Color(0.24f, 0.47f, 0.29f, 1f),
-            "MortalRealm" => new Color(0.56f, 0.41f, 0.20f, 1f),
-            "Market" => new Color(0.69f, 0.31f, 0.16f, 1f),
-            "Wilderness" => new Color(0.22f, 0.45f, 0.40f, 1f),
-            "CultivatorClan" => new Color(0.46f, 0.36f, 0.16f, 1f),
-            "ImmortalCity" => new Color(0.16f, 0.42f, 0.53f, 1f),
-            "Ruin" => new Color(0.42f, 0.30f, 0.34f, 1f),
-            _ => new Color(0.24f, 0.21f, 0.18f, 1f)
-        };
-
-        _worldSitePanelTitleLabel.AddThemeColorOverride("font_color", accent);
-        _worldSitePanelSubtitleLabel.AddThemeColorOverride("font_color", accent.Lightened(0.12f));
-        _worldSitePanelActionButton.Modulate = new Color(1f, 1f, 1f, 1f);
     }
 
     private static WorldSiteTemplateInfo BuildWorldSiteTemplateInfo(XianxiaSiteData site)

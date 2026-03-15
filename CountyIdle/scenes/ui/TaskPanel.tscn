@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://wpn6dya5kch6"]
 
 [ext_resource type="Script" uid="uid://d24s551njtx85" path="res://scripts/ui/TaskPanel.cs" id="1_task_panel"]
+[ext_resource type="Script" path="res://scripts/ui/gd/TaskPanelVisualFx.gd" id="2_task_fx"]
 
 [node name="TaskPanel" type="Control" unique_id=1414837021]
 visible = false
@@ -12,6 +13,9 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
 script = ExtResource("1_task_panel")
+
+[node name="VisualFx" type="Node" parent="."]
+script = ExtResource("2_task_fx")
 
 [node name="Overlay" type="ColorRect" parent="." unique_id=914555613]
 layout_mode = 1

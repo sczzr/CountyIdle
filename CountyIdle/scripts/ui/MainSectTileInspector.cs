@@ -45,6 +45,7 @@ public partial class Main
     private Button? _tileInspectorPrimaryButton;
     private Button? _tileInspectorSecondaryButton;
     private Button? _tileInspectorTertiaryButton;
+    private Node? _tileInspectorVisualFx;
 
     private TileInspectorAction _tileInspectorPrimaryAction = TileInspectorAction.OpenTaskPanel;
     private TileInspectorAction _tileInspectorSecondaryAction = TileInspectorAction.OpenDisciplePanel;
@@ -52,6 +53,7 @@ public partial class Main
 
     private void BindSectTileInspectorNodes()
     {
+        _tileInspectorVisualFx = GetNodeOrNull<Node>("TileInspectorVisualFx");
         _tileInspectorTitleLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/InspectorHeader/TileTitle");
         _tileInspectorSubtitleLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/InspectorHeader/TileSubtitle");
         _tileInspectorBadgeLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/InspectorHeader/TileBadgeBox/TileBadgeLabel");
@@ -74,6 +76,7 @@ public partial class Main
 
     private void ClearSectTileInspectorNodes()
     {
+        _tileInspectorVisualFx = null;
         _tileInspectorTitleLabel = null;
         _tileInspectorSubtitleLabel = null;
         _tileInspectorBadgeLabel = null;
@@ -231,21 +234,18 @@ public partial class Main
             _tileInspectorLocationLabel.Text = "所属区块";
             _tileInspectorLocationValueLabel.Text = "待识别";
             _tileInspectorDescriptionLabel.Text = "左键点选世界地图中的宗门、凡俗据点、坊市、世家、仙城或遗迹节点后，这里会显示对应的分层信息与建议去向。";
-            ApplyPrimaryTileInspectorBinding(new TileInspectorActionBinding(
-                TileInspectorAction.None,
-                "等待选中世界点位",
-                "先从世界地图点选一个外域点位。",
-                false));
-            ApplySecondaryTileInspectorBinding(new TileInspectorActionBinding(
-                TileInspectorAction.None,
-                "等待选中世界点位",
-                "当前尚未选中外域点位。",
-                false));
-            ApplyTertiaryTileInspectorBinding(new TileInspectorActionBinding(
-                TileInspectorAction.None,
-                "等待选中世界点位",
-                "选中点位后，这里会显示对应的联动入口。",
-                false));
+            ApplyTileInspectorBinding(
+                CreateDisabledTileInspectorBinding("等待选中世界点位", "先从世界地图点选一个外域点位。"),
+                _tileInspectorPrimaryButton,
+                ref _tileInspectorPrimaryAction);
+            ApplyTileInspectorBinding(
+                CreateDisabledTileInspectorBinding("等待选中世界点位", "当前尚未选中外域点位。"),
+                _tileInspectorSecondaryButton,
+                ref _tileInspectorSecondaryAction);
+            ApplyTileInspectorBinding(
+                CreateDisabledTileInspectorBinding("等待选中世界点位", "选中点位后，这里会显示对应的联动入口。"),
+                _tileInspectorTertiaryButton,
+                ref _tileInspectorTertiaryAction);
             ApplyTileInspectorActionHint("可执行项：左键点选世界点位查看分层信息；右键可清除当前选中。");
             ApplyWorldInspectorVisualTone("world", false);
             return;
@@ -279,21 +279,18 @@ public partial class Main
     {
         if (!summary.HasSelection)
         {
-            ApplyPrimaryTileInspectorBinding(new TileInspectorActionBinding(
-                TileInspectorAction.None,
-                "当前无选中院域",
-                "左键点选任意天衍峰六角地块后，即可查看对应院域详情。",
-                false));
-            ApplySecondaryTileInspectorBinding(new TileInspectorActionBinding(
-                TileInspectorAction.None,
-                "等待选中地块",
-                "当前尚未选中院域，暂不提供局部治理入口。",
-                false));
-            ApplyTertiaryTileInspectorBinding(new TileInspectorActionBinding(
-                TileInspectorAction.None,
-                "等待选中地块",
-                "选中院域后，可继续打开仓储、弟子谱或宗主中枢联动视图。",
-                false));
+            ApplyTileInspectorBinding(
+                CreateDisabledTileInspectorBinding("当前无选中院域", "左键点选任意天衍峰六角地块后，即可查看对应院域详情。"),
+                _tileInspectorPrimaryButton,
+                ref _tileInspectorPrimaryAction);
+            ApplyTileInspectorBinding(
+                CreateDisabledTileInspectorBinding("等待选中地块", "当前尚未选中院域，暂不提供局部治理入口。"),
+                _tileInspectorSecondaryButton,
+                ref _tileInspectorSecondaryAction);
+            ApplyTileInspectorBinding(
+                CreateDisabledTileInspectorBinding("等待选中地块", "选中院域后，可继续打开仓储、弟子谱或宗主中枢联动视图。"),
+                _tileInspectorTertiaryButton,
+                ref _tileInspectorTertiaryAction);
             ApplyTileInspectorActionHint("可执行项：左键点选任意院域后，可查看灵气、坊位、天然特征与推荐坊局；右键可清除当前选中。");
             return;
         }
@@ -423,9 +420,9 @@ public partial class Main
                 true)
         };
 
-        ApplyPrimaryTileInspectorBinding(primaryBinding);
-        ApplySecondaryTileInspectorBinding(secondaryBinding);
-        ApplyTertiaryTileInspectorBinding(tertiaryBinding);
+        ApplyTileInspectorBinding(primaryBinding, _tileInspectorPrimaryButton, ref _tileInspectorPrimaryAction);
+        ApplyTileInspectorBinding(secondaryBinding, _tileInspectorSecondaryButton, ref _tileInspectorSecondaryAction);
+        ApplyTileInspectorBinding(tertiaryBinding, _tileInspectorTertiaryButton, ref _tileInspectorTertiaryAction);
         ApplyTileInspectorActionHint(
             $"可执行项：{primaryBinding.Text} / {secondaryBinding.Text} / {tertiaryBinding.Text}");
     }
@@ -478,38 +475,29 @@ public partial class Main
             $"将【{tileName}】改为更稳的布局，优先缓解灵池压力、互扰与波动。",
             true);
 
-        ApplyPrimaryTileInspectorBinding(primaryBinding);
-        ApplySecondaryTileInspectorBinding(secondaryBinding);
-        ApplyTertiaryTileInspectorBinding(tertiaryBinding);
+        ApplyTileInspectorBinding(primaryBinding, _tileInspectorPrimaryButton, ref _tileInspectorPrimaryAction);
+        ApplyTileInspectorBinding(secondaryBinding, _tileInspectorSecondaryButton, ref _tileInspectorSecondaryAction);
+        ApplyTileInspectorBinding(tertiaryBinding, _tileInspectorTertiaryButton, ref _tileInspectorTertiaryAction);
         ApplyTileInspectorActionHint(
             $"可执行项：{primaryBinding.Text} / {secondaryBinding.Text} / {tertiaryBinding.Text}。切换后会立即刷新坊位、灵气、协同与稳定度反馈。{GetCompoundActionFocus(summary.StatusText)}");
     }
 
-    private void ApplyPrimaryTileInspectorBinding(TileInspectorActionBinding binding)
+    private static TileInspectorActionBinding CreateDisabledTileInspectorBinding(string text, string tooltipText)
     {
-        _tileInspectorPrimaryAction = binding.Action;
-        ApplyTileInspectorButtonBinding(_tileInspectorPrimaryButton, binding);
+        return new TileInspectorActionBinding(TileInspectorAction.None, text, tooltipText, false);
     }
 
-    private void ApplySecondaryTileInspectorBinding(TileInspectorActionBinding binding)
+    private void ApplyTileInspectorBinding(
+        TileInspectorActionBinding binding,
+        Button button,
+        ref TileInspectorAction targetAction)
     {
-        _tileInspectorSecondaryAction = binding.Action;
-        ApplyTileInspectorButtonBinding(_tileInspectorSecondaryButton, binding);
+        targetAction = binding.Action;
+        ApplyTileInspectorButtonBinding(button, binding);
     }
 
-    private void ApplyTertiaryTileInspectorBinding(TileInspectorActionBinding binding)
+    private static void ApplyTileInspectorButtonBinding(Button button, TileInspectorActionBinding binding)
     {
-        _tileInspectorTertiaryAction = binding.Action;
-        ApplyTileInspectorButtonBinding(_tileInspectorTertiaryButton, binding);
-    }
-
-    private static void ApplyTileInspectorButtonBinding(Button? button, TileInspectorActionBinding binding)
-    {
-        if (button == null)
-        {
-            return;
-        }
-
         button.Text = binding.Text;
         button.TooltipText = binding.TooltipText;
         button.Disabled = !binding.Enabled || binding.Action == TileInspectorAction.None;
@@ -555,59 +543,19 @@ public partial class Main
             _ => new TileInspectorActionBinding(TileInspectorAction.OpenTaskPanel, "查看外域法旨", $"打开宗主中枢，查看【{site.Label}】相关的外域法旨。", true)
         };
 
-        ApplyPrimaryTileInspectorBinding(primaryBinding);
-        ApplySecondaryTileInspectorBinding(secondaryBinding);
-        ApplyTertiaryTileInspectorBinding(tertiaryBinding);
+        ApplyTileInspectorBinding(primaryBinding, _tileInspectorPrimaryButton, ref _tileInspectorPrimaryAction);
+        ApplyTileInspectorBinding(secondaryBinding, _tileInspectorSecondaryButton, ref _tileInspectorSecondaryAction);
+        ApplyTileInspectorBinding(tertiaryBinding, _tileInspectorTertiaryButton, ref _tileInspectorTertiaryAction);
         ApplyTileInspectorActionHint($"可执行项：{primaryBinding.Text} / {secondaryBinding.Text} / {tertiaryBinding.Text}。当前点位属于{primaryTypeText}分层。");
     }
 
     private void ApplyWorldInspectorVisualTone(string primaryType, bool hasSelection)
     {
-        if (_tileInspectorTitleLabel == null ||
-            _tileInspectorSubtitleLabel == null ||
-            _tileInspectorBadgeLabel == null ||
-            _tileInspectorStatusValueLabel == null)
-        {
-            return;
-        }
-
-        if (!hasSelection)
-        {
-            _tileInspectorTitleLabel.AddThemeColorOverride("font_color", new Color(0.176471f, 0.145098f, 0.12549f, 1f));
-            _tileInspectorSubtitleLabel.AddThemeColorOverride("font_color", new Color(0.38f, 0.33f, 0.27f, 0.95f));
-            _tileInspectorBadgeLabel.AddThemeColorOverride("font_color", new Color(0.52f, 0.45f, 0.31f, 0.95f));
-            _tileInspectorStatusValueLabel.AddThemeColorOverride("font_color", new Color(0.34f, 0.29f, 0.24f, 0.92f));
-            return;
-        }
-
-        var accent = primaryType switch
-        {
-            "Sect" => new Color(0.27f, 0.50f, 0.31f, 1f),
-            "MortalRealm" => new Color(0.56f, 0.41f, 0.20f, 1f),
-            "Market" => new Color(0.69f, 0.31f, 0.16f, 1f),
-            "Wilderness" => new Color(0.23f, 0.46f, 0.40f, 1f),
-            "CultivatorClan" => new Color(0.48f, 0.38f, 0.17f, 1f),
-            "ImmortalCity" => new Color(0.17f, 0.43f, 0.52f, 1f),
-            "Ruin" => new Color(0.41f, 0.31f, 0.34f, 1f),
-            _ => new Color(0.32f, 0.26f, 0.18f, 1f)
-        };
-
-        _tileInspectorTitleLabel.AddThemeColorOverride("font_color", accent);
-        _tileInspectorSubtitleLabel.AddThemeColorOverride("font_color", accent.Lightened(0.12f));
-        _tileInspectorBadgeLabel.AddThemeColorOverride("font_color", accent);
-        _tileInspectorStatusValueLabel.AddThemeColorOverride("font_color", accent.Darkened(0.08f));
+        CallTileInspectorVisualFx("apply_world_inspector_tone", primaryType, hasSelection);
     }
 
     private void ApplyTileInspectorVisualTone(TownMapSelectionSummary summary)
     {
-        if (_tileInspectorTitleLabel == null ||
-            _tileInspectorSubtitleLabel == null ||
-            _tileInspectorBadgeLabel == null ||
-            _tileInspectorStatusValueLabel == null)
-        {
-            return;
-        }
-
         var badgeText = string.IsNullOrWhiteSpace(summary.BadgeText)
             ? TownActivityAnchorVisualRules.GetBadgeText(summary.AnchorType, summary.HasSelection)
             : summary.BadgeText;
@@ -617,13 +565,12 @@ public partial class Main
         var statusColor = summary.AnchorType != null
             ? TownActivityAnchorVisualRules.GetInspectorStatusColor(summary.AnchorType, summary.HasSelection)
             : TownActivityAnchorVisualRules.GetInspectorStatusColor(summary.ContentKind, summary.HasSelection);
-        var inkTitleColor = new Color(0.176471f, 0.145098f, 0.12549f, 1f);
-        var mutedAccentColor = inkTitleColor.Lerp(accentColor, 0.42f);
-        _tileInspectorBadgeLabel.Text = badgeText;
-        _tileInspectorBadgeLabel.AddThemeColorOverride("font_color", mutedAccentColor);
-        _tileInspectorTitleLabel.AddThemeColorOverride("font_color", inkTitleColor);
-        _tileInspectorSubtitleLabel.AddThemeColorOverride("font_color", mutedAccentColor);
-        _tileInspectorStatusValueLabel.AddThemeColorOverride("font_color", statusColor);
+        CallTileInspectorVisualFx("apply_local_inspector_tone", badgeText, accentColor, statusColor);
+    }
+
+    private void CallTileInspectorVisualFx(string methodName, params Variant[] args)
+    {
+        _tileInspectorVisualFx?.Call(methodName, args);
     }
 
     private static string GetCompoundActionFocus(string statusText)

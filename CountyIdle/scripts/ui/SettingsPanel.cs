@@ -7,13 +7,6 @@ namespace CountyIdle.UI;
 
 public partial class SettingsPanel : PopupPanelBase
 {
-    private static readonly Color PaperMainColor = new(0.95f, 0.92f, 0.84f, 1f);
-    private static readonly Color PaperDarkColor = new(0.89f, 0.85f, 0.76f, 1f);
-    private static readonly Color InkMainColor = new(0.17f, 0.15f, 0.13f, 1f);
-    private static readonly Color InkMutedColor = new(0.42f, 0.37f, 0.33f, 1f);
-    private static readonly Color SealRedColor = new(0.65f, 0.16f, 0.16f, 1f);
-    private static readonly Color BorderInkColor = new(0.29f, 0.25f, 0.21f, 1f);
-
     private static readonly (string Code, string Label)[] LanguageOptions =
     {
         ("zh_CN", "简体中文"),
@@ -65,6 +58,7 @@ public partial class SettingsPanel : PopupPanelBase
     private Button _closeButton = null!;
     private Button _cancelButton = null!;
     private Button _applyButton = null!;
+    private Node? _visualFx;
 
     private readonly Dictionary<ShortcutAction, Button> _shortcutButtons = new();
     private ClientSettings _editingSettings = new();
@@ -91,8 +85,8 @@ public partial class SettingsPanel : PopupPanelBase
         _closeButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/HeaderRow/CloseButton");
         _cancelButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/FooterRow/CancelButton");
         _applyButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/FooterRow/ApplyButton");
+        _visualFx = GetNodeOrNull<Node>("VisualFx");
 
-        ApplyScrollStyles();
         InitializePopupHint("CenterLayer/Dialog/Margin/MainColumn/HintLabel");
         PopulateOptionItems();
         BuildShortcutButtonMap();
@@ -106,6 +100,12 @@ public partial class SettingsPanel : PopupPanelBase
         _pendingShortcutAction = ShortcutAction.None;
         ApplySettingsToInputs(_editingSettings);
         OpenPopup();
+        CallVisualFx("play_open");
+    }
+
+    public void ClosePanel()
+    {
+        ClosePopup();
     }
 
     public override void _Process(double delta)
@@ -153,6 +153,7 @@ public partial class SettingsPanel : PopupPanelBase
         ShowPopupStatusMessage(statusMessage);
         UpdateShortcutButtonTexts();
         RefreshPopupHint();
+        CallVisualFxForShortcut(_pendingShortcutAction);
         GetViewport().SetInputAsHandled();
     }
 
@@ -211,65 +212,6 @@ public partial class SettingsPanel : PopupPanelBase
         _quickResetKeyButton.Pressed += () => BeginShortcutCapture(ShortcutAction.QuickReset);
     }
 
-    private void ApplyScrollStyles()
-    {
-        _dialog.AddThemeStyleboxOverride("panel", CreatePaperStyle());
-
-        var leftRoller = GetNode<PanelContainer>("CenterLayer/DecorLayer/LeftRoller");
-        var rightRoller = GetNode<PanelContainer>("CenterLayer/DecorLayer/RightRoller");
-        leftRoller.AddThemeStyleboxOverride("panel", CreateRollerStyle());
-        rightRoller.AddThemeStyleboxOverride("panel", CreateRollerStyle());
-
-        var titleLabel = GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/HeaderRow/TitleLabel");
-        titleLabel.AddThemeFontSizeOverride("font_size", 26);
-        titleLabel.AddThemeColorOverride("font_color", InkMainColor);
-
-        var hintLabel = GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/HintLabel");
-        hintLabel.AddThemeColorOverride("font_color", InkMutedColor);
-        hintLabel.AddThemeFontSizeOverride("font_size", 13);
-
-        foreach (var label in new[]
-                 {
-                     GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/InstantHeader"),
-                     GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/SavedHeader"),
-                     GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/LanguageRow/LanguageLabel"),
-                     GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ResolutionRow/ResolutionLabel"),
-                     GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/FontScaleRow/FontScaleLabel"),
-                     GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/VolumeRow/VolumeLabel"),
-                     GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ShortcutHeader"),
-                     GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/OpenSettingsKeyRow/OpenSettingsKeyLabel"),
-                     GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/OpenWarehouseKeyRow/OpenWarehouseKeyLabel"),
-                     GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ToggleExplorationKeyRow/ToggleExplorationKeyLabel"),
-                     GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ToggleSpeedKeyRow/ToggleSpeedKeyLabel"),
-                     GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/QuickSaveKeyRow/QuickSaveKeyLabel"),
-                     GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/QuickLoadKeyRow/QuickLoadKeyLabel"),
-                     GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/QuickResetKeyRow/QuickResetKeyLabel")
-                 })
-        {
-            label.AddThemeColorOverride("font_color", InkMainColor);
-            var labelName = label.Name.ToString();
-            label.AddThemeFontSizeOverride("font_size", labelName.EndsWith("Header", StringComparison.Ordinal) ? 16 : 14);
-        }
-
-        _volumeValueLabel.AddThemeColorOverride("font_color", InkMainColor);
-        _volumeValueLabel.AddThemeFontSizeOverride("font_size", 14);
-
-        ApplyCloseButtonStyle(_closeButton);
-        ApplyActionButtonStyle(_cancelButton, false);
-        ApplyActionButtonStyle(_applyButton, false);
-        ApplyActionButtonStyle(_openSettingsKeyButton, false);
-        ApplyActionButtonStyle(_openWarehouseKeyButton, false);
-        ApplyActionButtonStyle(_toggleExplorationKeyButton, false);
-        ApplyActionButtonStyle(_toggleSpeedKeyButton, false);
-        ApplyActionButtonStyle(_quickSaveKeyButton, false);
-        ApplyActionButtonStyle(_quickLoadKeyButton, false);
-        ApplyActionButtonStyle(_quickResetKeyButton, false);
-        ApplyFieldStyle(_languageOption);
-        ApplyFieldStyle(_resolutionOption);
-        ApplyFieldStyle(_fontScaleOption);
-        ApplySliderStyle(_volumeSlider);
-    }
-
     private void ApplySettingsToInputs(ClientSettings settings)
     {
         SelectLanguage(settings.Language);
@@ -282,6 +224,7 @@ public partial class SettingsPanel : PopupPanelBase
 
         UpdateShortcutButtonTexts();
         RefreshPopupHint();
+        CallVisualFxForShortcut(_pendingShortcutAction);
     }
 
     private void SelectLanguage(string languageCode)
@@ -345,6 +288,7 @@ public partial class SettingsPanel : PopupPanelBase
         _pendingShortcutAction = _pendingShortcutAction == shortcutAction ? ShortcutAction.None : shortcutAction;
         UpdateShortcutButtonTexts();
         RefreshPopupHint();
+        CallVisualFxForShortcut(_pendingShortcutAction);
     }
 
     private void CancelShortcutCapture()
@@ -352,6 +296,7 @@ public partial class SettingsPanel : PopupPanelBase
         _pendingShortcutAction = ShortcutAction.None;
         UpdateShortcutButtonTexts();
         RefreshPopupHint();
+        CallVisualFxForShortcut(_pendingShortcutAction);
     }
 
     private string AssignShortcut(ShortcutAction shortcutAction, string keyName)
@@ -475,6 +420,36 @@ public partial class SettingsPanel : PopupPanelBase
         }
     }
 
+    private void CallVisualFx(string methodName, params Variant[] args)
+    {
+        _visualFx?.Call(methodName, args);
+    }
+
+    private void CallVisualFxForShortcut(ShortcutAction shortcutAction)
+    {
+        if (shortcutAction == ShortcutAction.None)
+        {
+            return;
+        }
+
+        var buttonPath = shortcutAction switch
+        {
+            ShortcutAction.OpenSettings => "CenterLayer/Dialog/Margin/MainColumn/SettingsRows/OpenSettingsKeyRow/OpenSettingsKeyOption",
+            ShortcutAction.OpenWarehouse => "CenterLayer/Dialog/Margin/MainColumn/SettingsRows/OpenWarehouseKeyRow/OpenWarehouseKeyOption",
+            ShortcutAction.ToggleExploration => "CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ToggleExplorationKeyRow/ToggleExplorationKeyOption",
+            ShortcutAction.ToggleSpeed => "CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ToggleSpeedKeyRow/ToggleSpeedKeyOption",
+            ShortcutAction.QuickSave => "CenterLayer/Dialog/Margin/MainColumn/SettingsRows/QuickSaveKeyRow/QuickSaveKeyOption",
+            ShortcutAction.QuickLoad => "CenterLayer/Dialog/Margin/MainColumn/SettingsRows/QuickLoadKeyRow/QuickLoadKeyOption",
+            ShortcutAction.QuickReset => "CenterLayer/Dialog/Margin/MainColumn/SettingsRows/QuickResetKeyRow/QuickResetKeyOption",
+            _ => string.Empty
+        };
+
+        if (!string.IsNullOrEmpty(buttonPath))
+        {
+            CallVisualFx("pulse_shortcut", buttonPath);
+        }
+    }
+
     private void OnCloseRequested()
     {
         ClosePopup();
@@ -522,157 +497,4 @@ public partial class SettingsPanel : PopupPanelBase
         PreviewRequested?.Invoke(_editingSettings.Clone());
     }
 
-    private static void ApplyActionButtonStyle(Button button, bool destructive)
-    {
-        button.Flat = true;
-        button.Alignment = HorizontalAlignment.Left;
-        button.AddThemeFontSizeOverride("font_size", 14);
-        button.AddThemeStyleboxOverride("normal", CreateOrderButtonStyle(destructive, false));
-        button.AddThemeStyleboxOverride("hover", CreateOrderButtonStyle(destructive, true));
-        button.AddThemeStyleboxOverride("pressed", CreateOrderButtonStyle(destructive, true));
-        button.AddThemeStyleboxOverride("disabled", CreateOrderButtonStyle(false, false, true));
-        button.AddThemeColorOverride("font_color", destructive ? SealRedColor : InkMainColor);
-        button.AddThemeColorOverride("font_hover_color", PaperMainColor);
-        button.AddThemeColorOverride("font_pressed_color", PaperMainColor);
-        button.AddThemeColorOverride("font_disabled_color", InkMutedColor);
-    }
-
-    private static void ApplyCloseButtonStyle(Button button)
-    {
-        button.Flat = true;
-        button.Alignment = HorizontalAlignment.Center;
-        button.AddThemeFontSizeOverride("font_size", 22);
-        button.AddThemeStyleboxOverride("normal", CreateTransparentStyle());
-        button.AddThemeStyleboxOverride("hover", CreateTransparentStyle());
-        button.AddThemeStyleboxOverride("pressed", CreateTransparentStyle());
-        button.AddThemeColorOverride("font_color", InkMainColor);
-        button.AddThemeColorOverride("font_hover_color", SealRedColor);
-        button.AddThemeColorOverride("font_pressed_color", SealRedColor);
-    }
-
-    private static void ApplyFieldStyle(BaseButton button)
-    {
-        button.AddThemeStyleboxOverride("normal", CreateFieldStyle(false));
-        button.AddThemeStyleboxOverride("hover", CreateFieldStyle(true));
-        button.AddThemeStyleboxOverride("pressed", CreateFieldStyle(true));
-        button.AddThemeStyleboxOverride("focus", CreateFieldStyle(true));
-        button.AddThemeFontSizeOverride("font_size", 13);
-        button.AddThemeColorOverride("font_color", InkMainColor);
-        button.AddThemeColorOverride("font_hover_color", InkMainColor);
-        button.AddThemeColorOverride("font_pressed_color", InkMainColor);
-    }
-
-    private static void ApplySliderStyle(Godot.Range slider)
-    {
-        slider.AddThemeStyleboxOverride("slider", CreateSliderTrackStyle());
-        slider.AddThemeStyleboxOverride("grabber_area", CreateTransparentStyle());
-        slider.AddThemeStyleboxOverride("grabber_area_highlight", CreateTransparentStyle());
-        slider.AddThemeIconOverride("grabber", CreateSliderGrabber());
-        slider.AddThemeIconOverride("grabber_highlight", CreateSliderGrabber());
-    }
-
-    private static StyleBoxFlat CreatePaperStyle()
-    {
-        return new StyleBoxFlat
-        {
-            BgColor = PaperMainColor,
-            BorderWidthLeft = 1,
-            BorderWidthTop = 1,
-            BorderWidthRight = 1,
-            BorderWidthBottom = 1,
-            BorderColor = new Color(0.48f, 0.42f, 0.35f, 0.45f),
-            ShadowColor = new Color(0f, 0f, 0f, 0.35f),
-            ShadowSize = 10
-        };
-    }
-
-    private static StyleBoxFlat CreateRollerStyle()
-    {
-        return new StyleBoxFlat
-        {
-            BgColor = new Color(0.29f, 0.19f, 0.13f, 1f),
-            BorderWidthLeft = 1,
-            BorderWidthTop = 1,
-            BorderWidthRight = 1,
-            BorderWidthBottom = 1,
-            BorderColor = new Color(0.14f, 0.09f, 0.05f, 1f)
-        };
-    }
-
-    private static StyleBoxFlat CreateFieldStyle(bool focused)
-    {
-        return new StyleBoxFlat
-        {
-            BgColor = new Color(PaperMainColor.R, PaperMainColor.G, PaperMainColor.B, focused ? 0.75f : 0.35f),
-            BorderWidthLeft = 1,
-            BorderWidthTop = 1,
-            BorderWidthRight = 1,
-            BorderWidthBottom = 1,
-            BorderColor = focused ? SealRedColor : BorderInkColor,
-            ContentMarginLeft = 10,
-            ContentMarginTop = 8,
-            ContentMarginRight = 10,
-            ContentMarginBottom = 8
-        };
-    }
-
-    private static StyleBoxFlat CreateOrderButtonStyle(bool destructive, bool inverted, bool disabled = false)
-    {
-        var border = disabled
-            ? InkMutedColor
-            : destructive
-                ? SealRedColor
-                : BorderInkColor;
-        var background = inverted && !disabled
-            ? (destructive ? SealRedColor : InkMainColor)
-            : new Color(PaperMainColor.R, PaperMainColor.G, PaperMainColor.B, 0f);
-
-        return new StyleBoxFlat
-        {
-            BgColor = background,
-            BorderWidthLeft = 1,
-            BorderWidthTop = 1,
-            BorderWidthRight = 1,
-            BorderWidthBottom = 1,
-            BorderColor = border,
-            ContentMarginLeft = 12,
-            ContentMarginTop = 10,
-            ContentMarginRight = 12,
-            ContentMarginBottom = 10
-        };
-    }
-
-    private static StyleBoxFlat CreateSliderTrackStyle()
-    {
-        return new StyleBoxFlat
-        {
-            BgColor = PaperDarkColor,
-            BorderWidthLeft = 1,
-            BorderWidthTop = 1,
-            BorderWidthRight = 1,
-            BorderWidthBottom = 1,
-            BorderColor = BorderInkColor,
-            ContentMarginTop = 4,
-            ContentMarginBottom = 4
-        };
-    }
-
-    private static Texture2D CreateSliderGrabber()
-    {
-        var image = Image.CreateEmpty(14, 14, false, Image.Format.Rgba8);
-        image.Fill(SealRedColor);
-        return ImageTexture.CreateFromImage(image);
-    }
-
-    private static StyleBoxFlat CreateTransparentStyle()
-    {
-        return new StyleBoxFlat
-        {
-            BgColor = new Color(0f, 0f, 0f, 0f),
-            BorderWidthLeft = 0,
-            BorderWidthTop = 0,
-            BorderWidthRight = 0,
-            BorderWidthBottom = 0
-        };
-    }
 }

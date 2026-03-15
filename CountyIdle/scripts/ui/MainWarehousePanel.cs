@@ -51,6 +51,7 @@ public partial class Main
             return;
         }
 
+        CloseBlockingOverlayPopups(_warehousePanel);
         _warehousePanel.Open(_gameLoop.State.Clone());
     }
 

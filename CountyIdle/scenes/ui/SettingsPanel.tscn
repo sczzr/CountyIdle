@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://mauxggfyykyf"]
 
 [ext_resource type="Script" uid="uid://b4wfyy6kthib2" path="res://scripts/ui/SettingsPanel.cs" id="1_4af7x"]
+[ext_resource type="Script" path="res://scripts/ui/gd/SettingsPanelVisualFx.gd" id="2_settings_fx"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dialog"]
 bg_color = Color(0.0823529, 0.0862745, 0.101961, 1)
@@ -24,6 +25,9 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_4af7x")
+
+[node name="VisualFx" type="Node" parent="."]
+script = ExtResource("2_settings_fx")
 
 [node name="Backdrop" type="ColorRect" parent="." unique_id=426550606]
 layout_mode = 1

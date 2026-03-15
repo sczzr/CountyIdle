@@ -8,13 +8,6 @@ namespace CountyIdle.UI;
 
 public partial class SectOrganizationPanel : PopupPanelBase
 {
-	private static readonly Color PaperBackgroundColor = new(0.956f, 0.945f, 0.918f, 1f);
-	private static readonly Color InkBlackColor = new(0.173f, 0.145f, 0.125f, 1f);
-	private static readonly Color InkGrayColor = new(0.404f, 0.353f, 0.302f, 0.95f);
-	private static readonly Color CinnabarColor = new(0.620f, 0.165f, 0.133f, 1f);
-	private static readonly Color BorderGoldColor = new(0.773f, 0.627f, 0.349f, 1f);
-	private static readonly Color CeladonColor = new(0.439f, 0.553f, 0.506f, 1f);
-
 	private const string RootPath = "Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn";
 	private const string HeaderPath = RootPath + "/HeaderRow";
 	private const string BodyPath = RootPath + "/BodyRow";
@@ -89,6 +82,7 @@ public partial class SectOrganizationPanel : PopupPanelBase
 	private Button _resetSupportButton = null!;
 	private Button _openGovernanceButton = null!;
 	private Button _closeButton = null!;
+	private Node? _visualFx;
 
 	private GameState _state = new();
 	private JobType _selectedJobType = JobType.Scholar;
@@ -97,7 +91,6 @@ public partial class SectOrganizationPanel : PopupPanelBase
 	public override void _Ready()
 	{
 		BindUiNodes();
-		ApplyUiStyles();
 		BuildDynamicEntries();
 		BindEvents();
 		InitializePopupHint(_hintLabel);
@@ -123,6 +116,12 @@ public partial class SectOrganizationPanel : PopupPanelBase
 	{
 		RefreshState(state, preferredJobType, preferredPeakIndex);
 		OpenPopup();
+		CallVisualFx("play_open");
+	}
+
+	public void ClosePanel()
+	{
+		ClosePopup();
 	}
 
 	public void RefreshState(GameState state, JobType? preferredJobType = null, int? preferredPeakIndex = null)
@@ -185,50 +184,7 @@ public partial class SectOrganizationPanel : PopupPanelBase
 		_resetSupportButton = GetNode<Button>($"{BodyPath}/RightColumn/ActionColumn/ActionRow/ResetSupportButton");
 		_openGovernanceButton = GetNode<Button>($"{BodyPath}/RightColumn/ActionColumn/ActionRow/OpenGovernanceButton");
 		_hintLabel = GetNode<Label>($"{BodyPath}/RightColumn/HintLabel");
-	}
-
-	private void ApplyUiStyles()
-	{
-		GetNode<ColorRect>("Overlay/OuterMargin/Wrapper/TopTrim").Color = BorderGoldColor;
-		GetNode<ColorRect>("Overlay/OuterMargin/Wrapper/BottomTrim").Color = BorderGoldColor;
-		GetNode<PanelContainer>("Overlay/OuterMargin/Wrapper/FrameRow/LeftRoller")
-			.AddThemeStyleboxOverride("panel", CreateRollerStyle());
-		GetNode<PanelContainer>("Overlay/OuterMargin/Wrapper/FrameRow/RightRoller")
-			.AddThemeStyleboxOverride("panel", CreateRollerStyle());
-		GetNode<PanelContainer>("Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame")
-			.AddThemeStyleboxOverride("panel", CreatePaperStyle());
-		GetNode<PanelContainer>($"{MiddleContentPath}/SummaryPanel")
-			.AddThemeStyleboxOverride("panel", CreateTonePanelStyle(new Color(0.96f, 0.93f, 0.86f, 0.55f)));
-		GetNode<ScrollContainer>($"{BodyPath}/LeftColumn/PeakListScroll")
-			.AddThemeStyleboxOverride("panel", CreateTransparentStyle());
-		GetNode<ScrollContainer>($"{BodyPath}/MiddleColumn/MiddleScroll")
-			.AddThemeStyleboxOverride("panel", CreateTransparentStyle());
-
-		ApplyLabelStyle(GetNode<Label>($"{HeaderPath}/TitleColumn/TitleLabel"), 28, InkBlackColor);
-		ApplyLabelStyle(GetNode<Label>($"{HeaderPath}/TitleColumn/SubtitleLabel"), 13, InkGrayColor);
-		ApplyLabelStyle(GetNode<Label>($"{HeaderPath}/StatusColumn/StatusTitle"), 12, InkGrayColor);
-		ApplyLabelStyle(_headerStatusLabel, 13, CinnabarColor);
-		ApplyLabelStyle(GetNode<Label>($"{BodyPath}/LeftColumn/LeftSectionLabel"), 16, InkBlackColor);
-		ApplyLabelStyle(GetNode<Label>($"{BodyPath}/RightColumn/RightSectionLabel"), 16, InkBlackColor);
-		ApplyLabelStyle(GetNode<Label>($"{MiddleContentPath}/DepartmentSectionLabel"), 16, InkBlackColor);
-		ApplyLabelStyle(_peakTitleLabel, 36, InkBlackColor);
-		ApplyLabelStyle(_peakCounterLabel, 13, CinnabarColor);
-		ApplyLabelStyle(GetNode<Label>($"{MiddleContentPath}/SummaryPanel/SummaryMargin/SummaryColumn/PeakPositionRow/PeakPositionTitle"), 12, InkGrayColor);
-		ApplyLabelStyle(GetNode<Label>($"{MiddleContentPath}/SummaryPanel/SummaryMargin/SummaryColumn/PeakFocusRow/PeakFocusTitle"), 12, InkGrayColor);
-		ApplyLabelStyle(GetNode<Label>($"{MiddleContentPath}/SummaryPanel/SummaryMargin/SummaryColumn/PeakCoreUnitsRow/PeakCoreUnitsTitle"), 12, InkGrayColor);
-		ApplyLabelStyle(GetNode<Label>($"{MiddleContentPath}/SummaryPanel/SummaryMargin/SummaryColumn/PeakSupportActiveRow/PeakSupportActiveTitle"), 12, InkGrayColor);
-		ApplyLabelStyle(GetNode<Label>($"{MiddleContentPath}/SummaryPanel/SummaryMargin/SummaryColumn/PeakSupportCandidateRow/PeakSupportCandidateTitle"), 12, InkGrayColor);
-		ApplyLabelStyle(_peakPositionLabel, 13, InkBlackColor);
-		ApplyLabelStyle(_peakFocusLabel, 13, CinnabarColor);
-		ApplyLabelStyle(_peakCoreUnitsLabel, 13, InkBlackColor);
-		ApplyLabelStyle(_peakSupportActiveLabel, 13, InkBlackColor);
-		ApplyLabelStyle(_peakSupportCandidateLabel, 13, InkBlackColor);
-		ApplyLabelStyle(_hintLabel, 12, InkGrayColor);
-
-		ApplyCloseButtonStyle(_closeButton);
-		ApplyActionButtonStyle(_setSupportButton, InkBlackColor, emphasize: true);
-		ApplyActionButtonStyle(_resetSupportButton, CinnabarColor);
-		ApplyActionButtonStyle(_openGovernanceButton, CeladonColor);
+		_visualFx = GetNodeOrNull<Node>("VisualFx");
 	}
 
 	private void BuildDynamicEntries()
@@ -261,42 +217,6 @@ public partial class SectOrganizationPanel : PopupPanelBase
 		_openGovernanceButton.Pressed += OnOpenGovernancePressed;
 	}
 
-	private static void ApplyLabelStyle(Label label, int fontSize, Color color)
-	{
-		label.AddThemeFontSizeOverride("font_size", fontSize);
-		label.AddThemeColorOverride("font_color", color);
-	}
-
-	private static void ApplyCloseButtonStyle(Button button)
-	{
-		button.AddThemeFontSizeOverride("font_size", 22);
-		button.AddThemeStyleboxOverride("normal", CreateTransparentStyle());
-		button.AddThemeStyleboxOverride("hover", CreateTransparentStyle());
-		button.AddThemeStyleboxOverride("pressed", CreateTransparentStyle());
-		button.AddThemeStyleboxOverride("focus", CreateTransparentStyle());
-		button.AddThemeColorOverride("font_color", InkBlackColor);
-		button.AddThemeColorOverride("font_hover_color", CinnabarColor);
-		button.AddThemeColorOverride("font_pressed_color", CinnabarColor);
-	}
-
-	private static void ApplyActionButtonStyle(Button button, Color accentColor, bool emphasize = false)
-	{
-		button.AddThemeColorOverride("font_color", accentColor);
-		button.AddThemeColorOverride("font_hover_color", accentColor);
-		button.AddThemeColorOverride("font_pressed_color", accentColor);
-		button.AddThemeColorOverride("font_disabled_color", new Color(accentColor.R, accentColor.G, accentColor.B, 0.50f));
-		button.AddThemeFontSizeOverride("font_size", emphasize ? 15 : 13);
-
-		var normal = CreateButtonStyle(accentColor, emphasize);
-		var active = CreateButtonStyle(accentColor, emphasize, filled: true);
-		var disabled = CreateDisabledButtonStyle(accentColor, emphasize);
-		button.AddThemeStyleboxOverride("normal", normal);
-		button.AddThemeStyleboxOverride("hover", active);
-		button.AddThemeStyleboxOverride("pressed", active);
-		button.AddThemeStyleboxOverride("focus", active);
-		button.AddThemeStyleboxOverride("disabled", disabled);
-	}
-
 	private PeakNavBinding CreatePeakNavItem(int peakIndex)
 	{
 		var card = new PanelContainer
@@ -304,29 +224,26 @@ public partial class SectOrganizationPanel : PopupPanelBase
 			MouseFilter = MouseFilterEnum.Stop,
 			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
 		};
-		card.AddThemeStyleboxOverride("panel", CreatePeakNavStyle(selected: false));
-		card.MouseDefaultCursorShape = CursorShape.PointingHand;
 		card.GuiInput += @event => OnPeakNavInput(peakIndex, @event);
 
-		var margin = CreateMarginContainer(12, 10, 12, 10);
+		var margin = new MarginContainer();
 		card.AddChild(margin);
+		CallVisualFx("prepare_dynamic_card_margin", margin);
 
 		var column = new VBoxContainer();
-		column.AddThemeConstantOverride("separation", 4);
 		margin.AddChild(column);
+		CallVisualFx("prepare_peak_nav_shell", card, column);
 
 		var titleLabel = new Label();
-		titleLabel.AddThemeColorOverride("font_color", InkBlackColor);
-		titleLabel.AddThemeFontSizeOverride("font_size", 16);
 		column.AddChild(titleLabel);
 
 		var summaryLabel = new Label
 		{
 			AutowrapMode = TextServer.AutowrapMode.WordSmart
 		};
-		summaryLabel.AddThemeColorOverride("font_color", InkGrayColor);
-		summaryLabel.AddThemeFontSizeOverride("font_size", 12);
 		column.AddChild(summaryLabel);
+
+		CallVisualFx("style_peak_nav_item", card, titleLabel, summaryLabel);
 
 		return new PeakNavBinding(peakIndex, card, titleLabel, summaryLabel);
 	}
@@ -337,37 +254,32 @@ public partial class SectOrganizationPanel : PopupPanelBase
 		{
 			MouseFilter = MouseFilterEnum.Stop
 		};
-		card.AddThemeStyleboxOverride("panel", CreateJobCardStyle(selected: false));
-		card.MouseDefaultCursorShape = CursorShape.PointingHand;
 		card.GuiInput += @event => OnJobCardInput(jobType, @event);
 
-		var margin = CreateMarginContainer(12, 10, 12, 10);
+		var margin = new MarginContainer();
 		card.AddChild(margin);
+		CallVisualFx("prepare_dynamic_card_margin", margin);
 
 		var column = new VBoxContainer();
-		column.AddThemeConstantOverride("separation", 4);
 		margin.AddChild(column);
+		CallVisualFx("prepare_job_card_shell", card, column);
 
 		var titleLabel = new Label();
-		titleLabel.AddThemeColorOverride("font_color", InkBlackColor);
-		titleLabel.AddThemeFontSizeOverride("font_size", 16);
 		column.AddChild(titleLabel);
 
 		var summaryLabel = new Label
 		{
 			AutowrapMode = TextServer.AutowrapMode.WordSmart
 		};
-		summaryLabel.AddThemeColorOverride("font_color", InkGrayColor);
-		summaryLabel.AddThemeFontSizeOverride("font_size", 12);
 		column.AddChild(summaryLabel);
 
 		var detailLabel = new Label
 		{
 			AutowrapMode = TextServer.AutowrapMode.WordSmart
 		};
-		detailLabel.AddThemeColorOverride("font_color", new Color(0.32f, 0.28f, 0.23f, 0.92f));
-		detailLabel.AddThemeFontSizeOverride("font_size", 11);
 		column.AddChild(detailLabel);
+
+		CallVisualFx("style_job_card", card, titleLabel, summaryLabel, detailLabel);
 
 		return new JobCardBinding(card, titleLabel, summaryLabel, detailLabel);
 	}
@@ -384,6 +296,7 @@ public partial class SectOrganizationPanel : PopupPanelBase
 		_selectedPeakIndex = peakIndex;
 		RefreshPeakDetail();
 		RefreshPopupHint();
+		CallVisualFx("pulse_peak_nav");
 		GetViewport().SetInputAsHandled();
 	}
 
@@ -401,7 +314,13 @@ public partial class SectOrganizationPanel : PopupPanelBase
 		RefreshJobCards();
 		RefreshPeakDetail();
 		RefreshPopupHint();
+		CallVisualFx("pulse_job_cards");
 		GetViewport().SetInputAsHandled();
+	}
+
+	private void CallVisualFx(string methodName, params Variant[] args)
+	{
+		_visualFx?.Call(methodName, args);
 	}
 
 	private void RefreshOverview()
@@ -421,8 +340,7 @@ public partial class SectOrganizationPanel : PopupPanelBase
 			binding.Root.TooltipText = SectOrganizationRules.BuildPeakDetailText(binding.PeakIndex);
 
 			var selected = binding.PeakIndex == _selectedPeakIndex;
-			binding.Root.AddThemeStyleboxOverride("panel", CreatePeakNavStyle(selected));
-			binding.TitleLabel.AddThemeColorOverride("font_color", selected ? CinnabarColor : InkBlackColor);
+			CallVisualFx("apply_peak_nav_state", binding.Root, binding.TitleLabel, selected);
 		}
 	}
 
@@ -442,7 +360,7 @@ public partial class SectOrganizationPanel : PopupPanelBase
 			binding.SummaryLabel.Text = info.SummaryText;
 			binding.DetailLabel.Text = $"关联峰脉：{SectOrganizationRules.GetPeakTitle(SectOrganizationRules.GetRecommendedPeakIndex(jobType))}";
 			binding.Root.TooltipText = info.DetailText;
-			binding.Root.AddThemeStyleboxOverride("panel", CreateJobCardStyle(selected));
+			CallVisualFx("apply_job_card_state", binding.Root, selected);
 		}
 	}
 
@@ -544,27 +462,25 @@ public partial class SectOrganizationPanel : PopupPanelBase
 		}
 	}
 
-	private static PanelContainer CreateDepartmentCard(string title, string detail)
+	private PanelContainer CreateDepartmentCard(string title, string detail)
 	{
 		var card = new PanelContainer
 		{
 			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
 		};
-		card.AddThemeStyleboxOverride("panel", CreateDepartmentCardStyle());
 
-		var margin = CreateMarginContainer(12, 10, 12, 10);
+		var margin = new MarginContainer();
 		card.AddChild(margin);
+		CallVisualFx("prepare_dynamic_card_margin", margin);
 
 		var column = new VBoxContainer();
-		column.AddThemeConstantOverride("separation", 4);
 		margin.AddChild(column);
+		CallVisualFx("prepare_department_card_shell", card, column);
 
 		var titleLabel = new Label
 		{
 			Text = title
 		};
-		titleLabel.AddThemeColorOverride("font_color", InkBlackColor);
-		titleLabel.AddThemeFontSizeOverride("font_size", 14);
 		column.AddChild(titleLabel);
 
 		var detailLabel = new Label
@@ -572,9 +488,9 @@ public partial class SectOrganizationPanel : PopupPanelBase
 			Text = detail,
 			AutowrapMode = TextServer.AutowrapMode.WordSmart
 		};
-		detailLabel.AddThemeColorOverride("font_color", InkGrayColor);
-		detailLabel.AddThemeFontSizeOverride("font_size", 12);
 		column.AddChild(detailLabel);
+
+		CallVisualFx("style_department_card", card, titleLabel, detailLabel);
 
 		return card;
 	}
@@ -588,174 +504,4 @@ public partial class SectOrganizationPanel : PopupPanelBase
 		}
 	}
 
-	private static MarginContainer CreateMarginContainer(int left, int top, int right, int bottom)
-	{
-		var margin = new MarginContainer();
-		margin.AddThemeConstantOverride("margin_left", left);
-		margin.AddThemeConstantOverride("margin_top", top);
-		margin.AddThemeConstantOverride("margin_right", right);
-		margin.AddThemeConstantOverride("margin_bottom", bottom);
-		return margin;
-	}
-
-	private static StyleBoxFlat CreatePaperStyle()
-	{
-		return new StyleBoxFlat
-		{
-			BgColor = PaperBackgroundColor,
-			BorderWidthLeft = 1,
-			BorderWidthTop = 1,
-			BorderWidthRight = 1,
-			BorderWidthBottom = 1,
-			BorderColor = new Color(0.48f, 0.42f, 0.35f, 0.45f),
-			ShadowColor = new Color(0f, 0f, 0f, 0.35f),
-			ShadowSize = 10
-		};
-	}
-
-	private static StyleBoxFlat CreateRollerStyle()
-	{
-		return new StyleBoxFlat
-		{
-			BgColor = new Color(0.29f, 0.19f, 0.13f, 1f),
-			BorderWidthLeft = 1,
-			BorderWidthTop = 1,
-			BorderWidthRight = 1,
-			BorderWidthBottom = 1,
-			BorderColor = new Color(0.14f, 0.09f, 0.05f, 1f)
-		};
-	}
-
-	private static StyleBoxFlat CreateTonePanelStyle(Color backgroundColor)
-	{
-		return new StyleBoxFlat
-		{
-			BgColor = backgroundColor,
-			BorderColor = new Color(0.70f, 0.65f, 0.56f, 0.58f),
-			BorderWidthLeft = 1,
-			BorderWidthTop = 1,
-			BorderWidthRight = 1,
-			BorderWidthBottom = 1,
-			CornerRadiusTopLeft = 0,
-			CornerRadiusTopRight = 0,
-			CornerRadiusBottomRight = 0,
-			CornerRadiusBottomLeft = 0
-		};
-	}
-
-	private static StyleBoxFlat CreatePeakNavStyle(bool selected)
-	{
-		return new StyleBoxFlat
-		{
-			BgColor = selected ? new Color(0.93f, 0.88f, 0.80f, 0.70f) : new Color(1f, 1f, 1f, 0f),
-			BorderColor = selected ? CinnabarColor : new Color(0.70f, 0.65f, 0.56f, 0.35f),
-			BorderWidthLeft = selected ? 3 : 1,
-			BorderWidthTop = 1,
-			BorderWidthRight = 1,
-			BorderWidthBottom = 1,
-			CornerRadiusTopLeft = 0,
-			CornerRadiusTopRight = 0,
-			CornerRadiusBottomRight = 0,
-			CornerRadiusBottomLeft = 0
-		};
-	}
-
-	private static StyleBoxFlat CreateDepartmentCardStyle()
-	{
-		return new StyleBoxFlat
-		{
-			BgColor = new Color(0.98f, 0.96f, 0.90f, 0.55f),
-			BorderColor = new Color(0.70f, 0.65f, 0.56f, 0.45f),
-			BorderWidthLeft = 1,
-			BorderWidthTop = 1,
-			BorderWidthRight = 1,
-			BorderWidthBottom = 1,
-			CornerRadiusTopLeft = 0,
-			CornerRadiusTopRight = 0,
-			CornerRadiusBottomRight = 0,
-			CornerRadiusBottomLeft = 0
-		};
-	}
-
-	private static StyleBoxFlat CreateJobCardStyle(bool selected)
-	{
-		return new StyleBoxFlat
-		{
-			BgColor = selected ? new Color(0.95f, 0.90f, 0.82f, 0.85f) : new Color(0.98f, 0.96f, 0.90f, 0.45f),
-			BorderColor = selected ? new Color(0.62f, 0.16f, 0.13f, 0.82f) : new Color(0.70f, 0.65f, 0.56f, 0.45f),
-			BorderWidthLeft = selected ? 2 : 1,
-			BorderWidthTop = selected ? 2 : 1,
-			BorderWidthRight = selected ? 2 : 1,
-			BorderWidthBottom = selected ? 2 : 1,
-			CornerRadiusTopLeft = 0,
-			CornerRadiusTopRight = 0,
-			CornerRadiusBottomRight = 0,
-			CornerRadiusBottomLeft = 0
-		};
-	}
-
-	private static StyleBoxFlat CreateButtonStyle(Color borderColor, bool emphasize, bool filled = false)
-	{
-		var style = new StyleBoxFlat
-		{
-			BgColor = filled
-				? (emphasize ? new Color(0.91f, 0.84f, 0.74f, 0.82f) : new Color(PaperBackgroundColor.R, PaperBackgroundColor.G, PaperBackgroundColor.B, 0.58f))
-				: new Color(PaperBackgroundColor.R, PaperBackgroundColor.G, PaperBackgroundColor.B, emphasize ? 0.08f : 0f),
-			BorderColor = new Color(borderColor.R, borderColor.G, borderColor.B, emphasize ? 0.86f : 0.72f),
-			BorderWidthLeft = 1,
-			BorderWidthTop = 1,
-			BorderWidthRight = 1,
-			BorderWidthBottom = 1,
-			CornerRadiusTopLeft = 0,
-			CornerRadiusTopRight = 0,
-			CornerRadiusBottomRight = 0,
-			CornerRadiusBottomLeft = 0,
-			ContentMarginLeft = 12,
-			ContentMarginTop = 7,
-			ContentMarginRight = 12,
-			ContentMarginBottom = 7
-		};
-
-		if (emphasize)
-		{
-			style.ShadowSize = filled ? 0 : 3;
-			style.ShadowOffset = filled ? Vector2.Zero : new Vector2(2, 2);
-			style.ShadowColor = new Color(0f, 0f, 0f, 0.25f);
-		}
-
-		return style;
-	}
-
-	private static StyleBoxFlat CreateDisabledButtonStyle(Color borderColor, bool emphasize)
-	{
-		return new StyleBoxFlat
-		{
-			BgColor = new Color(PaperBackgroundColor.R, PaperBackgroundColor.G, PaperBackgroundColor.B, emphasize ? 0.16f : 0.08f),
-			BorderColor = new Color(borderColor.R, borderColor.G, borderColor.B, 0.28f),
-			BorderWidthLeft = 1,
-			BorderWidthTop = 1,
-			BorderWidthRight = 1,
-			BorderWidthBottom = 1,
-			CornerRadiusTopLeft = 0,
-			CornerRadiusTopRight = 0,
-			CornerRadiusBottomRight = 0,
-			CornerRadiusBottomLeft = 0,
-			ContentMarginLeft = 12,
-			ContentMarginTop = 7,
-			ContentMarginRight = 12,
-			ContentMarginBottom = 7
-		};
-	}
-
-	private static StyleBoxFlat CreateTransparentStyle()
-	{
-		return new StyleBoxFlat
-		{
-			BgColor = new Color(1f, 1f, 1f, 0f),
-			BorderWidthLeft = 0,
-			BorderWidthTop = 0,
-			BorderWidthRight = 0,
-			BorderWidthBottom = 0
-		};
-	}
 }

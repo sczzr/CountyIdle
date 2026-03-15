@@ -2,6 +2,11 @@
 
 [ext_resource type="Script" uid="uid://besw5r752ujvs" path="res://scripts/systems/SectMapViewSystem.cs" id="1_town_map"]
 [ext_resource type="Script" uid="uid://dih1wr3e2nle6" path="res://scripts/systems/StrategicMapViewSystem.cs" id="2_strategic_map"]
+[ext_resource type="Script" path="res://scripts/map/gd/HexHoverHighlight.gd" id="9_town_hover_fx"]
+[ext_resource type="Script" path="res://scripts/ui/gd/WorldPanelVisualFx.gd" id="10_world_panel_fx"]
+[ext_resource type="Script" path="res://scripts/ui/gd/MainTopTabVisualFx.gd" id="11_main_top_tab_fx"]
+[ext_resource type="Script" path="res://scripts/ui/gd/StrategicMapPanelToneFx.gd" id="12_strategic_tone_fx"]
+[ext_resource type="Script" path="res://scripts/ui/gd/CountyTownMapHintFx.gd" id="13_town_hint_fx"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab"]
 content_margin_left = 14.0
@@ -105,6 +110,12 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="VisualFx" type="Node" parent="PanelContent"]
+script = ExtResource("10_world_panel_fx")
+
+[node name="TopTabVisualFx" type="Node" parent="PanelContent"]
+script = ExtResource("11_main_top_tab_fx")
 
 [node name="TopTabRow" type="HBoxContainer" parent="PanelContent" unique_id=981224588]
 custom_minimum_size = Vector2(560, 34)
@@ -334,6 +345,9 @@ text = "世界地图（灵脉与奇观）"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="ToneFx" type="Node" parent="PanelContent/MapViewport/MapPages/WorldMapView"]
+script = ExtResource("12_strategic_tone_fx")
+
 [node name="PrefectureMapView" type="PanelContainer" parent="PanelContent/MapViewport/MapPages" unique_id=1212362671]
 visible = false
 layout_mode = 1
@@ -354,6 +368,9 @@ theme_override_colors/font_color = Color(0.517647, 0.52549, 0.556863, 1)
 text = "江陵府外域（隐藏备用视图）"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="ToneFx" type="Node" parent="PanelContent/MapViewport/MapPages/PrefectureMapView"]
+script = ExtResource("12_strategic_tone_fx")
 
 [node name="SecondaryMapView" type="PanelContainer" parent="PanelContent/MapViewport/MapPages" unique_id=170336771]
 visible = false
@@ -595,6 +612,34 @@ theme_override_font_sizes/font_size = 13
 text = "待定"
 autowrap_mode = 3
 
+[node name="GeneratedSecondarySandboxView" type="PanelContainer" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox" unique_id=1820211142]
+visible = false
+clip_contents = true
+custom_minimum_size = Vector2(0, 320)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_map_layer")
+script = ExtResource("1_town_map")
+
+[node name="HoverFx" type="Node2D" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/GeneratedSecondarySandboxView" unique_id=1043219102]
+z_index = 6
+script = ExtResource("9_town_hover_fx")
+
+[node name="MapHintLabel" type="Label" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/GeneratedSecondarySandboxView" unique_id=192263247]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 11
+text = "局部沙盘 · 点击地块以检视左栏"
+vertical_alignment = 1
+
+[node name="RegenerateButton" type="Button" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/GeneratedSecondarySandboxView" unique_id=854236177]
+visible = false
+custom_minimum_size = Vector2(110, 28)
+layout_mode = 2
+text = "重绘局部沙盘"
+
 [node name="DescriptionCard" type="PanelContainer" parent="PanelContent/MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox" unique_id=627114334]
 layout_mode = 2
 size_flags_vertical = 3
@@ -662,6 +707,10 @@ grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_map_layer")
 script = ExtResource("1_town_map")
 
+[node name="HoverFx" type="Node2D" parent="PanelContent/MapViewport/MapPages/CountyTownMapView" unique_id=1672013401]
+z_index = 6
+script = ExtResource("9_town_hover_fx")
+
 [node name="MapHintLabel" type="Label" parent="PanelContent/MapViewport/MapPages/CountyTownMapView" unique_id=1232416905]
 visible = false
 layout_mode = 2
@@ -675,6 +724,9 @@ visible = false
 custom_minimum_size = Vector2(110, 28)
 layout_mode = 2
 text = "重绘天衍峰"
+
+[node name="ToneFx" type="Node" parent="PanelContent/MapViewport/MapPages/CountyTownMapView"]
+script = ExtResource("13_town_hint_fx")
 
 [node name="EventPanelView" type="PanelContainer" parent="PanelContent/MapViewport/MapPages" unique_id=1804476821]
 visible = false

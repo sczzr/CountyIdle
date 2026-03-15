@@ -70,6 +70,65 @@
 | 天衍峰山门图与世界图 | 山门图、世界图、外域备用视图与双地图入口已建立 | `CountyIdle/scripts/systems/SectMapViewSystem.cs`、`CountyIdle/scripts/systems/StrategicMapViewSystem.cs`、`CountyIdle/scenes/ui/WorldPanel.tscn` | `docs/02_system_specs.md` |
 | 弟子谱与宗门组织谱 | 弟子谱、峰令谱与卷册式总览已接入正式 UI | `CountyIdle/scripts/ui/DisciplePanel.cs`、`CountyIdle/scripts/ui/SectOrganizationPanel.cs`、`CountyIdle/scripts/Main.cs` | `docs/02_system_specs.md` |
 | 多存档槽与 `SQLite` 存档 | 多槽、自动槽轮换、摘要预览与读写主链已成立 | `CountyIdle/scripts/core/SaveSystem.cs`、`CountyIdle/scripts/core/SqliteSaveRepository.cs`、`CountyIdle/scripts/ui/SaveSlotsPanel.cs` | `docs/13_runtime_support_appendix.md` |
+| UI 表现层 `GDScript` 辅助首批接入 | 仓储卷开场 / 分页、留影录预览切换、山门 hex hover 高亮已下放至 `GDScript`，权威逻辑仍留在 `C#` | `CountyIdle/scripts/ui/WarehousePanel.cs`、`CountyIdle/scripts/ui/SaveSlotsPanel.cs`、`CountyIdle/scripts/systems/CountyTownMapViewSystem.cs`、`CountyIdle/scripts/ui/gd/WarehousePanelTransition.gd`、`CountyIdle/scripts/ui/gd/SavePreviewCrossfade.gd`、`CountyIdle/scripts/map/gd/HexHoverHighlight.gd` | `docs/feature-cards/FC-20260313-ui-gdscript-boundary-split.md` |
+| UI 表现层 `GDScript` 辅助二批接入 | 治宗册开场 / 切页、弟子谱筛选 / 详情切换、中部地图页签 / 二级地图检视脉冲已下放至 `GDScript`，权威逻辑仍留在 `C#` | `CountyIdle/scripts/ui/TaskPanel.cs`、`CountyIdle/scripts/ui/DisciplePanel.cs`、`CountyIdle/scripts/Main.cs`、`CountyIdle/scripts/ui/MainWorldSitePanel.cs`、`CountyIdle/scripts/ui/gd/TaskPanelVisualFx.gd`、`CountyIdle/scripts/ui/gd/DisciplePanelVisualFx.gd`、`CountyIdle/scripts/ui/gd/WorldPanelVisualFx.gd` | `docs/feature-cards/FC-20260313-ui-gdscript-boundary-split-batch2.md` |
+| UI 表现层 `GDScript` 辅助三批接入 | 设置卷开场 / 录键高亮、宗门组织谱切峰 / 切职司、中部地图顶部标签强调反馈已下放至 `GDScript`，权威逻辑仍留在 `C#` | `CountyIdle/scripts/ui/SettingsPanel.cs`、`CountyIdle/scripts/ui/SectOrganizationPanel.cs`、`CountyIdle/scripts/Main.cs`、`CountyIdle/scripts/ui/gd/SettingsPanelVisualFx.gd`、`CountyIdle/scripts/ui/gd/SectOrganizationPanelVisualFx.gd`、`CountyIdle/scripts/ui/gd/MainTopTabVisualFx.gd` | `docs/feature-cards/FC-20260313-ui-gdscript-boundary-split-batch3.md` |
+
+| UI 表现层 `GDScript` 辅助四批接入 | 主界面底栏快捷键 / 倍速 / 存读设按钮的 hover / focus 灯笼强调反馈已下放至 `GDScript`，`Main.cs` 仅保留点击与业务绑定，权威逻辑仍留在 `C#` | `CountyIdle/scripts/Main.cs`、`CountyIdle/scripts/ui/gd/BottomBarLanternFx.gd`、`CountyIdle/scenes/ui/BottomBar.tscn`、`CountyIdle/scenes/ui/figma/BottomBar.tscn` | `docs/feature-cards/FC-20260313-ui-gdscript-boundary-split-batch4.md` |
+
+| UI 表现层 `GDScript` 辅助五批接入 | `Main.cs` 中剩余全局 hover / focus 灯笼反馈、`OptionButton` popup 表现样式与 hover 锁定已下放至 `GDScript`，`Main.cs` 仅保留一次性绑定转发，权威逻辑仍留在 `C#` | `CountyIdle/scripts/Main.cs`、`CountyIdle/scripts/ui/gd/MainLanternFx.gd`、`CountyIdle/scenes/Main.tscn` | `docs/feature-cards/FC-20260313-ui-gdscript-boundary-split-batch5.md` |
+
+| UI 表现层 `GDScript` 辅助六批接入 | 留影录右侧详情列的空态 / 预览态过渡已继续下放至 `GDScript`，预览框、详情文本、题名行与按钮行统一由 `SavePreviewCrossfade.gd` 承接，权威逻辑仍留在 `C#` | `CountyIdle/scripts/ui/SaveSlotsPanel.cs`、`CountyIdle/scripts/ui/gd/SavePreviewCrossfade.gd`、`CountyIdle/scenes/ui/SaveSlotsPanel.tscn` | `docs/feature-cards/FC-20260313-ui-gdscript-boundary-split-batch6.md` |
+
+| UI 表现层 `GDScript` 辅助七批接入 | 治宗册与机宜卷的书卷静态样式、字段皮肤与按钮外观已继续下放至 `GDScript`，`TaskPanel.cs` / `SettingsPanel.cs` 仅保留权威逻辑与单向调用边界 | `CountyIdle/scripts/ui/TaskPanel.cs`、`CountyIdle/scripts/ui/SettingsPanel.cs`、`CountyIdle/scripts/ui/gd/TaskPanelVisualFx.gd`、`CountyIdle/scripts/ui/gd/SettingsPanelVisualFx.gd` | `docs/feature-cards/FC-20260314-ui-gdscript-boundary-split-batch7.md` |
+
+| UI 表现层 `GDScript` 辅助八批接入 | 弟子谱与峰令谱的书卷静态样式、筛选控件 / 卡片 / 动态导航外观已继续下放至 `GDScript`，`DisciplePanel.cs` / `SectOrganizationPanel.cs` 仅保留权威逻辑、动态数据与单向调用边界 | `CountyIdle/scripts/ui/DisciplePanel.cs`、`CountyIdle/scripts/ui/SectOrganizationPanel.cs`、`CountyIdle/scripts/ui/gd/DisciplePanelVisualFx.gd`、`CountyIdle/scripts/ui/gd/SectOrganizationPanelVisualFx.gd` | `docs/feature-cards/FC-20260314-ui-gdscript-boundary-split-batch8.md` |
+
+| UI 表现层 `GDScript` 辅助九批接入 | 留影录与二级地图页的书卷静态样式、字段皮肤、预览区与 world-site sandbox 壳层外观已继续下放至 `GDScript`，`SaveSlotsPanel.cs` / `MainWorldSitePanel.cs` 仅保留权威逻辑、地图数据与单向调用边界 | `CountyIdle/scripts/ui/SaveSlotsPanel.cs`、`CountyIdle/scripts/ui/MainWorldSitePanel.cs`、`CountyIdle/scripts/ui/gd/SavePreviewCrossfade.gd`、`CountyIdle/scripts/ui/gd/WorldPanelVisualFx.gd` | `docs/feature-cards/FC-20260314-ui-gdscript-boundary-split-batch9.md` |
+
+| UI 表现层 `GDScript` 辅助十批回收 | 治宗册与弟子谱中已迁移到 `GDScript` 的历史静态样式 helper 已从 `C#` 回收清理，`TaskPanel.cs` / `DisciplePanel.cs` 进一步收口到权威逻辑、数据刷新与输入处理 | `CountyIdle/scripts/ui/TaskPanel.cs`、`CountyIdle/scripts/ui/DisciplePanel.cs`、`CountyIdle/scripts/ui/gd/TaskPanelVisualFx.gd`、`CountyIdle/scripts/ui/gd/DisciplePanelVisualFx.gd` | `docs/feature-cards/FC-20260314-ui-gdscript-boundary-split-batch10.md` |
+
+| UI 表现层 `GDScript` 辅助十一批拆分 | 仓储卷剩余的静态主题、页签选中态、库容负载色调与资源卡片纯视觉样式继续下放至 `GDScript`，`WarehousePanel.cs` 仅保留库存数据、按钮事件与提示文本逻辑 | `CountyIdle/scripts/ui/WarehousePanel.cs`、`CountyIdle/scripts/ui/gd/WarehousePanelTransition.gd` | `docs/feature-cards/FC-20260314-ui-gdscript-boundary-split-batch11.md` |
+
+| UI 表现层 `GDScript` 辅助十二批拆分 | 左侧地块检视器中世界点位 / 山门地块的标题、副标题、徽签与状态值纯色调切换已继续下放至 `GDScript`，`MainSectTileInspector.cs` 仅保留按钮绑定、描述文案、badge 语义与规则判断 | `CountyIdle/scripts/ui/MainSectTileInspector.cs`、`CountyIdle/scripts/ui/gd/TileInspectorVisualFx.gd`、`CountyIdle/scenes/Main.tscn` | `docs/feature-cards/FC-20260314-ui-gdscript-boundary-split-batch12.md` |
+
+| UI 表现层 `GDScript` 辅助十三批拆分 | 弟子谱中的雷达图展示控件已继续下放至独立 `GDScript`，`DisciplePanel.cs` 不再内嵌自绘雷达图实现，仅保留名册数据、筛选排序与详情文案 | `CountyIdle/scripts/ui/DisciplePanel.cs`、`CountyIdle/scripts/ui/gd/DiscipleRadarChart.gd`、`CountyIdle/scenes/ui/DisciplePanel.tscn` | `docs/feature-cards/FC-20260314-ui-gdscript-boundary-split-batch13.md` |
+
+| UI 表现层 `GDScript` 辅助十四批拆分 | 弟子谱中剩余的指标值颜色切换与 trait tag 纯视觉样式已继续下放至 `GDScript`，`DisciplePanel.cs` 进一步收口到名册数据、筛选排序与详情文案 | `CountyIdle/scripts/ui/DisciplePanel.cs`、`CountyIdle/scripts/ui/gd/DisciplePanelVisualFx.gd` | `docs/feature-cards/FC-20260314-ui-gdscript-boundary-split-batch14.md` |
+
+| UI 表现层 `GDScript` 辅助十五批拆分 | 二级地图页的 `GeneratedSecondarySandboxView` 壳层结构已从 `C#` 运行时动态构建回收到 `WorldPanel.tscn`，`MainWorldSitePanel.cs` 仅保留 world-site 数据绑定、sandbox 数据注入与入口行为 | `CountyIdle/scripts/ui/MainWorldSitePanel.cs`、`CountyIdle/scenes/ui/WorldPanel.tscn`、`CountyIdle/scripts/ui/gd/WorldPanelVisualFx.gd` | `docs/feature-cards/FC-20260314-ui-gdscript-boundary-split-batch15.md` |
+
+| UI 表现层 `GDScript` 辅助十六批拆分 | 世界/外域/山门地图页底部 `MapDirectiveRow` 的状态字色调与调度按钮强调样式已继续下放至 `GDScript`，`MainMapOperationalLink.cs` 仅保留地图态势快照、按钮动作与文案绑定 | `CountyIdle/scripts/ui/MainMapOperationalLink.cs`、`CountyIdle/scripts/ui/gd/WorldPanelVisualFx.gd`、`CountyIdle/scenes/ui/WorldPanel.tscn` | `docs/feature-cards/FC-20260314-ui-gdscript-boundary-split-batch16.md` |
+
+| UI 表现层 `GDScript` 辅助十七批拆分 | 世界图 / 外域图标题与山门图 `MapHintLabel` 的地图态势色调已继续下放至局部 `GDScript` helper，`StrategicMapViewSystem.cs` / `CountyTownMapViewSystem.cs` 仅保留态势快照、标题文案与地图绘制 | `CountyIdle/scripts/systems/StrategicMapViewSystem.cs`、`CountyIdle/scripts/systems/CountyTownMapViewSystem.cs`、`CountyIdle/scripts/ui/gd/StrategicMapPanelToneFx.gd`、`CountyIdle/scripts/ui/gd/CountyTownMapHintFx.gd`、`CountyIdle/scenes/ui/WorldPanel.tscn` | `docs/feature-cards/FC-20260314-ui-gdscript-boundary-split-batch17.md` |
+
+| UI 表现层 `GDScript` 辅助十八批回收 | `Main.cs` 中旧 `job-row / priority` 视觉 helper、未接线字典与选中样式残留已从 `C#` 回收清理；主界面继续只保留现行峰脉摘要、地图调度与面板入口逻辑 | `CountyIdle/scripts/Main.cs` | `docs/feature-cards/FC-20260314-ui-gdscript-boundary-split-batch18.md` |
+
+| UI 表现层 `GDScript` 辅助十九批拆分 | 世界图 `WorldTerrainTileLayer` 的地图态势 tint 已继续下放至局部 `GDScript` helper，`StrategicMapViewSystem.cs` 仅保留 terrain layer 的可见性、位置与缩放控制 | `CountyIdle/scripts/systems/StrategicMapViewSystem.cs`、`CountyIdle/scripts/ui/gd/StrategicMapPanelToneFx.gd`、`CountyIdle/scenes/ui/WorldPanel.tscn` | `docs/feature-cards/FC-20260314-ui-gdscript-boundary-split-batch19.md` |
+
+| UI 表现层 scene-side 第二十批回收 | 主界面背景 `TextureRect` 的静态视觉布局参数已回收到 `Main.tscn`，`Main.cs` 不再在运行时重复设置背景显隐 / 拉伸 / 层级 / 默认色调或注册冗余 resize 校正逻辑 | `CountyIdle/scenes/Main.tscn`、`CountyIdle/scripts/Main.cs` | `docs/feature-cards/FC-20260314-ui-gdscript-boundary-split-batch20.md` |
+
+| UI 表现层 `GDScript` 辅助二十一批拆分 | 峰令谱动态峰脉导航卡 / 职司卡的交互光标与三类动态卡片的内间距壳层已继续下放至 `SectOrganizationPanelVisualFx.gd`，`SectOrganizationPanel.cs` 仅保留动态卡片生成、输入与业务刷新 | `CountyIdle/scripts/ui/SectOrganizationPanel.cs`、`CountyIdle/scripts/ui/gd/SectOrganizationPanelVisualFx.gd` | `docs/feature-cards/FC-20260314-ui-gdscript-boundary-split-batch21.md` |
+
+| UI 表现层 `GDScript` 辅助二十二批拆分 | 峰令谱动态卡片 `MarginContainer` 的统一留白壳层已继续下放至 `SectOrganizationPanelVisualFx.gd`，`SectOrganizationPanel.cs` 不再直接写入卡片内边距常量 | `CountyIdle/scripts/ui/SectOrganizationPanel.cs`、`CountyIdle/scripts/ui/gd/SectOrganizationPanelVisualFx.gd` | `docs/feature-cards/FC-20260314-ui-gdscript-boundary-split-batch22.md` |
+
+| UI 表现层 `GDScript` 辅助二十三批回收 | 峰令谱中已收口到 `VisualFx` 边界后的冗余 `CreateMarginContainer()` helper 与分散 `_visualFx?.Call(...)` 残留已从 `SectOrganizationPanel.cs` 回收；面板继续仅保留动态卡片生成、输入与业务刷新 | `CountyIdle/scripts/ui/SectOrganizationPanel.cs` | `docs/feature-cards/FC-20260314-ui-gdscript-boundary-split-batch23.md` |
+
+| UI 表现层 `GDScript` 辅助二十四批回收 | 峰令谱初始主题应用的重复触发已从 `SectOrganizationPanel.cs` 回收，改由 `SectOrganizationPanelVisualFx.gd` 在 `_ready()` 中单点承接；面板继续仅保留动态卡片生成、输入与业务刷新 | `CountyIdle/scripts/ui/SectOrganizationPanel.cs`、`CountyIdle/scripts/ui/gd/SectOrganizationPanelVisualFx.gd` | `docs/feature-cards/FC-20260314-ui-gdscript-boundary-split-batch24.md` |
+
+| UI 表现层 `GDScript` 辅助二十五批回收 | 弟子谱、留影录、机宜卷、治宗册与仓储卷中重复的初始主题触发已从 `C#` 回收，统一改由各自 `VisualFx.gd` 的 `_ready()` 单点承接；对应面板继续仅保留数据、输入与业务刷新 | `CountyIdle/scripts/ui/DisciplePanel.cs`、`CountyIdle/scripts/ui/SaveSlotsPanel.cs`、`CountyIdle/scripts/ui/SettingsPanel.cs`、`CountyIdle/scripts/ui/TaskPanel.cs`、`CountyIdle/scripts/ui/WarehousePanel.cs` | `docs/feature-cards/FC-20260314-ui-gdscript-boundary-split-batch25.md` |
+
+| UI 表现层 `GDScript` 辅助二十六批回收 | 二级地图页 world-site 主题初始化的重复触发已从 `MainWorldSitePanel.cs` 回收，统一改由 `WorldPanelVisualFx.gd` 的 `_ready()` 单点承接；主脚本继续仅保留 world-site 数据绑定、入口行为与 sandbox 注入 | `CountyIdle/scripts/ui/MainWorldSitePanel.cs`、`CountyIdle/scripts/ui/gd/WorldPanelVisualFx.gd` | `docs/feature-cards/FC-20260315-ui-gdscript-boundary-split-batch26.md` |
+
+| UI 表现层 `GDScript` 辅助二十七批回收 | 地图调度条在“无状态 / 行隐藏”两种分支下共享的收尾逻辑已从 `MainMapOperationalLink.cs` 内联重复处回收到单一 helper，继续明确 `C#` 仅负责状态分支与 `WorldPanelVisualFx.gd` 的单向 reset 调用 | `CountyIdle/scripts/ui/MainMapOperationalLink.cs` | `docs/feature-cards/FC-20260315-ui-gdscript-boundary-split-batch27.md` |
+
+| UI 表现层 `GDScript` 辅助二十八批回收 | 左侧地块检视器中三类按钮绑定的薄壳 setter 与 disabled binding 构造重复已从 `MainSectTileInspector.cs` 收口到统一 helper，继续明确 `C#` 仅保留检视摘要、动作语义与对 `TileInspectorVisualFx.gd` 的单向 tone 调用 | `CountyIdle/scripts/ui/MainSectTileInspector.cs` | `docs/feature-cards/FC-20260315-ui-gdscript-boundary-split-batch28.md` |
+
+| UI 表现层 `GDScript` 辅助二十九批收尾巡检 | 对 `MainMapOperationalLink.cs`、`MainSectTileInspector.cs`、`MainWorldSitePanel.cs` 与多卷册 UI 剩余边界做最终巡检后，仅补做 `MainSectTileInspector.cs` 末端按钮 helper 的非空签名收紧；其余残留已确认属于 tooltip / `Visible` 业务切换 / 地图渲染 authority / 数据绑定边界，继续保留在 `C#` | `CountyIdle/scripts/ui/MainSectTileInspector.cs`、`CountyIdle/scripts/ui/MainMapOperationalLink.cs`、`CountyIdle/scripts/ui/MainWorldSitePanel.cs`、`CountyIdle/scripts/ui/DisciplePanel.cs`、`CountyIdle/scripts/ui/SaveSlotsPanel.cs`、`CountyIdle/scripts/ui/SettingsPanel.cs`、`CountyIdle/scripts/ui/TaskPanel.cs`、`CountyIdle/scripts/ui/WarehousePanel.cs`、`CountyIdle/scripts/ui/SectOrganizationPanel.cs` | `docs/feature-cards/FC-20260315-ui-gdscript-boundary-split-batch29.md` |
+
+| 卷册弹窗排他与快捷键门禁收口 | 主界面打开设置卷 / 仓储卷 / 治宗册 / 弟子谱 / 峰令谱 / 留影录时，现已统一先收起其他卷册弹窗；对应全局快捷键在这些卷册可见时也会统一让行，避免多卷叠层与误触全局操作 | `CountyIdle/scripts/ui/MainPopupCoordination.cs`、`CountyIdle/scripts/ui/MainClientSettings.cs`、`CountyIdle/scripts/ui/MainWarehousePanel.cs`、`CountyIdle/scripts/ui/MainTaskPanel.cs`、`CountyIdle/scripts/ui/MainDisciplePanel.cs`、`CountyIdle/scripts/ui/MainSectOrganizationPanel.cs`、`CountyIdle/scripts/ui/MainSaveSlotsPanel.cs`、`CountyIdle/scripts/ui/MainShortcutBindings.cs`、`CountyIdle/scripts/ui/SettingsPanel.cs`、`CountyIdle/scripts/ui/WarehousePanel.cs`、`CountyIdle/scripts/ui/TaskPanel.cs`、`CountyIdle/scripts/ui/DisciplePanel.cs`、`CountyIdle/scripts/ui/SectOrganizationPanel.cs` | `docs/feature-cards/FC-20260315-popup-exclusivity-shortcut-guard.md` |
+
+| 双地图兼容页签入口收口 | 主界面地图页签现继续只保留 `山门沙盘 / 世界舆图` 两个可交互入口；历史兼容的 `Prefecture / Event / Report / Expedition` 页签已统一退为隐藏且禁用状态，`Main.cs` 也不再把这些兼容按钮纳入现行点击绑定与双地图主链必需节点 | `CountyIdle/scripts/Main.cs`、`CountyIdle/scenes/ui/WorldPanel.tscn` | `docs/feature-cards/FC-20260315-dual-map-compat-tab-cleanup.md` |
 
 ## 4. 未立稳功能（🟡）
 
@@ -108,3 +167,7 @@
 - 本表只保留当前有效的状态裁定，不保留施工流水。
 - 若某项状态变化，必须同步回写 `02 / 08` 与对应功能卡。
 - 若一项内容只是历史参考、视觉迭代记录或迁移痕迹，不得写入本表正文。
+
+
+
+

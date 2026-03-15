@@ -48,11 +48,13 @@ public partial class Main
 
     private void OpenDisciplePanel()
     {
+        CloseBlockingOverlayPopups(_disciplePanel);
         _disciplePanel?.Open(_gameLoop.State.Clone());
     }
 
     private void OpenDisciplePanelForMapSelection(int discipleId, JobType? preferredJobType)
     {
+        CloseBlockingOverlayPopups(_disciplePanel);
         _disciplePanel?.Open(_gameLoop.State.Clone(), discipleId, preferredJobType);
     }
 

@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/WarehousePanel.cs" id="1_ware"]
+[ext_resource type="Script" path="res://scripts/ui/gd/WarehousePanelTransition.gd" id="2_warehouse_fx"]
 
 [node name="WarehousePanel" type="Control"]
 visible = false
@@ -12,6 +13,9 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_ware")
+
+[node name="VisualFx" type="Node" parent="."]
+script = ExtResource("2_warehouse_fx")
 
 [node name="Backdrop" type="ColorRect" parent="."]
 layout_mode = 1

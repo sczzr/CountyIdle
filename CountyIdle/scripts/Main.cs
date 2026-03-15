@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Godot;
 using CountyIdle.Core;
@@ -44,36 +44,15 @@ public partial class Main : Control
     private const string FigmaTimelinePath = $"{FigmaRootPath}/BodyRow/TimelinePanel/PanelPadding/MainColumn";
     private const string FigmaEquipmentPath = $"{FigmaRootPath}/BodyRow/EquipmentPanel/PanelPadding/MainColumn";
     private const string LegacyBackgroundTexturePath = "res://assets/ui/background/background_2.png";
-    private const string HoverSfxPath = "res://assets/audio/ui/hover_ink.wav";
 
     private const int JobAdjustStep = 1;
-    private const double LanternPulseDurationSeconds = 0.18;
-    private const double LanternResetDurationSeconds = 0.12;
-    private const float LanternHoverScale = 1.05f;
     private const int MineUnlockTechLevel = 1;
     private const string MineLockedText = "🔒 需科技 锻造术(T1)";
     private const string MineUnlockedText = "↑ 扩建传法院 (木16 石22 金22)";
-
-    private static readonly Color BaseButtonModulate = Colors.White;
-    private static readonly Color LanternHoverModulate = new(0.184f, 0.298f, 0.345f, 1.0f);
-    private static readonly Color DropdownPaperColor = new(0.95f, 0.92f, 0.84f, 1f);
-    private static readonly Color DropdownInkColor = new(0.17f, 0.15f, 0.13f, 1f);
-    private static readonly Color DropdownBorderColor = new(0.29f, 0.25f, 0.21f, 0.95f);
-    private const ulong HoverSfxCooldownMs = 80;
     private static readonly double[] SupportedTimeScales = { 1.0, 2.0, 4.0 };
     private static readonly string[] ChronicleTimeLabels = { "子时", "丑时", "寅时", "卯时", "辰时", "巳时", "午时", "未时", "申时", "酉时", "戌时", "亥时" };
 
     private readonly Queue<string> _logs = new();
-    private readonly Dictionary<Button, Tween> _buttonPulseTweens = new();
-    private readonly Dictionary<Button, Vector2> _buttonBaseScales = new();
-    private readonly HashSet<Button> _hoverLockedButtons = new();
-    private readonly Dictionary<JobType, PanelContainer> _jobRows = new();
-    private readonly Dictionary<JobType, Label> _jobCountLabels = new();
-    private readonly Dictionary<JobType, Label> _jobTitleLabels = new();
-    private readonly Dictionary<JobType, Label> _jobStatusLabels = new();
-    private readonly Dictionary<JobType, Label> _jobDetailLabels = new();
-    private readonly Dictionary<JobType, Button> _jobPriorityButtons = new();
-    private readonly Dictionary<JobType, StyleBoxFlat> _jobRowBaseStyles = new();
     private readonly GameCalendarSystem _gameCalendarSystem = new();
     private readonly SaveSystem _saveSystem = new();
 
@@ -105,6 +84,8 @@ public partial class Main : Control
     private Button? _expeditionMapButton;
     private Button? _mapZoomResetButton;
     private HSlider? _mapZoomSlider;
+    private Node? _worldPanelVisualFx;
+    private Node? _topTabVisualFx;
     private bool _isUpdatingMapZoomSlider;
     private Control? _worldMapView;
     private StrategicMapViewSystem? _worldMapRenderer;
@@ -129,8 +110,6 @@ public partial class Main : Control
     private Control _figmaLayoutRoot = null!;
     private TextureRect? _backgroundTextureRect;
     private SectMapViewSystem? _sectMapRenderer;
-    private AudioStreamPlayer? _hoverSfxPlayer;
-    private ulong _lastHoverSfxTicks;
 
     private Button? _figmaBuildAgricultureButton;
     private Button? _figmaBuildWorkshopButton;
@@ -144,7 +123,6 @@ public partial class Main : Control
     private bool _isUsingFigmaLayout;
     private int _timeScaleIndex;
     private MapTab _currentMapTab = MapTab.Sect;
-    private JobType? _inspectedJobType;
     private int _selectedPeakIndex = SectOrganizationRules.GetDefaultPeakIndex();
     private int _lastCalendarGameMinute = -1;
     private int _lastObservedHourSettlements = -1;
@@ -153,8 +131,6 @@ public partial class Main : Control
     {
         InitializeClientSettings();
         BindUiNodes();
-        InitializeHoverSfx();
-        BindBackgroundResizeEvents();
         ConfigureDualMapMode();
         CreateSettingsPanel();
         CreateWarehousePanel();
@@ -184,13 +160,6 @@ public partial class Main : Control
 
     public override void _ExitTree()
     {
-        foreach (var tween in _buttonPulseTweens.Values)
-        {
-            tween.Kill();
-        }
-
-        _buttonPulseTweens.Clear();
-        UnbindBackgroundResizeEvents();
         UnbindClientSettingEvents();
         UnbindWarehousePanelEvents();
         UnbindTaskPanelEvents();
@@ -324,38 +293,6 @@ public partial class Main : Control
 
     private void RefreshJobPanels(GameState state)
     {
-        if (_jobCountLabels.Count == 0)
-        {
-            return;
-        }
-
-        foreach (var jobType in Enum.GetValues<JobType>())
-        {
-            var panelInfo = SectTaskRules.GetJobPanelInfo(state, jobType);
-            _jobCountLabels[jobType].Text = IndustryRules.GetAssigned(state, jobType).ToString();
-            _jobTitleLabels[jobType].Text = panelInfo.TitleText;
-            _jobTitleLabels[jobType].TooltipText = panelInfo.DetailText;
-            _jobStatusLabels[jobType].Text = panelInfo.SummaryText;
-            _jobStatusLabels[jobType].TooltipText = panelInfo.DetailText;
-
-            if (_jobDetailLabels.TryGetValue(jobType, out var detailLabel))
-            {
-                var isInspected = _inspectedJobType == jobType;
-                detailLabel.Visible = isInspected;
-                detailLabel.Text = panelInfo.DetailText;
-            }
-
-            if (_jobRows.TryGetValue(jobType, out var row))
-            {
-                row.TooltipText = panelInfo.DetailText;
-            }
-
-            if (_jobPriorityButtons.TryGetValue(jobType, out var priorityButton))
-            {
-                priorityButton.TooltipText = panelInfo.DetailText;
-            }
-        }
-
         if (_peakOverviewLabel != null)
         {
             _peakOverviewLabel.Text = SectOrganizationRules.BuildPeakOverviewText();
@@ -363,8 +300,6 @@ public partial class Main : Control
         }
 
         RefreshPeakDetailPanel(state);
-        ApplyPriorityButtonTexts();
-        ApplyJobRowSelectionStyles();
     }
 
     private void UpdateFigmaPanels(GameState state)
@@ -509,13 +444,6 @@ public partial class Main : Control
             return;
         }
 
-        _backgroundTextureRect.Visible = true;
-        _backgroundTextureRect.MouseFilter = MouseFilterEnum.Ignore;
-        _backgroundTextureRect.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
-        _backgroundTextureRect.StretchMode = TextureRect.StretchModeEnum.KeepAspectCovered;
-        _backgroundTextureRect.ZIndex = -100;
-        _backgroundTextureRect.SelfModulate = Colors.White;
-
         var absolutePath = ProjectSettings.GlobalizePath(LegacyBackgroundTexturePath);
         if (FileAccess.FileExists(absolutePath))
         {
@@ -535,45 +463,6 @@ public partial class Main : Control
         }
 
         GD.PushWarning($"主界面背景图加载失败：{LegacyBackgroundTexturePath}");
-    }
-
-    private void BindBackgroundResizeEvents()
-    {
-        if (_backgroundTextureRect == null)
-        {
-            return;
-        }
-
-        Resized += RefreshLegacyBackgroundLayout;
-        GetViewport().SizeChanged += RefreshLegacyBackgroundLayout;
-        RefreshLegacyBackgroundLayout();
-    }
-
-    private void UnbindBackgroundResizeEvents()
-    {
-        if (_backgroundTextureRect == null)
-        {
-            return;
-        }
-
-        Resized -= RefreshLegacyBackgroundLayout;
-
-        var viewport = GetViewport();
-        if (viewport != null)
-        {
-            viewport.SizeChanged -= RefreshLegacyBackgroundLayout;
-        }
-    }
-
-    private void RefreshLegacyBackgroundLayout()
-    {
-        if (_backgroundTextureRect == null)
-        {
-            return;
-        }
-
-        _backgroundTextureRect.SetAnchorsPreset(LayoutPreset.FullRect);
-        _backgroundTextureRect.SetOffsetsPreset(LayoutPreset.FullRect);
     }
 
     private void BindLegacyUiNodes()
@@ -603,23 +492,25 @@ public partial class Main : Control
         _resetButton = GetNode<Button>($"{BottomBarPath}/BarPadding/MainRow/ActionRow/ResetButton");
 
         _worldMapButton = GetNode<Button>($"{CenterTopTabRowPath}/WorldMapButton");
-        _prefectureMapButton = GetNode<Button>($"{CenterTopTabRowPath}/PrefectureMapButton");
+        _prefectureMapButton = GetNodeOrNull<Button>($"{CenterTopTabRowPath}/PrefectureMapButton");
         _countyTownMapButton = GetNode<Button>($"{CenterTopTabRowPath}/CountyTownMapButton");
-        _eventPanelButton = GetNode<Button>($"{CenterTopTabRowPath}/EventPanelButton");
-        _reportPanelButton = GetNode<Button>($"{CenterTopTabRowPath}/ReportPanelButton");
-        _expeditionMapButton = GetNode<Button>($"{CenterTopTabRowPath}/ExpeditionMapButton");
+        _eventPanelButton = GetNodeOrNull<Button>($"{CenterTopTabRowPath}/EventPanelButton");
+        _reportPanelButton = GetNodeOrNull<Button>($"{CenterTopTabRowPath}/ReportPanelButton");
+        _expeditionMapButton = GetNodeOrNull<Button>($"{CenterTopTabRowPath}/ExpeditionMapButton");
         _mapZoomResetButton = GetNode<Button>($"{CenterTopTabRowPath}/MapZoomResetButton");
         _mapZoomSlider = GetNode<HSlider>($"{CenterTopTabRowPath}/MapZoomSlider");
+        _worldPanelVisualFx = GetNodeOrNull<Node>($"{CenterPanelContentPath}/VisualFx");
+        _topTabVisualFx = GetNodeOrNull<Node>($"{CenterPanelContentPath}/TopTabVisualFx");
         BindMapOperationalLegacyNodes();
 
         _worldMapView = GetNode<Control>($"{CenterMapPagesPath}/WorldMapView");
         _worldMapRenderer = _worldMapView as StrategicMapViewSystem;
         _worldSiteMapView = GetNode<Control>($"{CenterMapPagesPath}/SecondaryMapView");
-        _prefectureMapView = GetNode<Control>($"{CenterMapPagesPath}/PrefectureMapView");
+        _prefectureMapView = GetNodeOrNull<Control>($"{CenterMapPagesPath}/PrefectureMapView");
         _countyTownMapView = GetNode<Control>($"{CenterMapPagesPath}/CountyTownMapView");
-        _eventPanelView = GetNode<Control>($"{CenterMapPagesPath}/EventPanelView");
-        _reportPanelView = GetNode<Control>($"{CenterMapPagesPath}/ReportPanelView");
-        _expeditionMapView = GetNode<Control>($"{CenterMapPagesPath}/ExpeditionMapView");
+        _eventPanelView = GetNodeOrNull<Control>($"{CenterMapPagesPath}/EventPanelView");
+        _reportPanelView = GetNodeOrNull<Control>($"{CenterMapPagesPath}/ReportPanelView");
+        _expeditionMapView = GetNodeOrNull<Control>($"{CenterMapPagesPath}/ExpeditionMapView");
         _sectMapRenderer = GetNode<SectMapViewSystem>($"{CenterMapPagesPath}/CountyTownMapView");
         _mineUpgradeButton = GetNodeOrNull<Button>($"{CenterReportDetailPagesPath}/MineCard/CardVBox/UpgradeButton");
         BindSectTileInspectorNodes();
@@ -738,18 +629,10 @@ public partial class Main : Control
         }
 
         if (_worldMapButton != null &&
-            _prefectureMapButton != null &&
-            _countyTownMapButton != null &&
-            _eventPanelButton != null &&
-            _reportPanelButton != null &&
-            _expeditionMapButton != null)
+            _countyTownMapButton != null)
         {
             _worldMapButton.Pressed += () => SetMapTab(MapTab.World);
-            _prefectureMapButton.Pressed += () => SetMapTab(MapTab.Prefecture);
             _countyTownMapButton.Pressed += () => SetMapTab(MapTab.Sect);
-            _eventPanelButton.Pressed += () => SetMapTab(MapTab.EventPanel);
-            _reportPanelButton.Pressed += () => SetMapTab(MapTab.ReportPanel);
-            _expeditionMapButton.Pressed += () => SetMapTab(MapTab.Expedition);
         }
 
         if (_mapZoomResetButton != null)
@@ -790,14 +673,6 @@ public partial class Main : Control
         _peakSupportButton = null;
         _peakSupportResetButton = null;
         _peakCurrentDetailLabel = null;
-        _jobCountLabels.Clear();
-        _jobTitleLabels.Clear();
-        _jobStatusLabels.Clear();
-        _jobDetailLabels.Clear();
-        _jobRows.Clear();
-        _jobPriorityButtons.Clear();
-        _jobRowBaseStyles.Clear();
-        _inspectedJobType = null;
     }
 
     private void BindFigmaIndustryButtons()
@@ -934,37 +809,61 @@ public partial class Main : Control
 
         if (_worldMapView == null ||
             _worldSiteMapView == null ||
-            _prefectureMapView == null ||
             _countyTownMapView == null ||
-            _eventPanelView == null ||
-            _reportPanelView == null ||
-            _expeditionMapView == null ||
             _worldMapButton == null ||
-            _prefectureMapButton == null ||
-            _countyTownMapButton == null ||
-            _eventPanelButton == null ||
-            _reportPanelButton == null ||
-            _expeditionMapButton == null)
+            _countyTownMapButton == null)
         {
             return;
         }
 
         _worldMapView.Visible = mapTab == MapTab.World;
         _worldSiteMapView.Visible = mapTab == MapTab.WorldSite;
-        _prefectureMapView.Visible = mapTab == MapTab.Prefecture;
         _countyTownMapView.Visible = mapTab == MapTab.Sect;
-        _eventPanelView.Visible = mapTab == MapTab.EventPanel;
-        _reportPanelView.Visible = mapTab == MapTab.ReportPanel;
-        _expeditionMapView.Visible = mapTab == MapTab.Expedition;
+        if (_prefectureMapView != null)
+        {
+            _prefectureMapView.Visible = mapTab == MapTab.Prefecture;
+        }
+
+        if (_eventPanelView != null)
+        {
+            _eventPanelView.Visible = mapTab == MapTab.EventPanel;
+        }
+
+        if (_reportPanelView != null)
+        {
+            _reportPanelView.Visible = mapTab == MapTab.ReportPanel;
+        }
+
+        if (_expeditionMapView != null)
+        {
+            _expeditionMapView.Visible = mapTab == MapTab.Expedition;
+        }
 
         _worldMapButton.ButtonPressed = mapTab == MapTab.World;
-        _prefectureMapButton.ButtonPressed = mapTab == MapTab.Prefecture;
         _countyTownMapButton.ButtonPressed = mapTab == MapTab.Sect;
-        _eventPanelButton.ButtonPressed = mapTab == MapTab.EventPanel;
-        _reportPanelButton.ButtonPressed = mapTab == MapTab.ReportPanel;
-        _expeditionMapButton.ButtonPressed = mapTab == MapTab.Expedition;
+        if (_prefectureMapButton != null)
+        {
+            _prefectureMapButton.ButtonPressed = false;
+        }
+
+        if (_eventPanelButton != null)
+        {
+            _eventPanelButton.ButtonPressed = false;
+        }
+
+        if (_reportPanelButton != null)
+        {
+            _reportPanelButton.ButtonPressed = false;
+        }
+
+        if (_expeditionMapButton != null)
+        {
+            _expeditionMapButton.ButtonPressed = false;
+        }
 
         _currentMapTab = mapTab;
+        CallWorldPanelVisualFx("play_tab_switch", mapTab.ToString());
+        CallTopTabVisualFx("play_tab_emphasis", mapTab.ToString());
         if (mapTab == MapTab.World)
         {
             ApplyWorldSiteInspectorSummary(_worldMapRenderer?.SelectedWorldSite);
@@ -976,6 +875,16 @@ public partial class Main : Control
         }
         RefreshMapZoomUi();
         RefreshMapOperationalLinkUi();
+    }
+
+    private void CallWorldPanelVisualFx(string methodName, params Variant[] args)
+    {
+        _worldPanelVisualFx?.Call(methodName, args);
+    }
+
+    private void CallTopTabVisualFx(string methodName, params Variant[] args)
+    {
+        _topTabVisualFx?.Call(methodName, args);
     }
 
     private void AdjustCurrentMapZoom(float delta)
@@ -1038,6 +947,11 @@ public partial class Main : Control
         if (button != null)
         {
             button.Visible = false;
+            if (button is BaseButton baseButton)
+            {
+                baseButton.Disabled = true;
+                baseButton.ButtonPressed = false;
+            }
         }
 
         if (view != null)
@@ -1112,27 +1026,6 @@ public partial class Main : Control
         _isUpdatingMapZoomSlider = false;
     }
 
-    private void BindJobButtons(JobType jobType, string minusButtonPath, string plusButtonPath)
-    {
-        var minusButton = GetNode<Button>(minusButtonPath);
-        var plusButton = GetNode<Button>(plusButtonPath);
-        minusButton.Text = "法";
-        plusButton.Text = "旨";
-        minusButton.TooltipText = "岗位已改为宗主定调，点击打开宗主中枢。";
-        plusButton.TooltipText = "岗位已改为宗主定调，点击打开宗主中枢。";
-        minusButton.Pressed += () => OpenTaskPanelForJob(jobType);
-        plusButton.Pressed += () => OpenTaskPanelForJob(jobType);
-    }
-
-    private void BindJobPriorityButtons()
-    {
-        foreach (var entry in _jobPriorityButtons)
-        {
-            var jobType = entry.Key;
-            entry.Value.Pressed += () => OnJobPriorityPressed(jobType);
-        }
-    }
-
     private void BindPeakDetailButtons()
     {
         if (_peakPrevButton != null)
@@ -1160,59 +1053,6 @@ public partial class Main : Control
         }
     }
 
-    private void BindJobRowInteractions()
-    {
-        foreach (var entry in _jobRows)
-        {
-            var jobType = entry.Key;
-            entry.Value.GuiInput += @event => OnJobRowGuiInput(jobType, @event);
-        }
-    }
-
-    private void OnJobRowGuiInput(JobType jobType, InputEvent @event)
-    {
-        if (@event is not InputEventMouseButton mouseButton ||
-            mouseButton.ButtonIndex != MouseButton.Left ||
-            !mouseButton.Pressed)
-        {
-            return;
-        }
-
-        var panelInfo = SectTaskRules.GetJobPanelInfo(_gameLoop.State, jobType);
-        if (_inspectedJobType == jobType)
-        {
-            _inspectedJobType = null;
-            AppendLog($"收起 {panelInfo.ActiveRoleName} 执行摘要。");
-        }
-        else
-        {
-            _inspectedJobType = jobType;
-            _selectedPeakIndex = SectOrganizationRules.GetRecommendedPeakIndex(jobType);
-            AppendLog($"展开 {panelInfo.ActiveRoleName} 执行摘要，定位至 {SectOrganizationRules.GetPeakTitle(_selectedPeakIndex)}。");
-        }
-
-        RefreshJobPanels(_gameLoop.State);
-    }
-
-    private void OnJobPriorityPressed(JobType jobType)
-    {
-        OpenTaskPanelForJob(jobType);
-        AppendLog($"{SectTaskRules.GetJobButtonText(jobType)}已转到宗主中枢。");
-    }
-
-    private void ApplyPriorityButtonTexts()
-    {
-        if (_jobPriorityButtons.Count == 0)
-        {
-            return;
-        }
-
-        foreach (var entry in _jobPriorityButtons)
-        {
-            entry.Value.Text = SectTaskRules.GetJobButtonText(entry.Key);
-        }
-    }
-
     private void CyclePeakDetail(int delta)
     {
         var peakCount = SectOrganizationRules.GetPeakCount();
@@ -1229,46 +1069,6 @@ public partial class Main : Control
     {
         var supportType = SectOrganizationRules.GetSupportTypeForPeakIndex(_selectedPeakIndex);
         _gameLoop.SetPeakSupport(supportType);
-    }
-
-    private void RegisterJobRow(JobType jobType, string rowPath, string detailLabelPath)
-    {
-        var row = GetNode<PanelContainer>(rowPath);
-        var detailLabel = GetNode<Label>(detailLabelPath);
-        detailLabel.AutowrapMode = TextServer.AutowrapMode.WordSmart;
-        detailLabel.Visible = false;
-        row.MouseDefaultCursorShape = Control.CursorShape.PointingHand;
-        row.TooltipText = "点击查看职司摘要并定位关联峰脉。";
-        _jobRows[jobType] = row;
-        _jobDetailLabels[jobType] = detailLabel;
-
-        if (row.GetThemeStylebox("panel") is StyleBoxFlat styleBox)
-        {
-            _jobRowBaseStyles[jobType] = (StyleBoxFlat)styleBox.Duplicate();
-        }
-    }
-
-    private void ApplyJobRowSelectionStyles()
-    {
-        foreach (var entry in _jobRows)
-        {
-            if (!_jobRowBaseStyles.TryGetValue(entry.Key, out var baseStyle))
-            {
-                continue;
-            }
-
-            var isInspected = _inspectedJobType == entry.Key;
-            var displayStyle = (StyleBoxFlat)baseStyle.Duplicate();
-            var borderWidth = isInspected ? 2 : 1;
-            displayStyle.BorderWidthLeft = borderWidth;
-            displayStyle.BorderWidthTop = borderWidth;
-            displayStyle.BorderWidthRight = borderWidth;
-            displayStyle.BorderWidthBottom = borderWidth;
-            displayStyle.BorderColor = isInspected
-                ? new Color(0.831373f, 0.662745f, 0.32549f, 1.0f)
-                : baseStyle.BorderColor;
-            entry.Value.AddThemeStyleboxOverride("panel", displayStyle);
-        }
     }
 
     private void RefreshPeakDetailPanel(GameState? state = null)
@@ -1359,249 +1159,13 @@ public partial class Main : Control
 
     private void BindLanternHoverEffects()
     {
-        var buttons = new List<Button>();
-        CollectButtons(this, buttons);
-
-        foreach (var button in buttons)
-        {
-            button.SelfModulate = BaseButtonModulate;
-            UpdateButtonHoverPivot(button);
-            button.Resized += () => UpdateButtonHoverPivot(button);
-            if (!_buttonBaseScales.ContainsKey(button))
-            {
-                _buttonBaseScales[button] = button.Scale;
-            }
-            if (button is OptionButton optionButton)
-            {
-                StyleOptionPopup(optionButton);
-                RegisterOptionButtonHoverLock(optionButton);
-            }
-            button.MouseEntered += () => StartLanternPulse(button);
-            button.MouseExited += () => StopLanternPulse(button);
-            button.FocusEntered += () => StartLanternPulse(button);
-            button.FocusExited += () => StopLanternPulse(button);
-        }
-    }
-
-    private static void CollectButtons(Node node, List<Button> result)
-    {
-        foreach (var child in node.GetChildren())
-        {
-            if (child is Button button)
-            {
-                result.Add(button);
-            }
-
-            CollectButtons(child, result);
-        }
-    }
-
-    private void StartLanternPulse(Button button)
-    {
-        StopLanternPulse(button, smoothReset: false);
-        UpdateButtonHoverPivot(button);
-        PlayHoverSfx();
-
-        if (!_buttonBaseScales.TryGetValue(button, out var baseScale))
-        {
-            baseScale = button.Scale;
-            _buttonBaseScales[button] = baseScale;
-        }
-
-        var tween = CreateTween();
-        tween.SetTrans(Tween.TransitionType.Sine);
-        tween.SetEase(Tween.EaseType.InOut);
-        tween.TweenProperty(button, "scale", baseScale * LanternHoverScale, LanternPulseDurationSeconds);
-        tween.Parallel().TweenProperty(button, "self_modulate", LanternHoverModulate, LanternPulseDurationSeconds);
-
-        _buttonPulseTweens[button] = tween;
-    }
-
-    private void StopLanternPulse(Button button, bool smoothReset = true)
-    {
-        if (_hoverLockedButtons.Contains(button))
-        {
-            return;
-        }
-
-        if (_buttonPulseTweens.TryGetValue(button, out var tween))
-        {
-            tween.Kill();
-            _buttonPulseTweens.Remove(button);
-        }
-
-        if (!_buttonBaseScales.TryGetValue(button, out var baseScale))
-        {
-            baseScale = Vector2.One;
-            _buttonBaseScales[button] = baseScale;
-        }
-
-        if (!smoothReset)
-        {
-            button.Scale = baseScale;
-            button.SelfModulate = BaseButtonModulate;
-            return;
-        }
-
-        var resetTween = CreateTween();
-        resetTween.SetTrans(Tween.TransitionType.Sine);
-        resetTween.SetEase(Tween.EaseType.Out);
-        resetTween.TweenProperty(button, "scale", baseScale, LanternResetDurationSeconds);
-        resetTween.Parallel().TweenProperty(button, "self_modulate", BaseButtonModulate, LanternResetDurationSeconds);
-    }
-
-    private static void UpdateButtonHoverPivot(Button button)
-    {
-        if (button == null)
-        {
-            return;
-        }
-
-        button.PivotOffset = button.Size * 0.5f;
-    }
-
-    private void RegisterOptionButtonHoverLock(OptionButton optionButton)
-    {
-        var popup = optionButton.GetPopup();
-        optionButton.ButtonDown += () => LockOptionButtonHover(optionButton);
-        optionButton.Pressed += () => LockOptionButtonHover(optionButton);
-        popup.AboutToPopup += () =>
-        {
-            LockOptionButtonHover(optionButton);
-            AlignOptionPopup(optionButton, popup);
-        };
-        popup.PopupHide += () =>
-        {
-            _hoverLockedButtons.Remove(optionButton);
-            StopLanternPulse(optionButton);
-        };
-    }
-
-    private static void StyleOptionPopup(OptionButton optionButton)
-    {
-        var popup = optionButton.GetPopup();
-        popup.AddThemeStyleboxOverride("panel", CreateDropdownPanelStyle());
-        popup.AddThemeStyleboxOverride("hover", CreateDropdownHoverStyle());
-        popup.AddThemeStyleboxOverride("separator", CreateDropdownSeparatorStyle());
-        popup.AddThemeColorOverride("font_color", DropdownInkColor);
-        popup.AddThemeColorOverride("font_hover_color", DropdownPaperColor);
-        popup.AddThemeColorOverride("font_disabled_color", new Color(DropdownInkColor.R, DropdownInkColor.G, DropdownInkColor.B, 0.45f));
-    }
-
-    private void LockOptionButtonHover(OptionButton optionButton)
-    {
-        _hoverLockedButtons.Add(optionButton);
-        EnsureHoverVisual(optionButton);
-    }
-
-    private void EnsureHoverVisual(Button button)
-    {
-        UpdateButtonHoverPivot(button);
-
-        if (_buttonPulseTweens.TryGetValue(button, out var tween))
-        {
-            tween.Kill();
-            _buttonPulseTweens.Remove(button);
-        }
-
-        if (!_buttonBaseScales.TryGetValue(button, out var baseScale))
-        {
-            baseScale = button.Scale;
-            _buttonBaseScales[button] = baseScale;
-        }
-
-        button.Scale = baseScale * LanternHoverScale;
-        button.SelfModulate = LanternHoverModulate;
-    }
-
-    private static void AlignOptionPopup(OptionButton optionButton, PopupMenu popup)
-    {
-        var rect = optionButton.GetGlobalRect();
-        var targetPos = rect.Position + new Vector2(0f, rect.Size.Y);
-        var targetWidth = Mathf.RoundToInt(rect.Size.X);
-
-        popup.Position = new Vector2I(Mathf.RoundToInt(targetPos.X), Mathf.RoundToInt(targetPos.Y));
-        popup.MinSize = new Vector2I(targetWidth, Mathf.RoundToInt(popup.MinSize.Y));
-        popup.Size = new Vector2I(targetWidth, Mathf.RoundToInt(popup.Size.Y));
-    }
-
-    private static StyleBoxFlat CreateDropdownPanelStyle()
-    {
-        return new StyleBoxFlat
-        {
-            BgColor = DropdownPaperColor,
-            BorderWidthLeft = 1,
-            BorderWidthTop = 1,
-            BorderWidthRight = 1,
-            BorderWidthBottom = 1,
-            BorderColor = DropdownBorderColor,
-            ContentMarginLeft = 8,
-            ContentMarginTop = 6,
-            ContentMarginRight = 8,
-            ContentMarginBottom = 6
-        };
-    }
-
-    private static StyleBoxFlat CreateDropdownHoverStyle()
-    {
-        return new StyleBoxFlat
-        {
-            BgColor = new Color(LanternHoverModulate.R, LanternHoverModulate.G, LanternHoverModulate.B, 0.22f),
-            BorderWidthLeft = 0,
-            BorderWidthTop = 0,
-            BorderWidthRight = 0,
-            BorderWidthBottom = 0
-        };
-    }
-
-    private static StyleBoxFlat CreateDropdownSeparatorStyle()
-    {
-        return new StyleBoxFlat
-        {
-            BgColor = new Color(DropdownBorderColor.R, DropdownBorderColor.G, DropdownBorderColor.B, 0.45f),
-            BorderWidthLeft = 0,
-            BorderWidthTop = 0,
-            BorderWidthRight = 0,
-            BorderWidthBottom = 0
-        };
-    }
-
-    private void InitializeHoverSfx()
-    {
-        var stream = GD.Load<AudioStream>(HoverSfxPath);
-        if (stream == null)
-        {
-            return;
-        }
-
-        _hoverSfxPlayer = new AudioStreamPlayer
-        {
-            Name = "HoverSfxPlayer",
-            Stream = stream,
-            Bus = "Master",
-            VolumeDb = -8f
-        };
-        AddChild(_hoverSfxPlayer);
-    }
-
-    private void PlayHoverSfx()
-    {
-        if (_hoverSfxPlayer == null)
-        {
-            return;
-        }
-
-        var now = Time.GetTicksMsec();
-        if (now - _lastHoverSfxTicks < HoverSfxCooldownMs)
-        {
-            return;
-        }
-
-        _lastHoverSfxTicks = now;
-        _hoverSfxPlayer.Stop();
-        _hoverSfxPlayer.Play();
+        GetNodeOrNull<Node>("LanternFx")?.Call("bind_hover_fx");
     }
 }
+
+
+
+
 
 
 

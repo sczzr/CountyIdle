@@ -42,11 +42,13 @@ public partial class Main
 
     private void OpenSectOrganizationPanel()
     {
+        CloseBlockingOverlayPopups(_sectOrganizationPanel);
         _sectOrganizationPanel?.Open(_gameLoop.State.Clone());
     }
 
     private void OpenSectOrganizationPanelForJob(JobType jobType)
     {
+        CloseBlockingOverlayPopups(_sectOrganizationPanel);
         _sectOrganizationPanel?.Open(_gameLoop.State.Clone(), jobType);
     }
 

@@ -9,6 +9,8 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/BottomBar.tscn" id="6_empmh"]
 [ext_resource type="PackedScene" path="res://scenes/ui/figma/MakeGameUI.tscn" id="7_q2j8d"]
 [ext_resource type="Shader" uid="uid://bp4rtoxr5s7n4" path="res://assets/ui/background/background_frosted_glass.gdshader" id="8_s0l7t"]
+[ext_resource type="Script" path="res://scripts/ui/gd/MainLanternFx.gd" id="9_main_lantern_fx"]
+[ext_resource type="Script" path="res://scripts/ui/gd/TileInspectorVisualFx.gd" id="10_tile_inspector_fx"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_background_glass"]
 shader = ExtResource("8_s0l7t")
@@ -59,7 +61,11 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+expand_mode = 1
+stretch_mode = 6
 mouse_filter = 2
+z_index = -100
+self_modulate = Color(1, 1, 1, 1)
 texture = ExtResource("2_jlsqs")
 
 [node name="RootMargin" type="Control" parent="." unique_id=659476772]
@@ -297,3 +303,8 @@ grow_vertical = 0
 [node name="FigmaLayout" parent="." unique_id=709418332 instance=ExtResource("7_q2j8d")]
 visible = false
 layout_mode = 1
+[node name="LanternFx" type="Node" parent="."]
+script = ExtResource("9_main_lantern_fx")
+
+[node name="TileInspectorVisualFx" type="Node" parent="."]
+script = ExtResource("10_tile_inspector_fx")
