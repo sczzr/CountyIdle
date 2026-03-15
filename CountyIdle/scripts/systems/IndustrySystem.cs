@@ -6,6 +6,14 @@ namespace CountyIdle.Systems;
 
 public class IndustrySystem
 {
+    public readonly record struct BuildingCostPreview(
+        double Wood,
+        double Stone,
+        double Gold,
+        double Contribution,
+        double Construction,
+        string DisplayName);
+
     private const double AgricultureBuildWoodCost = 24;
     private const double AgricultureBuildStoneCost = 12;
     private const double AgricultureBuildGoldCost = 10;
@@ -55,6 +63,59 @@ public class IndustrySystem
     private const double FiberChainGoldCost = 8;
     private const double FiberChainContributionCost = 6;
     private const double FiberChainConstructionCost = 0.4;
+
+    public static BuildingCostPreview GetBuildCostPreview(IndustryBuildingType buildingType)
+    {
+        return buildingType switch
+        {
+            IndustryBuildingType.Agriculture => new BuildingCostPreview(
+                AgricultureBuildWoodCost,
+                AgricultureBuildStoneCost,
+                AgricultureBuildGoldCost,
+                AgricultureBuildContributionCost,
+                AgricultureBuildConstructionCost,
+                SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Agriculture)),
+            IndustryBuildingType.Workshop => new BuildingCostPreview(
+                WorkshopBuildWoodCost,
+                WorkshopBuildStoneCost,
+                WorkshopBuildGoldCost,
+                WorkshopBuildContributionCost,
+                WorkshopBuildConstructionCost,
+                SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Workshop)),
+            IndustryBuildingType.Research => new BuildingCostPreview(
+                ResearchBuildWoodCost,
+                ResearchBuildStoneCost,
+                ResearchBuildGoldCost,
+                ResearchBuildContributionCost,
+                ResearchBuildConstructionCost,
+                SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Research)),
+            IndustryBuildingType.Trade => new BuildingCostPreview(
+                TradeBuildWoodCost,
+                TradeBuildStoneCost,
+                TradeBuildGoldCost,
+                TradeBuildContributionCost,
+                TradeBuildConstructionCost,
+                SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Trade)),
+            IndustryBuildingType.Administration => new BuildingCostPreview(
+                AdminBuildWoodCost,
+                AdminBuildStoneCost,
+                AdminBuildGoldCost,
+                AdminBuildContributionCost,
+                AdminBuildConstructionCost,
+                SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Administration)),
+            _ => new BuildingCostPreview(0, 0, 0, 0, 0, "建筑")
+        };
+    }
+
+    public static bool CanAffordBuildCost(GameState state, BuildingCostPreview preview)
+    {
+        InventoryRules.EndTransaction(state);
+        return state.Wood >= InventoryRules.QuantizeCost(preview.Wood) &&
+               state.Stone >= InventoryRules.QuantizeCost(preview.Stone) &&
+               state.Gold >= InventoryRules.QuantizeCost(preview.Gold) &&
+               state.ContributionPoints >= InventoryRules.QuantizeCost(preview.Contribution) &&
+               state.ConstructionMaterials >= InventoryRules.QuantizeCost(preview.Construction);
+    }
 
     public bool TickHour(GameState state, out string? log)
     {
@@ -336,24 +397,22 @@ public class IndustrySystem
 
     private static bool TryBuildByType(GameState state, IndustryBuildingType buildingType, out string log)
     {
-        var (wood, stone, gold, contribution, construction, title) = buildingType switch
-        {
-            IndustryBuildingType.Agriculture => (AgricultureBuildWoodCost, AgricultureBuildStoneCost, AgricultureBuildGoldCost, AgricultureBuildContributionCost, AgricultureBuildConstructionCost, SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Agriculture)),
-            IndustryBuildingType.Workshop => (WorkshopBuildWoodCost, WorkshopBuildStoneCost, WorkshopBuildGoldCost, WorkshopBuildContributionCost, WorkshopBuildConstructionCost, SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Workshop)),
-            IndustryBuildingType.Research => (ResearchBuildWoodCost, ResearchBuildStoneCost, ResearchBuildGoldCost, ResearchBuildContributionCost, ResearchBuildConstructionCost, SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Research)),
-            IndustryBuildingType.Trade => (TradeBuildWoodCost, TradeBuildStoneCost, TradeBuildGoldCost, TradeBuildContributionCost, TradeBuildConstructionCost, SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Trade)),
-            IndustryBuildingType.Administration => (AdminBuildWoodCost, AdminBuildStoneCost, AdminBuildGoldCost, AdminBuildContributionCost, AdminBuildConstructionCost, SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Administration)),
-            _ => (0, 0, 0, 0, 0, "建筑")
-        };
+        var preview = GetBuildCostPreview(buildingType);
 
-        if (!CanAfford(state, wood, stone, gold, contribution, constructionMaterials: construction))
+        if (!CanAfford(state, preview.Wood, preview.Stone, preview.Gold, preview.Contribution, constructionMaterials: preview.Construction))
         {
             log =
-                $"{title}建造失败：木{InventoryRules.QuantizeCost(wood)}/石{InventoryRules.QuantizeCost(stone)}/灵石{InventoryRules.QuantizeCost(gold)}/贡献{InventoryRules.QuantizeCost(contribution)}/建材{InventoryRules.QuantizeCost(construction)} 不足。";
+                $"{preview.DisplayName}建造失败：木{InventoryRules.QuantizeCost(preview.Wood)}/石{InventoryRules.QuantizeCost(preview.Stone)}/灵石{InventoryRules.QuantizeCost(preview.Gold)}/贡献{InventoryRules.QuantizeCost(preview.Contribution)}/建材{InventoryRules.QuantizeCost(preview.Construction)} 不足。";
             return false;
         }
 
-        ConsumeBuildCost(state, wood, stone, gold, contribution, constructionMaterials: construction);
+        ConsumeBuildCost(
+            state,
+            preview.Wood,
+            preview.Stone,
+            preview.Gold,
+            preview.Contribution,
+            constructionMaterials: preview.Construction);
         switch (buildingType)
         {
             case IndustryBuildingType.Agriculture:
@@ -374,7 +433,7 @@ public class IndustrySystem
         }
 
         log =
-            $"产业扩建：新建{title} 1 座（木{InventoryRules.QuantizeCost(wood)}/石{InventoryRules.QuantizeCost(stone)}/灵石{InventoryRules.QuantizeCost(gold)}/贡献{InventoryRules.QuantizeCost(contribution)}/建材{InventoryRules.QuantizeCost(construction)}）。";
+            $"产业扩建：新建{preview.DisplayName} 1 座（木{InventoryRules.QuantizeCost(preview.Wood)}/石{InventoryRules.QuantizeCost(preview.Stone)}/灵石{InventoryRules.QuantizeCost(preview.Gold)}/贡献{InventoryRules.QuantizeCost(preview.Contribution)}/建材{InventoryRules.QuantizeCost(preview.Construction)}）。";
         return true;
     }
 

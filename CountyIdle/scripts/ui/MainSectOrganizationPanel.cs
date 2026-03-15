@@ -23,6 +23,7 @@ public partial class Main
         _sectOrganizationPanel.SupportRequested += OnSectOrganizationSupportRequested;
         _sectOrganizationPanel.SupportResetRequested += OnSectOrganizationSupportResetRequested;
         _sectOrganizationPanel.GovernanceRequested += OnSectOrganizationGovernanceRequested;
+        _sectOrganizationPanel.NamingRequested += OnSectOrganizationNamingRequested;
         _sectOrganizationPanel.Opened += OnSectOrganizationPanelOpened;
         _sectOrganizationPanel.Closed += OnSectOrganizationPanelClosed;
         AddChild(_sectOrganizationPanel);
@@ -73,6 +74,11 @@ public partial class Main
         AppendLog($"已从宗门组织谱系转入【{SectTaskRules.GetJobButtonText(jobType)}】。");
     }
 
+    private void OnSectOrganizationNamingRequested()
+    {
+        OpenSectNamePanel();
+    }
+
     private void OnSectOrganizationPanelOpened()
     {
         SetSectOrganizationQuickButtonState(true);
@@ -99,6 +105,7 @@ public partial class Main
         _sectOrganizationPanel.SupportRequested -= OnSectOrganizationSupportRequested;
         _sectOrganizationPanel.SupportResetRequested -= OnSectOrganizationSupportResetRequested;
         _sectOrganizationPanel.GovernanceRequested -= OnSectOrganizationGovernanceRequested;
+        _sectOrganizationPanel.NamingRequested -= OnSectOrganizationNamingRequested;
         _sectOrganizationPanel.Opened -= OnSectOrganizationPanelOpened;
         _sectOrganizationPanel.Closed -= OnSectOrganizationPanelClosed;
     }

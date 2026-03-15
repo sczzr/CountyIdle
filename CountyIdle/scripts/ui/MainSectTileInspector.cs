@@ -40,6 +40,8 @@ public partial class Main
     private Label? _tileInspectorTransitValueLabel;
     private Label? _tileInspectorLocationLabel;
     private Label? _tileInspectorLocationValueLabel;
+    private Label? _tileInspectorBuildingLabel;
+    private Label? _tileInspectorBuildingValueLabel;
     private Label? _tileInspectorDescriptionLabel;
     private Label? _tileInspectorActionHintLabel;
     private Button? _tileInspectorPrimaryButton;
@@ -65,6 +67,8 @@ public partial class Main
         _tileInspectorTransitValueLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/AttrGrid/TransitBox/AttrVBox/AttrValue");
         _tileInspectorLocationLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/AttrGrid/LocationBox/AttrVBox/AttrLabel");
         _tileInspectorLocationValueLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/AttrGrid/LocationBox/AttrVBox/AttrValue");
+        _tileInspectorBuildingLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/BuildingListBox/BuildingListVBox/BuildingListLabel");
+        _tileInspectorBuildingValueLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/BuildingListBox/BuildingListVBox/BuildingListValue");
         _tileInspectorDescriptionLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/InspectorDescription");
         _tileInspectorActionHintLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/ActionHintPanel/ActionHintLabel");
         _tileInspectorPrimaryButton = GetNodeOrNull<Button>($"{LeftPanelPath}/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/ActionList/PrimaryActionButton");
@@ -88,6 +92,8 @@ public partial class Main
         _tileInspectorTransitValueLabel = null;
         _tileInspectorLocationLabel = null;
         _tileInspectorLocationValueLabel = null;
+        _tileInspectorBuildingLabel = null;
+        _tileInspectorBuildingValueLabel = null;
         _tileInspectorDescriptionLabel = null;
         _tileInspectorActionHintLabel = null;
         _tileInspectorPrimaryButton = null;
@@ -184,23 +190,30 @@ public partial class Main
             _tileInspectorTransitValueLabel == null ||
             _tileInspectorLocationLabel == null ||
             _tileInspectorLocationValueLabel == null ||
+            _tileInspectorBuildingLabel == null ||
+            _tileInspectorBuildingValueLabel == null ||
             _tileInspectorDescriptionLabel == null ||
             _tileInspectorActionHintLabel == null)
         {
             return;
         }
 
-        _tileInspectorTitleLabel.Text = summary.Title;
-        _tileInspectorSubtitleLabel.Text = summary.Subtitle;
+        var nameMap = _gameLoop != null ? _gameLoop.State.SectNameMap : null;
+        string Resolve(string text) => SectNamingRules.ReplaceKnownNames(nameMap, text);
+
+        _tileInspectorTitleLabel.Text = Resolve(summary.Title);
+        _tileInspectorSubtitleLabel.Text = Resolve(summary.Subtitle);
         _tileInspectorStatusLabel.Text = summary.StatusLabel;
-        _tileInspectorStatusValueLabel.Text = summary.StatusText;
+        _tileInspectorStatusValueLabel.Text = Resolve(summary.StatusText);
         _tileInspectorResidentLabel.Text = summary.ResidentLabel;
-        _tileInspectorResidentValueLabel.Text = summary.ResidentText;
+        _tileInspectorResidentValueLabel.Text = Resolve(summary.ResidentText);
         _tileInspectorTransitLabel.Text = summary.TransitLabel;
-        _tileInspectorTransitValueLabel.Text = summary.TransitText;
+        _tileInspectorTransitValueLabel.Text = Resolve(summary.TransitText);
         _tileInspectorLocationLabel.Text = summary.LocationLabel;
-        _tileInspectorLocationValueLabel.Text = summary.LocationText;
-        _tileInspectorDescriptionLabel.Text = summary.DescriptionText;
+        _tileInspectorLocationValueLabel.Text = Resolve(summary.LocationText);
+        _tileInspectorBuildingLabel.Text = summary.BuildingLabel;
+        _tileInspectorBuildingValueLabel.Text = Resolve(summary.BuildingText);
+        _tileInspectorDescriptionLabel.Text = Resolve(summary.DescriptionText);
 
         ConfigureTileInspectorActions(summary);
         ApplyTileInspectorVisualTone(summary);
@@ -219,6 +232,8 @@ public partial class Main
             _tileInspectorTransitValueLabel == null ||
             _tileInspectorLocationLabel == null ||
             _tileInspectorLocationValueLabel == null ||
+            _tileInspectorBuildingLabel == null ||
+            _tileInspectorBuildingValueLabel == null ||
             _tileInspectorDescriptionLabel == null ||
             _tileInspectorActionHintLabel == null)
         {
@@ -238,6 +253,8 @@ public partial class Main
             _tileInspectorTransitValueLabel.Text = "待判定";
             _tileInspectorLocationLabel.Text = "所属区块";
             _tileInspectorLocationValueLabel.Text = "待识别";
+            _tileInspectorBuildingLabel.Text = "建筑列表";
+            _tileInspectorBuildingValueLabel.Text = "世界层无院域建筑";
             _tileInspectorDescriptionLabel.Text = "左键点选世界地图中的宗门、凡俗据点、坊市、世家、仙城或遗迹节点后，这里会显示对应的分层信息与建议去向。";
             ApplyTileInspectorBinding(
                 CreateDisabledTileInspectorBinding("等待选中世界点位", "先从世界地图点选一个外域点位。"),
@@ -274,6 +291,8 @@ public partial class Main
         };
         _tileInspectorLocationLabel.Text = "所属区块";
         _tileInspectorLocationValueLabel.Text = ResolveWorldRegionText(site.RegionId);
+        _tileInspectorBuildingLabel.Text = "建筑列表";
+        _tileInspectorBuildingValueLabel.Text = "世界层无院域建筑";
         _tileInspectorDescriptionLabel.Text = BuildWorldSiteDescription(site, primaryTypeText, rarityText);
 
         ConfigureWorldSiteInspectorActions(site, primaryTypeText);
@@ -282,10 +301,15 @@ public partial class Main
 
     private void ConfigureTileInspectorActions(TownMapSelectionSummary summary)
     {
+        var nameMap = _gameLoop != null ? _gameLoop.State.SectNameMap : null;
+        string Resolve(string text) => SectNamingRules.ReplaceKnownNames(nameMap, text);
+
         if (!summary.HasSelection)
         {
             ApplyTileInspectorBinding(
-                CreateDisabledTileInspectorBinding("当前无选中院域", "左键点选任意天衍峰六角地块后，即可查看对应院域详情。"),
+                CreateDisabledTileInspectorBinding(
+                    "当前无选中院域",
+                    Resolve("左键点选任意天衍峰六角地块后，即可查看对应院域详情。")),
                 _tileInspectorPrimaryButton,
                 ref _tileInspectorPrimaryAction);
             ApplyTileInspectorBinding(
@@ -300,7 +324,7 @@ public partial class Main
             return;
         }
 
-        var tileName = string.IsNullOrWhiteSpace(summary.Title) ? "当前地块" : summary.Title;
+        var tileName = string.IsNullOrWhiteSpace(summary.Title) ? "当前地块" : Resolve(summary.Title);
 
         if (summary.AnchorType == null)
         {
@@ -425,6 +449,10 @@ public partial class Main
                 true)
         };
 
+        primaryBinding = ApplyNamingToBinding(primaryBinding, nameMap);
+        secondaryBinding = ApplyNamingToBinding(secondaryBinding, nameMap);
+        tertiaryBinding = ApplyNamingToBinding(tertiaryBinding, nameMap);
+
         ApplyTileInspectorBinding(primaryBinding, _tileInspectorPrimaryButton, ref _tileInspectorPrimaryAction);
         ApplyTileInspectorBinding(secondaryBinding, _tileInspectorSecondaryButton, ref _tileInspectorSecondaryAction);
         ApplyTileInspectorBinding(tertiaryBinding, _tileInspectorTertiaryButton, ref _tileInspectorTertiaryAction);
@@ -434,6 +462,7 @@ public partial class Main
 
     private void ConfigureCompoundTileInspectorActions(TownMapSelectionSummary summary, string tileName)
     {
+        var nameMap = _gameLoop != null ? _gameLoop.State.SectNameMap : null;
         var primaryBinding = summary.SuggestedBuildType switch
         {
             IndustryBuildingType.Agriculture => new TileInspectorActionBinding(
@@ -480,6 +509,10 @@ public partial class Main
             $"将【{tileName}】改为更稳的布局，优先缓解灵池压力、互扰与波动。",
             true);
 
+        primaryBinding = ApplyNamingToBinding(primaryBinding, nameMap);
+        secondaryBinding = ApplyNamingToBinding(secondaryBinding, nameMap);
+        tertiaryBinding = ApplyNamingToBinding(tertiaryBinding, nameMap);
+
         ApplyTileInspectorBinding(primaryBinding, _tileInspectorPrimaryButton, ref _tileInspectorPrimaryAction);
         ApplyTileInspectorBinding(secondaryBinding, _tileInspectorSecondaryButton, ref _tileInspectorSecondaryAction);
         ApplyTileInspectorBinding(tertiaryBinding, _tileInspectorTertiaryButton, ref _tileInspectorTertiaryAction);
@@ -490,6 +523,22 @@ public partial class Main
     private static TileInspectorActionBinding CreateDisabledTileInspectorBinding(string text, string tooltipText)
     {
         return new TileInspectorActionBinding(TileInspectorAction.None, text, tooltipText, false);
+    }
+
+    private static TileInspectorActionBinding ApplyNamingToBinding(
+        TileInspectorActionBinding binding,
+        IReadOnlyDictionary<string, string>? nameMap)
+    {
+        if (nameMap == null)
+        {
+            return binding;
+        }
+
+        return new TileInspectorActionBinding(
+            binding.Action,
+            SectNamingRules.ReplaceKnownNames(nameMap, binding.Text),
+            SectNamingRules.ReplaceKnownNames(nameMap, binding.TooltipText),
+            binding.Enabled);
     }
 
     private void ApplyTileInspectorBinding(
@@ -562,7 +611,10 @@ public partial class Main
     private void ApplyTileInspectorVisualTone(TownMapSelectionSummary summary)
     {
         var badgeText = string.IsNullOrWhiteSpace(summary.BadgeText)
-            ? TownActivityAnchorVisualRules.GetBadgeText(summary.AnchorType, summary.HasSelection)
+            ? TownActivityAnchorVisualRules.GetBadgeText(
+                _gameLoop != null ? _gameLoop.State.SectNameMap : null,
+                summary.AnchorType,
+                summary.HasSelection)
             : summary.BadgeText;
         var accentColor = summary.AnchorType != null
             ? TownActivityAnchorVisualRules.GetAccentColor(summary.AnchorType, summary.HasSelection)
@@ -617,19 +669,19 @@ public partial class Main
                 OpenSelectedWorldSitePanel();
                 break;
             case TileInspectorAction.BuildAgriculture:
-                _gameLoop?.BuildIndustryBuilding(IndustryBuildingType.Agriculture);
+                BuildIndustryBuildingWithPlacement(IndustryBuildingType.Agriculture);
                 break;
             case TileInspectorAction.BuildWorkshop:
-                _gameLoop?.BuildIndustryBuilding(IndustryBuildingType.Workshop);
+                BuildIndustryBuildingWithPlacement(IndustryBuildingType.Workshop);
                 break;
             case TileInspectorAction.BuildResearch:
-                _gameLoop?.BuildIndustryBuilding(IndustryBuildingType.Research);
+                BuildIndustryBuildingWithPlacement(IndustryBuildingType.Research);
                 break;
             case TileInspectorAction.BuildTrade:
-                _gameLoop?.BuildIndustryBuilding(IndustryBuildingType.Trade);
+                BuildIndustryBuildingWithPlacement(IndustryBuildingType.Trade);
                 break;
             case TileInspectorAction.BuildAdministration:
-                _gameLoop?.BuildIndustryBuilding(IndustryBuildingType.Administration);
+                BuildIndustryBuildingWithPlacement(IndustryBuildingType.Administration);
                 break;
             case TileInspectorAction.PlanCompoundSpecialized:
                 if (_sectMapRenderer?.TryApplySelectedCompoundPlan(TownCompoundPlanStyle.Specialized, out var specializedLog) == true)

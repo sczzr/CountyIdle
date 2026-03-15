@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Godot;
 using CountyIdle.Models;
 
@@ -34,6 +35,34 @@ public static class TownActivityAnchorVisualRules
             TownActivityAnchorType.Academy => "📜 传法院 / 推演",
             TownActivityAnchorType.Administration => "🏛 庶务 / 治理",
             TownActivityAnchorType.Leisure => "☯ 休憩 / 论道",
+            _ => "⛰ 山门地块"
+        };
+    }
+
+    public static string GetBadgeText(
+        IReadOnlyDictionary<string, string>? nameMap,
+        TownActivityAnchorType? anchorType,
+        bool hasSelection)
+    {
+        if (!hasSelection || anchorType == null)
+        {
+            return "未选中地块";
+        }
+
+        var farmsteadName = SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Agriculture, false, nameMap);
+        var workshopName = SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Workshop, false, nameMap);
+        var marketName = SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Trade, true, nameMap);
+        var academyName = SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Research, false, nameMap);
+        var affairsName = SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Administration, false, nameMap);
+
+        return anchorType switch
+        {
+            TownActivityAnchorType.Farmstead => $"🌾 {farmsteadName} / 供养",
+            TownActivityAnchorType.Workshop => $"🛠 {workshopName} / 阵务",
+            TownActivityAnchorType.Market => $"💰 {marketName} / 外事",
+            TownActivityAnchorType.Academy => $"📜 {academyName} / 推演",
+            TownActivityAnchorType.Administration => $"🏛 {affairsName} / 治理",
+            TownActivityAnchorType.Leisure => $"☯ {SectNamingRules.GetName(nameMap, SectNamingRules.HallLeisureKey)} / 论道",
             _ => "⛰ 山门地块"
         };
     }

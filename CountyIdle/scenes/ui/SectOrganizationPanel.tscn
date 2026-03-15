@@ -336,6 +336,12 @@ text = "立 协同峰令"
 custom_minimum_size = Vector2(0, 34)
 size_flags_horizontal = 3
 
+[node name="NamingButton" type="Button" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/RightColumn/ActionColumn"]
+layout_mode = 2
+text = "宗门命名"
+custom_minimum_size = Vector2(0, 34)
+size_flags_horizontal = 3
+
 [node name="ActionRow" type="HBoxContainer" parent="Overlay/OuterMargin/Wrapper/FrameRow/PaperFrame/PaperMargin/RootColumn/BodyRow/RightColumn/ActionColumn"]
 layout_mode = 2
 theme_override_constants/separation = 8

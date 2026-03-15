@@ -65,6 +65,10 @@
 | `sect-peak-support-directives` | FC/CP/BL（本次新增） | 演进 | 用于“峰脉协同法旨 / 协同峰支援”链路；后续季度法令、跨峰支援继续沿用同 topic |
 | `sect-quarter-decrees` | FC/CP/BL（本次新增） | 演进 | 用于“季度法令 / 季度宗门方针”链路；后续门规树与季度模板可继续沿用同 topic |
 | `sect-rule-tree` | FC/CP/BL（本次新增） | 演进 | 用于“庶务 / 传功 / 巡山常设门规”链路；后续完整树状解锁继续沿用同 topic |
+| `playable-demo` | FC/BL（本次新增） | 演进 | 用于“最小可玩 Demo / 试玩目标引导”链路 |
+| `building-list` | FC/BL（本次新增） | 演进 | 用于“建筑列表 / 快捷建造”链路 |
+| `building-visualization` | FC/CP/BL（本次新增） | 演进 | 用于“建筑显影 / 山门图建筑落地可视化”链路 |
+| `sect-hex-compound-inspector` | FC/CP/BL 全量齐备 | 演进 | 用于“天衍峰院域坊局 / 左侧地块检视”链路 |
 
 ## 3. 建议收敛的“归档史诗”分组
 

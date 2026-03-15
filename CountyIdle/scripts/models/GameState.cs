@@ -102,6 +102,7 @@ public class GameState
     public int ResearchBuildings { get; set; } = 1;
     public int TradeBuildings { get; set; } = 1;
     public int AdministrationBuildings { get; set; } = 4;
+    public List<TownBuildingPlacement> TownBuildingPlacements { get; set; } = new();
     public double IndustryTools { get; set; } = 120;
     public int MiningLevel { get; set; } = 1;
     public int WarehouseLevel { get; set; } = 1;
@@ -123,6 +124,7 @@ public class GameState
     public string ActiveDoctrineRule { get; set; } = string.Empty;
     public string ActiveDisciplineRule { get; set; } = string.Empty;
     public string ActivePeakSupport { get; set; } = string.Empty;
+    public Dictionary<string, string> SectNameMap { get; set; } = new();
 
     public int GetAssignedPopulation()
     {
@@ -235,6 +237,30 @@ public class GameState
         clone.TaskResolvedWorkers = new Dictionary<string, int>(TaskResolvedWorkers ?? new Dictionary<string, int>());
         clone.DiscipleDirectives = new Dictionary<int, string>(DiscipleDirectives ?? new Dictionary<int, string>());
         clone.FormalStewardAppointments = new Dictionary<string, int>(FormalStewardAppointments ?? new Dictionary<string, int>());
+        clone.SectNameMap = new Dictionary<string, string>(SectNameMap ?? new Dictionary<string, string>());
+        clone.TownBuildingPlacements = CloneTownBuildingPlacements(TownBuildingPlacements);
+        return clone;
+    }
+
+    private static List<TownBuildingPlacement> CloneTownBuildingPlacements(
+        List<TownBuildingPlacement>? placements)
+    {
+        if (placements == null || placements.Count == 0)
+        {
+            return new List<TownBuildingPlacement>();
+        }
+
+        var clone = new List<TownBuildingPlacement>(placements.Count);
+        foreach (var placement in placements)
+        {
+            if (placement == null)
+            {
+                continue;
+            }
+
+            clone.Add(new TownBuildingPlacement(placement.BuildingType, placement.X, placement.Y));
+        }
+
         return clone;
     }
 }

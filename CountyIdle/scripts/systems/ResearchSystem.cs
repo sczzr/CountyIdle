@@ -31,7 +31,7 @@ public class ResearchSystem
         for (var tier = state.TechLevel + 1; tier <= targetTier; tier++)
         {
             ApplyTierBonuses(state, tier);
-            breakthroughs.Add(GetTierLog(tier));
+            breakthroughs.Add(GetTierLog(state, tier));
         }
 
         log = string.Join(" | ", breakthroughs);
@@ -68,13 +68,14 @@ public class ResearchSystem
         state.PopulationGrowthMultiplier = tier >= 3 ? Tier3PopulationGrowthMultiplier : BaseMultiplier;
     }
 
-    private static string GetTierLog(int tier)
+    private static string GetTierLog(GameState state, int tier)
     {
-        var trackName = SectMapSemanticRules.GetTechnologyTrackName();
+        var trackName = SectMapSemanticRules.GetTechnologyTrackName(state);
+        var nameMap = state.SectNameMap;
         return tier switch
         {
             1 => $"{trackName}悟道 T1：灵植改良生效，粮食产量提升 15%。",
-            2 => $"{trackName}悟道 T2：{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Workshop)}账册优化，木石产量 +15%，贸易产金 +10%。",
+            2 => $"{trackName}悟道 T2：{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Workshop, false, nameMap)}账册优化，木石产量 +15%，贸易产金 +10%。",
             3 => $"{trackName}悟道 T3：宗门谱录协同完善，人口增长效率提升 20%。",
             _ => $"{trackName}完成未知突破。"
         };

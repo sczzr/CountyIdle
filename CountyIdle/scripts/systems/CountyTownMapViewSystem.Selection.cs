@@ -10,6 +10,11 @@ public partial class CountyTownMapViewSystem
         SelectionSummaryChanged?.Invoke(BuildSelectionSummary());
     }
 
+    private string ResolveNamedText(string text)
+    {
+        return SectNamingRules.ReplaceKnownNames(_nameMap, text);
+    }
+
     private TownMapSelectionSummary BuildSelectionSummary()
     {
         if (_selectedActivityAnchor != null)
@@ -19,13 +24,17 @@ public partial class CountyTownMapViewSystem
 
         if (_selectedCell == null || _mapData == null)
         {
-            return TownMapSelectionSummary.CreateDefault();
+            return TownMapSelectionSummary.CreateDefault(
+                SectNamingRules.GetName(_nameMap, SectNamingRules.SectNameKey),
+                SectNamingRules.GetName(_nameMap, SectNamingRules.PeakTianyanKey));
         }
 
         var compound = _mapData.GetCellCompound(_selectedCell.Value);
         if (compound == null)
         {
-            return TownMapSelectionSummary.CreateDefault();
+            return TownMapSelectionSummary.CreateDefault(
+                SectNamingRules.GetName(_nameMap, SectNamingRules.SectNameKey),
+                SectNamingRules.GetName(_nameMap, SectNamingRules.PeakTianyanKey));
         }
 
         return BuildCellSelectionSummary(compound);
@@ -33,21 +42,25 @@ public partial class CountyTownMapViewSystem
 
     private TownMapSelectionSummary BuildAnchorSelectionSummary(TownActivityAnchorData anchor)
     {
-        var anchorTypeText = SectMapSemanticRules.GetAnchorTypeText(anchor.AnchorType);
+        var anchorTypeText = SectMapSemanticRules.GetAnchorTypeText(anchor.AnchorType, _nameMap);
         var assignedResidents = GetAssignedResidentCount(anchor);
         var presentResidents = GetPresentResidentCount(anchor);
         var inboundResidents = GetInboundResidentCount(anchor);
         var statusText = GetSelectedAnchorStatusText(anchor);
         var selectedWalker = GetSelectedResidentWalker();
+        var buildingListText = BuildAnchorBuildingListText(anchor);
+        var anchorLabel = ResolveNamedText(anchor.Label);
 
         return new TownMapSelectionSummary(
             true,
             anchor.AnchorType,
             TownCellContentKind.Service,
             null,
-            TownActivityAnchorVisualRules.GetBadgeText(anchor.AnchorType, true),
-            anchor.Label,
-            $"{anchorTypeText} · 归属：{SectMapSemanticRules.GetSettlementName()}",
+            TownActivityAnchorVisualRules.GetBadgeText(_nameMap, anchor.AnchorType, true),
+            anchorLabel,
+            $"{anchorTypeText} · 归属：{SectMapSemanticRules.GetSettlementName(_nameMap)}",
+            "建筑列表",
+            ResolveNamedText(buildingListText),
             "当前态势",
             statusText,
             "驻守门人",
@@ -56,14 +69,14 @@ public partial class CountyTownMapViewSystem
             $"{inboundResidents} 名前往中",
             "地气坐标",
             $"Hex [{anchor.LotCell.X}, {anchor.LotCell.Y}] · 临路 [{anchor.RoadCell.X}, {anchor.RoadCell.Y}]",
-            BuildSelectionDescription(anchor, statusText, selectedWalker));
+            ResolveNamedText(BuildSelectionDescription(anchor, statusText, selectedWalker)));
     }
 
     private TownMapSelectionSummary BuildCellSelectionSummary(TownCellCompoundData compound)
     {
         var buildingSummary = compound.SubBuildings.Length == 0
             ? "待规划"
-            : string.Join(" / ", compound.SubBuildings.Select(static building => building.DisplayName));
+            : string.Join(" / ", compound.SubBuildings.Select(building => ResolveNamedText(building.DisplayName)));
         var statusText = GetCompoundStatusText(compound);
         var qiText = $"{compound.BaseQiCapacity} 池 · 需求 {compound.TotalQiDemand:0.#} · 拥堵 {compound.QiCongestion:0.00}";
         var slotText = $"{compound.SubBuildings.Length}/{compound.BuildSlotCount} 坊位 · 协同 {compound.SynergyScore:+0.00;-0.00;0.00}";
@@ -71,6 +84,7 @@ public partial class CountyTownMapViewSystem
         var featureSummary = compound.FeatureTexts.Length == 0
             ? "暂无特征"
             : string.Join("、", compound.FeatureTexts);
+        var regionName = ResolveNamedText(compound.RegionName);
 
         return new TownMapSelectionSummary(
             true,
@@ -78,8 +92,10 @@ public partial class CountyTownMapViewSystem
             compound.ContentKind,
             compound.SuggestedBuildType,
             GetContentKindBadgeText(compound.ContentKind),
-            $"{compound.RegionName}·{GetContentKindTitle(compound.ContentKind)}",
+            $"{regionName}·{GetContentKindTitle(compound.ContentKind)}",
             $"{compound.QiAffinityText} · {GetPlanStyleText(compound.PlanStyle)} · 坊局：{buildingSummary}",
+            "建筑列表",
+            buildingSummary,
             "当前态势",
             statusText,
             "坊位格局",
@@ -88,7 +104,7 @@ public partial class CountyTownMapViewSystem
             qiText,
             "地气坐标",
             $"Hex [{compound.Cell.X}, {compound.Cell.Y}] · {GetTerrainText(terrainText)}",
-            BuildCompoundDescription(compound, featureSummary, buildingSummary, statusText));
+            ResolveNamedText(BuildCompoundDescription(compound, featureSummary, buildingSummary, statusText)));
     }
 
     private string BuildSelectionDescription(TownActivityAnchorData anchor, string statusText, object? selectedWalker)
@@ -178,6 +194,12 @@ public partial class CountyTownMapViewSystem
             _ => "院域稳定度处在可经营区间，适合继续观察最佳组合。"
         };
         return $"{compound.RegionName}以{compound.QiAffinityText}为主，天然特征为：{featureSummary}。当前院域态势：{statusText}，坊局为【{buildingSummary}】，稳定度 {compound.Stability:0.00}。{efficiencyHint}{stabilityHint}";
+    }
+
+    private static string BuildAnchorBuildingListText(TownActivityAnchorData anchor)
+    {
+        var floorText = anchor.Floors > 1 ? $"{anchor.Floors}层" : "1层";
+        return $"{anchor.Label}（{floorText}）";
     }
 
     private static string GetContentKindText(TownCellContentKind contentKind)

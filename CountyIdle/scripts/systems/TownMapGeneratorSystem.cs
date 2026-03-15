@@ -6,12 +6,32 @@ using System.Linq;
 
 namespace CountyIdle.Systems;
 
+public readonly record struct TownMapBuildingHints(
+    int Agriculture,
+    int Workshop,
+    int Research,
+    int Trade,
+    int Administration)
+{
+    public static TownMapBuildingHints FromState(GameState state)
+    {
+        return new TownMapBuildingHints(
+            state.AgricultureBuildings,
+            state.WorkshopBuildings,
+            state.ResearchBuildings,
+            state.TradeBuildings,
+            state.AdministrationBuildings);
+    }
+}
+
 public class TownMapGeneratorSystem
 {
     private const int MapWidth = 22;
     private const int MapHeight = 16;
+    public const int BuildingsPerAnchor = 2;
+    public const int MaxAnchorsPerType = 4;
 
-    public TownMapData Generate(int populationHint, int housingHint, int eliteHint, int layoutSeed)
+    public TownMapData Generate(int populationHint, int housingHint, int eliteHint, int layoutSeed, TownMapBuildingHints buildingHints)
     {
         var map = new TownMapData(MapWidth, MapHeight);
         var safeSeed = layoutSeed == 0 ? 20260311 : layoutSeed;
@@ -22,33 +42,48 @@ public class TownMapGeneratorSystem
         }
 
         PopulateTerrain(map, safeSeed);
-        PopulateStructures(map, populationHint, housingHint, eliteHint, safeSeed);
+        PopulateStructures(map, populationHint, housingHint, eliteHint, safeSeed, buildingHints);
         return map;
     }
 
-    private static void PopulateStructures(TownMapData map, int populationHint, int housingHint, int eliteHint, int layoutSeed)
+    private static void PopulateStructures(
+        TownMapData map,
+        int populationHint,
+        int housingHint,
+        int eliteHint,
+        int layoutSeed,
+        TownMapBuildingHints buildingHints)
     {
         var usedLots = new HashSet<Vector2I>();
         var anchorCounts = new Dictionary<TownActivityAnchorType, int>();
 
         var anchorSeeds = new[]
         {
-            (Type: TownActivityAnchorType.Farmstead, Content: TownCellContentKind.Production, Preferred: IndustryBuildingType.Agriculture, FloorBias: 1),
-            (Type: TownActivityAnchorType.Workshop, Content: TownCellContentKind.Production, Preferred: IndustryBuildingType.Workshop, FloorBias: 1),
-            (Type: TownActivityAnchorType.Market, Content: TownCellContentKind.Production, Preferred: IndustryBuildingType.Trade, FloorBias: 1),
-            (Type: TownActivityAnchorType.Academy, Content: TownCellContentKind.Service, Preferred: IndustryBuildingType.Research, FloorBias: eliteHint > 4 ? 2 : 1),
-            (Type: TownActivityAnchorType.Administration, Content: TownCellContentKind.Service, Preferred: IndustryBuildingType.Administration, FloorBias: 2),
-            (Type: TownActivityAnchorType.Leisure, Content: TownCellContentKind.Special, Preferred: (IndustryBuildingType?)null, FloorBias: 1)
+            (Type: TownActivityAnchorType.Farmstead, Content: TownCellContentKind.Production, Preferred: IndustryBuildingType.Agriculture, FloorBias: 1, Count: ClampAnchorCount(buildingHints.Agriculture)),
+            (Type: TownActivityAnchorType.Workshop, Content: TownCellContentKind.Production, Preferred: IndustryBuildingType.Workshop, FloorBias: 1, Count: ClampAnchorCount(buildingHints.Workshop)),
+            (Type: TownActivityAnchorType.Market, Content: TownCellContentKind.Production, Preferred: IndustryBuildingType.Trade, FloorBias: 1, Count: ClampAnchorCount(buildingHints.Trade)),
+            (Type: TownActivityAnchorType.Academy, Content: TownCellContentKind.Service, Preferred: IndustryBuildingType.Research, FloorBias: eliteHint > 4 ? 2 : 1, Count: ClampAnchorCount(buildingHints.Research)),
+            (Type: TownActivityAnchorType.Administration, Content: TownCellContentKind.Service, Preferred: IndustryBuildingType.Administration, FloorBias: 2, Count: ClampAnchorCount(buildingHints.Administration)),
+            (Type: TownActivityAnchorType.Leisure, Content: TownCellContentKind.Special, Preferred: (IndustryBuildingType?)null, FloorBias: 1, Count: 1)
         };
 
         foreach (var seed in anchorSeeds)
         {
-            if (TryAddAnchorForSeed(map, usedLots, anchorCounts, seed.Type, seed.Content, seed.Preferred, seed.FloorBias, layoutSeed))
+            if (seed.Count <= 0)
             {
                 continue;
             }
 
-            TryAddAnchorForSeed(map, usedLots, anchorCounts, seed.Type, seed.Content, null, seed.FloorBias, layoutSeed + 17);
+            for (var index = 0; index < seed.Count; index++)
+            {
+                var seedOffset = layoutSeed + (index * 73) + ((int)seed.Type * 29);
+                if (TryAddAnchorForSeed(map, usedLots, anchorCounts, seed.Type, seed.Content, seed.Preferred, seed.FloorBias, seedOffset))
+                {
+                    continue;
+                }
+
+                TryAddAnchorForSeed(map, usedLots, anchorCounts, seed.Type, seed.Content, null, seed.FloorBias, seedOffset + 17);
+            }
         }
 
         var residenceBudget = Math.Clamp(Math.Max(housingHint, populationHint) / 70, 2, 5);
@@ -126,6 +161,22 @@ public class TownMapGeneratorSystem
         }
 
         return false;
+    }
+
+    public static int ResolveAnchorCount(int buildingCount)
+    {
+        if (buildingCount <= 0)
+        {
+            return 0;
+        }
+
+        var mapped = (int)Math.Ceiling(buildingCount / (double)BuildingsPerAnchor);
+        return Math.Clamp(mapped, 1, MaxAnchorsPerType);
+    }
+
+    public static int ClampAnchorCount(int anchorCount)
+    {
+        return Math.Clamp(anchorCount, 0, MaxAnchorsPerType);
     }
 
     private static List<Vector2I> GetCandidateCells(

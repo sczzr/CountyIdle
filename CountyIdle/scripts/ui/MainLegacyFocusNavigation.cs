@@ -13,6 +13,7 @@ public partial class Main
         var taskQuickButton = GetTaskPanelButton();
         var organizationQuickButton = GetSectOrganizationPanelButton();
         var discipleQuickButton = GetDisciplePanelButton();
+        var cultivationQuickButton = GetCultivationPanelButton();
         Control? mapZoomSliderControl = _mapZoomSlider;
         Control? mapZoomResetButtonControl = _mapZoomResetButton;
         Control? worldMapButtonControl = _worldMapButton;
@@ -26,7 +27,7 @@ public partial class Main
             down: organizationQuickButton ?? taskQuickButton);
         LinkFocusNeighbors(_mapZoomResetButton,
             left: _mapZoomSlider,
-            down: discipleQuickButton ?? organizationQuickButton ?? taskQuickButton);
+            down: cultivationQuickButton ?? discipleQuickButton ?? organizationQuickButton ?? taskQuickButton);
 
         LinkFocusNeighbors(_mapPrimaryActionButton,
             left: _tileInspectorSecondaryButton ?? taskQuickButton,
@@ -36,7 +37,7 @@ public partial class Main
         LinkFocusNeighbors(_mapSecondaryActionButton,
             left: _tileInspectorTertiaryButton ?? organizationQuickButton ?? taskQuickButton,
             top: _mapZoomResetButton,
-            down: discipleQuickButton ?? organizationQuickButton ?? taskQuickButton);
+            down: cultivationQuickButton ?? discipleQuickButton ?? organizationQuickButton ?? taskQuickButton);
 
         LinkFocusNeighbors(_tileInspectorPrimaryButton,
             right: _worldMapButton);
@@ -52,6 +53,8 @@ public partial class Main
         LinkFocusNeighbors(organizationQuickButton,
             top: mapZoomSliderControl ?? worldMapButtonControl);
         LinkFocusNeighbors(discipleQuickButton,
+            top: mapZoomResetButtonControl ?? mapZoomSliderControl ?? worldMapButtonControl);
+        LinkFocusNeighbors(cultivationQuickButton,
             top: mapZoomResetButtonControl ?? mapZoomSliderControl ?? worldMapButtonControl);
     }
 

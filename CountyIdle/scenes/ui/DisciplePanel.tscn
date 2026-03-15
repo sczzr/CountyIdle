@@ -143,7 +143,7 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 8
 
-[node name="FilterColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/FilterPanel/FilterMargin" unique_id=1250861816]
+[node name="FilterColumn" type="HBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/FilterPanel/FilterMargin" unique_id=1250861816]
 layout_mode = 2
 theme_override_constants/separation = 8
 
@@ -154,6 +154,26 @@ size_flags_horizontal = 3
 [node name="SortOption" type="OptionButton" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/FilterPanel/FilterMargin/FilterColumn" unique_id=631010105]
 layout_mode = 2
 size_flags_horizontal = 3
+
+[node name="DebugPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn" unique_id=423885017]
+visible = false
+layout_mode = 2
+
+[node name="DebugMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/DebugPanel" unique_id=1973160223]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 6
+
+[node name="DebugRow" type="HBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/DebugPanel/DebugMargin" unique_id=1511845577]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="RandomRosterButton" type="Button" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/DebugPanel/DebugMargin/DebugRow" unique_id=1842851465]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "调试：随机名册"
 
 [node name="RosterFrame" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn" unique_id=953342034]
 layout_mode = 2
@@ -199,7 +219,7 @@ theme_override_constants/margin_bottom = 16
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/separation = 14
+theme_override_constants/separation = 20
 
 [node name="ProfilePanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn" unique_id=1129424395]
 layout_mode = 2
@@ -211,88 +231,93 @@ theme_override_constants/margin_top = 14
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 14
 
-[node name="ProfileHeader" type="GridContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin" unique_id=1311748949]
+[node name="ProfileRow" type="HBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin" unique_id=1734482063]
 layout_mode = 2
-theme_override_constants/h_separation = 14
-theme_override_constants/v_separation = 6
-columns = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 24
 
-[node name="ProfileName" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader" unique_id=1413304954]
+[node name="ProfileHeader" type="HBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow" unique_id=1311748949]
 layout_mode = 2
-theme_override_font_sizes/font_size = 26
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
 
-[node name="RootCircle" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader" unique_id=1723818615]
-custom_minimum_size = Vector2(96, 96)
+[node name="RootCircle" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/ProfileHeader" unique_id=1723818615]
+custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
 
-[node name="RootCircleLabel" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader/RootCircle" unique_id=945783154]
+[node name="RootCircleLabel" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/ProfileHeader/RootCircle" unique_id=945783154]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
 
-[node name="ProfileMeta" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader" unique_id=392714456]
+[node name="ProfileTextColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/ProfileHeader" unique_id=1694858979]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="ProfileName" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/ProfileHeader/ProfileTextColumn" unique_id=1413304954]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+
+[node name="ProfileMeta" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/ProfileHeader/ProfileTextColumn" unique_id=392714456]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 autowrap_mode = 3
 
-[node name="ProfileMetaSpacer" type="Control" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader" unique_id=1734482063]
-layout_mode = 2
-
-[node name="ProfileStatus" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader" unique_id=1701864083]
+[node name="ProfileStatus" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/ProfileHeader/ProfileTextColumn" unique_id=1701864083]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 autowrap_mode = 3
 
-[node name="ProfileStatusSpacer" type="Control" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader" unique_id=1694858979]
+[node name="DirectivePanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow" unique_id=91820417]
 layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(300, 0)
 
-[node name="DirectivePanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn" unique_id=91820417]
-layout_mode = 2
-
-[node name="DirectiveMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel" unique_id=207516341]
+[node name="DirectiveMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/DirectivePanel" unique_id=207516341]
 layout_mode = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 12
 
-[node name="DirectiveColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel/DirectiveMargin" unique_id=911072364]
+[node name="DirectiveColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/DirectivePanel/DirectiveMargin" unique_id=911072364]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="DirectiveHeader" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel/DirectiveMargin/DirectiveColumn" unique_id=1885738562]
+[node name="DirectiveHeader" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/DirectivePanel/DirectiveMargin/DirectiveColumn" unique_id=1885738562]
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 text = "【弟子交互】"
 
-[node name="DirectiveStatus" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel/DirectiveMargin/DirectiveColumn" unique_id=1818599046]
+[node name="DirectiveStatus" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/DirectivePanel/DirectiveMargin/DirectiveColumn" unique_id=1818599046]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "当前批注：常制观察"
 
-[node name="DirectiveEffect" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel/DirectiveMargin/DirectiveColumn" unique_id=2139912900]
+[node name="DirectiveEffect" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/DirectivePanel/DirectiveMargin/DirectiveColumn" unique_id=2139912900]
 layout_mode = 2
 theme_override_font_sizes/font_size = 11
 text = "弟子批注会在历练与内务回流中生效。"
 autowrap_mode = 3
 
-[node name="DirectiveButtonRow" type="HBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel/DirectiveMargin/DirectiveColumn" unique_id=149550352]
+[node name="DirectiveButtonRow" type="HBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/DirectivePanel/DirectiveMargin/DirectiveColumn" unique_id=149550352]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="DirectiveNoneButton" type="Button" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveButtonRow" unique_id=1801821726]
+[node name="DirectiveNoneButton" type="Button" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveButtonRow" unique_id=1801821726]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "常制观察"
 
-[node name="DirectiveOuterButton" type="Button" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveButtonRow" unique_id=283644835]
+[node name="DirectiveOuterButton" type="Button" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveButtonRow" unique_id=283644835]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "纳入外务"
 
-[node name="DirectiveStewardButton" type="Button" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveButtonRow" unique_id=874263101]
+[node name="DirectiveStewardButton" type="Button" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveButtonRow" unique_id=874263101]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "执事培养"
@@ -305,7 +330,7 @@ theme_override_constants/h_separation = 24
 theme_override_constants/v_separation = 24
 
 [node name="FoundationPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow" unique_id=442415935]
-custom_minimum_size = Vector2(320, 0)
+custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -580,7 +605,7 @@ text = "0"
 horizontal_alignment = 1
 
 [node name="CultivationPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow" unique_id=2004348307]
-custom_minimum_size = Vector2(320, 0)
+custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -708,28 +733,6 @@ layout_mode = 2
 theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 8
 
-[node name="AnnotationPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn" unique_id=801365116]
-layout_mode = 2
-
-[node name="AnnotationMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/AnnotationPanel" unique_id=1122235317]
-layout_mode = 2
-theme_override_constants/margin_left = 18
-theme_override_constants/margin_top = 14
-theme_override_constants/margin_right = 18
-theme_override_constants/margin_bottom = 14
-
-[node name="AnnotationColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/AnnotationPanel/AnnotationMargin" unique_id=291601773]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="AnnotationHeader" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/AnnotationPanel/AnnotationMargin/AnnotationColumn" unique_id=135734135]
-layout_mode = 2
-theme_override_font_sizes/font_size = 13
-text = "【衍天批注】"
-
-[node name="AnnotationText" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/AnnotationPanel/AnnotationMargin/AnnotationColumn" unique_id=1065459550]
-layout_mode = 2
-
 [node name="FullInfoPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn" unique_id=946533041]
 custom_minimum_size = Vector2(0, 190)
 layout_mode = 2
@@ -744,12 +747,35 @@ theme_override_constants/margin_bottom = 14
 [node name="FullInfoColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/FullInfoPanel/FullInfoMargin" unique_id=383587387]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 8
+theme_override_constants/separation = 12
 
 [node name="FullInfoHeader" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/FullInfoPanel/FullInfoMargin/FullInfoColumn" unique_id=2018006387]
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
-text = "【卷尾详录】"
+text = "卷尾详录 · 衍天推演"
+
+[node name="AnnotationPanel" type="PanelContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/FullInfoPanel/FullInfoMargin/FullInfoColumn" unique_id=801365116]
+layout_mode = 2
+
+[node name="AnnotationMargin" type="MarginContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/FullInfoPanel/FullInfoMargin/FullInfoColumn/AnnotationPanel" unique_id=1122235317]
+layout_mode = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 0
+
+[node name="AnnotationColumn" type="VBoxContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/FullInfoPanel/FullInfoMargin/FullInfoColumn/AnnotationPanel/AnnotationMargin" unique_id=291601773]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="AnnotationHeader" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/FullInfoPanel/FullInfoMargin/FullInfoColumn/AnnotationPanel/AnnotationMargin/AnnotationColumn" unique_id=135734135]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "衍天批注"
+
+[node name="AnnotationText" type="Label" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/FullInfoPanel/FullInfoMargin/FullInfoColumn/AnnotationPanel/AnnotationMargin/AnnotationColumn" unique_id=1065459550]
+layout_mode = 2
 
 [node name="FullInfoScroll" type="ScrollContainer" parent="Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/FullInfoPanel/FullInfoMargin/FullInfoColumn" unique_id=840757335]
 layout_mode = 2
@@ -773,3 +799,4 @@ color = Color(0.478431, 0.478431, 0.478431, 0.35)
 custom_minimum_size = Vector2(0, 30)
 layout_mode = 2
 vertical_alignment = 1
+

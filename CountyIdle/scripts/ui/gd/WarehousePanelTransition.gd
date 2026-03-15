@@ -1,13 +1,13 @@
 extends Node
 
-const PAPER_MAIN := Color(0.95, 0.92, 0.84, 1.0)
-const PAPER_DARK := Color(0.89, 0.85, 0.76, 1.0)
-const INK_MAIN := Color(0.17, 0.15, 0.13, 1.0)
-const INK_MUTED := Color(0.42, 0.37, 0.33, 1.0)
-const SEAL_RED := Color(0.65, 0.16, 0.16, 1.0)
-const BORDER_INK := Color(0.29, 0.25, 0.21, 1.0)
-const ACCENT_GOLD := Color(0.72, 0.53, 0.04, 1.0)
-const ACCENT_BLUE := Color(0.19, 0.33, 0.54, 1.0)
+const PAPER_MAIN := Color(0.925, 0.906, 0.835, 1.0)
+const PAPER_DARK := Color(0.890, 0.863, 0.780, 1.0)
+const INK_MAIN := Color(0.169, 0.157, 0.141, 1.0)
+const INK_MUTED := Color(0.478, 0.443, 0.380, 1.0)
+const SEAL_RED := Color(0.722, 0.231, 0.231, 1.0)
+const BORDER_INK := Color(0.820, 0.784, 0.706, 1.0)
+const ACCENT_GOLD := Color(0.769, 0.604, 0.271, 1.0)
+const ACCENT_BLUE := Color(0.231, 0.510, 0.769, 1.0)
 const ACTIVE_SLOT_MODULATE := Color(1.0, 1.0, 1.0, 1.0)
 const INACTIVE_SLOT_MODULATE := Color(1.0, 1.0, 1.0, 0.45)
 const TOKEN_INACTIVE_MODULATE := Color(1.0, 1.0, 1.0, 0.62)
@@ -52,9 +52,11 @@ func _ready() -> void:
 	_tier_zero_chain_status_value = root.get_node("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection/ChainInfoFrame/ChainInfoMargin/TierZeroStatusValue")
 	_tab_buttons = {
 		"All": root.get_node("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/TabRow/AllTabButton") as Button,
-		"Basic": root.get_node("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/TabRow/BasicTabButton") as Button,
-		"Materials": root.get_node("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/TabRow/MaterialsTabButton") as Button,
-		"Crafted": root.get_node("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/TabRow/CraftedTabButton") as Button
+		"Relics": root.get_node("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/TabRow/BasicTabButton") as Button,
+		"Manuals": root.get_node("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/TabRow/MaterialsTabButton") as Button,
+		"Elixirs": root.get_node("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/TabRow/CraftedTabButton") as Button,
+		"Treasures": root.get_node("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/TabRow/TreasuresTabButton") as Button,
+		"Currency": root.get_node("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/TabRow/CurrencyTabButton") as Button
 	}
 	apply_theme_styles()
 	reset_state()
@@ -81,7 +83,7 @@ func apply_theme_styles() -> void:
 	_chain_info_frame.add_theme_stylebox_override("panel", _create_note_style())
 
 	var title_label: Label = root.get_node("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/HeaderRow/TitleGroup/TitleLabel")
-	title_label.add_theme_font_size_override("font_size", 26)
+	title_label.add_theme_font_size_override("font_size", 28)
 	title_label.add_theme_color_override("font_color", INK_MAIN)
 
 	var subtitle_label: Label = root.get_node("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/HeaderRow/TitleGroup/SubtitleLabel")
@@ -94,7 +96,7 @@ func apply_theme_styles() -> void:
 	_hint_label.add_theme_font_size_override("font_size", 14)
 	_warehouse_status_value.add_theme_font_size_override("font_size", 12)
 	_warehouse_status_value.add_theme_color_override("font_color", INK_MUTED)
-	_capacity_value_label.add_theme_font_size_override("font_size", 20)
+	_capacity_value_label.add_theme_font_size_override("font_size", 18)
 	_capacity_value_label.add_theme_color_override("font_color", INK_MAIN)
 	_tier_zero_chain_status_value.add_theme_font_size_override("font_size", 13)
 	_tier_zero_chain_status_value.add_theme_color_override("font_color", INK_MAIN)
@@ -153,7 +155,7 @@ func style_resource_slot(card, token, token_glyph, name_label, type_label, amoun
 		token_glyph.add_theme_color_override("font_color", PAPER_MAIN)
 	if name_label is Label:
 		name_label.add_theme_font_size_override("font_size", 17)
-		name_label.add_theme_color_override("font_color", INK_MAIN)
+		name_label.add_theme_color_override("font_color", accent_color)
 	if type_label is Label:
 		type_label.add_theme_font_size_override("font_size", 11)
 		type_label.add_theme_color_override("font_color", INK_MUTED)
@@ -214,7 +216,7 @@ func reset_state() -> void:
 func _apply_tab_button_style(button: Button, active: bool) -> void:
 	button.flat = true
 	button.alignment = HORIZONTAL_ALIGNMENT_CENTER
-	button.add_theme_font_size_override("font_size", 16)
+	button.add_theme_font_size_override("font_size", 17 if active else 16)
 	button.add_theme_stylebox_override("normal", _create_tab_style(active))
 	button.add_theme_stylebox_override("hover", _create_tab_style(true))
 	button.add_theme_stylebox_override("pressed", _create_tab_style(true))
@@ -246,8 +248,8 @@ func _apply_close_button_style(button: Button) -> void:
 	button.add_theme_stylebox_override("normal", _create_transparent_style())
 	button.add_theme_stylebox_override("hover", _create_transparent_style())
 	button.add_theme_stylebox_override("pressed", _create_transparent_style())
-	button.add_theme_color_override("font_color", INK_MAIN)
-	button.add_theme_color_override("font_hover_color", SEAL_RED)
+	button.add_theme_color_override("font_color", ACCENT_GOLD)
+	button.add_theme_color_override("font_hover_color", ACCENT_GOLD)
 	button.add_theme_color_override("font_pressed_color", SEAL_RED)
 
 
@@ -274,7 +276,7 @@ func _create_paper_style() -> StyleBoxFlat:
 	style.border_width_top = 1
 	style.border_width_right = 1
 	style.border_width_bottom = 1
-	style.border_color = Color(0.48, 0.42, 0.35, 0.45)
+	style.border_color = Color(ACCENT_GOLD.r, ACCENT_GOLD.g, ACCENT_GOLD.b, 0.55)
 	style.corner_radius_top_left = 2
 	style.corner_radius_top_right = 2
 	style.corner_radius_bottom_right = 2
@@ -319,27 +321,27 @@ func _create_note_style() -> StyleBoxFlat:
 
 func _create_tab_style(active: bool) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = PAPER_DARK if active else Color(PAPER_MAIN.r, PAPER_MAIN.g, PAPER_MAIN.b, 0.0)
-	style.border_width_left = 1
-	style.border_width_top = 1
-	style.border_width_right = 1
-	style.border_width_bottom = 0
-	style.border_color = BORDER_INK if active else Color(0.0, 0.0, 0.0, 0.0)
-	style.content_margin_left = 12
-	style.content_margin_top = 8
-	style.content_margin_right = 12
-	style.content_margin_bottom = 8
+	style.bg_color = Color(PAPER_MAIN.r, PAPER_MAIN.g, PAPER_MAIN.b, 0.0)
+	style.border_width_left = 0
+	style.border_width_top = 0
+	style.border_width_right = 0
+	style.border_width_bottom = 3 if active else 0
+	style.border_color = ACCENT_GOLD if active else Color(0.0, 0.0, 0.0, 0.0)
+	style.content_margin_left = 10
+	style.content_margin_top = 6
+	style.content_margin_right = 10
+	style.content_margin_bottom = 6
 	return style
 
 
 func _create_slot_style() -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(PAPER_MAIN.r, PAPER_MAIN.g, PAPER_MAIN.b, 0.32)
+	style.bg_color = PAPER_DARK
 	style.border_width_left = 1
 	style.border_width_top = 1
 	style.border_width_right = 1
 	style.border_width_bottom = 1
-	style.border_color = Color(BORDER_INK.r, BORDER_INK.g, BORDER_INK.b, 0.55)
+	style.border_color = Color(BORDER_INK.r, BORDER_INK.g, BORDER_INK.b, 0.65)
 	style.corner_radius_top_left = 2
 	style.corner_radius_top_right = 2
 	style.corner_radius_bottom_right = 2
@@ -354,7 +356,7 @@ func _create_token_style(accent_color: Color) -> StyleBoxFlat:
 	style.border_width_top = 1
 	style.border_width_right = 1
 	style.border_width_bottom = 1
-	style.border_color = Color(0.12, 0.10, 0.08, 0.85)
+	style.border_color = Color(1.0, 1.0, 1.0, 0.45)
 	style.corner_radius_top_left = 6
 	style.corner_radius_top_right = 6
 	style.corner_radius_bottom_right = 6

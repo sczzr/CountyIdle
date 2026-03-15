@@ -380,11 +380,11 @@ public static class SectTaskRules
 
         var title = $"{GetJobIcon(jobType)} {GetJobDisplayName(jobType)}";
         var summary = summaryParts.Count > 0
-            ? $"{SectOrganizationRules.GetLinkedPeakSummary(jobType)} · {BuildJobExecutionText(tasks, snapshot, state)}"
-            : $"{SectOrganizationRules.GetLinkedPeakSummary(jobType)} · 尚未定调";
+            ? $"{SectOrganizationRules.GetLinkedPeakSummary(state, jobType)} · {BuildJobExecutionText(tasks, snapshot, state)}"
+            : $"{SectOrganizationRules.GetLinkedPeakSummary(state, jobType)} · 尚未定调";
         var activeSupport = SectPeakSupportRules.GetActiveDefinition(state);
         var detail =
-            $"当前方略：{string.Join("；", detailParts)}。{SectOrganizationRules.GetLinkedDepartmentDetail(jobType)} 当前峰脉协同：{activeSupport.DisplayName}（{activeSupport.ShortEffect}）。该职司由执事层按门人状态、场所条件与门规自动排班，宗主只需决定方向与轻重，不必逐人分配。请在“宗主中枢”中调整。";
+            $"当前方略：{string.Join("；", detailParts)}。{SectOrganizationRules.GetLinkedDepartmentDetail(state, jobType)} 当前峰脉协同：{activeSupport.DisplayName}（{activeSupport.ShortEffect}）。该职司由执事层按门人状态、场所条件与门规自动排班，宗主只需决定方向与轻重，不必逐人分配。请在“宗主中枢”中调整。";
 
         return new JobPanelInfo(
             jobType,

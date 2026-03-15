@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://b20qvcemv4kby" path="res://scripts/ui/gd/MainTopTabVisualFx.gd" id="11_main_top_tab_fx"]
 [ext_resource type="Script" uid="uid://c0qu7x3gk3qos" path="res://scripts/ui/gd/StrategicMapPanelToneFx.gd" id="12_strategic_tone_fx"]
 [ext_resource type="Script" uid="uid://0ea62yb24kia" path="res://scripts/ui/gd/CountyTownMapHintFx.gd" id="13_town_hint_fx"]
+[ext_resource type="Script" path="res://scripts/map/gd/WorldTerrainTileBindings.gd" id="14_world_terrain_bindings"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab"]
 content_margin_left = 14.0
@@ -321,6 +322,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_map_layer")
 script = ExtResource("2_strategic_map")
 
 [node name="WorldTerrainTileLayer" type="TileMapLayer" parent="PanelContent/MapViewport/MapPages/WorldMapView" unique_id=1379658821]
+script = ExtResource("14_world_terrain_bindings")
 
 [node name="Label" type="Label" parent="PanelContent/MapViewport/MapPages/WorldMapView" unique_id=235955371]
 layout_mode = 2

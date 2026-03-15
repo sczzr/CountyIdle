@@ -22,7 +22,8 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
     private const bool ShowLayer2TerrainOverlay = false;
     private static readonly bool DrawTerrainGridOutline = false;
     private const float PanSpeed = 520f;
-    private const float TerrainHexFillScale = 1.01f;
+    private const float TerrainHexFillScale = 1.0f;
+    private const float TerrainHexSeamUvInsetPx = 20.0f;
 
     private static readonly Color GroundColor = new(0.23f, 0.27f, 0.21f, 1.0f);
     private static readonly Color RoadColor = new(0.43f, 0.41f, 0.35f, 1.0f);
@@ -125,6 +126,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
     private const string RoofTexturePath = "";
     private const string GateTexturePath = "";
 
+    private IReadOnlyDictionary<string, string>? _nameMap;
     private readonly TownMapGeneratorSystem _generator = new();
     private readonly Dictionary<TownTerrainType, Texture2D?> _terrainTextures = new();
     private readonly Dictionary<string, Texture2D> _terrainAtlasTextures = new(StringComparer.Ordinal);
@@ -152,6 +154,8 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
     private int _populationHint = 120;
     private int _housingHint = 180;
     private int _eliteHint = 8;
+    private TownMapBuildingHints _buildingHints = new(0, 0, 0, 0, 0);
+    private readonly List<TownBuildingPlacement> _placedBuildings = new();
     private float _zoom = 1.22f;
     private float _zoomTarget = 1.22f;
     private float _zoomVelocity;
@@ -414,8 +418,14 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         return direction;
     }
 
-    public void RefreshMap(int populationHint, int housingHint, int eliteHint)
+    public void RefreshMap(
+        int populationHint,
+        int housingHint,
+        int eliteHint,
+        TownMapBuildingHints buildingHints,
+        IReadOnlyList<TownBuildingPlacement>? placements = null)
     {
+        var placementsChanged = SyncPlacedBuildings(placements);
         if (_usesExternalMap)
         {
             return;
@@ -424,11 +434,32 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         var safePopulation = Math.Max(populationHint, 0);
         var safeHousing = Math.Max(housingHint, 0);
         var safeElite = Math.Max(eliteHint, 0);
+        var safeBuildingHints = new TownMapBuildingHints(
+            Math.Max(buildingHints.Agriculture, 0),
+            Math.Max(buildingHints.Workshop, 0),
+            Math.Max(buildingHints.Research, 0),
+            Math.Max(buildingHints.Trade, 0),
+            Math.Max(buildingHints.Administration, 0));
+        var placedCounts = GetPlacedBuildingCounts();
+        var totalAnchorCounts = new TownMapBuildingHints(
+            TownMapGeneratorSystem.ResolveAnchorCount(safeBuildingHints.Agriculture),
+            TownMapGeneratorSystem.ResolveAnchorCount(safeBuildingHints.Workshop),
+            TownMapGeneratorSystem.ResolveAnchorCount(safeBuildingHints.Research),
+            TownMapGeneratorSystem.ResolveAnchorCount(safeBuildingHints.Trade),
+            TownMapGeneratorSystem.ResolveAnchorCount(safeBuildingHints.Administration));
+        var effectiveBuildingHints = new TownMapBuildingHints(
+            Math.Max(totalAnchorCounts.Agriculture - placedCounts.Agriculture, 0),
+            Math.Max(totalAnchorCounts.Workshop - placedCounts.Workshop, 0),
+            Math.Max(totalAnchorCounts.Research - placedCounts.Research, 0),
+            Math.Max(totalAnchorCounts.Trade - placedCounts.Trade, 0),
+            Math.Max(totalAnchorCounts.Administration - placedCounts.Administration, 0));
 
         if (_mapData != null &&
             safePopulation == _populationHint &&
             safeHousing == _housingHint &&
-            safeElite == _eliteHint)
+            safeElite == _eliteHint &&
+            effectiveBuildingHints.Equals(_buildingHints) &&
+            !placementsChanged)
         {
             return;
         }
@@ -436,6 +467,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         _populationHint = safePopulation;
         _housingHint = safeHousing;
         _eliteHint = safeElite;
+        _buildingHints = effectiveBuildingHints;
 
         if (!_isInitialized)
         {
@@ -445,9 +477,75 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         RebuildMap();
     }
 
+    private bool SyncPlacedBuildings(IReadOnlyList<TownBuildingPlacement>? placements)
+    {
+        placements ??= Array.Empty<TownBuildingPlacement>();
+        if (ArePlacementsEqual(_placedBuildings, placements))
+        {
+            return false;
+        }
+
+        _placedBuildings.Clear();
+        foreach (var placement in placements)
+        {
+            if (placement == null)
+            {
+                continue;
+            }
+
+            _placedBuildings.Add(new TownBuildingPlacement(placement.BuildingType, placement.X, placement.Y));
+        }
+
+        return true;
+    }
+
+    private static bool ArePlacementsEqual(
+        List<TownBuildingPlacement> existing,
+        IReadOnlyList<TownBuildingPlacement> incoming)
+    {
+        if (existing.Count != incoming.Count)
+        {
+            return false;
+        }
+
+        for (var index = 0; index < existing.Count; index++)
+        {
+            var left = existing[index];
+            var right = incoming[index];
+            if (left == null || right == null)
+            {
+                return false;
+            }
+
+            if (left.BuildingType != right.BuildingType ||
+                left.X != right.X ||
+                left.Y != right.Y)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public void RefreshOperationalState(MapViewStyle style)
     {
         _operationalStyle = style ?? new MapViewStyle();
+        UpdateMapHint();
+        QueueRedraw();
+    }
+
+    public void RefreshNaming(GameState state)
+    {
+        if (state == null)
+        {
+            _nameMap = null;
+            UpdateMapHint();
+            return;
+        }
+
+        SectNamingRules.EnsureDefaults(state);
+        _nameMap = new Dictionary<string, string>(state.SectNameMap ?? new Dictionary<string, string>());
         UpdateMapHint();
         QueueRedraw();
     }
@@ -472,7 +570,8 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
             return;
         }
 
-        _mapData = _generator.Generate(_populationHint, _housingHint, _eliteHint, _layoutSeed);
+        _mapData = _generator.Generate(_populationHint, _housingHint, _eliteHint, _layoutSeed, _buildingHints);
+        ApplyPlacedBuildings(_mapData);
         _selectedActivityAnchor = null;
         _selectedCell = null;
         _hoveredCell = null;
@@ -496,9 +595,11 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
             return;
         }
 
+        var sectName = SectNamingRules.GetName(_nameMap, SectNamingRules.SectNameKey);
+        var peakName = SectNamingRules.GetName(_nameMap, SectNamingRules.PeakTianyanKey);
         var summaryLine = _usesExternalMap
             ? $"{_externalMapTitle} · 缩放 {(int)Mathf.Round(_zoom * 100f)}%"
-            : $"浮云宗·天衍峰（hex 俯瞰） · {_operationalStyle.TitleSuffix} · 院域检视 · 缩放 {(int)Mathf.Round(_zoom * 100f)}%";
+            : $"{sectName}·{peakName}（hex 俯瞰） · {_operationalStyle.TitleSuffix} · 院域检视 · 缩放 {(int)Mathf.Round(_zoom * 100f)}%";
         var interactionLine = _usesExternalMap
             ? _externalMapInteractionHint
             : SectMapSemanticRules.GetMapInteractionHint();
@@ -786,10 +887,13 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
             _hexTintColors[index] = TintColor(Colors.White, _operationalStyle.TerrainTint);
         }
 
+        var uvRegion = ClipAtlasRegionToTileSize(new Rect2(textureRegion.Position, textureRegion.Size), _layer1TileSet.TileSize);
+        uvRegion = InsetAtlasRegion(uvRegion, TerrainHexSeamUvInsetPx);
+
         DrawPolygon(
             tile,
             _hexTintColors,
-            CreateAtlasRegionUv(new Rect2(textureRegion.Position, textureRegion.Size), atlasSource.Texture),
+            CreateAtlasRegionUv(uvRegion, atlasSource.Texture),
             atlasSource.Texture);
         return true;
     }
@@ -1703,6 +1807,54 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
             new Vector2(region.Position.X / atlasWidth, (region.Position.Y + (region.Size.Y * 0.75f)) / atlasHeight),
             new Vector2(region.Position.X / atlasWidth, (region.Position.Y + (region.Size.Y * 0.25f)) / atlasHeight)
         ];
+    }
+
+    private static Rect2 ClipAtlasRegionToTileSize(Rect2 region, Vector2I tileSize)
+    {
+        if (tileSize.X <= 0 || tileSize.Y <= 0)
+        {
+            return region;
+        }
+
+        var targetWidth = MathF.Min(region.Size.X, tileSize.X);
+        var targetHeight = MathF.Min(region.Size.Y, tileSize.Y);
+        if (targetWidth <= 0f || targetHeight <= 0f)
+        {
+            return region;
+        }
+
+        var targetSize = new Vector2(targetWidth, targetHeight);
+        var padding = (region.Size - targetSize) * 0.5f;
+        if (padding.X < 0f || padding.Y < 0f)
+        {
+            return region;
+        }
+
+        return new Rect2(region.Position + padding, targetSize);
+    }
+
+    private static Rect2 InsetAtlasRegion(Rect2 region, float insetPx)
+    {
+        if (insetPx <= 0f)
+        {
+            return region;
+        }
+
+        var maxInset = MathF.Min(region.Size.X, region.Size.Y) * 0.25f;
+        var inset = MathF.Min(insetPx, maxInset);
+        if (inset <= 0f)
+        {
+            return region;
+        }
+
+        var insetVector = new Vector2(inset, inset);
+        var newSize = region.Size - (insetVector * 2f);
+        if (newSize.X <= 0f || newSize.Y <= 0f)
+        {
+            return region;
+        }
+
+        return new Rect2(region.Position + insetVector, newSize);
     }
 
     private Color GetTerrainColor(TownTerrainType terrainType)

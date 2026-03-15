@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Godot;
 using CountyIdle.Models;
 using CountyIdle.Systems;
@@ -58,6 +59,7 @@ public partial class GameLoop : Node
     {
         _state = state ?? new GameState();
         InventoryRules.EndTransaction(_state);
+        SectNamingRules.EnsureDefaults(_state);
         IndustryRules.EnsureDefaults(_state);
         PopulationRules.EnsureDefaults(_state);
         MaterialRules.EnsureDefaults(_state);
@@ -76,6 +78,7 @@ public partial class GameLoop : Node
     {
         _state = new GameState();
         InventoryRules.EndTransaction(_state);
+        SectNamingRules.EnsureDefaults(_state);
         PopulationRules.EnsureDefaults(_state);
         MaterialRules.EnsureDefaults(_state);
         _sectGovernanceSystem.EnsureDefaults(_state);
@@ -317,6 +320,18 @@ public partial class GameLoop : Node
         }
 
         _eventBus.PublishLog(log);
+        _eventBus.PublishState(_state.Clone());
+    }
+
+    public void UpdateSectNames(IReadOnlyDictionary<string, string> nameMap)
+    {
+        if (nameMap == null)
+        {
+            return;
+        }
+
+        SectNamingRules.ApplyNames(_state, nameMap);
+        _eventBus.PublishLog("宗门命名已更新。");
         _eventBus.PublishState(_state.Clone());
     }
 

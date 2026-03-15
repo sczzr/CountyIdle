@@ -12,6 +12,8 @@ public sealed class TownMapSelectionSummary
         string badgeText,
         string title,
         string subtitle,
+        string buildingLabel,
+        string buildingText,
         string statusLabel,
         string statusText,
         string residentLabel,
@@ -29,6 +31,8 @@ public sealed class TownMapSelectionSummary
         BadgeText = badgeText;
         Title = title;
         Subtitle = subtitle;
+        BuildingLabel = buildingLabel;
+        BuildingText = buildingText;
         StatusLabel = statusLabel;
         StatusText = statusText;
         ResidentLabel = residentLabel;
@@ -47,6 +51,8 @@ public sealed class TownMapSelectionSummary
     public string BadgeText { get; }
     public string Title { get; }
     public string Subtitle { get; }
+    public string BuildingLabel { get; }
+    public string BuildingText { get; }
     public string StatusLabel { get; }
     public string StatusText { get; }
     public string ResidentLabel { get; }
@@ -59,14 +65,23 @@ public sealed class TownMapSelectionSummary
 
     public static TownMapSelectionSummary CreateDefault()
     {
+        return CreateDefault("浮云宗", "天衍峰");
+    }
+
+    public static TownMapSelectionSummary CreateDefault(string sectName, string peakName)
+    {
+        var safeSectName = string.IsNullOrWhiteSpace(sectName) ? "浮云宗" : sectName;
+        var safePeakName = string.IsNullOrWhiteSpace(peakName) ? "天衍峰" : peakName;
         return new TownMapSelectionSummary(
             false,
             null,
             null,
             null,
             "未选中地块",
-            "浮云宗·天衍峰",
+            $"{safeSectName}·{safePeakName}",
             "点击任意院域检视地块详情",
+            "建筑列表",
+            "待选中",
             "当前态势",
             "未检视",
             "坊位格局",
@@ -75,6 +90,6 @@ public sealed class TownMapSelectionSummary
             "--",
             "地气坐标",
             "Hex 坐标待定",
-            "天衍峰山门图现已支持全格检视，左键点选任意六角地块后可查看其院域底盘、灵气和推荐坊局。");
+            $"{safePeakName}山门图现已支持全格检视，左键点选任意六角地块后可查看其院域底盘、灵气和推荐坊局。");
     }
 }

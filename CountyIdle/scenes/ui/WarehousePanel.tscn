@@ -4,11 +4,12 @@
 [ext_resource type="Script" uid="uid://cw6burt7tuet5" path="res://scripts/ui/gd/WarehousePanelTransition.gd" id="2_warehouse_fx"]
 
 [node name="WarehousePanel" type="Control" unique_id=45709030]
-visible = false
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_right = 768.0
+offset_bottom = 432.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -24,7 +25,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.101961, 0.0862745, 0.0745098, 0.94)
+color = Color(0.0588235, 0.0666667, 0.0823529, 0.95)
 
 [node name="CenterLayer" type="CenterContainer" parent="." unique_id=1148067976]
 layout_mode = 1
@@ -35,7 +36,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="LedgerWrapper" type="Control" parent="CenterLayer" unique_id=743845529]
-custom_minimum_size = Vector2(1400, 640)
+custom_minimum_size = Vector2(1920, 1080)
 layout_mode = 2
 
 [node name="TopTrim" type="ColorRect" parent="CenterLayer/LedgerWrapper" unique_id=628581716]
@@ -44,7 +45,7 @@ offset_left = 10.0
 offset_top = 12.0
 offset_right = 1390.0
 offset_bottom = 22.0
-color = Color(0.831373, 0.686275, 0.215686, 1)
+color = Color(0.768627, 0.603922, 0.270588, 1)
 
 [node name="BottomTrim" type="ColorRect" parent="CenterLayer/LedgerWrapper" unique_id=68501338]
 layout_mode = 0
@@ -52,7 +53,7 @@ offset_left = 10.0
 offset_top = 618.0
 offset_right = 1390.0
 offset_bottom = 628.0
-color = Color(0.831373, 0.686275, 0.215686, 1)
+color = Color(0.768627, 0.603922, 0.270588, 1)
 
 [node name="FrameRow" type="HBoxContainer" parent="CenterLayer/LedgerWrapper" unique_id=2089936167]
 layout_mode = 0
@@ -63,17 +64,18 @@ offset_bottom = 616.0
 theme_override_constants/separation = 0
 
 [node name="LeftRoller" type="PanelContainer" parent="CenterLayer/LedgerWrapper/FrameRow" unique_id=786379213]
+visible = false
 custom_minimum_size = Vector2(24, 0)
 layout_mode = 2
 size_flags_vertical = 3
 
 [node name="LeftTopCap" type="ColorRect" parent="CenterLayer/LedgerWrapper/FrameRow/LeftRoller" unique_id=2124898496]
 layout_mode = 2
-color = Color(0.831373, 0.686275, 0.215686, 1)
+color = Color(0.768627, 0.603922, 0.270588, 1)
 
 [node name="LeftBottomCap" type="ColorRect" parent="CenterLayer/LedgerWrapper/FrameRow/LeftRoller" unique_id=1293246648]
 layout_mode = 2
-color = Color(0.831373, 0.686275, 0.215686, 1)
+color = Color(0.768627, 0.603922, 0.270588, 1)
 
 [node name="Paper" type="PanelContainer" parent="CenterLayer/LedgerWrapper/FrameRow" unique_id=1589847313]
 custom_minimum_size = Vector2(880, 0)
@@ -103,11 +105,11 @@ theme_override_constants/separation = 10
 
 [node name="TitleLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/HeaderRow/TitleGroup" unique_id=367401343]
 layout_mode = 2
-text = "天衍峰库藏卷"
+text = "天衍宗 · 藏宝阁"
 
 [node name="SubtitleLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/HeaderRow/TitleGroup" unique_id=1331277134]
 layout_mode = 2
-text = "（总库）"
+text = "（内门总库）"
 
 [node name="CloseButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/HeaderRow" unique_id=660057542]
 custom_minimum_size = Vector2(36, 32)
@@ -144,16 +146,16 @@ theme_override_constants/separation = 2
 
 [node name="HintLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/StatusRow/StatusTextColumn" unique_id=1835077941]
 layout_mode = 2
-text = "仓廪将满，亟需扩建或消耗度支。"
+text = "须弥芥子空间已达极限，亟需阵法宗师铭刻扩容阵纹。"
 autowrap_mode = 3
 
 [node name="WarehouseStatusValue" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/StatusRow/StatusTextColumn" unique_id=2012291731]
 layout_mode = 2
-text = "仓储壹级 · 矿坑壹级"
+text = "当前品阶：须弥空间 贰阶 · 聚灵大阵 叁阶"
 
 [node name="CapacityValueLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/StatusRow" unique_id=1093576269]
 layout_mode = 2
-text = "已占 0 / 1200"
+text = "9,985 / 10,000"
 horizontal_alignment = 2
 
 [node name="CapacityBarFrame" type="Panel" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent" unique_id=343182364]
@@ -191,32 +193,42 @@ theme_override_constants/separation = 14
 
 [node name="TabRow" type="HBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea" unique_id=1787820981]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 16
 
 [node name="AllTabButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/TabRow" unique_id=1561387101]
-custom_minimum_size = Vector2(72, 54)
+custom_minimum_size = Vector2(86, 54)
 layout_mode = 2
-text = "全览"
+text = "森罗全象"
 
 [node name="BasicTabButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/TabRow" unique_id=760143598]
-custom_minimum_size = Vector2(106, 54)
+custom_minimum_size = Vector2(90, 54)
 layout_mode = 2
-text = "农桑（基础）"
+text = "神兵法宝"
 
 [node name="MaterialsTabButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/TabRow" unique_id=1794883168]
-custom_minimum_size = Vector2(106, 54)
+custom_minimum_size = Vector2(90, 54)
 layout_mode = 2
-text = "金石（资材）"
+text = "功法秘籍"
 
 [node name="CraftedTabButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/TabRow" unique_id=67758145]
-custom_minimum_size = Vector2(106, 54)
+custom_minimum_size = Vector2(90, 54)
 layout_mode = 2
-text = "百工（造物）"
+text = "丹药灵草"
+
+[node name="TreasuresTabButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/TabRow" unique_id=1548311315]
+custom_minimum_size = Vector2(90, 54)
+layout_mode = 2
+text = "天材地宝"
+
+[node name="CurrencyTabButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/TabRow" unique_id=1008963497]
+custom_minimum_size = Vector2(90, 54)
+layout_mode = 2
+text = "宗门玉钱"
 
 [node name="InventoryUnderline" type="ColorRect" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea" unique_id=808595488]
 custom_minimum_size = Vector2(0, 1)
 layout_mode = 2
-color = Color(0.294118, 0.247059, 0.207843, 1)
+color = Color(0.819608, 0.784314, 0.705882, 1)
 
 [node name="InventoryScroll" type="ScrollContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea" unique_id=529776580]
 layout_mode = 2
@@ -306,18 +318,18 @@ theme_override_constants/separation = 10
 
 [node name="ManufactureTitle" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ManufactureSection" unique_id=1331644440]
 layout_mode = 2
-text = "◈ 天工造物（制造）"
+text = "◈ 炼器设炉（锻造）"
 
 [node name="LockedForgeButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ManufactureSection" unique_id=749866467]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 disabled = true
-text = "锻制法器（未解锁）"
+text = "锻造法宝（未解锁）"
 
 [node name="CraftToolsButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ManufactureSection" unique_id=842462415]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
-text = "锻制工器"
+text = "祭炼阵旗"
 
 [node name="BuildSection" type="VBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn" unique_id=1488360730]
 layout_mode = 2
@@ -325,22 +337,22 @@ theme_override_constants/separation = 10
 
 [node name="BuildTitle" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/BuildSection" unique_id=1300836476]
 layout_mode = 2
-text = "◈ 宗门土木（扩建）"
+text = "◈ 洞天福地（扩建）"
 
 [node name="UpgradeButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/BuildSection" unique_id=2090871679]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
-text = "矿仓联建"
+text = "须弥扩容"
 
 [node name="BuildWorkshopButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/BuildSection" unique_id=1643694770]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
-text = "扩建傀儡工坊"
+text = "辟建地火丹室"
 
 [node name="BuildAdministrationButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/BuildSection" unique_id=566847329]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
-text = "扩建庶务殿"
+text = "扩建传功阁"
 
 [node name="ChainSection" type="VBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn" unique_id=2063039304]
 layout_mode = 2
@@ -348,7 +360,7 @@ theme_override_constants/separation = 10
 
 [node name="ChainTitle" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection" unique_id=1897588516]
 layout_mode = 2
-text = "◈ 供养法旨（生产链）"
+text = "◈ 聚灵法阵（流转）"
 
 [node name="ChainInfoFrame" type="PanelContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection" unique_id=572104987]
 layout_mode = 2
@@ -362,40 +374,41 @@ theme_override_constants/margin_bottom = 12
 
 [node name="TierZeroStatusValue" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection/ChainInfoFrame/ChainInfoMargin" unique_id=828491941]
 layout_mode = 2
-text = "当前运作纲要：
-灵材：灵木链 贰阶 · 石陶链 壹阶
-丹鼎：盐丹链 壹阶 · 织裘链 壹阶"
+text = "当前周天运转：
+天地：聚灵阵 贰阶 · 引星阵 壹阶
+造化：五行阵 壹阶 · 炼魔阵 壹阶"
 autowrap_mode = 3
 
 [node name="BuildForestryChainButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection" unique_id=384643953]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
-text = "配置 灵木链"
+text = "布置 聚灵阵"
 
 [node name="BuildMasonryChainButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection" unique_id=308351591]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
-text = "配置 石陶链"
+text = "布置 引星阵"
 
 [node name="BuildMedicinalChainButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection" unique_id=868712974]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
-text = "配置 盐丹链"
+text = "布置 五行阵"
 
 [node name="BuildFiberChainButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection" unique_id=1193874398]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
-text = "配置 织裘链"
+text = "布置 炼魔阵"
 
 [node name="RightRoller" type="PanelContainer" parent="CenterLayer/LedgerWrapper/FrameRow" unique_id=375130381]
+visible = false
 custom_minimum_size = Vector2(24, 0)
 layout_mode = 2
 size_flags_vertical = 3
 
 [node name="RightTopCap" type="ColorRect" parent="CenterLayer/LedgerWrapper/FrameRow/RightRoller" unique_id=1787539634]
 layout_mode = 2
-color = Color(0.831373, 0.686275, 0.215686, 1)
+color = Color(0.768627, 0.603922, 0.270588, 1)
 
 [node name="RightBottomCap" type="ColorRect" parent="CenterLayer/LedgerWrapper/FrameRow/RightRoller" unique_id=2077240565]
 layout_mode = 2
-color = Color(0.831373, 0.686275, 0.215686, 1)
+color = Color(0.768627, 0.603922, 0.270588, 1)

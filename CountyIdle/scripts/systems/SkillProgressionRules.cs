@@ -164,7 +164,8 @@ public static class SkillProgressionRules
 
     private static string BuildSummaryText(GameState state, CraftSkillType skillType, int assigned, int capacity)
     {
-        return $"{BuildBuildingSnapshot(state, skillType)} · 已派 {assigned}/{capacity} · {GetTechnologyLabel(state.TechLevel)}";
+        var summary = $"{BuildBuildingSnapshot(state, skillType)} · 已派 {assigned}/{capacity} · {GetTechnologyLabel(state.TechLevel)}";
+        return SectNamingRules.ReplaceKnownNames(state, summary);
     }
 
     private static string BuildDetailText(
@@ -178,7 +179,9 @@ public static class SkillProgressionRules
             ? "已达当前技艺最高阶。"
             : $"下一阶：{nextStage.DisplayName}（需 {nextStage.UnlockConditionText}）。";
 
-        return $"规则：{BuildCapacityFormula(state, skillType)}；已派 {assigned}/{capacity}；{GetTechnologyLabel(state.TechLevel)}；{nextStageText}";
+        var detail =
+            $"规则：{BuildCapacityFormula(state, skillType)}；已派 {assigned}/{capacity}；{GetTechnologyLabel(state.TechLevel)}；{nextStageText}";
+        return SectNamingRules.ReplaceKnownNames(state, detail);
     }
 
     private static string BuildCapacityFormula(GameState state, CraftSkillType skillType)

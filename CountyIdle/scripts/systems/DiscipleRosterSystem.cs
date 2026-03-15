@@ -8,6 +8,9 @@ namespace CountyIdle.Systems;
 public static class DiscipleRosterSystem
 {
     private const int MinutesPerDay = 24 * 60;
+    private const int RandomIndexUpperBound = 1_000_000;
+    private const int RandomNameRetryLimit = 24;
+    private const double DefaultEliteRate = 0.08;
 
     private static readonly string[] Surnames =
     [
@@ -92,15 +95,101 @@ public static class DiscipleRosterSystem
             var execution = ResolveExecution(index, state, jobType, law, mood);
             var contribution = ResolveContribution(index, isElite, execution, law);
             var realmTier = ResolveRealmTier(index, state, jobType, isElite, talentPlan, direction, ageBand);
-            var currentAssignment = ResolveCurrentAssignment(jobType, ageBand, minuteOfDay, isElite, directiveType);
-            var residenceName = ResolveResidenceName(jobType, ageBand, isElite);
-            var linkedPeakSummary = ResolveLinkedPeakSummary(jobType, ageBand);
+            var currentAssignment = ResolveCurrentAssignment(state, jobType, ageBand, minuteOfDay, isElite, directiveType);
+            var residenceName = ResolveResidenceName(state, jobType, ageBand, isElite);
+            var linkedPeakSummary = ResolveLinkedPeakSummary(state, jobType, ageBand);
             var traitSummary = ResolveTraitSummary(index, jobType, ageBand, talentPlan, law);
             var note = ResolveNote(jobType, isElite, health, mood, potential, insight, currentAssignment, directiveType);
 
             roster.Add(new DiscipleProfile(
                 index + 1,
                 BuildName(index),
+                ResolveRankName(jobType, ageBand, isElite, potential),
+                directiveType,
+                jobType,
+                ResolveDutyDisplayName(jobType),
+                ResolveRealmName(realmTier),
+                realmTier,
+                ageBand,
+                age,
+                isElite,
+                health,
+                mood,
+                potential,
+                combat,
+                craft,
+                insight,
+                execution,
+                contribution,
+                currentAssignment,
+                residenceName,
+                linkedPeakSummary,
+                traitSummary,
+                note));
+        }
+
+        return roster;
+    }
+
+    public static IReadOnlyList<DiscipleProfile> BuildRandomRoster(GameState sourceState, int count, int? seed = null)
+    {
+        var state = sourceState.Clone();
+        PopulationRules.EnsureDefaults(state);
+        SectGovernanceRules.EnsureDefaults(state);
+        DiscipleDirectiveRules.EnsureDefaults(state);
+
+        var safeCount = Math.Max(count, 0);
+        if (safeCount == 0)
+        {
+            return Array.Empty<DiscipleProfile>();
+        }
+
+        var random = seed.HasValue ? new Random(seed.Value) : new Random();
+        var virtualPopulation = Math.Max(state.Population, safeCount);
+        var jobAssignments = virtualPopulation > 0
+            ? BuildJobAssignments(state, virtualPopulation)
+            : new List<JobType?> { null };
+        var ageAssignments = virtualPopulation > 0
+            ? BuildAgeAssignments(state, virtualPopulation)
+            : new List<DiscipleAgeBand> { DiscipleAgeBand.Prime };
+        var eliteRate = state.Population > 0
+            ? Math.Clamp(state.ElitePopulation / (double)state.Population, 0.0, 1.0)
+            : DefaultEliteRate;
+
+        var minuteOfDay = Modulo(state.GameMinutes, MinutesPerDay);
+        var talentPlan = SectGovernanceRules.GetActiveTalentPlan(state);
+        var direction = SectGovernanceRules.GetActiveDevelopmentDirection(state);
+        var law = SectGovernanceRules.GetActiveLaw(state);
+
+        var roster = new List<DiscipleProfile>(safeCount);
+        var usedNames = new HashSet<string>();
+
+        for (var index = 0; index < safeCount; index++)
+        {
+            var indexSeed = RollRandomIndex(random, usedNames, out var name);
+            var jobType = jobAssignments.Count > 0 ? jobAssignments[random.Next(jobAssignments.Count)] : null;
+            var ageBand = ageAssignments.Count > 0 ? ageAssignments[random.Next(ageAssignments.Count)] : DiscipleAgeBand.Prime;
+            var isElite = random.NextDouble() < eliteRate;
+            var directiveType = DiscipleDirectiveType.None;
+            var age = ResolveAge(indexSeed, ageBand);
+            var health = ResolveHealth(indexSeed, state, ageBand, isElite);
+            var mood = ResolveMood(indexSeed, state, law);
+            var potential = ResolvePotential(indexSeed, state, jobType, isElite, talentPlan, ageBand);
+            var combat = ResolveCombat(indexSeed, state, jobType, isElite, talentPlan, direction, ageBand);
+            var craft = ResolveCraft(indexSeed, state, jobType, isElite, direction);
+            var insight = ResolveInsight(indexSeed, state, jobType, isElite, talentPlan, direction);
+            var execution = ResolveExecution(indexSeed, state, jobType, law, mood);
+            var contribution = ResolveContribution(indexSeed, isElite, execution, law);
+            var realmTier = ResolveRealmTier(indexSeed, state, jobType, isElite, talentPlan, direction, ageBand);
+            var currentAssignment = ResolveCurrentAssignment(state, jobType, ageBand, minuteOfDay, isElite, directiveType);
+            var residenceName = ResolveResidenceName(state, jobType, ageBand, isElite);
+            var linkedPeakSummary = ResolveLinkedPeakSummary(state, jobType, ageBand);
+            var traitSummary = ResolveTraitSummary(indexSeed, jobType, ageBand, talentPlan, law);
+            var note = ResolveNote(jobType, isElite, health, mood, potential, insight, currentAssignment, directiveType);
+
+            roster.Add(new DiscipleProfile(
+                index + 1,
+                name,
                 ResolveRankName(jobType, ageBand, isElite, potential),
                 directiveType,
                 jobType,
@@ -485,6 +574,7 @@ public static class DiscipleRosterSystem
     }
 
     private static string ResolveCurrentAssignment(
+        GameState state,
         JobType? jobType,
         DiscipleAgeBand ageBand,
         int minuteOfDay,
@@ -502,19 +592,19 @@ public static class DiscipleRosterSystem
                 _ => "回舍温习与抄录"
             };
 
-            return assignment;
+            return SectNamingRules.ReplaceKnownNames(state, assignment);
         }
 
         if (minuteOfDay < 300)
         {
             assignment = isElite ? "夜静行功" : "夜息回舍";
-            return AppendDirectiveSuffix(assignment, directiveType);
+            return SectNamingRules.ReplaceKnownNames(state, AppendDirectiveSuffix(assignment, directiveType));
         }
 
         if (minuteOfDay < 480)
         {
             assignment = isElite ? "晨钟吐纳" : "点卯整队";
-            return AppendDirectiveSuffix(assignment, directiveType);
+            return SectNamingRules.ReplaceKnownNames(state, AppendDirectiveSuffix(assignment, directiveType));
         }
 
         if (minuteOfDay < 900)
@@ -528,7 +618,7 @@ public static class DiscipleRosterSystem
                 _ => "待命补位"
             };
 
-            return AppendDirectiveSuffix(assignment, directiveType);
+            return SectNamingRules.ReplaceKnownNames(state, AppendDirectiveSuffix(assignment, directiveType));
         }
 
         if (minuteOfDay < 1140)
@@ -542,31 +632,31 @@ public static class DiscipleRosterSystem
                 _ => "轮值巡舍"
             };
 
-            return AppendDirectiveSuffix(assignment, directiveType);
+            return SectNamingRules.ReplaceKnownNames(state, AppendDirectiveSuffix(assignment, directiveType));
         }
 
         assignment = isElite ? "晚课收束与静修" : "归舍整理与晚修";
-        return AppendDirectiveSuffix(assignment, directiveType);
+        return SectNamingRules.ReplaceKnownNames(state, AppendDirectiveSuffix(assignment, directiveType));
     }
 
-    private static string ResolveResidenceName(JobType? jobType, DiscipleAgeBand ageBand, bool isElite)
+    private static string ResolveResidenceName(GameState state, JobType? jobType, DiscipleAgeBand ageBand, bool isElite)
     {
         if (ageBand == DiscipleAgeBand.Seedling)
         {
-            return "启蒙院舍";
+            return SectNamingRules.ReplaceKnownNames(state, "启蒙院舍");
         }
 
         if (ageBand == DiscipleAgeBand.Elder)
         {
-            return "护峰别院";
+            return SectNamingRules.ReplaceKnownNames(state, "护峰别院");
         }
 
         if (isElite)
         {
-            return "真传静修院";
+            return SectNamingRules.ReplaceKnownNames(state, "真传静修院");
         }
 
-        return jobType switch
+        var residence = jobType switch
         {
             JobType.Farmer => "阵材圃轮值舍",
             JobType.Worker => "傀儡工坊值守舍",
@@ -574,21 +664,22 @@ public static class DiscipleRosterSystem
             JobType.Scholar => "传法院静修舍",
             _ => "外门居舍"
         };
+        return SectNamingRules.ReplaceKnownNames(state, residence);
     }
 
-    private static string ResolveLinkedPeakSummary(JobType? jobType, DiscipleAgeBand ageBand)
+    private static string ResolveLinkedPeakSummary(GameState state, JobType? jobType, DiscipleAgeBand ageBand)
     {
         if (ageBand == DiscipleAgeBand.Seedling)
         {
-            return "启蒙院 / 传功总院 / 天衍峰教习轮值";
+            return SectNamingRules.ReplaceKnownNames(state, "启蒙院 / 传功总院 / 天衍峰教习轮值");
         }
 
         if (!jobType.HasValue)
         {
-            return "庶务殿 / 外门轮值司 / 天衍峰巡值队";
+            return SectNamingRules.ReplaceKnownNames(state, "庶务殿 / 外门轮值司 / 天衍峰巡值队");
         }
 
-        return SectOrganizationRules.GetLinkedPeakSummary(jobType.Value);
+        return SectOrganizationRules.GetLinkedPeakSummary(state, jobType.Value);
     }
 
     private static string ResolveTraitSummary(int index, JobType? jobType, DiscipleAgeBand ageBand, SectTalentPlanType talentPlan, SectLawType law)
@@ -713,6 +804,24 @@ public static class DiscipleRosterSystem
         var first = NameFirstChars[StableHash(index, 463) % NameFirstChars.Length];
         var second = NameSecondChars[StableHash(index, 467) % NameSecondChars.Length];
         return $"{surname}{first}{second}";
+    }
+
+    private static int RollRandomIndex(Random random, HashSet<string> usedNames, out string name)
+    {
+        for (var attempt = 0; attempt < RandomNameRetryLimit; attempt++)
+        {
+            var index = random.Next(RandomIndexUpperBound);
+            var candidateName = BuildName(index);
+            if (usedNames.Add(candidateName))
+            {
+                name = candidateName;
+                return index;
+            }
+        }
+
+        var fallback = random.Next(RandomIndexUpperBound);
+        name = BuildName(fallback);
+        return fallback;
     }
 
     private static string PickTrait(JobType? jobType, int index)

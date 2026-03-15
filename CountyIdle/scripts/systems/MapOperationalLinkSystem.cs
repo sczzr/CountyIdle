@@ -22,6 +22,7 @@ public class MapOperationalLinkSystem
         var worldStyle = BuildWorldStyle(state);
         var prefectureStyle = BuildPrefectureStyle(state);
         var countyTownStyle = BuildCountyTownStyle(state);
+        var primaryPeakName = SectMapSemanticRules.GetPrimaryPeakName(state);
         var snapshot = new MapOperationalSnapshot
         {
             WorldStyle = worldStyle,
@@ -35,7 +36,7 @@ public class MapOperationalLinkSystem
             case MapRegionScope.World:
                 snapshot.ActiveStatusText = $"{SectMapSemanticRules.GetWorldMapTitle()}：{worldStyle.HintText}";
                 snapshot.ActiveStatusColor = worldStyle.AccentColor;
-                snapshot.PrimaryChoice = CreateDisabledChoice("世界总览", "切换到天衍峰山门图后可执行峰内调度。");
+                snapshot.PrimaryChoice = CreateDisabledChoice("世界总览", $"切换到{primaryPeakName}山门图后可执行峰内调度。");
                 snapshot.SecondaryChoice = CreateDisabledChoice("暂无调度", "世界图当前只展示全局态势。");
                 break;
             case MapRegionScope.Prefecture:
@@ -45,7 +46,7 @@ public class MapOperationalLinkSystem
                 snapshot.SecondaryChoice = BuildReliefChoice(state);
                 break;
             case MapRegionScope.CountyTown:
-                snapshot.ActiveStatusText = $"天衍峰：{countyTownStyle.HintText}";
+                snapshot.ActiveStatusText = $"{primaryPeakName}：{countyTownStyle.HintText}";
                 snapshot.ActiveStatusColor = countyTownStyle.AccentColor;
                 snapshot.PrimaryChoice = BuildStreetRepairChoice(state);
                 snapshot.SecondaryChoice = BuildNightWatchChoice(state);
@@ -237,13 +238,14 @@ public class MapOperationalLinkSystem
             state.Wood >= StreetRepairWoodCost &&
             state.Gold >= StreetRepairGoldCost &&
             state.ContributionPoints >= StreetRepairContributionCost;
+        var primaryPeakName = SectMapSemanticRules.GetPrimaryPeakName(state);
 
         return new MapDirectiveChoice
         {
             Action = MapDirectiveAction.RepairStreets,
             Label = $"修整坊路 (-24木 -{StreetRepairGoldCost}灵石 -{StreetRepairContributionCost}贡献)",
             HintText = enabled
-                ? "疏理天衍峰坊路并提升门人安稳度。"
+                ? $"疏理{primaryPeakName}坊路并提升门人安稳度。"
                 : "木材、灵石或贡献不足，暂时无法修整坊路。",
             Enabled = enabled
         };
@@ -252,12 +254,13 @@ public class MapOperationalLinkSystem
     private MapDirectiveChoice BuildNightWatchChoice(GameState state)
     {
         var enabled = state.Gold >= NightWatchGoldCost && state.ContributionPoints >= NightWatchContributionCost;
+        var primaryPeakName = SectMapSemanticRules.GetPrimaryPeakName(state);
         return new MapDirectiveChoice
         {
             Action = MapDirectiveAction.NightWatch,
             Label = $"夜巡清巷 (-{NightWatchGoldCost}灵石 -{NightWatchContributionCost}贡献)",
             HintText = enabled
-                ? "压低天衍峰山门戒备压力。"
+                ? $"压低{primaryPeakName}山门戒备压力。"
                 : "灵石或贡献不足，无法组织巡山夜值。",
             Enabled = enabled
         };

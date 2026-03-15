@@ -1,0 +1,362 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/CultivationPanel.cs" id="1_cultivation"]
+[ext_resource type="Script" path="res://scripts/ui/gd/CultivationPanelVisualFx.gd" id="2_cultivation_fx"]
+
+[node name="CultivationPanel" type="Control"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_cultivation")
+
+[node name="VisualFx" type="Node" parent="."]
+script = ExtResource("2_cultivation_fx")
+
+[node name="Backdrop" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.101961, 0.0862745, 0.0745098, 0.9)
+
+[node name="CenterLayer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="DecorLayer" type="Control" parent="CenterLayer"]
+custom_minimum_size = Vector2(1000, 640)
+layout_mode = 2
+
+[node name="TopTrim" type="ColorRect" parent="CenterLayer/DecorLayer"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 12.0
+offset_right = 990.0
+offset_bottom = 22.0
+color = Color(0.831373, 0.686275, 0.215686, 1)
+
+[node name="BottomTrim" type="ColorRect" parent="CenterLayer/DecorLayer"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 618.0
+offset_right = 990.0
+offset_bottom = 628.0
+color = Color(0.831373, 0.686275, 0.215686, 1)
+
+[node name="LeftRoller" type="PanelContainer" parent="CenterLayer/DecorLayer"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 24.0
+offset_right = 34.0
+offset_bottom = 616.0
+
+[node name="LeftTopCap" type="ColorRect" parent="CenterLayer/DecorLayer/LeftRoller"]
+layout_mode = 2
+color = Color(0.831373, 0.686275, 0.215686, 1)
+
+[node name="LeftBottomCap" type="ColorRect" parent="CenterLayer/DecorLayer/LeftRoller"]
+layout_mode = 2
+color = Color(0.831373, 0.686275, 0.215686, 1)
+
+[node name="RightRoller" type="PanelContainer" parent="CenterLayer/DecorLayer"]
+layout_mode = 0
+offset_left = 966.0
+offset_top = 24.0
+offset_right = 990.0
+offset_bottom = 616.0
+
+[node name="RightTopCap" type="ColorRect" parent="CenterLayer/DecorLayer/RightRoller"]
+layout_mode = 2
+color = Color(0.831373, 0.686275, 0.215686, 1)
+
+[node name="RightBottomCap" type="ColorRect" parent="CenterLayer/DecorLayer/RightRoller"]
+layout_mode = 2
+color = Color(0.831373, 0.686275, 0.215686, 1)
+
+[node name="Dialog" type="PanelContainer" parent="CenterLayer"]
+custom_minimum_size = Vector2(940, 592)
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="CenterLayer/Dialog"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 22
+
+[node name="MainColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="HeaderRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/HeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "天衍峰 · 修炼卷"
+
+[node name="CloseButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/HeaderRow"]
+custom_minimum_size = Vector2(44, 28)
+layout_mode = 2
+text = "✖"
+
+[node name="HintLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn"]
+layout_mode = 2
+text = "安排弟子修炼与功法打磨，本卷暂作登记，尚未接入结算。"
+autowrap_mode = 3
+
+[node name="HeaderDivider" type="ColorRect" parent="CenterLayer/Dialog/Margin/MainColumn"]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+color = Color(0.294118, 0.247059, 0.207843, 1)
+
+[node name="SummaryRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="PopulationCard" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CardMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/PopulationCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="CardColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/PopulationCard/CardMargin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/PopulationCard/CardMargin/CardColumn"]
+layout_mode = 2
+text = "门人总数"
+
+[node name="ValueLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/PopulationCard/CardMargin/CardColumn"]
+layout_mode = 2
+text = "0"
+
+[node name="TechCard" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CardMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/TechCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="CardColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/TechCard/CardMargin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/TechCard/CardMargin/CardColumn"]
+layout_mode = 2
+text = "研修层级"
+
+[node name="ValueLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/TechCard/CardMargin/CardColumn"]
+layout_mode = 2
+text = "T1"
+
+[node name="ResourceCard" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CardMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/ResourceCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="CardColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/ResourceCard/CardMargin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/ResourceCard/CardMargin/CardColumn"]
+layout_mode = 2
+text = "修炼资源"
+
+[node name="ValueLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/ResourceCard/CardMargin/CardColumn"]
+layout_mode = 2
+text = "灵石 0\n贡献 0"
+
+[node name="ActionSection" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="ActionHeader" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection"]
+layout_mode = 2
+text = "修炼安排"
+
+[node name="SkillTrainingCard" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CardMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/SkillTrainingCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="CardRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/SkillTrainingCard/CardMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="InfoColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/SkillTrainingCard/CardMargin/CardRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/SkillTrainingCard/CardMargin/CardRow/InfoColumn"]
+layout_mode = 2
+text = "技能修炼"
+
+[node name="DescLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/SkillTrainingCard/CardMargin/CardRow/InfoColumn"]
+layout_mode = 2
+text = "安排弟子在技艺堂口修炼基础法门，稳固技艺根基。"
+autowrap_mode = 3
+
+[node name="StatusLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/SkillTrainingCard/CardMargin/CardRow/InfoColumn"]
+layout_mode = 2
+text = "当前：未安排"
+
+[node name="ActionButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/SkillTrainingCard/CardMargin/CardRow"]
+custom_minimum_size = Vector2(130, 36)
+layout_mode = 2
+text = "安排修炼"
+
+[node name="TechniquePolishCard" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CardMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/TechniquePolishCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="CardRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/TechniquePolishCard/CardMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="InfoColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/TechniquePolishCard/CardMargin/CardRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/TechniquePolishCard/CardMargin/CardRow/InfoColumn"]
+layout_mode = 2
+text = "功法打磨"
+
+[node name="DescLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/TechniquePolishCard/CardMargin/CardRow/InfoColumn"]
+layout_mode = 2
+text = "聚焦传功堂校订功法要诀，提升法门稳定与悟性。"
+autowrap_mode = 3
+
+[node name="StatusLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/TechniquePolishCard/CardMargin/CardRow/InfoColumn"]
+layout_mode = 2
+text = "当前：未安排"
+
+[node name="ActionButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/TechniquePolishCard/CardMargin/CardRow"]
+custom_minimum_size = Vector2(130, 36)
+layout_mode = 2
+text = "安排打磨"
+
+[node name="CraftPracticeCard" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CardMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/CraftPracticeCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="CardRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/CraftPracticeCard/CardMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="InfoColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/CraftPracticeCard/CardMargin/CardRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/CraftPracticeCard/CardMargin/CardRow/InfoColumn"]
+layout_mode = 2
+text = "技艺练习"
+
+[node name="DescLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/CraftPracticeCard/CardMargin/CardRow/InfoColumn"]
+layout_mode = 2
+text = "在炼器、炼丹、阵法等技艺堂口轮修，稳固产能。"
+autowrap_mode = 3
+
+[node name="StatusLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/CraftPracticeCard/CardMargin/CardRow/InfoColumn"]
+layout_mode = 2
+text = "当前：未安排"
+
+[node name="ActionButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/CraftPracticeCard/CardMargin/CardRow"]
+custom_minimum_size = Vector2(130, 36)
+layout_mode = 2
+text = "安排练习"
+
+[node name="MeditationCard" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CardMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/MeditationCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="CardRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/MeditationCard/CardMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="InfoColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/MeditationCard/CardMargin/CardRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/MeditationCard/CardMargin/CardRow/InfoColumn"]
+layout_mode = 2
+text = "打坐修炼"
+
+[node name="DescLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/MeditationCard/CardMargin/CardRow/InfoColumn"]
+layout_mode = 2
+text = "安排静室打坐，温养气海与心境，积蓄长时修为。"
+autowrap_mode = 3
+
+[node name="StatusLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/MeditationCard/CardMargin/CardRow/InfoColumn"]
+layout_mode = 2
+text = "当前：未安排"
+
+[node name="ActionButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/MeditationCard/CardMargin/CardRow"]
+custom_minimum_size = Vector2(130, 36)
+layout_mode = 2
+text = "安排静修"
+
+[node name="FooterHint" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn"]
+layout_mode = 2
+text = "注：本卷为修炼安排记录，实际效果将在后续与时辰结算接入。"
+autowrap_mode = 3

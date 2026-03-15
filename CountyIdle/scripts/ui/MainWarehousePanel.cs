@@ -72,12 +72,12 @@ public partial class Main
 
     private void OnWarehouseBuildWorkshopRequested()
     {
-        _gameLoop.BuildIndustryBuilding(IndustryBuildingType.Workshop);
+        BuildIndustryBuildingWithPlacement(IndustryBuildingType.Workshop);
     }
 
     private void OnWarehouseBuildAdministrationRequested()
     {
-        _gameLoop.BuildIndustryBuilding(IndustryBuildingType.Administration);
+        BuildIndustryBuildingWithPlacement(IndustryBuildingType.Administration);
     }
 
     private void OnWarehouseBuildForestryChainRequested()

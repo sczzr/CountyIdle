@@ -17,15 +17,8 @@ public sealed class WorldSiteLocalMapGeneratorSystem
         HexDirectionMask.SouthEast
     ];
 
-    private static readonly HexDirectionMask[] EntryPreferenceOrder =
-    [
-        HexDirectionMask.West,
-        HexDirectionMask.NorthWest,
-        HexDirectionMask.SouthWest,
-        HexDirectionMask.East,
-        HexDirectionMask.NorthEast,
-        HexDirectionMask.SouthEast
-    ];
+    private const float DirectionDiagonalFactor = 0.8660254f;
+    private const float DirectionVectorEpsilon = 0.0001f;
 
     public TownMapData GenerateSandboxMap(XianxiaSiteData site, XianxiaHexCellData? sourceCell)
     {
@@ -230,10 +223,19 @@ public sealed class WorldSiteLocalMapGeneratorSystem
             approachDirections.Add(ResolvePrimaryEntryDirection(site, sourceCell));
         }
 
+        if (TryResolveOppositePair(approachDirections, out var entryA, out var entryB))
+        {
+            var start = ResolveBoundaryCell(entryA, width, height, coreCell);
+            var end = ResolveBoundaryCell(entryB, width, height, coreCell);
+            PaintFeatureLine(tiles, start, end, WorldSiteLocalTileType.Path, 0, CanOverrideWithPath);
+            return;
+        }
+
+        var focusDirection = ResolveCompositeDirection(approachDirections, sourceCell, 23);
+        var pathTarget = ResolvePathTarget(focusDirection, width, height, coreCell, random);
         foreach (var direction in approachDirections)
         {
             var boundaryCell = ResolveBoundaryCell(direction, width, height, coreCell);
-            var pathTarget = ResolvePathTarget(direction, width, height, coreCell, random);
             PaintFeatureLine(tiles, boundaryCell, pathTarget, WorldSiteLocalTileType.Path, 0, CanOverrideWithPath);
         }
     }
@@ -259,11 +261,31 @@ public sealed class WorldSiteLocalMapGeneratorSystem
         }
 
         var basinCenters = new List<Vector2I>();
-        foreach (var direction in waterDirections)
+
+        if (TryResolveOppositePair(waterDirections, out var waterA, out var waterB))
         {
-            var boundaryCell = ResolveBoundaryCell(direction, width, height, coreCell);
-            var waterFocus = ResolveWaterFocus(direction, width, height, coreCell, random);
-            PaintFeatureLine(tiles, boundaryCell, waterFocus, WorldSiteLocalTileType.Water, sourceCell.Water != XianxiaWaterType.None ? 1 : 0);
+            var start = ResolveBoundaryCell(waterA, width, height, coreCell);
+            var end = ResolveBoundaryCell(waterB, width, height, coreCell);
+            PaintFeatureLine(tiles, start, end, WorldSiteLocalTileType.Water, sourceCell.Water != XianxiaWaterType.None ? 1 : 0);
+
+            if (sourceCell.Water != XianxiaWaterType.None)
+            {
+                var midpoint = new Vector2I(
+                    Mathf.RoundToInt((start.X + end.X) * 0.5f),
+                    Mathf.RoundToInt((start.Y + end.Y) * 0.5f));
+                basinCenters.Add(midpoint);
+            }
+        }
+        else
+        {
+            var focusDirection = ResolveCompositeDirection(waterDirections, sourceCell, 41);
+            var waterFocus = ResolveWaterFocus(focusDirection, width, height, coreCell, random);
+            foreach (var direction in waterDirections)
+            {
+                var boundaryCell = ResolveBoundaryCell(direction, width, height, coreCell);
+                PaintFeatureLine(tiles, boundaryCell, waterFocus, WorldSiteLocalTileType.Water, sourceCell.Water != XianxiaWaterType.None ? 1 : 0);
+            }
+
             basinCenters.Add(waterFocus);
         }
 
@@ -325,11 +347,27 @@ public sealed class WorldSiteLocalMapGeneratorSystem
         var ridgeTileType = site.PrimaryType == "Ruin" && (sourceCell.Corruption > 0.58f || sourceCell.MonsterThreat > 0.56f)
             ? WorldSiteLocalTileType.Hazard
             : WorldSiteLocalTileType.Ridge;
-        foreach (var direction in ridgeDirections)
+
+        if (TryResolveOppositePair(ridgeDirections, out var ridgeA, out var ridgeB))
         {
-            var boundaryCell = ResolveBoundaryCell(direction, width, height, coreCell);
-            var ridgeFocus = ResolveRidgeFocus(direction, width, height, coreCell, random);
-            PaintFeatureLine(tiles, boundaryCell, ridgeFocus, ridgeTileType, 1);
+            var start = ResolveBoundaryCell(ridgeA, width, height, coreCell);
+            var end = ResolveBoundaryCell(ridgeB, width, height, coreCell);
+            PaintFeatureLine(tiles, start, end, ridgeTileType, 1);
+            var midpoint = new Vector2I(
+                Mathf.RoundToInt((start.X + end.X) * 0.5f),
+                Mathf.RoundToInt((start.Y + end.Y) * 0.5f));
+            PaintFeatureBlob(tiles, midpoint, 1, ridgeTileType);
+        }
+        else
+        {
+            var focusDirection = ResolveCompositeDirection(ridgeDirections, sourceCell, 67);
+            var ridgeFocus = ResolveRidgeFocus(focusDirection, width, height, coreCell, random);
+            foreach (var direction in ridgeDirections)
+            {
+                var boundaryCell = ResolveBoundaryCell(direction, width, height, coreCell);
+                PaintFeatureLine(tiles, boundaryCell, ridgeFocus, ridgeTileType, 1);
+            }
+
             PaintFeatureBlob(tiles, ridgeFocus, 1, ridgeTileType);
         }
     }
@@ -464,12 +502,12 @@ public sealed class WorldSiteLocalMapGeneratorSystem
     {
         if (sourceCell != null && sourceCell.RoadMask != HexDirectionMask.None)
         {
-            return ResolveDominantDirection(sourceCell.RoadMask);
+            return ResolveDominantDirection(sourceCell.RoadMask, sourceCell, 11);
         }
 
         if (sourceCell != null && sourceCell.RiverMask != HexDirectionMask.None)
         {
-            return Opposite(ResolveDominantDirection(sourceCell.RiverMask));
+            return Opposite(ResolveDominantDirection(sourceCell.RiverMask, sourceCell, 23));
         }
 
         if (sourceCell?.Water != XianxiaWaterType.None)
@@ -479,7 +517,7 @@ public sealed class WorldSiteLocalMapGeneratorSystem
 
         if (sourceCell != null && sourceCell.CliffMask != HexDirectionMask.None)
         {
-            return Opposite(ResolveDominantDirection(sourceCell.CliffMask));
+            return Opposite(ResolveDominantDirection(sourceCell.CliffMask, sourceCell, 37));
         }
 
         return site.PrimaryType switch
@@ -490,17 +528,56 @@ public sealed class WorldSiteLocalMapGeneratorSystem
         };
     }
 
-    private static HexDirectionMask ResolveDominantDirection(HexDirectionMask mask)
+    private static HexDirectionMask ResolveDominantDirection(HexDirectionMask mask, XianxiaHexCellData? sourceCell, int fallbackSalt)
     {
-        foreach (var direction in EntryPreferenceOrder)
+        var directions = ExtractDirections(mask);
+        return ResolveCompositeDirection(directions, sourceCell, fallbackSalt);
+    }
+
+    private static HexDirectionMask ResolveCompositeDirection(
+        IReadOnlyList<HexDirectionMask> directions,
+        XianxiaHexCellData? sourceCell,
+        int fallbackSalt)
+    {
+        if (directions.Count == 0)
         {
-            if ((mask & direction) != HexDirectionMask.None)
+            return sourceCell != null ? ResolveStableFallbackDirection(sourceCell, fallbackSalt) : HexDirectionMask.West;
+        }
+
+        if (directions.Count == 1)
+        {
+            return directions[0];
+        }
+
+        var vector = Vector2.Zero;
+        foreach (var direction in directions)
+        {
+            vector += ResolveDirectionVector(direction);
+        }
+
+        if (vector.LengthSquared() < DirectionVectorEpsilon)
+        {
+            return sourceCell != null ? ResolveStableFallbackDirection(sourceCell, fallbackSalt) : directions[0];
+        }
+
+        return ResolveNearestDirection(vector);
+    }
+
+    private static HexDirectionMask ResolveNearestDirection(Vector2 vector)
+    {
+        var bestDirection = HexDirectionMask.None;
+        var bestScore = float.MinValue;
+        foreach (var direction in MaskIterationOrder)
+        {
+            var score = vector.Dot(ResolveDirectionVector(direction));
+            if (score > bestScore)
             {
-                return direction;
+                bestScore = score;
+                bestDirection = direction;
             }
         }
 
-        return HexDirectionMask.West;
+        return bestDirection == HexDirectionMask.None ? HexDirectionMask.West : bestDirection;
     }
 
     private static HexDirectionMask ResolveStableFallbackDirection(XianxiaHexCellData sourceCell, int salt)
@@ -516,6 +593,40 @@ public sealed class WorldSiteLocalMapGeneratorSystem
         };
         var index = Hash(sourceCell.Coord.Q, sourceCell.Coord.R, salt) % directions.Length;
         return directions[index];
+    }
+
+    private static Vector2 ResolveDirectionVector(HexDirectionMask direction)
+    {
+        return direction switch
+        {
+            HexDirectionMask.East => new Vector2(1f, 0f),
+            HexDirectionMask.NorthEast => new Vector2(0.5f, -DirectionDiagonalFactor),
+            HexDirectionMask.NorthWest => new Vector2(-0.5f, -DirectionDiagonalFactor),
+            HexDirectionMask.West => new Vector2(-1f, 0f),
+            HexDirectionMask.SouthWest => new Vector2(-0.5f, DirectionDiagonalFactor),
+            HexDirectionMask.SouthEast => new Vector2(0.5f, DirectionDiagonalFactor),
+            _ => Vector2.Zero
+        };
+    }
+
+    private static bool TryResolveOppositePair(
+        IReadOnlyList<HexDirectionMask> directions,
+        out HexDirectionMask first,
+        out HexDirectionMask second)
+    {
+        if (directions.Count == 2)
+        {
+            first = directions[0];
+            second = directions[1];
+            if (Opposite(first) == second)
+            {
+                return true;
+            }
+        }
+
+        first = HexDirectionMask.None;
+        second = HexDirectionMask.None;
+        return false;
     }
 
     private static Vector2I ResolveBoundaryCell(HexDirectionMask direction, int width, int height, Vector2I coreCell)
@@ -687,7 +798,9 @@ public sealed class WorldSiteLocalMapGeneratorSystem
 
     private static bool CanOverrideWithPath(WorldSiteLocalTileType current)
     {
-        return current != WorldSiteLocalTileType.Water;
+        return current is not (WorldSiteLocalTileType.Water or
+            WorldSiteLocalTileType.Settlement or
+            WorldSiteLocalTileType.Spirit);
     }
 
     private static TownCellCompoundData CreateCompound(

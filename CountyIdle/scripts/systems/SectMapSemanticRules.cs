@@ -1,12 +1,28 @@
+using System.Collections.Generic;
 using CountyIdle.Models;
 
 namespace CountyIdle.Systems;
 
 public static class SectMapSemanticRules
 {
-    public static string GetSettlementName()
+    public static string GetSettlementName(GameState state)
     {
-        return "浮云宗";
+        return GetSettlementName(state?.SectNameMap);
+    }
+
+    public static string GetSettlementName(IReadOnlyDictionary<string, string>? nameMap = null)
+    {
+        return SectNamingRules.GetName(nameMap, SectNamingRules.SectNameKey);
+    }
+
+    public static string GetPrimaryPeakName(GameState state)
+    {
+        return GetPrimaryPeakName(state?.SectNameMap);
+    }
+
+    public static string GetPrimaryPeakName(IReadOnlyDictionary<string, string>? nameMap = null)
+    {
+        return SectNamingRules.GetName(nameMap, SectNamingRules.PeakTianyanKey);
     }
 
     public static string GetWorldMapTitle()
@@ -39,55 +55,65 @@ public static class SectMapSemanticRules
         return "峰外采办";
     }
 
-    public static string GetTechnologyTrackName()
+    public static string GetTechnologyTrackName(GameState state)
     {
-        return "传法院";
+        return GetTechnologyTrackName(state?.SectNameMap);
     }
 
-    public static string GetTechnologyLevelLabel(int techLevel)
+    public static string GetTechnologyTrackName(IReadOnlyDictionary<string, string>? nameMap = null)
     {
-        var trackName = GetTechnologyTrackName();
+        return SectNamingRules.GetName(nameMap, SectNamingRules.HallAcademyKey);
+    }
+
+    public static string GetTechnologyLevelLabel(int techLevel, IReadOnlyDictionary<string, string>? nameMap = null)
+    {
+        var trackName = GetTechnologyTrackName(nameMap);
         return techLevel <= 0 ? $"{trackName}未悟道" : $"{trackName} T{techLevel}";
     }
 
-    public static string GetBuildingDisplayName(IndustryBuildingType buildingType, bool compact = false)
+    public static string GetBuildingDisplayName(
+        IndustryBuildingType buildingType,
+        bool compact = false,
+        IReadOnlyDictionary<string, string>? nameMap = null)
     {
         return buildingType switch
         {
-            IndustryBuildingType.Agriculture => "阵材圃",
-            IndustryBuildingType.Workshop => "傀儡工坊",
-            IndustryBuildingType.Research => GetTechnologyTrackName(),
-            IndustryBuildingType.Trade => compact ? "总坊" : "青云总坊",
-            IndustryBuildingType.Administration => "庶务殿",
+            IndustryBuildingType.Agriculture => SectNamingRules.GetName(nameMap, SectNamingRules.HallFormationFieldKey),
+            IndustryBuildingType.Workshop => SectNamingRules.GetName(nameMap, SectNamingRules.HallPuppetWorkshopKey),
+            IndustryBuildingType.Research => GetTechnologyTrackName(nameMap),
+            IndustryBuildingType.Trade => compact
+                ? SectNamingRules.GetCompactName(nameMap, SectNamingRules.HallMarketKey, "总坊")
+                : SectNamingRules.GetName(nameMap, SectNamingRules.HallMarketKey),
+            IndustryBuildingType.Administration => SectNamingRules.GetName(nameMap, SectNamingRules.HallAffairsKey),
             _ => "建筑"
         };
     }
 
-    public static string GetAnchorLabelPrefix(TownActivityAnchorType anchorType)
+    public static string GetAnchorLabelPrefix(TownActivityAnchorType anchorType, IReadOnlyDictionary<string, string>? nameMap = null)
     {
         return anchorType switch
         {
-            TownActivityAnchorType.Farmstead => "阵材圃",
-            TownActivityAnchorType.Workshop => "傀儡工坊",
-            TownActivityAnchorType.Market => "青云总坊",
-            TownActivityAnchorType.Academy => "传法院",
-            TownActivityAnchorType.Administration => "庶务殿",
-            TownActivityAnchorType.Leisure => "演阵台",
-            _ => "浮云宗场所"
+            TownActivityAnchorType.Farmstead => SectNamingRules.GetName(nameMap, SectNamingRules.HallFormationFieldKey),
+            TownActivityAnchorType.Workshop => SectNamingRules.GetName(nameMap, SectNamingRules.HallPuppetWorkshopKey),
+            TownActivityAnchorType.Market => SectNamingRules.GetName(nameMap, SectNamingRules.HallMarketKey),
+            TownActivityAnchorType.Academy => SectNamingRules.GetName(nameMap, SectNamingRules.HallAcademyKey),
+            TownActivityAnchorType.Administration => SectNamingRules.GetName(nameMap, SectNamingRules.HallAffairsKey),
+            TownActivityAnchorType.Leisure => SectNamingRules.GetName(nameMap, SectNamingRules.HallLeisureKey),
+            _ => $"{GetSettlementName(nameMap)}场所"
         };
     }
 
-    public static string GetAnchorTypeText(TownActivityAnchorType anchorType)
+    public static string GetAnchorTypeText(TownActivityAnchorType anchorType, IReadOnlyDictionary<string, string>? nameMap = null)
     {
         return anchorType switch
         {
-            TownActivityAnchorType.Farmstead => "阵材圃",
-            TownActivityAnchorType.Workshop => "傀儡工坊",
-            TownActivityAnchorType.Market => "总坊",
-            TownActivityAnchorType.Academy => "传法院",
-            TownActivityAnchorType.Administration => "庶务殿",
-            TownActivityAnchorType.Leisure => "演阵台",
-            _ => "浮云宗场所"
+            TownActivityAnchorType.Farmstead => SectNamingRules.GetName(nameMap, SectNamingRules.HallFormationFieldKey),
+            TownActivityAnchorType.Workshop => SectNamingRules.GetName(nameMap, SectNamingRules.HallPuppetWorkshopKey),
+            TownActivityAnchorType.Market => SectNamingRules.GetCompactName(nameMap, SectNamingRules.HallMarketKey, "总坊"),
+            TownActivityAnchorType.Academy => SectNamingRules.GetName(nameMap, SectNamingRules.HallAcademyKey),
+            TownActivityAnchorType.Administration => SectNamingRules.GetName(nameMap, SectNamingRules.HallAffairsKey),
+            TownActivityAnchorType.Leisure => SectNamingRules.GetName(nameMap, SectNamingRules.HallLeisureKey),
+            _ => $"{GetSettlementName(nameMap)}场所"
         };
     }
 

@@ -1,0 +1,93 @@
+using Godot;
+using CountyIdle.Models;
+using CountyIdle.UI;
+
+namespace CountyIdle;
+
+public partial class Main
+{
+    private const string CultivationPanelScenePath = "res://scenes/ui/CultivationPanel.tscn";
+
+    private CultivationPanel? _cultivationPanel;
+
+    private void CreateCultivationPanel()
+    {
+        var panelScene = GD.Load<PackedScene>(CultivationPanelScenePath);
+        if (panelScene == null)
+        {
+            return;
+        }
+
+        _cultivationPanel = panelScene.Instantiate<CultivationPanel>();
+        _cultivationPanel.Opened += OnCultivationPanelOpened;
+        _cultivationPanel.Closed += OnCultivationPanelClosed;
+        AddChild(_cultivationPanel);
+        MoveChild(_cultivationPanel, GetChildCount() - 1);
+    }
+
+    private void BindCultivationButtonEvent()
+    {
+        var cultivationPanelButton = GetCultivationPanelButton();
+        if (cultivationPanelButton == null)
+        {
+            return;
+        }
+
+        cultivationPanelButton.Pressed += OpenCultivationPanel;
+    }
+
+    private void OpenCultivationPanel()
+    {
+        CloseBlockingOverlayPopups(_cultivationPanel);
+        _cultivationPanel?.Open(_gameLoop.State.Clone());
+    }
+
+    private void RefreshCultivationPanelPopup(GameState state)
+    {
+        _cultivationPanel?.RefreshState(state);
+    }
+
+    private void OnCultivationPanelOpened()
+    {
+        SetCultivationQuickButtonState(true);
+    }
+
+    private void OnCultivationPanelClosed()
+    {
+        SetCultivationQuickButtonState(false);
+    }
+
+    private void UnbindCultivationPanelEvents()
+    {
+        var cultivationPanelButton = GetCultivationPanelButton();
+        if (cultivationPanelButton != null)
+        {
+            cultivationPanelButton.Pressed -= OpenCultivationPanel;
+        }
+
+        if (_cultivationPanel == null)
+        {
+            return;
+        }
+
+        _cultivationPanel.Opened -= OnCultivationPanelOpened;
+        _cultivationPanel.Closed -= OnCultivationPanelClosed;
+    }
+
+    private Button? GetCultivationPanelButton()
+    {
+        return GetNodeOrNull<Button>($"{BottomBarPath}/BarPadding/MainRow/QuickActionRow/CultivationQuickButton");
+    }
+
+    private void SetCultivationQuickButtonState(bool pressed)
+    {
+        var cultivationPanelButton = GetCultivationPanelButton();
+        if (cultivationPanelButton == null)
+        {
+            return;
+        }
+
+        cultivationPanelButton.ToggleMode = true;
+        cultivationPanelButton.ButtonPressed = pressed;
+    }
+}

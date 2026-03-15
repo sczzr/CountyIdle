@@ -83,6 +83,22 @@ public static class SectPeakSupportRules
 	private static readonly IReadOnlyDictionary<SectPeakSupportType, SectPeakSupportDefinition> Lookup =
 		Definitions.ToDictionary(static item => item.SupportType);
 
+	private static SectPeakSupportDefinition ApplyNaming(GameState? state, SectPeakSupportDefinition definition)
+	{
+		if (state == null)
+		{
+			return definition;
+		}
+
+		return definition with
+		{
+			DisplayName = SectNamingRules.ReplaceKnownNames(state, definition.DisplayName),
+			ShortEffect = SectNamingRules.ReplaceKnownNames(state, definition.ShortEffect),
+			Description = SectNamingRules.ReplaceKnownNames(state, definition.Description),
+			ModifierSummary = SectNamingRules.ReplaceKnownNames(state, definition.ModifierSummary)
+		};
+	}
+
 	public static void EnsureDefaults(GameState state)
 	{
 		state.ActivePeakSupport = NormalizeEnumValue(state.ActivePeakSupport, DefaultSupport);
@@ -93,11 +109,16 @@ public static class SectPeakSupportRules
 		return Lookup[supportType];
 	}
 
+	public static SectPeakSupportDefinition GetDefinition(GameState state, SectPeakSupportType supportType)
+	{
+		return ApplyNaming(state, GetDefinition(supportType));
+	}
+
 	public static SectPeakSupportDefinition GetActiveDefinition(GameState state)
 	{
 		EnsureDefaults(state);
 		Enum.TryParse<SectPeakSupportType>(state.ActivePeakSupport, out var supportType);
-		return Lookup[supportType];
+		return ApplyNaming(state, Lookup[supportType]);
 	}
 
 	public static SectPeakSupportType GetActiveSupport(GameState state)
@@ -217,6 +238,12 @@ public static class SectPeakSupportRules
 	public static string BuildSelectionPreview(SectPeakSupportType supportType)
 	{
 		var definition = GetDefinition(supportType);
+		return $"{definition.DisplayName}｜{definition.ModifierSummary}";
+	}
+
+	public static string BuildSelectionPreview(GameState state, SectPeakSupportType supportType)
+	{
+		var definition = GetDefinition(state, supportType);
 		return $"{definition.DisplayName}｜{definition.ModifierSummary}";
 	}
 

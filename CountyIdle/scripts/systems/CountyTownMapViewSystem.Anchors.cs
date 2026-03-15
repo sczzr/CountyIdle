@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Godot;
 using CountyIdle.Models;
 
@@ -322,5 +323,361 @@ public partial class CountyTownMapViewSystem
     private static Color GetAnchorColor(TownActivityAnchorType anchorType)
     {
         return TownActivityAnchorVisualRules.GetMapBaseColor(anchorType);
+    }
+
+    public bool TryPlaceBuildingAnchor(
+        IndustryBuildingType buildingType,
+        out Vector2I? placedCell,
+        out string log)
+    {
+        placedCell = null;
+        log = string.Empty;
+        if (_usesExternalMap || _mapData == null)
+        {
+            log = "当前不在山门沙盘，无法落地建筑。";
+            return false;
+        }
+
+        var targetCell = ResolvePlacementCell(buildingType, out var usedSelected, out var fallbackNote);
+        if (targetCell == null)
+        {
+            log = "未找到可用地块，暂无法落地建筑。";
+            return false;
+        }
+
+        var anchorType = ResolveAnchorType(buildingType);
+        var roadCell = FindNearestRoadCell(_mapData, targetCell.Value) ?? targetCell.Value;
+        var facing = ResolveFacingFromRoad(targetCell.Value, roadCell);
+        var floors = ResolveAnchorFloors(buildingType);
+        var visualVariant = GetCellHash(targetCell.Value, ((int)buildingType * 37) + 17) % 3;
+        var label = BuildAnchorLabel(anchorType);
+
+        var anchor = new TownActivityAnchorData(
+            anchorType,
+            roadCell,
+            targetCell.Value,
+            facing,
+            floors,
+            visualVariant,
+            label);
+
+        RegisterPlacement(buildingType, targetCell.Value);
+        _mapData.AddActivityAnchor(anchor);
+        _mapData.AddBuilding(new TownBuildingData(targetCell.Value, facing, floors, anchorType is TownActivityAnchorType.Academy or TownActivityAnchorType.Administration));
+        _selectedActivityAnchor = anchor;
+        _selectedCell = targetCell.Value;
+        placedCell = targetCell.Value;
+        UpdateMapHint();
+        QueueRedraw();
+
+        var locationText = $"[{targetCell.Value.X},{targetCell.Value.Y}]";
+        var displayName = SectMapSemanticRules.GetBuildingDisplayName(buildingType);
+        log = usedSelected
+            ? $"已在地块 {locationText} 落成 {displayName}。"
+            : $"未选中可用地块{fallbackNote}，已在 {locationText} 落成 {displayName}。";
+        return true;
+    }
+
+    private void RegisterPlacement(IndustryBuildingType buildingType, Vector2I cell)
+    {
+        for (var index = _placedBuildings.Count - 1; index >= 0; index--)
+        {
+            var existing = _placedBuildings[index];
+            if (existing.X == cell.X && existing.Y == cell.Y)
+            {
+                _placedBuildings.RemoveAt(index);
+            }
+        }
+
+        _placedBuildings.Add(new TownBuildingPlacement(buildingType, cell.X, cell.Y));
+    }
+
+    private void ApplyPlacedBuildings(TownMapData mapData)
+    {
+        if (_placedBuildings.Count == 0)
+        {
+            return;
+        }
+
+        var anchorCounts = new Dictionary<TownActivityAnchorType, int>();
+        foreach (var anchor in mapData.ActivityAnchors)
+        {
+            anchorCounts[anchor.AnchorType] = anchorCounts.GetValueOrDefault(anchor.AnchorType, 0) + 1;
+        }
+
+        foreach (var placed in _placedBuildings)
+        {
+            var cell = new Vector2I(placed.X, placed.Y);
+            if (!mapData.IsInside(cell) || mapData.GetTerrain(cell.X, cell.Y) == TownTerrainType.Water)
+            {
+                continue;
+            }
+
+            ClearStructuresAtCell(mapData, cell);
+
+            var anchorType = ResolveAnchorType(placed.BuildingType);
+            var roadCell = FindNearestRoadCell(mapData, cell) ?? cell;
+            var facing = ResolveFacingFromRoad(cell, roadCell);
+            var floors = ResolveAnchorFloors(placed.BuildingType);
+            var visualVariant = GetCellHash(cell, ((int)placed.BuildingType * 37) + 17) % 3;
+            var label = BuildAnchorLabel(anchorType, anchorCounts);
+            var anchor = new TownActivityAnchorData(
+                anchorType,
+                roadCell,
+                cell,
+                facing,
+                floors,
+                visualVariant,
+                label);
+            mapData.AddActivityAnchor(anchor);
+            mapData.AddBuilding(new TownBuildingData(cell, facing, floors, anchorType is TownActivityAnchorType.Academy or TownActivityAnchorType.Administration));
+        }
+    }
+
+    private TownMapBuildingHints GetPlacedBuildingCounts()
+    {
+        var agriculture = 0;
+        var workshop = 0;
+        var research = 0;
+        var trade = 0;
+        var administration = 0;
+
+        foreach (var placed in _placedBuildings)
+        {
+            switch (placed.BuildingType)
+            {
+                case IndustryBuildingType.Agriculture:
+                    agriculture++;
+                    break;
+                case IndustryBuildingType.Workshop:
+                    workshop++;
+                    break;
+                case IndustryBuildingType.Research:
+                    research++;
+                    break;
+                case IndustryBuildingType.Trade:
+                    trade++;
+                    break;
+                case IndustryBuildingType.Administration:
+                    administration++;
+                    break;
+            }
+        }
+
+        return new TownMapBuildingHints(agriculture, workshop, research, trade, administration);
+    }
+
+    private Vector2I? ResolvePlacementCell(IndustryBuildingType buildingType, out bool usedSelected, out string fallbackNote)
+    {
+        usedSelected = false;
+        fallbackNote = string.Empty;
+        if (_mapData == null)
+        {
+            return null;
+        }
+
+        if (_selectedCell.HasValue && IsCellAvailable(_mapData, _selectedCell.Value))
+        {
+            usedSelected = true;
+            return _selectedCell.Value;
+        }
+
+        if (_selectedActivityAnchor != null && IsCellAvailable(_mapData, _selectedActivityAnchor.LotCell))
+        {
+            usedSelected = true;
+            return _selectedActivityAnchor.LotCell;
+        }
+
+        var autoCell = FindAutoPlacementCell(_mapData, buildingType);
+        if (autoCell != null)
+        {
+            fallbackNote = "（已按推荐落点自动落建）";
+        }
+        return autoCell;
+    }
+
+    private static bool IsCellAvailable(TownMapData mapData, Vector2I cell)
+    {
+        return mapData.IsInside(cell) &&
+               mapData.GetTerrain(cell.X, cell.Y) != TownTerrainType.Water &&
+               !IsCellOccupied(mapData, cell);
+    }
+
+    private static bool IsCellOccupied(TownMapData mapData, Vector2I cell)
+    {
+        foreach (var anchor in mapData.ActivityAnchors)
+        {
+            if (anchor.LotCell == cell)
+            {
+                return true;
+            }
+        }
+
+        foreach (var building in mapData.Buildings)
+        {
+            if (building.Cell == cell)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static void ClearStructuresAtCell(TownMapData mapData, Vector2I cell)
+    {
+        for (var index = mapData.ActivityAnchors.Count - 1; index >= 0; index--)
+        {
+            if (mapData.ActivityAnchors[index].LotCell == cell)
+            {
+                mapData.ActivityAnchors.RemoveAt(index);
+            }
+        }
+
+        for (var index = mapData.Buildings.Count - 1; index >= 0; index--)
+        {
+            if (mapData.Buildings[index].Cell == cell)
+            {
+                mapData.Buildings.RemoveAt(index);
+            }
+        }
+    }
+
+    private Vector2I? FindAutoPlacementCell(TownMapData mapData, IndustryBuildingType buildingType)
+    {
+        var bestCell = (Vector2I?)null;
+        var bestScore = int.MinValue;
+        foreach (var cell in mapData.EnumerateAllCells())
+        {
+            if (!IsCellAvailable(mapData, cell))
+            {
+                continue;
+            }
+
+            var compound = mapData.GetCellCompound(cell);
+            if (compound == null)
+            {
+                continue;
+            }
+
+            var score = 0;
+            if (compound.SuggestedBuildType == buildingType)
+            {
+                score += 100;
+            }
+
+            if (compound.ContentKind == TownCellContentKind.Production &&
+                buildingType is IndustryBuildingType.Agriculture or IndustryBuildingType.Workshop or IndustryBuildingType.Trade)
+            {
+                score += 40;
+            }
+
+            if (compound.ContentKind == TownCellContentKind.Service &&
+                buildingType is IndustryBuildingType.Research or IndustryBuildingType.Administration)
+            {
+                score += 40;
+            }
+
+            if (mapData.GetTerrain(cell.X, cell.Y) == TownTerrainType.Courtyard)
+            {
+                score += 20;
+            }
+
+            if (FindNearestRoadCell(mapData, cell) != null)
+            {
+                score += 10;
+            }
+
+            if (score > bestScore)
+            {
+                bestScore = score;
+                bestCell = cell;
+            }
+        }
+
+        return bestCell;
+    }
+
+    private static TownActivityAnchorType ResolveAnchorType(IndustryBuildingType buildingType)
+    {
+        return buildingType switch
+        {
+            IndustryBuildingType.Agriculture => TownActivityAnchorType.Farmstead,
+            IndustryBuildingType.Workshop => TownActivityAnchorType.Workshop,
+            IndustryBuildingType.Research => TownActivityAnchorType.Academy,
+            IndustryBuildingType.Trade => TownActivityAnchorType.Market,
+            IndustryBuildingType.Administration => TownActivityAnchorType.Administration,
+            _ => TownActivityAnchorType.Farmstead
+        };
+    }
+
+    private int ResolveAnchorFloors(IndustryBuildingType buildingType)
+    {
+        return buildingType switch
+        {
+            IndustryBuildingType.Administration => 2,
+            IndustryBuildingType.Research => _eliteHint > 4 ? 2 : 1,
+            _ => 1
+        };
+    }
+
+    private string BuildAnchorLabel(TownActivityAnchorType anchorType)
+    {
+        var anchorCounts = new Dictionary<TownActivityAnchorType, int>();
+        if (_mapData != null)
+        {
+            foreach (var anchor in _mapData.ActivityAnchors)
+            {
+                anchorCounts[anchor.AnchorType] = anchorCounts.GetValueOrDefault(anchor.AnchorType, 0) + 1;
+            }
+        }
+
+        return BuildAnchorLabel(anchorType, anchorCounts);
+    }
+
+    private static string BuildAnchorLabel(TownActivityAnchorType anchorType, Dictionary<TownActivityAnchorType, int> anchorCounts)
+    {
+        var count = anchorCounts.GetValueOrDefault(anchorType, 0) + 1;
+        anchorCounts[anchorType] = count;
+        return $"{SectMapSemanticRules.GetAnchorLabelPrefix(anchorType)}·{count}号";
+    }
+
+    private static Vector2I? FindNearestRoadCell(TownMapData mapData, Vector2I lotCell)
+    {
+        Vector2I? bestRoadCell = null;
+        var bestDistance = int.MaxValue;
+        foreach (var offset in GetHexNeighborOffsets(lotCell.Y))
+        {
+            var neighbor = lotCell + offset;
+            if (!mapData.IsInside(neighbor) || mapData.GetTerrain(neighbor.X, neighbor.Y) != TownTerrainType.Road)
+            {
+                continue;
+            }
+
+            var distance = Math.Abs(neighbor.X - lotCell.X) + Math.Abs(neighbor.Y - lotCell.Y);
+            if (distance < bestDistance)
+            {
+                bestDistance = distance;
+                bestRoadCell = neighbor;
+            }
+        }
+
+        return bestRoadCell;
+    }
+
+    private static TownFacing ResolveFacingFromRoad(Vector2I lotCell, Vector2I roadCell)
+    {
+        var delta = roadCell - lotCell;
+        if (delta.Y < 0)
+        {
+            return TownFacing.North;
+        }
+
+        if (delta.Y > 0)
+        {
+            return TownFacing.South;
+        }
+
+        return delta.X >= 0 ? TownFacing.East : TownFacing.West;
     }
 }

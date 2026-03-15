@@ -32,14 +32,17 @@ func apply_theme_styles() -> void:
 	_apply_panel_style("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel", _create_inset_paper_style(Color(PAPER_BG.r, PAPER_BG.g, PAPER_BG.b, 0.32), Color(INK_GRAY.r, INK_GRAY.g, INK_GRAY.b, 0.25)))
 	_apply_panel_style("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/SummaryPanel", _create_inset_paper_style(Color(PAPER_BG.r, PAPER_BG.g, PAPER_BG.b, 0.58), Color(INK_GRAY.r, INK_GRAY.g, INK_GRAY.b, 0.35)))
 	_apply_panel_style("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/FilterPanel", _create_inset_paper_style(Color(PAPER_BG.r, PAPER_BG.g, PAPER_BG.b, 0.46), Color(INK_GRAY.r, INK_GRAY.g, INK_GRAY.b, 0.32)))
+	var debug_panel := root.get_node_or_null("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/DebugPanel")
+	if debug_panel != null:
+		_apply_panel_style("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/DebugPanel", _create_inset_paper_style(Color(PAPER_BG.r, PAPER_BG.g, PAPER_BG.b, 0.42), Color(INK_GRAY.r, INK_GRAY.g, INK_GRAY.b, 0.32)))
 	_apply_panel_style("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/RosterFrame", _create_inset_paper_style(Color(PAPER_BG.r, PAPER_BG.g, PAPER_BG.b, 0.62), Color(INK_GRAY.r, INK_GRAY.g, INK_GRAY.b, 0.30)))
 	_apply_panel_style("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel", _create_inset_paper_style(Color(PAPER_BG.r, PAPER_BG.g, PAPER_BG.b, 0.62), Color(INK_GRAY.r, INK_GRAY.g, INK_GRAY.b, 0.35)))
-	_apply_panel_style("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel", _create_inset_paper_style(Color(PAPER_BG.r, PAPER_BG.g, PAPER_BG.b, 0.56), Color(INK_GRAY.r, INK_GRAY.g, INK_GRAY.b, 0.32)))
-	_apply_panel_style("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader/RootCircle", _create_circle_style(Color(1, 1, 1, 0), CINNABAR))
+	_apply_panel_style("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/DirectivePanel", _create_transparent_style())
+	_apply_panel_style("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/ProfileHeader/RootCircle", _create_circle_style(Color(1, 1, 1, 0), CINNABAR))
 	_apply_panel_style("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel", _create_inset_paper_style(Color(0, 0, 0, 0.03), Color(0.74, 0.68, 0.60, 1.0)))
 	_apply_panel_style("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel", _create_inset_paper_style(Color(0, 0, 0, 0.02), Color(0.78, 0.71, 0.61, 1.0)))
 	_apply_panel_style("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel", _create_inset_paper_style(Color(0, 0, 0, 0.02), Color(0.78, 0.71, 0.61, 1.0)))
-	_apply_panel_style("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/AnnotationPanel", _create_inset_paper_style(Color(0.97, 0.96, 0.94, 1.0), Color(0.56, 0.48, 0.37, 0.95), 2))
+	_apply_panel_style("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/FullInfoPanel/FullInfoMargin/FullInfoColumn/AnnotationPanel", _create_transparent_style())
 	_apply_panel_style("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/CombatTag", _create_combat_tag_style())
 	_apply_panel_style("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/FullInfoPanel", _create_inset_paper_style(Color(0.97, 0.96, 0.94, 1.0), Color(0.56, 0.48, 0.37, 0.80), 2))
 
@@ -47,12 +50,12 @@ func apply_theme_styles() -> void:
 		_apply_metric_tile_style(key)
 
 	for entry in [
-		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader/ProfileName", 26, INK_BLACK],
-		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader/ProfileMeta", 12, INK_GRAY],
-		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader/ProfileStatus", 12, INK_BLACK],
-		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveStatus", 12, INK_BLACK],
-		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveEffect", 11, INK_GRAY],
-		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader/RootCircle/RootCircleLabel", 12, CINNABAR],
+		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/ProfileHeader/ProfileTextColumn/ProfileName", 26, INK_BLACK],
+		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/ProfileHeader/ProfileTextColumn/ProfileMeta", 12, INK_GRAY],
+		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/ProfileHeader/ProfileTextColumn/ProfileStatus", 12, INK_BLACK],
+		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveStatus", 12, INK_BLACK],
+		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveEffect", 11, INK_GRAY],
+		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/ProfileHeader/RootCircle/RootCircleLabel", 12, CINNABAR],
 		["Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/SummaryPanel/SummaryMargin/SummaryColumn/SummaryLabel", 12, INK_BLACK],
 		["Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/SummaryPanel/SummaryMargin/SummaryColumn/GovernanceLabel", 11, INK_GRAY],
 		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/RealmBox/RealmStatus", 13, INK_BLACK],
@@ -60,7 +63,7 @@ func apply_theme_styles() -> void:
 		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/QiSeaBox/QiSeaHint", 11, INK_GRAY],
 		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/CombatTag/CombatMargin/CombatColumn/CombatMain", 22, CINNABAR],
 		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/CombatTag/CombatMargin/CombatColumn/CombatHint", 12, INK_GRAY],
-		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/AnnotationPanel/AnnotationMargin/AnnotationColumn/AnnotationText", 13, Color(0.25, 0.25, 0.25, 1.0)],
+		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/FullInfoPanel/FullInfoMargin/FullInfoColumn/AnnotationPanel/AnnotationMargin/AnnotationColumn/AnnotationText", 13, Color(0.25, 0.25, 0.25, 1.0)],
 		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/FullInfoPanel/FullInfoMargin/FullInfoColumn/FullInfoHeader", 13, INK_BLACK],
 		["Overlay/Wrapper/RootColumn/HintLabel", 11, INK_GRAY]
 	]:
@@ -89,9 +92,12 @@ func apply_theme_styles() -> void:
 
 	_style_paper_option_button(root.get_node("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/FilterPanel/FilterMargin/FilterColumn/FilterOption"))
 	_style_paper_option_button(root.get_node("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/FilterPanel/FilterMargin/FilterColumn/SortOption"))
-	_style_paper_button(root.get_node("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveButtonRow/DirectiveNoneButton"))
-	_style_paper_button(root.get_node("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveButtonRow/DirectiveOuterButton"))
-	_style_paper_button(root.get_node("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveButtonRow/DirectiveStewardButton"))
+	var random_roster_button := root.get_node_or_null("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/DebugPanel/DebugMargin/DebugRow/RandomRosterButton")
+	if random_roster_button != null:
+		_style_paper_button(random_roster_button)
+	_style_paper_button(root.get_node("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveButtonRow/DirectiveNoneButton"))
+	_style_paper_button(root.get_node("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveButtonRow/DirectiveOuterButton"))
+	_style_paper_button(root.get_node("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveButtonRow/DirectiveStewardButton"))
 	_style_roster_tree(root.get_node("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/RosterFrame/RosterMargin/RosterTree"))
 	_style_ink_progress_bar(root.get_node("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/RealmBox/RealmProgress"), INK_BLACK, Color(0.91, 0.89, 0.84, 1.0))
 	_style_ink_progress_bar(root.get_node("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/QiSeaBox/QiSeaProgress"), CELADON, Color(0.91, 0.89, 0.84, 1.0))

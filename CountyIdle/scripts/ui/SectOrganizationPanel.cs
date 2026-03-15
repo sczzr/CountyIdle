@@ -62,11 +62,13 @@ public partial class SectOrganizationPanel : PopupPanelBase
 	public event Action<SectPeakSupportType>? SupportRequested;
 	public event Action? SupportResetRequested;
 	public event Action<JobType>? GovernanceRequested;
+	public event Action? NamingRequested;
 
 	private readonly Dictionary<JobType, JobCardBinding> _jobCards = new();
 	private readonly List<PeakNavBinding> _peakNavItems = new();
 
 	private Label _headerStatusLabel = null!;
+	private Label _titleLabel = null!;
 	private Label _hintLabel = null!;
 	private Label _peakTitleLabel = null!;
 	private Label _peakCounterLabel = null!;
@@ -81,6 +83,7 @@ public partial class SectOrganizationPanel : PopupPanelBase
 	private Button _setSupportButton = null!;
 	private Button _resetSupportButton = null!;
 	private Button _openGovernanceButton = null!;
+	private Button _namingButton = null!;
 	private Button _closeButton = null!;
 	private Node? _visualFx;
 
@@ -127,6 +130,7 @@ public partial class SectOrganizationPanel : PopupPanelBase
 	public void RefreshState(GameState state, JobType? preferredJobType = null, int? preferredPeakIndex = null)
 	{
 		_state = state.Clone();
+		SectNamingRules.EnsureDefaults(_state);
 		SectPeakSupportRules.EnsureDefaults(_state);
 
 		if (preferredJobType.HasValue)
@@ -156,13 +160,14 @@ public partial class SectOrganizationPanel : PopupPanelBase
 			return PopupStatusMessage!;
 		}
 
-		var peakTitle = SectOrganizationRules.GetPeakTitle(_selectedPeakIndex);
+		var peakTitle = SectOrganizationRules.GetPeakTitle(_state, _selectedPeakIndex);
 		var supportStatus = SectPeakSupportRules.BuildActiveSupportStatus(_state);
 		return $"当前浏览【{peakTitle}】。左侧可切换峰脉，右侧职司导览可定位关联峰脉并下发协同峰令。当前协同：{supportStatus}。按 Esc 可收卷。";
 	}
 
 	private void BindUiNodes()
 	{
+		_titleLabel = GetNode<Label>($"{HeaderPath}/TitleColumn/TitleLabel");
 		_headerStatusLabel = GetNode<Label>($"{HeaderPath}/StatusColumn/HeaderStatusLabel");
 		_closeButton = GetNode<Button>($"{HeaderPath}/CloseButton");
 		_peakTitleLabel = GetNode<Label>($"{MiddleContentPath}/DetailHeaderRow/PeakTitleLabel");
@@ -183,6 +188,7 @@ public partial class SectOrganizationPanel : PopupPanelBase
 		_setSupportButton = GetNode<Button>($"{BodyPath}/RightColumn/ActionColumn/SetSupportButton");
 		_resetSupportButton = GetNode<Button>($"{BodyPath}/RightColumn/ActionColumn/ActionRow/ResetSupportButton");
 		_openGovernanceButton = GetNode<Button>($"{BodyPath}/RightColumn/ActionColumn/ActionRow/OpenGovernanceButton");
+		_namingButton = GetNode<Button>($"{BodyPath}/RightColumn/ActionColumn/NamingButton");
 		_hintLabel = GetNode<Label>($"{BodyPath}/RightColumn/HintLabel");
 		_visualFx = GetNodeOrNull<Node>("VisualFx");
 	}
@@ -215,6 +221,7 @@ public partial class SectOrganizationPanel : PopupPanelBase
 		_setSupportButton.Pressed += OnSetSupportPressed;
 		_resetSupportButton.Pressed += OnResetSupportPressed;
 		_openGovernanceButton.Pressed += OnOpenGovernancePressed;
+		_namingButton.Pressed += OnNamingPressed;
 	}
 
 	private PeakNavBinding CreatePeakNavItem(int peakIndex)
@@ -328,16 +335,19 @@ public partial class SectOrganizationPanel : PopupPanelBase
 		var activeSupport = SectPeakSupportRules.GetActiveDefinition(_state);
 		_headerStatusLabel.Text = $"当前协同：{activeSupport.DisplayName}｜{activeSupport.ShortEffect}";
 		_headerStatusLabel.TooltipText = activeSupport.Description;
+
+		var sectName = SectNamingRules.GetName(_state, SectNamingRules.SectNameKey);
+		_titleLabel.Text = $"{sectName}·峰令谱";
 	}
 
 	private void RefreshPeakNav()
 	{
 		foreach (var binding in _peakNavItems)
 		{
-			var profile = SectOrganizationRules.GetPeakProfile(binding.PeakIndex);
+			var profile = SectOrganizationRules.GetPeakProfile(_state, binding.PeakIndex);
 			binding.TitleLabel.Text = profile.IsCurrentPlayableFocus ? $"{profile.Name}（当前）" : profile.Name;
 			binding.SummaryLabel.Text = profile.CoreUnits;
-			binding.Root.TooltipText = SectOrganizationRules.BuildPeakDetailText(binding.PeakIndex);
+			binding.Root.TooltipText = SectOrganizationRules.BuildPeakDetailText(_state, binding.PeakIndex);
 
 			var selected = binding.PeakIndex == _selectedPeakIndex;
 			CallVisualFx("apply_peak_nav_state", binding.Root, binding.TitleLabel, selected);
@@ -358,7 +368,7 @@ public partial class SectOrganizationPanel : PopupPanelBase
 
 			binding.TitleLabel.Text = info.TitleText;
 			binding.SummaryLabel.Text = info.SummaryText;
-			binding.DetailLabel.Text = $"关联峰脉：{SectOrganizationRules.GetPeakTitle(SectOrganizationRules.GetRecommendedPeakIndex(jobType))}";
+			binding.DetailLabel.Text = $"关联峰脉：{SectOrganizationRules.GetPeakTitle(_state, SectOrganizationRules.GetRecommendedPeakIndex(jobType))}";
 			binding.Root.TooltipText = info.DetailText;
 			CallVisualFx("apply_job_card_state", binding.Root, selected);
 		}
@@ -379,9 +389,9 @@ public partial class SectOrganizationPanel : PopupPanelBase
 		var peakCount = SectOrganizationRules.GetPeakCount();
 		_selectedPeakIndex = SectOrganizationRules.NormalizePeakIndex(_selectedPeakIndex);
 
-		var profile = SectOrganizationRules.GetPeakProfile(_selectedPeakIndex);
+		var profile = SectOrganizationRules.GetPeakProfile(_state, _selectedPeakIndex);
 		var selectedSupportType = SectOrganizationRules.GetSupportTypeForPeakIndex(_selectedPeakIndex);
-		var selectedSupportDefinition = SectPeakSupportRules.GetDefinition(selectedSupportType);
+		var selectedSupportDefinition = SectPeakSupportRules.GetDefinition(_state, selectedSupportType);
 		var activeSupport = SectPeakSupportRules.GetActiveSupport(_state);
 		var activeSupportDefinition = SectPeakSupportRules.GetActiveDefinition(_state);
 
@@ -412,7 +422,7 @@ public partial class SectOrganizationPanel : PopupPanelBase
 	{
 		var supportType = SectOrganizationRules.GetSupportTypeForPeakIndex(_selectedPeakIndex);
 		SupportRequested?.Invoke(supportType);
-		ShowPopupStatusMessage($"已请求将【{SectOrganizationRules.GetPeakTitle(_selectedPeakIndex)}】立为本季协同峰。");
+		ShowPopupStatusMessage($"已请求将【{SectOrganizationRules.GetPeakTitle(_state, _selectedPeakIndex)}】立为本季协同峰。");
 	}
 
 	private void OnResetSupportPressed()
@@ -424,6 +434,12 @@ public partial class SectOrganizationPanel : PopupPanelBase
 	private void OnOpenGovernancePressed()
 	{
 		GovernanceRequested?.Invoke(_selectedJobType);
+		ClosePopup();
+	}
+
+	private void OnNamingPressed()
+	{
+		NamingRequested?.Invoke();
 		ClosePopup();
 	}
 

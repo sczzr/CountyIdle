@@ -6,6 +6,11 @@ namespace CountyIdle.Systems;
 
 public static class SectOrganizationRules
 {
+	private static string ApplyNaming(GameState? state, string text)
+	{
+		return state == null ? text : SectNamingRules.ReplaceKnownNames(state, text);
+	}
+
 	private sealed record PeakEntry(
 		string PeakName,
 		string Positioning,
@@ -54,6 +59,11 @@ public static class SectOrganizationRules
 		}
 
 		return string.Join("\n", lines);
+	}
+
+	public static string BuildPeakOverviewText(GameState state)
+	{
+		return ApplyNaming(state, BuildPeakOverviewText());
 	}
 
 	public static int GetPeakCount()
@@ -113,6 +123,11 @@ public static class SectOrganizationRules
 		return entry.PeakName;
 	}
 
+	public static string GetPeakTitle(GameState state, int peakIndex)
+	{
+		return ApplyNaming(state, GetPeakTitle(peakIndex));
+	}
+
 	public static PeakProfile GetPeakProfile(int peakIndex)
 	{
 		var entry = PeakEntries[NormalizePeakIndex(peakIndex)];
@@ -125,11 +140,28 @@ public static class SectOrganizationRules
 			entry.IsCurrentPlayableFocus);
 	}
 
+	public static PeakProfile GetPeakProfile(GameState state, int peakIndex)
+	{
+		var baseProfile = GetPeakProfile(peakIndex);
+		return new PeakProfile(
+			ApplyNaming(state, baseProfile.Name),
+			ApplyNaming(state, baseProfile.Positioning),
+			ApplyNaming(state, baseProfile.CoreUnits),
+			ApplyNaming(state, baseProfile.Responsibility),
+			ApplyNaming(state, baseProfile.DepartmentDetails),
+			baseProfile.IsCurrentPlayableFocus);
+	}
+
 	public static string GetPeakSummary(int peakIndex)
 	{
 		var entry = PeakEntries[NormalizePeakIndex(peakIndex)];
 		var focusTag = entry.IsCurrentPlayableFocus ? "【当前经营焦点】" : string.Empty;
 		return $"{focusTag}{entry.Positioning}｜{entry.Responsibility}";
+	}
+
+	public static string GetPeakSummary(GameState state, int peakIndex)
+	{
+		return ApplyNaming(state, GetPeakSummary(peakIndex));
 	}
 
 	public static string BuildPeakDetailText(int peakIndex)
@@ -146,6 +178,12 @@ public static class SectOrganizationRules
 			$"协同法旨：{supportDefinition.ModifierSummary}";
 	}
 
+	public static string BuildPeakDetailText(GameState state, int peakIndex)
+	{
+		var text = BuildPeakDetailText(peakIndex);
+		return ApplyNaming(state, text);
+	}
+
 	public static string GetLinkedPeakSummary(JobType jobType)
 	{
 		return jobType switch
@@ -158,6 +196,11 @@ public static class SectOrganizationRules
 		};
 	}
 
+	public static string GetLinkedPeakSummary(GameState state, JobType jobType)
+	{
+		return ApplyNaming(state, GetLinkedPeakSummary(jobType));
+	}
+
 	public static string GetLinkedDepartmentDetail(JobType jobType)
 	{
 		return jobType switch
@@ -168,5 +211,10 @@ public static class SectOrganizationRules
 			JobType.Scholar => "关联部门：传功总殿定传承规制，衍法阁承担阵道深造，讲法院与传功总院负责基础与进阶授业。",
 			_ => "关联部门：由青云峰总殿与天衍峰各机构协同落实。"
 		};
+	}
+
+	public static string GetLinkedDepartmentDetail(GameState state, JobType jobType)
+	{
+		return ApplyNaming(state, GetLinkedDepartmentDetail(jobType));
 	}
 }

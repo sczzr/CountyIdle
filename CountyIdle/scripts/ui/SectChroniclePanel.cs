@@ -59,6 +59,7 @@ public partial class SectChroniclePanel : PopupPanelBase
     private readonly Dictionary<ChroniclePage, Button> _pageButtons = new();
     private readonly List<LogFilterBinding> _logFilters = new();
 
+    private Label _headerTitleLabel = null!;
     private Label _headerMetaLabel = null!;
     private Button _chronicleTabButton = null!;
     private Button _reportTabButton = null!;
@@ -128,6 +129,7 @@ public partial class SectChroniclePanel : PopupPanelBase
         IReadOnlyList<SectChronicleSettlementSnapshot>? settlementSnapshots = null)
     {
         _state = state.Clone();
+        SectNamingRules.EnsureDefaults(_state);
 
         if (recentLogs != null)
         {
@@ -166,6 +168,7 @@ public partial class SectChroniclePanel : PopupPanelBase
 
     private void BindUiNodes()
     {
+        _headerTitleLabel = GetNode<Label>($"{HeaderPath}/TitleColumn/TitleLabel");
         _headerMetaLabel = GetNode<Label>($"{HeaderPath}/TitleColumn/HeaderMetaLabel");
         _chronicleTabButton = GetNode<Button>($"{HeaderPath}/TabRow/ChronicleTabButton");
         _reportTabButton = GetNode<Button>($"{HeaderPath}/TabRow/ReportTabButton");
@@ -241,6 +244,8 @@ public partial class SectChroniclePanel : PopupPanelBase
     {
         var calendarInfo = _calendarSystem.Describe(_state.GameMinutes);
         var summary = SectChronicleRules.BuildSummary(_state, calendarInfo);
+        var sectName = SectNamingRules.GetName(_state, SectNamingRules.SectNameKey);
+        _headerTitleLabel.Text = $"{sectName} · 见闻报表卷";
         _headerMetaLabel.Text =
             $"{calendarInfo.DateText} · {calendarInfo.DetailText} · 门人 {_state.Population:0} · 危兆 {_state.Threat:0}%";
         _chronicleSummaryLabel.Text = SectChronicleRules.BuildChronicleOverviewText(_state, calendarInfo);

@@ -15,6 +15,10 @@ public partial class DisciplePanel : PopupPanelBase
 	private static readonly Color CeladonColor = new(0.439f, 0.553f, 0.506f, 1f);
 	private const string MetricGridPath =
 		"Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid";
+	private const int RandomRosterMinCount = 12;
+	private const int RandomRosterMaxCount = 48;
+	private const string RandomRosterButtonIdleText = "调试：随机名册";
+	private const string RandomRosterButtonActiveText = "调试：恢复宗门名册";
 
 	private enum FilterMode
 	{
@@ -50,6 +54,8 @@ public partial class DisciplePanel : PopupPanelBase
 	private Label _governanceLabel = null!;
 	private OptionButton _filterOption = null!;
 	private OptionButton _sortOption = null!;
+	private Control? _debugPanel;
+	private Button _randomRosterButton = null!;
 	private Tree _rosterTree = null!;
 	private Label _profileNameLabel = null!;
 	private Label _profileMetaLabel = null!;
@@ -77,9 +83,12 @@ public partial class DisciplePanel : PopupPanelBase
 	private readonly Dictionary<string, MetricBinding> _metrics = new();
 	private readonly List<DiscipleProfile> _allProfiles = new();
 	private readonly List<DiscipleProfile> _visibleProfiles = new();
+	private readonly List<DiscipleProfile> _randomRosterProfiles = new();
 	private readonly Dictionary<int, TreeItem> _rosterItems = new();
 	private Node? _visualFx;
 	private bool _uiBound;
+	private bool _randomRosterPreviewActive;
+	private int? _randomRosterSeed;
 
 	private GameState _state = new();
 	private int _selectedDiscipleId = 1;
@@ -131,7 +140,19 @@ public partial class DisciplePanel : PopupPanelBase
 		DiscipleDirectiveRules.EnsureDefaults(_state);
 
 		_allProfiles.Clear();
-		_allProfiles.AddRange(DiscipleRosterSystem.BuildRoster(_state));
+		if (_randomRosterPreviewActive)
+		{
+			preferredDiscipleId = null;
+			preferredJobType = null;
+			EnsureRandomRosterPreview();
+			_allProfiles.AddRange(_randomRosterProfiles);
+		}
+		else
+		{
+			_randomRosterProfiles.Clear();
+			_randomRosterSeed = null;
+			_allProfiles.AddRange(DiscipleRosterSystem.BuildRoster(_state));
+		}
 		if (_allProfiles.Count > 0 && _allProfiles.All(profile => profile.Id != _selectedDiscipleId))
 		{
 			_selectedDiscipleId = _allProfiles[0].Id;
@@ -157,6 +178,7 @@ public partial class DisciplePanel : PopupPanelBase
 
 		RefreshSummary();
 		RebuildDiscipleList();
+		UpdateRandomRosterButton();
 		RefreshPopupHint();
 	}
 
@@ -165,6 +187,11 @@ public partial class DisciplePanel : PopupPanelBase
 		if (!string.IsNullOrWhiteSpace(PopupStatusMessage))
 		{
 			return PopupStatusMessage!;
+		}
+
+		if (_randomRosterPreviewActive)
+		{
+			return "当前为随机名册预览（调试），批注不会写入宗门名册。按 Esc 可收卷。";
 		}
 
 		return "弟子谱会按当前经营态势派生生成名册，用于查看门人属性、培养方向与当前差事；现可将个体纳入外务候补或执事培养，并直接反馈到历练与内务回流。按 Esc 可收卷。";
@@ -181,13 +208,15 @@ public partial class DisciplePanel : PopupPanelBase
 		_governanceLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/SummaryPanel/SummaryMargin/SummaryColumn/GovernanceLabel");
 		_filterOption = GetNode<OptionButton>("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/FilterPanel/FilterMargin/FilterColumn/FilterOption");
 		_sortOption = GetNode<OptionButton>("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/FilterPanel/FilterMargin/FilterColumn/SortOption");
+		_debugPanel = GetNodeOrNull<Control>("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/DebugPanel");
+		_randomRosterButton = GetNode<Button>("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/DebugPanel/DebugMargin/DebugRow/RandomRosterButton");
 		_rosterTree = GetNode<Tree>("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/RosterFrame/RosterMargin/RosterTree");
-		_profileNameLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader/ProfileName");
-		_profileMetaLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader/ProfileMeta");
-		_profileStatusLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader/ProfileStatus");
-		_directiveStatusLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveStatus");
-		_directiveEffectLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveEffect");
-		_rootCircleLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileHeader/RootCircle/RootCircleLabel");
+		_profileNameLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/ProfileHeader/ProfileTextColumn/ProfileName");
+		_profileMetaLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/ProfileHeader/ProfileTextColumn/ProfileMeta");
+		_profileStatusLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/ProfileHeader/ProfileTextColumn/ProfileStatus");
+		_directiveStatusLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveStatus");
+		_directiveEffectLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveEffect");
+		_rootCircleLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/ProfileHeader/RootCircle/RootCircleLabel");
 		_radarChart = GetNode<Control>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/RadarCenter/RadarChart");
 		_realmStatusLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/RealmBox/RealmStatus");
 		_realmProgressBar = GetNode<ProgressBar>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/RealmBox/RealmProgress");
@@ -198,11 +227,11 @@ public partial class DisciplePanel : PopupPanelBase
 		_combatSealHintLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/CombatTag/CombatMargin/CombatColumn/CombatHint");
 		_traitFlow = GetNode<FlowContainer>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel/TraitMargin/TraitColumn/TraitFlow");
 		_traitTagTemplate = GetNode<PanelContainer>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel/TraitTagTemplate");
-		_annotationLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/AnnotationPanel/AnnotationMargin/AnnotationColumn/AnnotationText");
+		_annotationLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/FullInfoPanel/FullInfoMargin/FullInfoColumn/AnnotationPanel/AnnotationMargin/AnnotationColumn/AnnotationText");
 		_fullInfoLabel = GetNode<RichTextLabel>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/FullInfoPanel/FullInfoMargin/FullInfoColumn/FullInfoScroll/FullInfoLabel");
-		_directiveNoneButton = GetNode<Button>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveButtonRow/DirectiveNoneButton");
-		_directiveOuterButton = GetNode<Button>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveButtonRow/DirectiveOuterButton");
-		_directiveStewardButton = GetNode<Button>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveButtonRow/DirectiveStewardButton");
+		_directiveNoneButton = GetNode<Button>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveButtonRow/DirectiveNoneButton");
+		_directiveOuterButton = GetNode<Button>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveButtonRow/DirectiveOuterButton");
+		_directiveStewardButton = GetNode<Button>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveButtonRow/DirectiveStewardButton");
 		_hintLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/HintLabel");
 		_closeButton = GetNode<Button>("Overlay/Wrapper/RootColumn/HeaderPanel/HeaderMargin/HeaderRow/CloseButton");
 		_visualFx = GetNodeOrNull<Node>("VisualFx");
@@ -220,6 +249,7 @@ public partial class DisciplePanel : PopupPanelBase
 
 		_filterOption.ItemSelected += OnFilterSelected;
 		_sortOption.ItemSelected += OnSortSelected;
+		_randomRosterButton.Pressed += ToggleRandomRosterPreview;
 		_rosterTree.ItemSelected += OnRosterTreeItemSelected;
 		_directiveNoneButton.Pressed += () => RequestDirectiveChange(DiscipleDirectiveType.None);
 		_directiveOuterButton.Pressed += () => RequestDirectiveChange(DiscipleDirectiveType.OuterMissionCandidate);
@@ -227,6 +257,13 @@ public partial class DisciplePanel : PopupPanelBase
 		_closeButton.Pressed += ClosePopup;
 
 		_traitTagTemplate.Visible = false;
+
+		if (_debugPanel != null)
+		{
+			_debugPanel.Visible = OS.IsDebugBuild();
+		}
+
+		UpdateRandomRosterButton();
 
 		_uiBound = true;
 	}
@@ -263,14 +300,100 @@ public partial class DisciplePanel : PopupPanelBase
 		_sortOption.Select((int)_sortMode);
 	}
 
+	private void ToggleRandomRosterPreview()
+	{
+		if (!OS.IsDebugBuild())
+		{
+			return;
+		}
+
+		if (_randomRosterPreviewActive)
+		{
+			_randomRosterPreviewActive = false;
+			_randomRosterProfiles.Clear();
+			_randomRosterSeed = null;
+			RefreshState(_state);
+			UpdateRandomRosterButton();
+			ShowPopupStatusMessage("已恢复宗门名册。");
+			return;
+		}
+
+		_randomRosterPreviewActive = true;
+		_randomRosterProfiles.Clear();
+		_randomRosterSeed = null;
+		RefreshState(_state);
+		UpdateRandomRosterButton();
+		ShowPopupStatusMessage("已生成随机名册用于调试预览。");
+	}
+
+	private void EnsureRandomRosterPreview()
+	{
+		if (_randomRosterProfiles.Count > 0)
+		{
+			return;
+		}
+
+		var count = ResolveRandomRosterCount();
+		_randomRosterSeed ??= BuildRandomSeed();
+		_randomRosterProfiles.AddRange(DiscipleRosterSystem.BuildRandomRoster(_state, count, _randomRosterSeed));
+	}
+
+	private int ResolveRandomRosterCount()
+	{
+		var target = Math.Max(_state.Population, RandomRosterMinCount);
+		return Math.Clamp(target, RandomRosterMinCount, RandomRosterMaxCount);
+	}
+
+	private static int BuildRandomSeed()
+	{
+		return Random.Shared.Next();
+	}
+
+	private void UpdateRandomRosterButton()
+	{
+		if (!OS.IsDebugBuild())
+		{
+			if (_debugPanel != null)
+			{
+				_debugPanel.Visible = false;
+			}
+
+			return;
+		}
+
+		if (_debugPanel != null)
+		{
+			_debugPanel.Visible = true;
+		}
+
+		if (_randomRosterPreviewActive)
+		{
+			var seedText = _randomRosterSeed.HasValue ? $"（seed {_randomRosterSeed.Value}）" : string.Empty;
+			_randomRosterButton.Text = RandomRosterButtonActiveText;
+			_randomRosterButton.TooltipText = $"当前为随机名册预览{seedText}，点击恢复宗门名册。";
+			return;
+		}
+
+		_randomRosterButton.Text = RandomRosterButtonIdleText;
+		_randomRosterButton.TooltipText = "生成一批随机弟子名册，仅用于调试预览。";
+	}
+
 	private void RefreshSummary()
 	{
 		var talentPlan = SectGovernanceRules.GetActiveTalentPlanDefinition(_state);
 		var law = SectGovernanceRules.GetActiveLawDefinition(_state);
 		var direction = SectGovernanceRules.GetActiveDevelopmentDefinition(_state);
 
-		_summaryLabel.Text =
-			$"卷册总录：门人 {_state.Population} · 真传 {_state.ElitePopulation} · 现役 {_state.GetAssignedPopulation()} · 待命 {_state.GetUnassignedPopulation()} · {DiscipleDirectiveRules.BuildDirectiveSummary(_state)}";
+		if (_randomRosterPreviewActive)
+		{
+			_summaryLabel.Text =
+				$"卷册总录：调试预览 {_allProfiles.Count} 人 · 当前批注 {DiscipleDirectiveRules.BuildDirectiveSummary(_state)}";
+		}
+		else
+		{
+			_summaryLabel.Text =
+				$"卷册总录：门人 {_state.Population} · 真传 {_state.ElitePopulation} · 现役 {_state.GetAssignedPopulation()} · 待命 {_state.GetUnassignedPopulation()} · {DiscipleDirectiveRules.BuildDirectiveSummary(_state)}";
+		}
 		_governanceLabel.Text =
 			$"当前治宗：{direction.DisplayName} / {law.DisplayName} / {talentPlan.DisplayName}";
 	}
@@ -297,7 +420,7 @@ public partial class DisciplePanel : PopupPanelBase
 		foreach (var peakGroup in BuildPeakSections(_visibleProfiles))
 		{
 			var peakItem = _rosterTree.CreateItem(root);
-			peakItem.SetText(0, $"◈ {peakGroup.Key}");
+			peakItem.SetText(0, $"◈ {ResolveRosterPeakTitle(peakGroup.Key)}");
 			peakItem.SetSelectable(0, false);
 			peakItem.Collapsed = false;
 
@@ -477,6 +600,12 @@ public partial class DisciplePanel : PopupPanelBase
 
 	private void RequestDirectiveChange(DiscipleDirectiveType directiveType)
 	{
+		if (_randomRosterPreviewActive)
+		{
+			ShowPopupStatusMessage("随机名册仅用于调试预览，暂不可批注。");
+			return;
+		}
+
 		var profile = _visibleProfiles.FirstOrDefault(candidate => candidate.Id == _selectedDiscipleId);
 		if (profile == null)
 		{
@@ -580,7 +709,7 @@ public partial class DisciplePanel : PopupPanelBase
 	private IEnumerable<IGrouping<string, DiscipleProfile>> BuildPeakSections(IEnumerable<DiscipleProfile> profiles)
 	{
 		return profiles
-			.GroupBy(ResolveRosterPeakTitle)
+			.GroupBy(ResolveRosterPeakKey)
 			.OrderBy(group => ResolveRosterPeakOrder(group.Key))
 			.ThenBy(group => group.Key);
 	}
@@ -596,90 +725,115 @@ public partial class DisciplePanel : PopupPanelBase
 		_rosterTree.EnsureCursorIsVisible();
 	}
 
-	private static int ResolveRosterPeakOrder(string peakTitle)
+	private static int ResolveRosterPeakOrder(string peakKey)
 	{
-		return peakTitle switch
+		return peakKey switch
 		{
-			"天衍峰" => 0,
-			"青云峰" => 1,
-			"庶务殿" => 2,
-			"启蒙院" => 3,
+			SectNamingRules.PeakTianyanKey => 0,
+			SectNamingRules.PeakQingyunKey => 1,
+			SectNamingRules.HallAffairsKey => 2,
+			SectNamingRules.HallSeedlingKey => 3,
 			_ => 9
 		};
 	}
 
-	private static string ResolveRosterPeakTitle(DiscipleProfile profile)
+	private string ResolveRosterPeakTitle(string peakKey)
+	{
+		return SectNamingRules.GetName(_state, peakKey);
+	}
+
+	private string ResolveRosterPeakTitle(DiscipleProfile profile)
+	{
+		return ResolveRosterPeakTitle(ResolveRosterPeakKey(profile));
+	}
+
+	private string ResolveRosterPeakKey(DiscipleProfile profile)
 	{
 		if (profile.AgeBand == DiscipleAgeBand.Seedling)
 		{
-			return "启蒙院";
+			return SectNamingRules.HallSeedlingKey;
 		}
 
 		if (profile.IsElite)
 		{
 			return profile.JobType switch
 			{
-				JobType.Worker => "天衍峰",
-				JobType.Merchant => "青云峰",
-				JobType.Scholar => "青云峰",
-				JobType.Farmer => "天元峰",
-				_ => "天衍峰"
+				JobType.Worker => SectNamingRules.PeakTianyanKey,
+				JobType.Merchant => SectNamingRules.PeakQingyunKey,
+				JobType.Scholar => SectNamingRules.PeakQingyunKey,
+				JobType.Farmer => SectNamingRules.PeakTianyuanKey,
+				_ => SectNamingRules.PeakTianyanKey
 			};
 		}
 
 		return profile.JobType switch
 		{
-			JobType.Farmer => "天元峰",
-			JobType.Worker => profile.CurrentAssignment.Contains("检修", StringComparison.Ordinal) ? "天权峰" : "天工峰",
-			JobType.Merchant => profile.CurrentAssignment.Contains("商路", StringComparison.Ordinal) ? "天枢峰" : "青云峰",
-			JobType.Scholar => "天机峰",
-			_ => "庶务殿"
+			JobType.Farmer => SectNamingRules.PeakTianyuanKey,
+			JobType.Worker => profile.CurrentAssignment.Contains("检修", StringComparison.Ordinal)
+				? SectNamingRules.PeakTianquanKey
+				: SectNamingRules.PeakTiangongKey,
+			JobType.Merchant => profile.CurrentAssignment.Contains("商路", StringComparison.Ordinal)
+				? SectNamingRules.PeakTianshuKey
+				: SectNamingRules.PeakQingyunKey,
+			JobType.Scholar => SectNamingRules.PeakTianjiKey,
+			_ => SectNamingRules.HallAffairsKey
 		};
 	}
 
-	private static string ResolveRosterHallTitle(DiscipleProfile profile)
+	private string ResolveRosterHallTitle(DiscipleProfile profile)
+	{
+		return SectNamingRules.GetName(_state, ResolveRosterHallKey(profile));
+	}
+
+	private string ResolveRosterHallKey(DiscipleProfile profile)
 	{
 		if (profile.AgeBand == DiscipleAgeBand.Seedling)
 		{
-			return "传功总院";
+			return SectNamingRules.HallTeachingInstituteKey;
 		}
 
 		if (profile.IsElite)
 		{
 			return profile.JobType switch
 			{
-				JobType.Worker => "总枢殿",
-				JobType.Merchant => "外事总殿",
-				JobType.Scholar => "传功总殿",
-				JobType.Farmer => "济世堂",
-				_ => "总枢殿"
+				JobType.Worker => SectNamingRules.HallGeneralKey,
+				JobType.Merchant => SectNamingRules.HallExternalAffairsKey,
+				JobType.Scholar => SectNamingRules.HallTransmissionKey,
+				JobType.Farmer => SectNamingRules.HallReliefKey,
+				_ => SectNamingRules.HallGeneralKey
 			};
 		}
 
 		return profile.JobType switch
 		{
-			JobType.Farmer => "济世堂",
-			JobType.Worker => profile.CurrentAssignment.Contains("检修", StringComparison.Ordinal) ? "承山堂" : "铸机阁",
-			JobType.Merchant => profile.CurrentAssignment.Contains("商路", StringComparison.Ordinal) ? "鸿胪司" : "外事总殿",
-			JobType.Scholar => profile.CurrentAssignment.Contains("讲法", StringComparison.Ordinal) ? "传功总院" : "衍法阁",
-			_ => "外门轮值司"
+			JobType.Farmer => SectNamingRules.HallReliefKey,
+			JobType.Worker => profile.CurrentAssignment.Contains("检修", StringComparison.Ordinal)
+				? SectNamingRules.HallBearMountainKey
+				: SectNamingRules.HallForgeKey,
+			JobType.Merchant => profile.CurrentAssignment.Contains("商路", StringComparison.Ordinal)
+				? SectNamingRules.HallDiplomacyKey
+				: SectNamingRules.HallExternalAffairsKey,
+			JobType.Scholar => profile.CurrentAssignment.Contains("讲法", StringComparison.Ordinal)
+				? SectNamingRules.HallTeachingInstituteKey
+				: SectNamingRules.HallResearchKey,
+			_ => SectNamingRules.HallOuterDutyKey
 		};
 	}
 
-	private static int ResolveRosterHallOrder(string hallTitle)
+	private static int ResolveRosterHallOrder(string hallKey)
 	{
-		return hallTitle switch
+		return hallKey switch
 		{
-			"总枢殿" => 0,
-			"外事总殿" => 1,
-			"传功总殿" => 2,
-			"传功总院" => 3,
-			"衍法阁" => 4,
-			"铸机阁" => 5,
-			"承山堂" => 6,
-			"鸿胪司" => 7,
-			"济世堂" => 8,
-			"外门轮值司" => 9,
+			SectNamingRules.HallGeneralKey => 0,
+			SectNamingRules.HallExternalAffairsKey => 1,
+			SectNamingRules.HallTransmissionKey => 2,
+			SectNamingRules.HallTeachingInstituteKey => 3,
+			SectNamingRules.HallResearchKey => 4,
+			SectNamingRules.HallForgeKey => 5,
+			SectNamingRules.HallBearMountainKey => 6,
+			SectNamingRules.HallDiplomacyKey => 7,
+			SectNamingRules.HallReliefKey => 8,
+			SectNamingRules.HallOuterDutyKey => 9,
 			_ => 9
 		};
 	}
@@ -966,6 +1120,22 @@ public partial class DisciplePanel : PopupPanelBase
 
 	private void UpdateDirectiveButtons(DiscipleProfile? profile)
 	{
+		if (_randomRosterPreviewActive)
+		{
+			_directiveNoneButton.ToggleMode = true;
+			_directiveOuterButton.ToggleMode = true;
+			_directiveStewardButton.ToggleMode = true;
+
+			_directiveNoneButton.ButtonPressed = false;
+			_directiveOuterButton.ButtonPressed = false;
+			_directiveStewardButton.ButtonPressed = false;
+
+			_directiveNoneButton.Disabled = true;
+			_directiveOuterButton.Disabled = true;
+			_directiveStewardButton.Disabled = true;
+			return;
+		}
+
 		var directiveType = profile?.DirectiveType ?? DiscipleDirectiveType.None;
 		var allowSpecialDirective = profile != null && profile.AgeBand != DiscipleAgeBand.Seedling;
 

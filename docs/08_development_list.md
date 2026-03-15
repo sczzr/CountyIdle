@@ -93,7 +93,7 @@
 | DL-044 | 门规树（一期：三支门规纲目） | DONE（本轮） | 产业供养→传承研修→人口繁衍→反哺宗门 | 宗主中枢新增 `庶务 / 传功 / 巡山` 三支门规纲目，门规会真实影响收益、人口、威胁与工器锻制；`dotnet build .\\Finally.sln` 通过 |
 | DL-045 | 主界面六边形沙盘重构 | DONE（本轮） | 反哺宗门 | 主界面改为“中央 hex 沙盘 + 左侧地块检视 + 右侧宗门纪事 + 底部控制台”布局；天衍峰场所选中会同步刷新地块检视卡；不改小时结算与存档结构；`dotnet build .\\Finally.sln` 通过 |
 | DL-046 | 交互 icon 规范文档 | DONE（本轮） | 反哺宗门 | 输出 UI 交互 icon 清单、命名规范、尺寸/状态与入口映射文档（`docs/10_ui_icon_guide.md`） |
-| DL-047 | 天衍峰院域坊局与全格检视系统 | IN_PROGRESS（代码二期：坊局数值骨架） | 产业涌现→科技涌现→人口繁衍→反哺宗门 | 天衍峰任意 hex 可点击检视；地块具备固定灵气池、坊位数、天然特征与分区；同地块支持多建筑坊局组合、共享灵气与协同/互扰规则；随机性来自地块 traits、节气、局部事件与驻守差异，而非纯硬摇点 |
+| DL-047 | 天衍峰院域坊局与全格检视系统 | IN_PROGRESS（代码三期：建筑列表补齐） | 产业涌现→科技涌现→人口繁衍→反哺宗门 | 天衍峰任意 hex 可点击检视；地块具备固定灵气池、坊位数、天然特征与分区；同地块支持多建筑坊局组合、共享灵气与协同/互扰规则；随机性来自地块 traits、节气、局部事件与驻守差异，而非纯硬摇点 |
 | DL-048 | 世界格二级地图分层与入口系统 | IN_PROGRESS（运行时八期：局部检视闭环） | 反哺宗门→产业涌现→武装探险 | 世界地图任意 hex 点选后都会先在左侧刷新该格详情；玩家通过进入按钮可打开 `SecondaryMapView`，并基于该格的 `Biome / Terrain / Water / Wonder / Structure / QiDensity / Corruption / MonsterThreat / Fertility` 生成一张与山门沙盘同形的下一层 hex 沙盘；局部沙盘点选后会继续复用左侧检视器与缩放链路，未选中局部 hex 时则回退显示世界点位摘要；已有站点继续沿用原生 `PrimaryType / SecondaryTag / RegionId / RarityTier / UnlockTier`，非站点格则回退生成格子级入口语义；`Wilderness` 已进入点击链路与占位页模板，后续继续细化专属模板与真实玩法 |
 | DL-049 | 地图素材生产规格与分层资产流水线 | IN_PROGRESS（运行时四期：世界图底盘回收到 hex polygon 投影） | 反哺宗门→产业涌现→武装探险 | 已形成正式地图素材规格文档，并新增 L1-L5 绘制实施方案；当前宗门图已接入 `Layer 1` atlas manifest、`Layer 2` decal / connector 链路，并进一步补上 `Layer 3` 最小运行时闭环；世界图基础地块现继续复用 `L1_hex_tileset.tres`，但正式运行时底盘已回收到 hex polygon 投 atlas 区域的绘制方式，避免 `TileMapLayer` 方片排布产生白缝，后续可继续扩到正式国风地块、宗门图立体物件、世界图高层 overlay 与二级地图 |
 | DL-050 | 三相治宗循环重设计（季度战略相位 + 双层时间制） | TODO（文档重设计中） | 门人生息→产业供养→传承研修→职司分化→武装历练→反哺宗门 | 将玩法主循环收口为“季度立纲 -> 月度筹划 -> 小时结算”三相节奏，并补入“细时间运转 + 长时间岁月感”的双层时间制；完成 `docs/01` 重写、`docs/02` 可执行规格补充、`feature-card + change-proposal` 归档，并给出首批可实现工单 |
@@ -123,6 +123,13 @@
 | DL-080 | 卷册弹窗排他与快捷键门禁收口 | DONE | 反哺宗门 | 主界面打开设置卷 / 仓储卷 / 治宗册 / 弟子谱 / 峰令谱 / 留影录时会统一先收起其他卷册弹窗；对应全局快捷键在这些卷册可见时也会统一让行，避免多卷叠层与误触全局操作；`dotnet build .\Finally.sln` 通过 |
 | DL-081 | 双地图兼容页签入口收口 | DONE | 反哺宗门 | 主界面地图页签继续只保留 `山门沙盘 / 世界舆图` 两个可交互入口；历史兼容的 `Prefecture / Event / Report / Expedition` 页签已统一隐藏并禁用，且不再纳入现行点击绑定与双地图主链必需节点；`dotnet build .\Finally.sln` 通过 |
 | DL-082 | 弟子谱交互指令接入（一期/二期/三期） | DONE（三期：执事候选池自动补位） | 职司分化→武装探险→反哺宗门 | 弟子谱可对个体下达 `常制观察 / 外务候补 / 执事培养`，并实际影响历练战力 / 外务回流、内务执行效率与贡献回流；系统会自动为当前内务条目匹配补位执事，且弟子谱 / 治宗册可读取同一结果；支持存档；`dotnet build .\Finally.sln` 通过 |
+| DL-083 | 最小可玩 Demo 目标引导（右栏试玩目标） | DONE（试玩目标面板） | 反哺宗门→传承研修→武装探险 | 右栏新增“试玩目标”小面板，显示时辰结算 / 研修突破 / 历练结算三项目标并随 `GameState` 刷新；不改核心结算与存档；`dotnet build .\Finally.sln` 通过 |
+| DL-084 | 随机弟子生成器（开发辅助） | DONE | 弟子调度 | 提供可复现随机 `DiscipleProfile` 列表用于弟子谱/系统预览；不写入 `GameState`，不改存档；`dotnet build .\Finally.sln` 通过 |
+| DL-085 | 弟子谱随机名册预览按钮（调试） | IN_PROGRESS（构建阻塞） | 弟子调度 | 弟子谱内提供随机名册预览入口；Debug 构建可见；预览不写入存档，批注禁用；`dotnet build .\Finally.sln` 通过 |
+| DL-086 | 建筑列表与快捷建造 | DONE（右栏营建清单） | 产业涌现→反哺宗门 | 右栏新增“营建清单”面板，展示可建造建筑的数量、消耗与建造按钮；按钮触发现有建造逻辑与日志；不改核心结算与存档；`dotnet build .\Finally.sln` 通过 |
+| DL-087 | 建筑落地可视化（山门图建筑显影） | DONE（二期：落点持久化） | 产业涌现→反哺宗门 | 建造后山门图出现对应建筑；建筑数量映射为可见锚点数量；落点写入存档可恢复；`dotnet build .\Finally.sln` 通过 |
+| DL-088 | 弟子修炼卷（修炼安排页） | TODO | 门人→传承研修→反哺宗门 | 主界面新增修炼卷入口与弹窗，包含技能修炼 / 功法打磨 / 技艺练习 / 打坐修炼四类安排入口，按钮可提供状态反馈；暂不改结算与存档结构 |
+| DL-088 | 宗门命名自定义（宗门/峰/堂口全替换显示名） | TODO | 反哺宗门 | 宗主中枢/宗门档案支持自定义宗门、峰与堂口显示名；山门图/卷宗/日志/事件/调度提示统一读取显示名；旧存档缺失时回落默认名；提供恢复默认；`dotnet build .\Finally.sln` 通过 |
 
 ### 3.1 DL-019 功能包详情（宗门弟子可视移动）
 
@@ -608,7 +615,7 @@
 
 ### 3.27 DL-047 功能包详情（天衍峰院域坊局与全格检视系统）
 
-- 当前状态：代码三期进行中，已打通运行时坊局切换，待补事件触发与小时结算联动。
+- 当前状态：代码三期进行中，已补地块建筑列表展示与运行时坊局切换，待补事件触发与小时结算联动。
 - 目标（玩家价值）：让山门图的每个地块都从“背景 hex”变成“可检视、可规划、可做坊局组合”的经营对象，玩家可以围绕同地块多建筑、共享灵气和局部协同做长期钻研。
 - 飞轮环节：产业涌现 → 科技涌现 → 人口繁衍 → 反哺宗门。
 - 依赖（前置系统）：`DL-045`、`TownMapGeneratorSystem`、`CountyTownMapViewSystem`、`Tile Inspector`、后续建筑/弟子/资源系统。
@@ -617,6 +624,7 @@
   - 地块至少具备 `固定灵气池 / 灵气回复 / 可建坊位 / 分区 / 天然特征` 五类底盘字段；
   - 同地块支持多个子建筑组成坊局，并明确共享灵气、协同收益、互扰代价；
   - 左侧检视器一期统一回答 `这里是什么 / 它在干什么 / 为什么顺或为什么卡 / 我现在能做什么`；
+  - 左侧检视器可展示地块建筑列表（锚点显示已落成建筑，院域显示坊位规划列表）；
   - 随机性来源明确限定为 `地块 traits / 节气波动 / 低频局部事件 / 驻守差异 / 宗门缺口`；
   - `docs/02_system_specs.md`、`docs/05_feature_inventory.md`、`docs/08_development_list.md`、`FC / CP / BL` 已同步。
 - 2026-03-11 本轮起步：
@@ -642,6 +650,11 @@
   - `MainSectTileInspector` 三颗动作按钮已改为对当前选中 hex 生效，可直接切换 `主修坊局 / 协同坊局 / 稳态坊局`；
   - `CountyTownMapViewSystem` 已支持对当前选中院域即时回写新坊局并刷新左侧检视摘要；
   - `docs/02_system_specs.md`、`docs/05_feature_inventory.md`、`docs/08_development_list.md`、`FC / BL` 已同步回写。
+- 2026-03-16 细节补入：
+  - 新增 `FC-20260316-sect-hex-compound-inspector.md`；
+  - 新增 `BL-20260316-sect-hex-compound-inspector.md`；
+  - 左侧检视器新增“建筑列表”字段，锚点与院域均可显示对应清单；
+  - `dotnet build .\Finally.sln` 通过。
 - 分阶段建议：
   - 一期：全格点击检视 + 院域数据骨架；
   - 二期：开放基础坊局组合与共享灵气；
@@ -683,7 +696,7 @@
   - 野外模板阶段：`MainSectTileInspector` 与 `MainWorldSitePanel` 已补 `Wilderness` 分支，世界地图不再只有少数站点能进入二级页，普通野外格也能给出主玩法、产出、风险与筹备动作；
   - 沙盘生成阶段：点击世界格后会先刷新左侧检视器，玩家再通过“前往二级地图”按钮打开 `SecondaryMapView`；该页现已接入 `WorldSiteLocalMapGeneratorSystem`，并复用 `CountyTownMapViewSystem / SectMapViewSystem` 的同形 hex 沙盘视图，会按所选格的类型、地形、水体、奇观、建筑与威胁语义生成不同内容的下层沙盘；
   - 地貌继承阶段：二级地图 external map 已新增“继承自 world hex 的地形家族”口径；`WorldSiteLocalMapGeneratorSystem` 会继续根据 source world hex 的 `Terrain / Biome / Water / QiDensity / Corruption` 调整 `Ridge / Spirit / Hazard / Water` 分布，`CountyTownMapViewSystem` 则会优先按继承家族复用 `L1_hex_tileset.tres` 的底盘图块，不再只按 `Ground / Courtyard / Water / Road` 粗分类随机取图；
-  - 方向继承阶段：`WorldSiteLocalMapGeneratorSystem` 现已继续把 `RoadMask / RiverMask / CliffMask` 映射到局部沙盘边界方向；道路入口不再固定永远从左侧进入，水体与 ridge / hazard 也会随 world hex 的方向语义变化，入口锚点朝向同步跟随主入口边界调整；
+  - 方向继承阶段：`WorldSiteLocalMapGeneratorSystem` 现已继续把 `RoadMask / RiverMask / CliffMask` 映射到局部沙盘边界方向；多方向会先合成主轴并收口到同一焦点，对向成对时生成贯通线，入口方向随合成主轴稳定落点，水体与 ridge / hazard 会随 world hex 的方向语义变化，不再固定偏向单侧；
   - 局部检视阶段：`SecondaryMapView` 内生成的局部沙盘现已把 `SelectionSummaryChanged` 回灌到左侧检视器；玩家在二级地图页点选局部 hex 时，会复用山门沙盘同族的检视面板与按钮节奏，清空局部选中后则自动回退到当前世界点位摘要；
   - 当前边界：二级地图已完成“任意世界格可点选、可看详情、可按格语义生成同形态沙盘、并能继承一级地图底盘地貌与主要方向语义”的最小闭环，但仍停留在模板化入口层，尚未为各类型接入独立交互控件、结算或专属场景逻辑；
   - 验证结论：上述阶段接入后，`dotnet build .\Finally.sln` 持续通过。
@@ -725,6 +738,7 @@
   - 基础地块阶段：`CountyTownMapViewSystem` 已先完成 `Layer 1` atlas manifest 过渡链路；
   - tileset 运行时阶段：当前宗门图与局部沙盘的 L1 基础地块已改为直接加载 `L1_hex_tileset.tres`，并从 atlas source / texture region 中读取纹理，不再只是在运行时切 atlas 图片；
   - 世界图底盘阶段：已新增 `FC-20260313-world-map-tilemaplayer-rendering.md`；`StrategicMapViewSystem` 当前继续复用 `L1_hex_tileset.tres` 的同一套地貌资源，但正式主链已回收到按 hex polygon 逐格投 atlas 区域的脚本绘制，避免先前 `WorldTerrainTileLayer` 方片排布经六边形裁切后留下连续白缝；`WorldTerrainTileLayer` 节点当前仅保留为后续实验/备用基础设施，同时继续保留现有 roads / rivers / cliffs / labels overlay 的脚本叠加口径；旧版蜂窝背景网格默认关闭；
+  - 世界图地貌绑定阶段：优先允许在 tileset custom data layer `world_terrain_family` 声明地形家族 -> tileset 坐标映射；若未配置则回退 `WorldTerrainTileLayer` 的场景 / `GDScript` 绑定，`StrategicMapViewSystem` 运行时统一读取并在缺失时回退默认映射，确保 `_Draw()` 与 tile layer 共享同一绑定口径；
   - 几何收口阶段：基础地块继续沿用现有 hex polygon 几何完成无缝贴近绘制，同时默认关闭基础边沿描边，避免 tileset 方片口径与旧 hex 沙盘选取链路互相打架；
   - 连接层一期：`Road / Courtyard / Water` 已在 `Layer 2` 接入 decal 贴图，同时保留逻辑连接线作为运行时兼容；
   - 连接层二期：现有道路与水域仍保留过渡性的邻接贴图绘制，但文档主口径已切到“独立道路 / 独立河流”自由摆放方案；
@@ -1146,6 +1160,79 @@
   - `外务候补` 会影响探险战力与外务回流，并在日志中可解释；
   - `执事培养` 会影响内务执行效率与贡献回流，并在弟子谱详情、治宗册摘要与条目说明中显示当前效果摘要；
   - 系统会自动从执事培养名册中为内务类条目分配补位执事，且弟子谱与治宗册显示结果一致；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.63 DL-083 功能包详情（最小可玩 Demo 目标引导）
+
+- 当前状态：本轮完成右栏试玩目标面板与目标刷新逻辑。
+- 目标（玩家价值）：让首次进入的玩家在 10 分钟内完成“时辰结算 / 研修突破 / 历练结算”三件事，形成最小可玩闭环与可见进度。
+- 飞轮环节：传承研修 → 武装探险 → 反哺宗门。
+- 依赖（前置系统）：`GameLoop` 时辰结算、`ResearchSystem` 研修突破、`CombatSystem` 历练结算、右栏“天衍峰记事”面板布局。
+- 完成标准（DoD）：
+  - 右栏新增“试玩目标”小面板，包含三条目标与完成计数；
+  - 目标进度随 `GameState` 实时刷新，且不引入存档结构改动；
+  - 目标完成后提示为“已达成”，并保持显示；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.64 DL-084 功能包详情（随机弟子生成器 / 开发辅助）
+
+- 当前状态：本轮完成随机弟子生成器（开发辅助）。
+- 目标（玩家价值）：缩短弟子谱与相关系统的调试周期，确保名册展示与数据口径可快速预览，不影响正式主循环。
+- 飞轮环节：弟子调度（开发辅助）。
+- 依赖（前置系统）：`DiscipleRosterSystem`、`DiscipleProfile`、`docs/02_system_specs.md`。
+- 完成标准（DoD）：
+  - 提供 `DiscipleRosterSystem.BuildRandomRoster(GameState, int, int?)` 生成随机 `DiscipleProfile` 列表；
+  - 支持可复现 `seed`，未传入时随机生成；
+  - 生成结果不写入 `GameState`，不改存档与小时结算链；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.65 DL-085 功能包详情（弟子谱随机名册预览按钮 / 调试）
+
+- 当前状态：功能实现完成，构建阻塞待修复。
+- 目标（玩家价值）：加速弟子谱 UI 与字段口径的调试验证，不影响正式玩家流程。
+- 飞轮环节：弟子调度（开发辅助）。
+- 依赖（前置系统）：`DL-084` 随机弟子生成器、`DisciplePanel`。
+- 完成标准（DoD）：
+  - Debug 构建下弟子谱提供随机名册预览入口；非 Debug 构建默认隐藏；
+  - 预览模式不写入 `GameState`，弟子批注禁用且有提示；
+  - 可一键恢复宗门名册；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.64 DL-086 功能包详情（建筑列表与快捷建造）
+
+- 当前状态：本轮完成右栏营建清单面板与建造按钮绑定。
+- 目标（玩家价值）：集中展示可建造建筑的数量与成本，让玩家能够快速批量扩建。
+- 飞轮环节：产业涌现 → 反哺宗门。
+- 依赖（前置系统）：`IndustrySystem` 建造逻辑、`GameLoop.BuildIndustryBuilding`、右栏“天衍峰记事”面板布局。
+- 完成标准（DoD）：
+  - 右栏新增“营建清单”面板，列出主要建筑的数量与建造成本；
+  - 建造按钮触发现有建造逻辑并产生日志反馈；
+  - 不改核心结算与存档结构；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.65 DL-087 功能包详情（建筑落地可视化）
+
+- 当前状态：二期补完落点持久化。
+- 目标（玩家价值）：建造行为能够在山门图上直观看见，提升“扩建反馈感”。
+- 飞轮环节：产业涌现 → 反哺宗门。
+- 依赖（前置系统）：`TownMapGeneratorSystem`、`CountyTownMapViewSystem`、`IndustrySystem` 建造逻辑。
+- 完成标准（DoD）：
+  - 建造任一产业建筑后，天衍峰山门图出现对应建筑显影；
+  - 建筑数量映射为可见锚点数量（有上限，避免堆满地块）；
+  - 建筑落点写入 `GameState` 并随存档持久化，读档可恢复；
+  - `dotnet build .\Finally.sln` 通过。
+
+### 3.66 DL-088 功能包详情（弟子修炼卷 / 修炼安排页）
+
+- 当前状态：需求新立项。
+- 目标（玩家价值）：提供统一的弟子修炼安排入口，用卷册方式组织技能修炼、功法打磨、技艺练习、打坐修炼等操作。
+- 飞轮环节：门人 → 传承研修 → 反哺宗门。
+- 依赖（前置系统）：`DisciplePanel`、`SkillProgressionRules`、`GameState` 基础字段与主界面弹窗体系。
+- 完成标准（DoD）：
+  - 主界面底栏新增“修炼”入口，打开独立修炼卷弹窗；
+  - 卷内包含技能修炼 / 功法打磨 / 技艺练习 / 打坐修炼四类安排卡片与状态文案；
+  - 按钮触发状态提示，清晰标注“待接入结算”占位；
+  - 不改小时结算与存档结构；
   - `dotnet build .\Finally.sln` 通过。
 
 ## 4. 执行与回写规则

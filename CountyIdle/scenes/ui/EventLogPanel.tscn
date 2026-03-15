@@ -1,5 +1,8 @@
 [gd_scene format=3 uid="uid://b41bsu0i675xo"]
 
+[ext_resource type="Script" path="res://scripts/ui/DemoPanel.cs" id="1_demo_panel"]
+[ext_resource type="Script" path="res://scripts/ui/BuildingListPanel.cs" id="2_building_list_panel"]
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 bg_color = Color(0.94902, 0.92549, 0.862745, 0.88)
 border_width_left = 1
@@ -128,6 +131,269 @@ theme_override_colors/font_color = Color(0.294118, 0.247059, 0.2, 0.95)
 theme_override_font_sizes/font_size = 12
 text = "·【午时】外务坊市回流转正，灵石略有回补。"
 autowrap_mode = 3
+
+[node name="DemoBox" type="PanelContainer" parent="PanelContent/MainVBox" unique_id=1704282193]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_log_content")
+script = ExtResource("1_demo_panel")
+
+[node name="DemoVBox" type="VBoxContainer" parent="PanelContent/MainVBox/DemoBox" unique_id=104105206]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="DemoHeader" type="HBoxContainer" parent="PanelContent/MainVBox/DemoBox/DemoVBox" unique_id=2078947130]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DemoTitle" type="Label" parent="PanelContent/MainVBox/DemoBox/DemoVBox/DemoHeader" unique_id=2083985860]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 15
+text = "试玩目标"
+
+[node name="DemoProgress" type="Label" parent="PanelContent/MainVBox/DemoBox/DemoVBox/DemoHeader" unique_id=756252334]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.294118, 0.247059, 0.2, 0.95)
+theme_override_font_sizes/font_size = 12
+text = "0/3"
+
+[node name="DemoGoals" type="RichTextLabel" parent="PanelContent/MainVBox/DemoBox/DemoVBox" unique_id=2068326889]
+layout_mode = 2
+theme_override_colors/default_color = Color(0.294118, 0.247059, 0.2, 0.95)
+theme_override_styles/normal = SubResource("StyleBoxEmpty_log_rich")
+bbcode_enabled = true
+text = "○ 完成 3 次时辰结算（0/3）\n○ 完成一次研修突破（进度 0/30）\n○ 完成 1 次历练结算（0/1）"
+
+[node name="BuildingListBox" type="PanelContainer" parent="PanelContent/MainVBox" unique_id=1398686628]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_log_content")
+script = ExtResource("2_building_list_panel")
+
+[node name="BuildingListVBox" type="VBoxContainer" parent="PanelContent/MainVBox/BuildingListBox" unique_id=838089239]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="BuildingHeader" type="HBoxContainer" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox" unique_id=456327359]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="BuildingTitle" type="Label" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingHeader" unique_id=675225163]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 15
+text = "营建清单"
+
+[node name="BuildingHint" type="Label" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingHeader" unique_id=687092906]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.403922, 0.352941, 0.301961, 0.9)
+theme_override_font_sizes/font_size = 11
+text = "可批量建造"
+
+[node name="BuildingRows" type="VBoxContainer" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox" unique_id=1236822033]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="RowAgriculture" type="VBoxContainer" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows" unique_id=1733606803]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="HeaderRow" type="HBoxContainer" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows/RowAgriculture" unique_id=1486669925]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="NameLabel" type="Label" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows/RowAgriculture/HeaderRow" unique_id=69365995]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 12
+text = "阵材圃"
+
+[node name="CountLabel" type="Label" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows/RowAgriculture/HeaderRow" unique_id=2064335598]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.403922, 0.352941, 0.301961, 0.9)
+theme_override_font_sizes/font_size = 11
+text = "×0"
+
+[node name="ActionRow" type="HBoxContainer" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows/RowAgriculture" unique_id=782319072]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CostLabel" type="Label" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows/RowAgriculture/ActionRow" unique_id=1470239282]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.294118, 0.247059, 0.2, 0.95)
+theme_override_font_sizes/font_size = 11
+text = "木24 / 石12 / 灵石10 / 贡献10"
+autowrap_mode = 3
+
+[node name="BuildButton" type="Button" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows/RowAgriculture/ActionRow" unique_id=520740050]
+custom_minimum_size = Vector2(56, 24)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 11
+text = "建造"
+
+[node name="RowWorkshop" type="VBoxContainer" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows" unique_id=2075805961]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="HeaderRow" type="HBoxContainer" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows/RowWorkshop" unique_id=1670114615]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="NameLabel" type="Label" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows/RowWorkshop/HeaderRow" unique_id=1060650922]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 12
+text = "傀儡工坊"
+
+[node name="CountLabel" type="Label" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows/RowWorkshop/HeaderRow" unique_id=33434827]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.403922, 0.352941, 0.301961, 0.9)
+theme_override_font_sizes/font_size = 11
+text = "×0"
+
+[node name="ActionRow" type="HBoxContainer" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows/RowWorkshop" unique_id=1008040584]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CostLabel" type="Label" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows/RowWorkshop/ActionRow" unique_id=1008626581]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.294118, 0.247059, 0.2, 0.95)
+theme_override_font_sizes/font_size = 11
+text = "木26 / 石18 / 灵石12 / 贡献12 / 建材1"
+autowrap_mode = 3
+
+[node name="BuildButton" type="Button" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows/RowWorkshop/ActionRow" unique_id=1955883698]
+custom_minimum_size = Vector2(56, 24)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 11
+text = "建造"
+
+[node name="RowResearch" type="VBoxContainer" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows" unique_id=529272256]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="HeaderRow" type="HBoxContainer" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows/RowResearch" unique_id=904271411]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="NameLabel" type="Label" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows/RowResearch/HeaderRow" unique_id=382926546]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 12
+text = "传法院"
+
+[node name="CountLabel" type="Label" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows/RowResearch/HeaderRow" unique_id=662792722]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.403922, 0.352941, 0.301961, 0.9)
+theme_override_font_sizes/font_size = 11
+text = "×0"
+
+[node name="ActionRow" type="HBoxContainer" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows/RowResearch" unique_id=64290670]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CostLabel" type="Label" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows/RowResearch/ActionRow" unique_id=1371019994]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.294118, 0.247059, 0.2, 0.95)
+theme_override_font_sizes/font_size = 11
+text = "木16 / 石22 / 灵石22 / 贡献18 / 建材2"
+autowrap_mode = 3
+
+[node name="BuildButton" type="Button" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows/RowResearch/ActionRow" unique_id=1386008105]
+custom_minimum_size = Vector2(56, 24)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 11
+text = "建造"
+
+[node name="RowTrade" type="VBoxContainer" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows" unique_id=1679088766]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="HeaderRow" type="HBoxContainer" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows/RowTrade" unique_id=857029866]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="NameLabel" type="Label" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows/RowTrade/HeaderRow" unique_id=682208405]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 12
+text = "青云总坊"
+
+[node name="CountLabel" type="Label" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows/RowTrade/HeaderRow" unique_id=404217392]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.403922, 0.352941, 0.301961, 0.9)
+theme_override_font_sizes/font_size = 11
+text = "×0"
+
+[node name="ActionRow" type="HBoxContainer" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows/RowTrade" unique_id=808340337]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CostLabel" type="Label" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows/RowTrade/ActionRow" unique_id=543878993]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.294118, 0.247059, 0.2, 0.95)
+theme_override_font_sizes/font_size = 11
+text = "木18 / 石14 / 灵石24 / 贡献16 / 建材2"
+autowrap_mode = 3
+
+[node name="BuildButton" type="Button" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows/RowTrade/ActionRow" unique_id=1956907825]
+custom_minimum_size = Vector2(56, 24)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 11
+text = "建造"
+
+[node name="RowAdministration" type="VBoxContainer" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows" unique_id=1638398016]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="HeaderRow" type="HBoxContainer" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows/RowAdministration" unique_id=140081148]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="NameLabel" type="Label" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows/RowAdministration/HeaderRow" unique_id=998122246]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 12
+text = "庶务殿"
+
+[node name="CountLabel" type="Label" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows/RowAdministration/HeaderRow" unique_id=970023963]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.403922, 0.352941, 0.301961, 0.9)
+theme_override_font_sizes/font_size = 11
+text = "×0"
+
+[node name="ActionRow" type="HBoxContainer" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows/RowAdministration" unique_id=1485093956]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CostLabel" type="Label" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows/RowAdministration/ActionRow" unique_id=1236606837]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.294118, 0.247059, 0.2, 0.95)
+theme_override_font_sizes/font_size = 11
+text = "木20 / 石20 / 灵石20 / 贡献14 / 建材2"
+autowrap_mode = 3
+
+[node name="BuildButton" type="Button" parent="PanelContent/MainVBox/BuildingListBox/BuildingListVBox/BuildingRows/RowAdministration/ActionRow" unique_id=1857077003]
+custom_minimum_size = Vector2(56, 24)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 11
+text = "建造"
 
 [node name="LogBox" type="PanelContainer" parent="PanelContent/MainVBox" unique_id=715546861]
 layout_mode = 2

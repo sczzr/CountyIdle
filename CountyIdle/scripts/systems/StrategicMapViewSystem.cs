@@ -38,6 +38,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     private const float WorldHexUnderlayPaddingMax = 1.60f;
     private const string Layer1TileSetPath = "res://assets/ui/tilemap/L1_hex_tileset.tres";
     private const string WorldHexTileClipShaderPath = "res://assets/ui/tilemap/world_hex_tile_clip.gdshader";
+    private static readonly StringName WorldTerrainFamilyCustomDataLayer = new("world_terrain_family");
     private static readonly Vector2I[] WorldPlainTileCoords =
     [
         new Vector2I(0, 1),
@@ -65,6 +66,12 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     [
         new Vector2I(2, 0)
     ];
+    private Vector2I[] _worldPlainTileCoords = WorldPlainTileCoords;
+    private Vector2I[] _worldSpiritTileCoords = WorldSpiritTileCoords;
+    private Vector2I[] _worldRuggedTileCoords = WorldRuggedTileCoords;
+    private Vector2I[] _worldSnowTileCoords = WorldSnowTileCoords;
+    private Vector2I[] _worldDeepWaterTileCoords = WorldWaterTileCoords;
+    private Vector2I[] _worldShallowWaterTileCoords = WorldWaterTileCoords;
     private static readonly Color MapBackdropColor = new(0.09f, 0.11f, 0.16f, 0.92f);
     private static readonly Color GridColor = new(0.16f, 0.20f, 0.28f, 0.55f);
     private static readonly Color DefaultOutlineColor = new(0.82f, 0.86f, 0.96f, 0.35f);
@@ -1831,6 +1838,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         _worldTerrainTileLayer.Material = LoadWorldTerrainClipMaterial();
 
         LoadWorldLayer1TileSet();
+        LoadWorldTerrainTileBindings();
     }
 
     private void LoadWorldLayer1TileSet()
@@ -1856,6 +1864,158 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         {
             _worldTerrainTileLayer.TileSet = tileSet;
         }
+    }
+
+    private void LoadWorldTerrainTileBindings()
+    {
+        if (TryLoadWorldTerrainTilesFromTileSet())
+        {
+            return;
+        }
+
+        if (_worldTerrainTileLayer == null)
+        {
+            ResetWorldTerrainTileBindings();
+            return;
+        }
+
+        _worldPlainTileCoords = ReadWorldTerrainTileCoords(_worldTerrainTileLayer, "plain_tiles", WorldPlainTileCoords);
+        _worldSpiritTileCoords = ReadWorldTerrainTileCoords(_worldTerrainTileLayer, "spirit_tiles", WorldSpiritTileCoords);
+        _worldRuggedTileCoords = ReadWorldTerrainTileCoords(_worldTerrainTileLayer, "rugged_tiles", WorldRuggedTileCoords);
+        _worldSnowTileCoords = ReadWorldTerrainTileCoords(_worldTerrainTileLayer, "snow_tiles", WorldSnowTileCoords);
+        _worldDeepWaterTileCoords = ReadWorldTerrainTileCoords(_worldTerrainTileLayer, "deep_water_tiles", WorldWaterTileCoords);
+        _worldShallowWaterTileCoords = ReadWorldTerrainTileCoords(_worldTerrainTileLayer, "shallow_water_tiles", WorldWaterTileCoords);
+    }
+
+    private bool TryLoadWorldTerrainTilesFromTileSet()
+    {
+        if (_worldLayer1TileSet == null || _worldLayer1SourceId < 0)
+        {
+            return false;
+        }
+
+        if (_worldLayer1TileSet.GetSource(_worldLayer1SourceId) is not TileSetAtlasSource atlasSource)
+        {
+            return false;
+        }
+
+        var plain = new HashSet<Vector2I>();
+        var spirit = new HashSet<Vector2I>();
+        var rugged = new HashSet<Vector2I>();
+        var snow = new HashSet<Vector2I>();
+        var deepWater = new HashSet<Vector2I>();
+        var shallowWater = new HashSet<Vector2I>();
+
+        var tilesCount = atlasSource.GetTilesCount();
+        for (var index = 0; index < tilesCount; index++)
+        {
+            var coords = atlasSource.GetTileId(index);
+            var tileData = atlasSource.GetTileData(coords, 0);
+            if (tileData == null)
+            {
+                continue;
+            }
+
+            var familyVariant = tileData.GetCustomData(WorldTerrainFamilyCustomDataLayer);
+            if (familyVariant.VariantType == Variant.Type.Nil)
+            {
+                continue;
+            }
+
+            var familyText = familyVariant.AsString();
+            if (string.IsNullOrWhiteSpace(familyText))
+            {
+                continue;
+            }
+
+            var normalized = familyText.Trim().ToLowerInvariant();
+            switch (normalized)
+            {
+                case "plain":
+                    plain.Add(coords);
+                    break;
+                case "spirit":
+                case "spirit_vein":
+                case "spiritvein":
+                    spirit.Add(coords);
+                    break;
+                case "rugged":
+                case "foothill":
+                case "mountain":
+                    rugged.Add(coords);
+                    break;
+                case "snow":
+                    snow.Add(coords);
+                    break;
+                case "deep_water":
+                case "deepwater":
+                case "water_deep":
+                    deepWater.Add(coords);
+                    break;
+                case "shallow_water":
+                case "shallowwater":
+                case "water_shallow":
+                    shallowWater.Add(coords);
+                    break;
+            }
+        }
+
+        var foundAny = plain.Count > 0 || spirit.Count > 0 || rugged.Count > 0 || snow.Count > 0 ||
+                       deepWater.Count > 0 || shallowWater.Count > 0;
+        if (!foundAny)
+        {
+            return false;
+        }
+
+        _worldPlainTileCoords = plain.Count > 0 ? new List<Vector2I>(plain).ToArray() : WorldPlainTileCoords;
+        _worldSpiritTileCoords = spirit.Count > 0 ? new List<Vector2I>(spirit).ToArray() : WorldSpiritTileCoords;
+        _worldRuggedTileCoords = rugged.Count > 0 ? new List<Vector2I>(rugged).ToArray() : WorldRuggedTileCoords;
+        _worldSnowTileCoords = snow.Count > 0 ? new List<Vector2I>(snow).ToArray() : WorldSnowTileCoords;
+        _worldDeepWaterTileCoords = deepWater.Count > 0 ? new List<Vector2I>(deepWater).ToArray() : WorldWaterTileCoords;
+        _worldShallowWaterTileCoords = shallowWater.Count > 0 ? new List<Vector2I>(shallowWater).ToArray() : WorldWaterTileCoords;
+        return true;
+    }
+
+    private void ResetWorldTerrainTileBindings()
+    {
+        _worldPlainTileCoords = WorldPlainTileCoords;
+        _worldSpiritTileCoords = WorldSpiritTileCoords;
+        _worldRuggedTileCoords = WorldRuggedTileCoords;
+        _worldSnowTileCoords = WorldSnowTileCoords;
+        _worldDeepWaterTileCoords = WorldWaterTileCoords;
+        _worldShallowWaterTileCoords = WorldWaterTileCoords;
+    }
+
+    private static Vector2I[] ReadWorldTerrainTileCoords(
+        Node bindingNode,
+        StringName property,
+        Vector2I[] fallback)
+    {
+        var value = bindingNode.Get(property);
+        if (value.VariantType != Variant.Type.Array)
+        {
+            return fallback;
+        }
+
+        var array = (Godot.Collections.Array)value;
+        if (array.Count == 0)
+        {
+            return fallback;
+        }
+
+        var coords = new List<Vector2I>(array.Count);
+        for (var index = 0; index < array.Count; index++)
+        {
+            var entry = (Variant)array[index];
+            if (entry.VariantType != Variant.Type.Vector2I)
+            {
+                continue;
+            }
+
+            coords.Add(entry.AsVector2I());
+        }
+
+        return coords.Count > 0 ? coords.ToArray() : fallback;
     }
 
     private bool RebuildWorldTerrainTileLayer()
@@ -2017,19 +2177,24 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     private Layer1TileVariant ResolveWorldLayer1TileVariant(XianxiaHexCellData cell)
     {
         var coords = ResolveWorldTileCoords(cell);
+        if (coords.Length == 0)
+        {
+            coords = WorldPlainTileCoords;
+        }
         var variantIndex = ResolveVariantColumn(cell, 521) % coords.Length;
         return new Layer1TileVariant(_worldLayer1SourceId, coords[variantIndex], 0);
     }
 
-    private static Vector2I[] ResolveWorldTileCoords(XianxiaHexCellData cell)
+    private Vector2I[] ResolveWorldTileCoords(XianxiaHexCellData cell)
     {
         return WorldTerrainVisualRules.ResolveWorldVisualFamily(cell) switch
         {
-            TownTerrainVisualFamily.DeepWater or TownTerrainVisualFamily.ShallowWater => WorldWaterTileCoords,
-            TownTerrainVisualFamily.Snow => WorldSnowTileCoords,
-            TownTerrainVisualFamily.Rugged => WorldRuggedTileCoords,
-            TownTerrainVisualFamily.Spirit => WorldSpiritTileCoords,
-            _ => WorldPlainTileCoords
+            TownTerrainVisualFamily.DeepWater => _worldDeepWaterTileCoords,
+            TownTerrainVisualFamily.ShallowWater => _worldShallowWaterTileCoords,
+            TownTerrainVisualFamily.Snow => _worldSnowTileCoords,
+            TownTerrainVisualFamily.Rugged => _worldRuggedTileCoords,
+            TownTerrainVisualFamily.Spirit => _worldSpiritTileCoords,
+            _ => _worldPlainTileCoords
         };
     }
 

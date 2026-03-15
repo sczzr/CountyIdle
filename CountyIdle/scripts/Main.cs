@@ -116,7 +116,9 @@ public partial class Main : Control
         CreateWarehousePanel();
         CreateTaskPanel();
         CreateDisciplePanel();
+        CreateCultivationPanel();
         CreateSectOrganizationPanel();
+        CreateSectNamePanel();
         CreateSaveSlotsPanel();
         CreateSectChroniclePanel();
         BindUiEvents();
@@ -144,9 +146,11 @@ public partial class Main : Control
         UnbindWarehousePanelEvents();
         UnbindTaskPanelEvents();
         UnbindDisciplePanelEvents();
+        UnbindCultivationPanelEvents();
         UnbindSectOrganizationPanelEvents();
         UnbindSaveSlotsPanelEvents();
         UnbindSectChroniclePanelEvents();
+        UnbindBuildingListPanelEvents();
         UnbindSectTileInspectorEvents();
     }
 
@@ -210,14 +214,23 @@ public partial class Main : Control
 
         CaptureSectChronicleSnapshot(state);
 
-        _sectMapRenderer?.RefreshMap(state.Population, state.HousingCapacity, state.ElitePopulation);
+        _sectMapRenderer?.RefreshNaming(state);
+        _sectMapRenderer?.RefreshMap(
+            state.Population,
+            state.HousingCapacity,
+            state.ElitePopulation,
+            TownMapBuildingHints.FromState(state),
+            state.TownBuildingPlacements);
         _sectMapRenderer?.RefreshResidents(state);
         _sectMapRenderer?.SetResidentClock(state.GameMinutes, GetCurrentTimeScaleFloat());
         RefreshWarehousePanelPopup(state);
         RefreshTaskPanelPopup(state);
         RefreshDisciplePanelPopup(state);
+        RefreshCultivationPanelPopup(state);
         RefreshSectOrganizationPanelPopup(state);
         RefreshSectChroniclePanelPopup(state);
+        RefreshDemoPanel(state);
+        RefreshBuildingListPanel(state);
         HandleAutoSaveFromState(state);
 
         RefreshJobPanels(state);
@@ -275,7 +288,10 @@ public partial class Main : Control
     {
         if (_peakOverviewLabel != null)
         {
-            _peakOverviewLabel.Text = SectOrganizationRules.BuildPeakOverviewText();
+            var namingState = _gameLoop != null ? _gameLoop.State : null;
+            _peakOverviewLabel.Text = namingState == null
+                ? SectOrganizationRules.BuildPeakOverviewText()
+                : SectOrganizationRules.BuildPeakOverviewText(namingState);
             _peakOverviewLabel.TooltipText = "按设定文档汇总当前可见九峰与附属部门结构。";
         }
 
@@ -420,6 +436,8 @@ private void ConfigureLegacyBackground()
         BindSectTileInspectorNodes();
         BindWorldSitePanelNodes();
         BindSectChronicleNodes();
+        BindDemoPanelNodes();
+        BindBuildingListPanelNodes();
         ClearLegacyJobsPaddingBindings();
 
     }
@@ -431,6 +449,7 @@ private void ConfigureLegacyBackground()
         BindWarehouseButtonEvent();
         BindTaskButtonEvent();
         BindDiscipleButtonEvent();
+        BindCultivationButtonEvent();
         BindSectOrganizationButtonEvent();
         BindSectChronicleEntry();
         BindDiscipleMapInspectionEvent();
@@ -519,13 +538,13 @@ private void ConfigureLegacyBackground()
         var agricultureButton = GetNodeOrNull<Button>($"{CenterReportDetailPagesPath}/MulberryCard/CardVBox/UpgradeButton");
         if (agricultureButton != null)
         {
-            agricultureButton.Pressed += () => _gameLoop.BuildIndustryBuilding(IndustryBuildingType.Agriculture);
+            agricultureButton.Pressed += () => BuildIndustryBuildingWithPlacement(IndustryBuildingType.Agriculture);
         }
 
         var workshopButton = GetNodeOrNull<Button>($"{CenterReportDetailPagesPath}/LumberCard/CardVBox/UpgradeButton");
         if (workshopButton != null)
         {
-            workshopButton.Pressed += () => _gameLoop.BuildIndustryBuilding(IndustryBuildingType.Workshop);
+            workshopButton.Pressed += () => BuildIndustryBuildingWithPlacement(IndustryBuildingType.Workshop);
         }
 
         if (_mineUpgradeButton != null)
@@ -660,21 +679,16 @@ private void ConfigureLegacyBackground()
         _worldMapButton.ButtonPressed = mapTab == MapTab.World;
 
         if (_worldMapButton != null)
-
         {
-
             if (mapTab == MapTab.World)
-
             {
-
                 _worldMapButton.Text = "返回山门沙盘";
-
-                _worldMapButton.TooltipText = "返回天衍峰山门沙盘，继续山门布局与内务经营。";
-
+                var peakName = _gameLoop != null
+                    ? SectNamingRules.GetName(_gameLoop.State, SectNamingRules.PeakTianyanKey)
+                    : "天衍峰";
+                _worldMapButton.TooltipText = $"返回{peakName}山门沙盘，继续山门布局与内务经营。";
             }
-
             else
-
             {
 
                 _worldMapButton.Text = "返回世界地图";
@@ -925,17 +939,36 @@ private void ConfigureLegacyBackground()
         }
 
         _selectedPeakIndex = SectOrganizationRules.NormalizePeakIndex(_selectedPeakIndex);
-        _peakCurrentTitleLabel.Text = SectOrganizationRules.GetPeakTitle(_selectedPeakIndex);
+        var namingState = state ?? (_gameLoop != null ? _gameLoop.State : null);
+        _peakCurrentTitleLabel.Text = namingState == null
+            ? SectOrganizationRules.GetPeakTitle(_selectedPeakIndex)
+            : SectOrganizationRules.GetPeakTitle(namingState, _selectedPeakIndex);
         _peakCurrentTitleLabel.TooltipText = "点击四条职司摘要时会自动跳到推荐峰脉。";
         _peakDetailCounterLabel.Text = $"{_selectedPeakIndex + 1}/{peakCount}";
-        _peakCurrentSummaryLabel.Text = SectOrganizationRules.GetPeakSummary(_selectedPeakIndex);
-        _peakCurrentSummaryLabel.TooltipText = SectOrganizationRules.BuildPeakDetailText(_selectedPeakIndex);
-        _peakCurrentDetailLabel.Text = SectOrganizationRules.BuildPeakDetailText(_selectedPeakIndex);
-        _peakCurrentDetailLabel.TooltipText = "峰脉详情来自《浮云宗-天衍峰》设定整理。";
+        _peakCurrentSummaryLabel.Text = namingState == null
+            ? SectOrganizationRules.GetPeakSummary(_selectedPeakIndex)
+            : SectOrganizationRules.GetPeakSummary(namingState, _selectedPeakIndex);
+        var peakDetailText = namingState == null
+            ? SectOrganizationRules.BuildPeakDetailText(_selectedPeakIndex)
+            : SectOrganizationRules.BuildPeakDetailText(namingState, _selectedPeakIndex);
+        _peakCurrentSummaryLabel.TooltipText = peakDetailText;
+        _peakCurrentDetailLabel.Text = peakDetailText;
+        if (namingState == null)
+        {
+            _peakCurrentDetailLabel.TooltipText = "峰脉详情来自《浮云宗-天衍峰》设定整理。";
+        }
+        else
+        {
+            var sectName = SectNamingRules.GetName(namingState, SectNamingRules.SectNameKey);
+            var peakName = SectNamingRules.GetName(namingState, SectNamingRules.PeakTianyanKey);
+            _peakCurrentDetailLabel.TooltipText = $"峰脉详情来自《{sectName}-{peakName}》设定整理。";
+        }
 
-        var currentState = state ?? (_gameLoop != null ? _gameLoop.State : null);
+        var currentState = namingState;
         var selectedSupportType = SectOrganizationRules.GetSupportTypeForPeakIndex(_selectedPeakIndex);
-        var selectedSupportDefinition = SectPeakSupportRules.GetDefinition(selectedSupportType);
+        var selectedSupportDefinition = currentState == null
+            ? SectPeakSupportRules.GetDefinition(selectedSupportType)
+            : SectPeakSupportRules.GetDefinition(currentState, selectedSupportType);
 
         if (_peakSupportStatusLabel != null)
         {
@@ -943,7 +976,7 @@ private void ConfigureLegacyBackground()
                 ? SectPeakSupportRules.BuildActiveSupportStatus(currentState)
                 : SectPeakSupportRules.BuildSelectionPreview(SectPeakSupportType.Balanced);
             _peakSupportStatusLabel.Text =
-                $"当前协同：{activeSupportText}\n候选峰令：{SectPeakSupportRules.BuildSelectionPreview(selectedSupportType)}";
+                $"当前协同：{activeSupportText}\n候选峰令：{(currentState == null ? SectPeakSupportRules.BuildSelectionPreview(selectedSupportType) : SectPeakSupportRules.BuildSelectionPreview(currentState, selectedSupportType))}";
             _peakSupportStatusLabel.TooltipText = selectedSupportDefinition.Description;
         }
 
@@ -980,7 +1013,7 @@ private void ConfigureLegacyBackground()
             return;
         }
 
-        _gameLoop.BuildIndustryBuilding(IndustryBuildingType.Research);
+        BuildIndustryBuildingWithPlacement(IndustryBuildingType.Research);
     }
 
     private void RefreshMineButtonState(GameState state)
@@ -991,7 +1024,15 @@ private void ConfigureLegacyBackground()
         }
 
         _mineUpgradeButton.Disabled = false;
-        _mineUpgradeButton.Text = state.TechLevel >= MineUnlockTechLevel ? MineUnlockedText : MineLockedText;
+        _mineUpgradeButton.Text = state.TechLevel >= MineUnlockTechLevel
+            ? BuildMineUnlockedText(state)
+            : MineLockedText;
+    }
+
+    private static string BuildMineUnlockedText(GameState state)
+    {
+        var academyName = SectMapSemanticRules.GetTechnologyTrackName(state);
+        return $"↑ 扩建{academyName} (木16 石22 金22)";
     }
 
     private void BindLanternHoverEffects()

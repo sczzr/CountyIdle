@@ -215,6 +215,18 @@
 - 匹配依据至少包括：当前条目侧重、弟子执行、悟性、贡献与职司匹配度
 - 弟子谱与治宗册必须能读取同一套自动补位结果，避免两边口径不一致
 
+### 4.2.2 随机弟子生成器（开发辅助）
+
+仅用于开发与预览，不进入正式结算或存档。
+
+裁定如下：
+
+- 提供 `DiscipleRosterSystem.BuildRandomRoster(GameState, count, seed?)` 作为随机名册生成入口
+- 生成结果只用于弟子谱样式/系统预览，不写入 `GameState`，不进入存档
+- 允许传入 `seed` 以获得可复现结果；未传入则为非确定随机
+- 生成字段仍遵循现有 `DiscipleProfile` 语义，不引入职业歧视叙事
+- 弟子谱调试入口默认仅 Debug 构建可见，避免影响正式玩家流程
+
 ### 4.3 挂机自动运转
 
 挂机是本项目成立条件之一，不是简化模式。
@@ -471,9 +483,11 @@ DiscipleRecord（可选扩展字段）：
 本文裁定：
 
 - 天衍峰山门图的任意 hex 都必须可点选；若未命中场所锚点，则进入“院域坊局检视”分支，不再退回纯背景格。
+- 天衍峰山门图的产业建筑显影需与建筑数量联动：按“每 2 座建筑映射 1 个锚点建筑（至少 1 个、上限 4 个）”生成可见锚点；建造时优先落在当前选中地块，未选中则按推荐落点自动落建；落点写入 `GameState` 并随存档持久化，读档后自动复原。
 - 每个院域地块至少维护以下固定底盘字段：`RegionName`、`ContentKind`、`QiAffinityText`、`BaseQiCapacity`、`QiRecoveryPerHour`、`BuildSlotCount`、`FeatureTexts`。
 - 每个院域地块的一期坊局层至少维护以下可变字段：`PlanStyle`、`SubBuildings`、`TotalQiDemand`、`QiCongestion`、`SynergyScore`、`Stability`、`SuggestedBuildType`。
 - 检视器一期必须统一回答四个问题：`这里是什么`、`它现在在干什么`、`为什么顺或为什么卡`、`我现在能做什么`。
+- 左侧检视器需展示地块建筑列表：锚点场所显示已落成建筑，普通院域显示坊位规划列表。
 - 当前运行版至少支持三档运行时坊局调整：`主修坊局`、`协同坊局`、`稳态坊局`；切换后要立即刷新坊位摘要、灵气需求、协同分和稳定度。
 - 天衍峰山门图与同族二级局部沙盘的基础地块层，必须优先直接读取 `L1_hex_tileset.tres` 作为运行时纹理来源；不允许长期维持“编辑器已有 tileset、运行时仍直接切图片 atlas”的双轨漂移状态。
 - 若基础地块 atlas 本身为方形切片，运行时必须按 hex polygon 进行投影，保证玩家看到的是无缝 hex 地块，而不是原始矩形贴图区。
@@ -492,9 +506,10 @@ DiscipleRecord（可选扩展字段）：
 - `SecondaryMapView` 在当前运行版必须包含一张按所选 world hex 语义生成的局部地图；地图生成至少要参考该格的 `Biome / Terrain / Water / Wonder / Structure / QiDensity / Corruption / MonsterThreat / Fertility` 中的可用字段。
 - 世界格进入 `SecondaryMapView` 后，局部地图的基础底盘不得只退化为统一的 `Ground` 皮肤；运行时必须至少保留一层“继承自 world hex 的地形家族”口径，当前统一收口为 `Plain / Spirit / Rugged / Snow / ShallowWater / DeepWater` 六类，用于让一级图与二级图共享基础贴图分桶。
 - 二级地图 external map 模式当前继续复用 `L1_hex_tileset.tres`，但选图优先级应为：`继承的地形家族 -> 局部 terrain 语义 fallback -> atlas / 纯色 fallback`，以避免雪地、荒岭、灵地进入二级地图后又全部退成同一种普通底盘。
-- 在共享地形家族之外，二级地图还必须尽量继承 world hex 的方向信息：当前至少要求 `RoadMask` 影响局部进场道路的边界方向，`RiverMask / Water` 影响局部水体/水路的主要边界方向，`CliffMask` 或高差山地语义影响 `Ridge / Hazard` 的主要压迫方向；不允许长期把入口、水体和高差都固定写死在同一侧。
+- 在共享地形家族之外，二级地图还必须尽量继承 world hex 的方向信息：`RoadMask` 影响局部进场道路，`RiverMask / Water` 影响局部水体/水路，`CliffMask` 或高差山地语义影响 `Ridge / Hazard` 的主要压迫方向；多方向时应先合成主方向或汇合焦点，对向成对时允许生成贯通线（路/河/脊穿越），入口方向应与合成方向一致并使用稳定的非固定侧 fallback；不允许长期把入口、水体和高差都固定写死在同一侧。
 - 上述局部地图在表现形态上必须与天衍峰山门沙盘保持同族：继续使用同类 hex 沙盘视图、缩放/点选节奏与地块检视习惯，只允许改变地图内容、地块语义和局部布局，不另起一套完全不同的预览样式。
 - 世界图一期的基础地块层当前继续复用 `L1_hex_tileset.tres`，但运行时主链已回到 `StrategicMapViewSystem._Draw()` 按 hex polygon 逐格投 atlas 区域；此前直接把世界格写入 `WorldTerrainTileLayer` 的方片排布会在六边形裁切后留下连续白缝，因此该节点目前仅保留为后续实验/备用基础设施，不再承担正式世界图底盘。道路 / 河流 / 站点 / 标签 / 选中高亮仍继续由 `StrategicMapViewSystem` 脚本叠加层承接，避免把交互反馈压进纯地块层后失真；旧版蜂窝背景网格也不再叠加。
+- 世界图地形与 tileset 纹理的映射优先由 tileset custom data layer `world_terrain_family` 提供；若未配置，则回退到 `WorldTerrainTileLayer` 上的绑定脚本（如 `WorldTerrainTileBindings.gd`），最终再回退默认映射。`StrategicMapViewSystem` 必须确保 `_Draw()` 与 tile layer 共享同一映射口径。
 - 当前阶段允许把“世界格二级地图”停留在模板化入口层，不强制立即接入专属场景、独立结算或存档结构；但所有世界格都必须能给出下一层身份、开放层级与回流方向。
 
 ### 8.2 界面定位

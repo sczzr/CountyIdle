@@ -10,7 +10,9 @@ public partial class Main
                _warehousePanel?.Visible == true ||
                _taskPanel?.Visible == true ||
                _disciplePanel?.Visible == true ||
+               _cultivationPanel?.Visible == true ||
                _sectOrganizationPanel?.Visible == true ||
+               _sectNamePanel?.Visible == true ||
                _saveSlotsPanel?.Visible == true ||
                _sectChroniclePanel?.Visible == true;
     }
@@ -37,9 +39,19 @@ public partial class Main
             _disciplePanel.ClosePanel();
         }
 
+        if (_cultivationPanel != null && _cultivationPanel.Visible && !ReferenceEquals(_cultivationPanel, except))
+        {
+            _cultivationPanel.ClosePanel();
+        }
+
         if (_sectOrganizationPanel != null && _sectOrganizationPanel.Visible && !ReferenceEquals(_sectOrganizationPanel, except))
         {
             _sectOrganizationPanel.ClosePanel();
+        }
+
+        if (_sectNamePanel != null && _sectNamePanel.Visible && !ReferenceEquals(_sectNamePanel, except))
+        {
+            _sectNamePanel.ClosePanel();
         }
 
         if (_saveSlotsPanel != null && _saveSlotsPanel.Visible && !ReferenceEquals(_saveSlotsPanel, except))

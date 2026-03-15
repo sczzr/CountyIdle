@@ -425,34 +425,41 @@ public static class SectChronicleRules
     {
         if (state.ExplorationEnabled && state.ElitePopulation > 0)
         {
-            return $"[{timeOfDay}] 外务历练持续至第 {state.ExplorationDepth} 层，当前有 {state.ElitePopulation} 名骨干在外整装。";
+            return SectNamingRules.ReplaceKnownNames(state,
+                $"[{timeOfDay}] 外务历练持续至第 {state.ExplorationDepth} 层，当前有 {state.ElitePopulation} 名骨干在外整装。");
         }
 
         if (SectGovernanceRules.GetActiveQuarterDecree(state) != SectQuarterDecreeType.None)
         {
-            return $"[{timeOfDay}] 本季法令【{activeQuarterDecree.DisplayName}】在行：{activeQuarterDecree.ShortEffect}。";
+            return SectNamingRules.ReplaceKnownNames(state,
+                $"[{timeOfDay}] 本季法令【{activeQuarterDecree.DisplayName}】在行：{activeQuarterDecree.ShortEffect}。");
         }
 
         if (SectPeakSupportRules.GetActiveSupport(state) != SectPeakSupportType.Balanced)
         {
-            return $"[{timeOfDay}] 协同峰当前为【{activePeakSupport.DisplayName}】，{activePeakSupport.ShortEffect}。";
+            return SectNamingRules.ReplaceKnownNames(state,
+                $"[{timeOfDay}] 协同峰当前为【{activePeakSupport.DisplayName}】，{activePeakSupport.ShortEffect}。");
         }
 
         if (state.Happiness >= 75.0)
         {
-            return $"[{timeOfDay}] 山门民心 {state.Happiness:0.#} ，诸殿气象安定，可顺势扩建与收徒。";
+            return SectNamingRules.ReplaceKnownNames(state,
+                $"[{timeOfDay}] 山门民心 {state.Happiness:0.#} ，诸殿气象安定，可顺势扩建与收徒。");
         }
 
         if (state.TechLevel > 0 || state.Research > 0.0)
         {
-            return $"[{timeOfDay}] 传法院研修推进中，当前科技 T{Math.Max(state.TechLevel + 1, 1)}，可继续叠加讲法与深造。";
+            return SectNamingRules.ReplaceKnownNames(state,
+                $"[{timeOfDay}] 传法院研修推进中，当前科技 T{Math.Max(state.TechLevel + 1, 1)}，可继续叠加讲法与深造。");
         }
 
         if (warehouseLoad < 0.65 && state.ConstructionMaterials >= 4)
         {
-            return $"[{timeOfDay}] 仓储仍有余裕，护山构件 {state.ConstructionMaterials:0} ，可择机推进营造。";
+            return SectNamingRules.ReplaceKnownNames(state,
+                $"[{timeOfDay}] 仓储仍有余裕，护山构件 {state.ConstructionMaterials:0} ，可择机推进营造。");
         }
 
-        return $"[{timeOfDay}] 宗主中枢正行【{activeLawName}】与【{activeTalentPlanName}】，诸堂按令运转。";
+        return SectNamingRules.ReplaceKnownNames(state,
+            $"[{timeOfDay}] 宗主中枢正行【{activeLawName}】与【{activeTalentPlanName}】，诸堂按令运转。");
     }
 }
