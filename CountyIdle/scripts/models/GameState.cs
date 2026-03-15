@@ -18,10 +18,32 @@ public class GameState
     public double MapCommuteReductionBonusKm { get; set; } = 0.0;
     public double MapRoadMobilityBonus { get; set; } = 0.0;
 
+    #region 八大修仙技艺 - 弟子人数
+    /// <summary>灵植 - 种植灵药灵谷</summary>
+    public int FollowersSpiritPlant { get; set; }
+    /// <summary>灵兽 - 培育战斗灵兽</summary>
+    public int FollowersSpiritBeast { get; set; }
+    /// <summary>炼丹 - 炼制丹药</summary>
+    public int FollowersAlchemy { get; set; }
+    /// <summary>炼器 - 锻造装备法宝</summary>
+    public int FollowersForging { get; set; }
+    /// <summary>符箓 - 绘制战斗符箓</summary>
+    public int FollowersTalisman { get; set; }
+    /// <summary>阵法 - 布置宗门阵法</summary>
+    public int FollowersFormation { get; set; }
+    /// <summary>傀儡 - 操控自动化傀儡</summary>
+    public int FollowersGolem { get; set; }
+    /// <summary>天机 - 研究解锁新内容</summary>
+    public int FollowersArcane { get; set; }
+    #endregion
+
+    #region 旧字段兼容 - 将会在后续迁移后删除
+    // 旧兼容字段 - 用于存档迁移
     public int Farmers { get; set; } = 70;
     public int Workers { get; set; } = 25;
     public int Merchants { get; set; } = 12;
     public int Scholars { get; set; } = 8;
+    #endregion
 
     public double Happiness { get; set; } = 72.0;
     public double Threat { get; set; } = 10.0;
@@ -102,12 +124,37 @@ public class GameState
 
     public int GetAssignedPopulation()
     {
-        return Farmers + Workers + Merchants + Scholars;
+        return FollowersSpiritPlant + 
+               FollowersSpiritBeast + 
+               FollowersAlchemy + 
+               FollowersForging + 
+               FollowersTalisman + 
+               FollowersFormation + 
+               FollowersGolem + 
+               FollowersArcane;
     }
 
     public int GetUnassignedPopulation()
     {
         return Math.Max(Population - GetAssignedPopulation(), 0);
+    }
+
+    /// <summary>
+    /// 旧存档迁移 - 将原职业数据迁移到八大技艺
+    /// </summary>
+    public void MigrateFromOldJobs()
+    {
+        // 迁移规则：原职业 → 对应技艺
+        FollowersSpiritPlant = Farmers;      // 农 → 灵植
+        FollowersForging = Workers;          // 工 → 炼器
+        FollowersGolem = Merchants;          // 商 → 傀儡（暂时）
+        FollowersArcane = Scholars;         // 学 → 天机
+        
+        // 新增技艺初始化为 0
+        if (FollowersSpiritBeast == 0) FollowersSpiritBeast = 0;
+        if (FollowersAlchemy == 0) FollowersAlchemy = 0;
+        if (FollowersTalisman == 0) FollowersTalisman = 0;
+        if (FollowersFormation == 0) FollowersFormation = 0;
     }
 
     public double GetWarehouseUsed()
@@ -138,6 +185,44 @@ public class GameState
                Math.Max(CompositeMaterial, 0) +
                Math.Max(IndustrialParts, 0) +
                Math.Max(ConstructionMaterials, 0);
+    }
+
+    /// <summary>
+    /// 获取指定技艺当前弟子人数
+    /// </summary>
+    public int GetSkillFollowers(CraftSkillType skillType)
+    {
+        return skillType switch
+        {
+            CraftSkillType.SpiritPlant => FollowersSpiritPlant,
+            CraftSkillType.SpiritBeast => FollowersSpiritBeast,
+            CraftSkillType.Alchemy => FollowersAlchemy,
+            CraftSkillType.Forging => FollowersForging,
+            CraftSkillType.Talisman => FollowersTalisman,
+            CraftSkillType.Formation => FollowersFormation,
+            CraftSkillType.Golem => FollowersGolem,
+            CraftSkillType.Arcane => FollowersArcane,
+            _ => 0
+        };
+    }
+
+    /// <summary>
+    /// 设置指定技艺弟子人数
+    /// </summary>
+    public void SetSkillFollowers(CraftSkillType skillType, int count)
+    {
+        count = Math.Max(count, 0);
+        switch (skillType)
+        {
+            case CraftSkillType.SpiritPlant: FollowersSpiritPlant = count; break;
+            case CraftSkillType.SpiritBeast: FollowersSpiritBeast = count; break;
+            case CraftSkillType.Alchemy: FollowersAlchemy = count; break;
+            case CraftSkillType.Forging: FollowersForging = count; break;
+            case CraftSkillType.Talisman: FollowersTalisman = count; break;
+            case CraftSkillType.Formation: FollowersFormation = count; break;
+            case CraftSkillType.Golem: FollowersGolem = count; break;
+            case CraftSkillType.Arcane: FollowersArcane = count; break;
+        }
     }
 
     public GameState Clone()

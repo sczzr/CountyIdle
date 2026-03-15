@@ -3146,7 +3146,7 @@ public sealed partial class XianxiaWorldGeneratorSystem
 
         for (var octave = 0; octave < Math.Max(octaves, 1); octave++)
         {
-            total += SampleValueNoise(x * frequency, y * frequency, seed + (octave * 1987)) * amplitude;
+            total += SamplePerlinNoise(x * frequency, y * frequency, seed + (octave * 1987)) * amplitude;
             maxValue += amplitude;
             amplitude *= persistence;
             frequency *= 2f;
@@ -3160,22 +3160,43 @@ public sealed partial class XianxiaWorldGeneratorSystem
         return total / maxValue;
     }
 
-    private static float SampleValueNoise(float x, float y, int seed)
+    private static float SamplePerlinNoise(float x, float y, int seed)
     {
-        var floorX = Mathf.FloorToInt(x);
-        var floorY = Mathf.FloorToInt(y);
-        var tx = x - floorX;
-        var ty = y - floorY;
-        var smoothX = tx * tx * (3f - (2f * tx));
-        var smoothY = ty * ty * (3f - (2f * ty));
+        var x0 = Mathf.FloorToInt(x);
+        var y0 = Mathf.FloorToInt(y);
+        var x1 = x0 + 1;
+        var y1 = y0 + 1;
 
-        var n00 = Hash01(floorX, floorY, seed);
-        var n10 = Hash01(floorX + 1, floorY, seed);
-        var n01 = Hash01(floorX, floorY + 1, seed);
-        var n11 = Hash01(floorX + 1, floorY + 1, seed);
-        var ix0 = Mathf.Lerp(n00, n10, smoothX);
-        var ix1 = Mathf.Lerp(n01, n11, smoothX);
-        return Mathf.Lerp(ix0, ix1, smoothY);
+        var sx = x - x0;
+        var sy = y - y0;
+        var u = Fade(sx);
+        var v = Fade(sy);
+
+        var g00 = RandomGradient(x0, y0, seed);
+        var g10 = RandomGradient(x1, y0, seed);
+        var g01 = RandomGradient(x0, y1, seed);
+        var g11 = RandomGradient(x1, y1, seed);
+
+        var n00 = g00.Dot(new Vector2(sx, sy));
+        var n10 = g10.Dot(new Vector2(sx - 1f, sy));
+        var n01 = g01.Dot(new Vector2(sx, sy - 1f));
+        var n11 = g11.Dot(new Vector2(sx - 1f, sy - 1f));
+
+        var ix0 = Mathf.Lerp(n00, n10, u);
+        var ix1 = Mathf.Lerp(n01, n11, u);
+        var value = Mathf.Lerp(ix0, ix1, v);
+        return Mathf.Clamp((value * 0.5f) + 0.5f, 0f, 1f);
+    }
+
+    private static float Fade(float t)
+    {
+        return t * t * t * (t * (t * 6f - 15f) + 10f);
+    }
+
+    private static Vector2 RandomGradient(int x, int y, int seed)
+    {
+        var angle = Hash01(x, y, seed) * Mathf.Tau;
+        return new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
     }
 
     private static string ToHtmlColor(Color color)
@@ -3232,3 +3253,5 @@ public sealed partial class XianxiaWorldGeneratorSystem
         public Rect2 Bounds { get; set; }
     }
 }
+
+

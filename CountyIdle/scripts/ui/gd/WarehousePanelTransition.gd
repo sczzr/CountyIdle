@@ -184,7 +184,6 @@ func play_open() -> void:
 	_current_tween.set_parallel(true)
 	_current_tween.tween_property(_backdrop, "modulate:a", 1.0, 0.18).from(0.0)
 	_current_tween.tween_property(_paper, "modulate:a", 1.0, 0.18).from(0.0)
-	_current_tween.tween_property(_paper, "scale", Vector2.ONE, 0.22).from(Vector2(0.985, 0.985))
 	_current_tween.tween_property(_left_roller, "modulate:a", 1.0, 0.16).from(0.0)
 	_current_tween.tween_property(_right_roller, "modulate:a", 1.0, 0.16).from(0.0)
 
@@ -192,8 +191,6 @@ func play_open() -> void:
 func play_tab_switch(_tab_name: String) -> void:
 	_kill_tween()
 	_current_tween = create_tween()
-	_current_tween.tween_property(_paper, "scale", Vector2.ONE * 1.008, 0.08)
-	_current_tween.tween_property(_paper, "scale", Vector2.ONE, 0.12)
 
 
 func play_invalid_feedback() -> void:

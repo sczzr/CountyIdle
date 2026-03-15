@@ -1,4 +1,4 @@
-using Godot;
+﻿using Godot;
 using CountyIdle.Models;
 using CountyIdle.Systems;
 using CountyIdle.UI;
@@ -156,10 +156,6 @@ public partial class Main
 
     private Button? GetTaskPanelButton()
     {
-        if (_useFigmaLayout)
-        {
-            return null;
-        }
 
         var bottomQuickButton = GetNodeOrNull<Button>($"{BottomBarPath}/BarPadding/MainRow/QuickActionRow/TaskQuickButton");
         if (bottomQuickButton != null)
@@ -182,3 +178,4 @@ public partial class Main
         bottomQuickButton.ButtonPressed = pressed;
     }
 }
+

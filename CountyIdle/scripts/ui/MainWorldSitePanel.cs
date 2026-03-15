@@ -7,6 +7,7 @@ namespace CountyIdle;
 public partial class Main
 {
     private VBoxContainer? _worldSitePanelRootVBox;
+    private XianxiaSiteData? _lastSelectedWorldSite;
     private readonly WorldSiteLocalMapGeneratorSystem _worldSiteSandboxGenerator = new();
     private Label? _worldSitePanelTitleLabel;
     private Label? _worldSitePanelSubtitleLabel;
@@ -112,7 +113,7 @@ public partial class Main
             return;
         }
 
-        var site = _worldMapRenderer?.SelectedWorldSite;
+        var site = _worldMapRenderer?.SelectedWorldSite ?? _lastSelectedWorldSite;
         if (site == null)
         {
             _worldSitePanelTitleLabel.Text = "二级地图";
@@ -168,6 +169,9 @@ public partial class Main
                 $"左键点选局部 hex 检视当前二级地图地块。当前依据 {site.PrimaryType} / {site.SecondaryTag} 生成。");
             CallWorldPanelVisualFx("set_world_site_sandbox_visible", true);
         }
+        else
+        {
+        }
         CallWorldPanelVisualFx("apply_world_site_tone", site.PrimaryType);
         CallWorldPanelVisualFx("pulse_world_site_panel");
     }
@@ -179,6 +183,7 @@ public partial class Main
             return;
         }
 
+        SetWorldSiteInspectorVisible(summary.HasSelection);
         if (summary.HasSelection)
         {
             ApplySectTileInspectorSummary(summary);
@@ -188,6 +193,10 @@ public partial class Main
         ApplyWorldSiteInspectorSummary(_worldMapRenderer?.SelectedWorldSite);
     }
 
+    private void SetWorldSiteInspectorVisible(bool hasSelection)
+    {
+        CallWorldPanelVisualFx("set_world_site_intro_visible", !hasSelection);
+    }
     private void EnsureWorldSiteSandboxMapView()
     {
         _worldSiteSandboxMapView = GetNodeOrNull<SectMapViewSystem>($"{CenterMapPagesPath}/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/GeneratedSecondarySandboxView");
@@ -201,12 +210,15 @@ public partial class Main
 
     private void OpenSelectedWorldSitePanel()
     {
-        if (_worldMapRenderer?.SelectedWorldSite == null)
+        var selectedSite = _worldMapRenderer?.SelectedWorldSite ?? _lastSelectedWorldSite;
+        var fromCache = _worldMapRenderer?.SelectedWorldSite == null && _lastSelectedWorldSite != null;
+        if (selectedSite == null)
         {
             AppendLog("当前尚未选中世界点位，无法进入二级地图入口。");
             return;
         }
 
+        _lastSelectedWorldSite = selectedSite;
         RefreshWorldSitePanel();
         SetMapTab(MapTab.WorldSite);
     }
@@ -218,11 +230,13 @@ public partial class Main
 
     private void OnWorldSitePanelActionPressed()
     {
-        var site = _worldMapRenderer?.SelectedWorldSite;
+        var site = _worldMapRenderer?.SelectedWorldSite ?? _lastSelectedWorldSite;
         if (site == null)
         {
             return;
         }
+
+        _lastSelectedWorldSite = site;
 
         switch (site.PrimaryType)
         {
@@ -328,3 +342,25 @@ public partial class Main
         string YieldText,
         string RiskText);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

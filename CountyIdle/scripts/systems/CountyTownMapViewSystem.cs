@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Godot;
 using CountyIdle.Models;
@@ -313,6 +313,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         _zoom = clampedZoom;
         UpdateMapHint();
         QueueRedraw();
+        RefreshHoverVisual();
     }
 
     public void AdjustZoom(float delta)
@@ -353,6 +354,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         _zoom = clampedZoom;
         UpdateMapHint();
         QueueRedraw();
+        RefreshHoverVisual();
     }
 
     private Vector2 GetPanDirection()
@@ -1643,4 +1645,6 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
 }
 
 internal readonly record struct Layer1TileVariant(int SourceId, Vector2I AtlasCoords, int AlternativeTile);
+
+
 

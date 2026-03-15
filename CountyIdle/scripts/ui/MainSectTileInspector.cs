@@ -158,6 +158,11 @@ public partial class Main
 
     private void OnWorldSiteSelectionChanged(XianxiaSiteData? site)
     {
+        if (site != null)
+        {
+            _lastSelectedWorldSite = site;
+        }
+
         if (_currentMapTab != MapTab.World)
         {
             return;
@@ -754,3 +759,8 @@ public partial class Main
         return $"【{site.Label}】属于{primaryTypeText}层，子类为“{ResolveWorldSecondaryTagText(site.SecondaryTag)}”，当前稀有度为{rarityText}，所在区块为{ResolveWorldRegionText(site.RegionId)}。{focus}";
     }
 }
+
+
+
+
+

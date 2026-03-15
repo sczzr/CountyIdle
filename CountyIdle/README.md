@@ -1,4 +1,4 @@
-# CountyIdle
+﻿# CountyIdle
 
 Godot 4 + C# 原型项目，核心是“人口 -> 职业 -> 精英 -> 探险 -> 反哺”的县域飞轮。
 
@@ -14,10 +14,11 @@ Godot 4 + C# 原型项目，核心是“人口 -> 职业 -> 精英 -> 探险 -> 
 - 人口、岗位、产业建筑、工具覆盖联动
 - 科研突破（T1/T2/T3）与产能倍率成长
 - 精英繁育、自动探险、装备掉落、郡县动态事件
-- 双布局 UI（Legacy/Figma）与存档/读档
+- UI 与存档/读档
 
 ## 文档入口
 
 - 总导航：`../docs/README.md`
 - 系统规格：`../docs/02_system_specs.md`
 - 功能总表：`../docs/05_feature_inventory.md`
+

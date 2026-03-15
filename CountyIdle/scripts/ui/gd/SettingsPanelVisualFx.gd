@@ -91,12 +91,10 @@ func play_open() -> void:
 	_kill_tween()
 	_backdrop.modulate.a = 0.0
 	_dialog.modulate.a = 0.0
-	_dialog.scale = Vector2(0.988, 0.988)
 	_current_tween = create_tween()
 	_current_tween.set_parallel(true)
 	_current_tween.tween_property(_backdrop, "modulate:a", 1.0, 0.18)
 	_current_tween.tween_property(_dialog, "modulate:a", 1.0, 0.2)
-	_current_tween.tween_property(_dialog, "scale", Vector2.ONE, 0.22)
 
 
 func pulse_shortcut(button_path: String) -> void:
@@ -105,13 +103,10 @@ func pulse_shortcut(button_path: String) -> void:
 
 	_kill_tween()
 	var button: Control = get_parent().get_node(button_path)
-	button.scale = Vector2.ONE
 	button.modulate.a = 0.82
 	_current_tween = create_tween()
 	_current_tween.set_parallel(true)
-	_current_tween.tween_property(button, "scale", Vector2.ONE * 1.02, 0.08)
 	_current_tween.tween_property(button, "modulate:a", 1.0, 0.1)
-	_current_tween.chain().tween_property(button, "scale", Vector2.ONE, 0.12)
 
 
 func reset_state() -> void:

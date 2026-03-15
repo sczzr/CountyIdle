@@ -1,4 +1,4 @@
-using Godot;
+﻿using Godot;
 using CountyIdle.Models;
 using CountyIdle.Systems;
 using CountyIdle.UI;
@@ -105,10 +105,6 @@ public partial class Main
 
     private Button? GetSectOrganizationPanelButton()
     {
-        if (_useFigmaLayout)
-        {
-            return null;
-        }
 
         return GetNodeOrNull<Button>($"{BottomBarPath}/BarPadding/MainRow/QuickActionRow/OrganizationQuickButton");
     }
@@ -125,3 +121,4 @@ public partial class Main
         bottomQuickButton.ButtonPressed = pressed;
     }
 }
+

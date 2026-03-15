@@ -87,7 +87,7 @@ func apply_theme_styles() -> void:
 
 func transition_to_preview() -> void:
 	_kill_tween()
-	_preview_frame.scale = Vector2(0.992, 0.992)
+	_preview_frame.scale = Vector2.ONE
 	_preview_texture.modulate.a = 0.0
 	_preview_hint.modulate.a = 0.0
 	_slot_detail_label.modulate.a = 0.78
@@ -95,19 +95,17 @@ func transition_to_preview() -> void:
 	_action_row_primary.modulate.a = 0.82
 	_action_row_secondary.modulate.a = 0.82
 	_action_row_tertiary.modulate.a = 0.82
-	_name_row.scale = Vector2(0.996, 0.996)
+	_name_row.scale = Vector2.ONE
 
 	_current_tween = create_tween()
 	_current_tween.set_parallel(true)
 	_current_tween.tween_property(_preview_texture, "modulate:a", 1.0, 0.18)
 	_current_tween.tween_property(_preview_hint, "modulate:a", 1.0, 0.18)
-	_current_tween.tween_property(_preview_frame, "scale", Vector2.ONE, 0.20)
 	_current_tween.tween_property(_slot_detail_label, "modulate:a", 1.0, 0.16)
 	_current_tween.tween_property(_name_row, "modulate:a", 1.0, 0.16)
 	_current_tween.tween_property(_action_row_primary, "modulate:a", 1.0, 0.16)
 	_current_tween.tween_property(_action_row_secondary, "modulate:a", 1.0, 0.16)
 	_current_tween.tween_property(_action_row_tertiary, "modulate:a", 1.0, 0.16)
-	_current_tween.tween_property(_name_row, "scale", Vector2.ONE, 0.18)
 
 
 func transition_to_empty() -> void:
@@ -131,12 +129,6 @@ func pulse_on_select() -> void:
 
 	_current_tween = create_tween()
 	_current_tween.set_parallel(true)
-	_current_tween.tween_property(_preview_frame, "scale", Vector2.ONE * 1.012, 0.08)
-	_current_tween.tween_property(_slot_detail_label, "scale", Vector2.ONE * 1.006, 0.08)
-	_current_tween.tween_property(_action_row_primary, "scale", Vector2.ONE * 1.004, 0.08)
-	_current_tween.chain().tween_property(_preview_frame, "scale", Vector2.ONE, 0.12)
-	_current_tween.parallel().tween_property(_slot_detail_label, "scale", Vector2.ONE, 0.12)
-	_current_tween.parallel().tween_property(_action_row_primary, "scale", Vector2.ONE, 0.12)
 
 
 func reset_state() -> void:
@@ -294,3 +286,4 @@ func _kill_tween() -> void:
 	if _current_tween != null and _current_tween.is_running():
 		_current_tween.kill()
 	_current_tween = null
+

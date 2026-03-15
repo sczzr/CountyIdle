@@ -9,8 +9,6 @@ namespace CountyIdle;
 
 public partial class Main : Control
 {
-    [Export]
-    private bool _useFigmaLayout;
 
     private enum MapTab
     {
@@ -35,14 +33,7 @@ public partial class Main : Control
     private const string CenterMapPagesPath = $"{CenterPanelContentPath}/MapViewport/MapPages";
     private const string CenterReportDetailPagesPath = $"{CenterMapPagesPath}/ReportPanelView/ReportScroll/DetailPages";
     private const string LegacyLayoutPath = "RootMargin";
-    private const string FigmaLayoutPath = "FigmaLayout";
 
-    private const string FigmaRootPath = $"{FigmaLayoutPath}/RootMargin/MainColumn";
-    private const string FigmaTopBarPath = $"{FigmaRootPath}/HUDTopBar/BarPadding/MainRow";
-    private const string FigmaBottomBarPath = $"{FigmaRootPath}/BottomBar/PanelPadding/MainColumn";
-    private const string FigmaCenterPath = $"{FigmaRootPath}/BodyRow/CenterView/PanelPadding/MainColumn";
-    private const string FigmaTimelinePath = $"{FigmaRootPath}/BodyRow/TimelinePanel/PanelPadding/MainColumn";
-    private const string FigmaEquipmentPath = $"{FigmaRootPath}/BodyRow/EquipmentPanel/PanelPadding/MainColumn";
     private const string LegacyBackgroundTexturePath = "res://assets/ui/background/background_2.png";
 
     private const int JobAdjustStep = 1;
@@ -78,7 +69,6 @@ public partial class Main : Control
     private Button _resetButton = null!;
     private Button? _worldMapButton;
     private Button? _prefectureMapButton;
-    private Button? _countyTownMapButton;
     private Button? _eventPanelButton;
     private Button? _reportPanelButton;
     private Button? _expeditionMapButton;
@@ -107,20 +97,10 @@ public partial class Main : Control
     private Button? _peakSupportResetButton;
     private RichTextLabel? _peakCurrentDetailLabel;
     private Control _legacyLayoutRoot = null!;
-    private Control _figmaLayoutRoot = null!;
     private TextureRect? _backgroundTextureRect;
     private SectMapViewSystem? _sectMapRenderer;
 
-    private Button? _figmaBuildAgricultureButton;
-    private Button? _figmaBuildWorkshopButton;
-    private Button? _figmaCraftToolsButton;
-    private Label? _figmaCenterTitleLabel;
-    private Label? _figmaCenterDescriptionLabel;
-    private Label? _figmaEquipmentTitleLabel;
-    private Label? _figmaEquipmentSummaryLabel;
-    private RichTextLabel? _figmaNotificationLabel;
 
-    private bool _isUsingFigmaLayout;
     private int _timeScaleIndex;
     private MapTab _currentMapTab = MapTab.Sect;
     private int _selectedPeakIndex = SectOrganizationRules.GetDefaultPeakIndex();
@@ -143,7 +123,6 @@ public partial class Main : Control
         BindLanternHoverEffects();
         SetupGameLoop();
         LoadInitialState();
-        ApplyLayoutSwitch();
     }
 
     public override void _Process(double delta)
@@ -225,10 +204,7 @@ public partial class Main : Control
             $"功绩 {state.ContributionPoints:0}（{FormatSigned(visibleContributionDelta)}/时），灵石流转 {FormatSigned(visibleGoldDelta)}/时。";
         _threatLabel.Text = $"危兆 {state.Threat:0}%";
         _techLabel.Text = $"研修 T{Math.Max(state.TechLevel + 1, 1)}";
-
-        _exploreButton.Text = _isUsingFigmaLayout
-            ? (state.ExplorationEnabled ? "⏸ 探险中" : "▶ 探险")
-            : (state.ExplorationEnabled ? "历练中" : "历练");
+        _exploreButton.Text = state.ExplorationEnabled ? "历练中" : "历练";
 
         _sectMapRenderer?.RefreshMap(state.Population, state.HousingCapacity, state.ElitePopulation);
         _sectMapRenderer?.RefreshResidents(state);
@@ -242,7 +218,6 @@ public partial class Main : Control
         RefreshJobPanels(state);
         RefreshMineButtonState(state);
         RefreshSectChroniclePanel(state);
-        UpdateFigmaPanels(state);
         UpdateCalendarUi(force: true);
         RefreshMapOperationalLinkUi(state);
     }
@@ -302,67 +277,6 @@ public partial class Main : Control
         RefreshPeakDetailPanel(state);
     }
 
-    private void UpdateFigmaPanels(GameState state)
-    {
-        if (!_isUsingFigmaLayout)
-        {
-            return;
-        }
-
-        var toolCoverage = IndustryRules.GetToolCoverage(state);
-        var managementBoost = IndustryRules.GetManagementBoost(state);
-        var activeDirection = SectGovernanceRules.GetActiveDevelopmentDefinition(state);
-        var activeLaw = SectGovernanceRules.GetActiveLawDefinition(state);
-        var activeTalentPlan = SectGovernanceRules.GetActiveTalentPlanDefinition(state);
-
-        if (_figmaBuildAgricultureButton != null)
-        {
-            _figmaBuildAgricultureButton.Text = $"扩建{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Agriculture)} ({state.AgricultureBuildings})";
-        }
-
-        if (_figmaBuildWorkshopButton != null)
-        {
-            _figmaBuildWorkshopButton.Text = $"扩建{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Workshop)} ({state.WorkshopBuildings})";
-        }
-
-        if (_figmaCraftToolsButton != null)
-        {
-            _figmaCraftToolsButton.Text = $"锻制工器 ({state.IndustryTools:0})";
-        }
-
-        if (_figmaCenterTitleLabel != null)
-        {
-            _figmaCenterTitleLabel.Text = "宗主中枢";
-        }
-
-        if (_figmaCenterDescriptionLabel != null)
-        {
-            _figmaCenterDescriptionLabel.Text =
-                $"方向 {activeDirection.DisplayName} · 法令 {activeLaw.DisplayName} · 育才 {activeTalentPlan.DisplayName}\n" +
-                $"治宗重心 {SectTaskRules.BuildGovernanceHeadline(state)} · {SectTaskRules.BuildGovernanceExecutionSummary(state)} · 管理加成 x{managementBoost:0.00} · 工器覆盖 {toolCoverage * 100:0}%";
-        }
-
-        if (_figmaEquipmentTitleLabel != null)
-        {
-            _figmaEquipmentTitleLabel.Text = "产业基建总览";
-        }
-
-        if (_figmaEquipmentSummaryLabel != null)
-        {
-            _figmaEquipmentSummaryLabel.Text =
-                $"战备评分 {state.AvgGearScore:0.0} · 传说 {state.LegendaryGearCount} · 史诗 {state.EpicGearCount}\n" +
-                $"精良 {state.RareGearCount} · 普通 {state.CommonGearCount}";
-        }
-
-        if (_figmaNotificationLabel != null)
-        {
-            _figmaNotificationLabel.Text =
-                $"探险：{(state.ExplorationEnabled ? "进行中" : "暂停")}\n" +
-                $"治理态势：{SectTaskRules.BuildGovernanceExecutionSummary(state)}\n" +
-                $"威胁等级：{state.Threat:0}%";
-        }
-    }
-
     private void AppendLog(string message)
     {
         if (string.IsNullOrWhiteSpace(message))
@@ -418,26 +332,13 @@ public partial class Main : Control
         _backgroundTextureRect = GetNodeOrNull<TextureRect>(BackgroundPath);
         ConfigureLegacyBackground();
         _legacyLayoutRoot = GetNode<Control>(LegacyLayoutPath);
-        _figmaLayoutRoot = GetNode<Control>(FigmaLayoutPath);
-        _isUsingFigmaLayout = _useFigmaLayout;
-
-        if (_isUsingFigmaLayout)
-        {
-            BindFigmaUiNodes();
-        }
-        else
-        {
-            BindLegacyUiNodes();
-        }
+        BindLegacyUiNodes();
 
         SetSpeedScale(1.0);
-        if (!_isUsingFigmaLayout)
-        {
-            SetMapTab(MapTab.Sect);
-        }
+        SetMapTab(MapTab.Sect);
     }
 
-    private void ConfigureLegacyBackground()
+private void ConfigureLegacyBackground()
     {
         if (_backgroundTextureRect == null)
         {
@@ -480,7 +381,6 @@ public partial class Main : Control
         _calendarDayProgress = GetNode<ProgressBar>($"{TopBarPath}/BarContent/MainRow/CycleBox/DayProgressRow/DayProgress");
 
         _logLabel = GetNode<RichTextLabel>($"{RightPanelPath}/PanelContent/MainVBox/LogBox/LogVBox/LogContent/LogLabel");
-        _figmaNotificationLabel = null;
 
         _exploreButton = GetNode<Button>($"{BottomBarPath}/BarPadding/MainRow/SpeedRow/ExploreButton");
         _speedX1Button = GetNode<Button>($"{BottomBarPath}/BarPadding/MainRow/SpeedRow/SpeedX1Button");
@@ -493,7 +393,6 @@ public partial class Main : Control
 
         _worldMapButton = GetNode<Button>($"{CenterTopTabRowPath}/WorldMapButton");
         _prefectureMapButton = GetNodeOrNull<Button>($"{CenterTopTabRowPath}/PrefectureMapButton");
-        _countyTownMapButton = GetNode<Button>($"{CenterTopTabRowPath}/CountyTownMapButton");
         _eventPanelButton = GetNodeOrNull<Button>($"{CenterTopTabRowPath}/EventPanelButton");
         _reportPanelButton = GetNodeOrNull<Button>($"{CenterTopTabRowPath}/ReportPanelButton");
         _expeditionMapButton = GetNodeOrNull<Button>($"{CenterTopTabRowPath}/ExpeditionMapButton");
@@ -518,79 +417,6 @@ public partial class Main : Control
         BindSectChronicleNodes();
         ClearLegacyJobsPaddingBindings();
 
-        _figmaBuildAgricultureButton = null;
-        _figmaBuildWorkshopButton = null;
-        _figmaCraftToolsButton = null;
-        _figmaCenterTitleLabel = null;
-        _figmaCenterDescriptionLabel = null;
-        _figmaEquipmentTitleLabel = null;
-        _figmaEquipmentSummaryLabel = null;
-    }
-
-    private void BindFigmaUiNodes()
-    {
-        _populationLabel = GetNode<Label>($"{FigmaTopBarPath}/ResourceRow/PopulationLabel");
-        _happinessLabel = GetNode<Label>($"{FigmaTopBarPath}/ResourceRow/MoraleLabel");
-        _foodLabel = GetNode<Label>($"{FigmaTopBarPath}/ResourceRow/FoodLabel");
-        _woodLabel = GetNode<Label>($"{FigmaTopBarPath}/ResourceRow/StoneLabel");
-        _goldLabel = GetNode<Label>($"{FigmaTopBarPath}/ResourceRow/MoneyLabel");
-        _threatLabel = GetNode<Label>($"{FigmaTopBarPath}/ResourceRow/FireLabel");
-        _techLabel = GetNode<Label>($"{FigmaTopBarPath}/ResourceRow/QiLabel");
-        _calendarLabel = GetNode<Label>($"{FigmaTopBarPath}/CalendarBox/EraLabel");
-        _calendarDetailLabel = GetNode<Label>($"{FigmaTopBarPath}/CalendarBox/DetailLabel");
-        _calendarQuarterProgress = GetNode<ProgressBar>($"{FigmaTopBarPath}/CalendarBox/QuarterProgressRow/QuarterProgress");
-        _calendarDayProgress = GetNode<ProgressBar>($"{FigmaTopBarPath}/CalendarBox/DayProgressRow/DayProgress");
-
-        _figmaNotificationLabel = GetNode<RichTextLabel>($"{FigmaTimelinePath}/NotificationSection/NotificationContent");
-        _logLabel = GetNode<RichTextLabel>($"{FigmaTimelinePath}/TimelineSection/TimelineContent");
-
-        _exploreButton = GetNode<Button>($"{FigmaBottomBarPath}/ActionRow/LeftActions/ExploreButton");
-        _speedX1Button = GetNode<Button>($"{FigmaBottomBarPath}/ActionRow/LeftActions/SpeedX1Button");
-        _speedX2Button = GetNode<Button>($"{FigmaBottomBarPath}/ActionRow/LeftActions/SpeedX2Button");
-        _speedX4Button = GetNode<Button>($"{FigmaBottomBarPath}/ActionRow/LeftActions/SpeedX4Button");
-        _saveButton = GetNode<Button>($"{FigmaBottomBarPath}/ActionRow/RightActions/SaveButton");
-        _loadButton = GetNode<Button>($"{FigmaBottomBarPath}/ActionRow/RightActions/LoadButton");
-        _settingsButton = GetNode<Button>($"{FigmaBottomBarPath}/ActionRow/RightActions/SettingsButton");
-        _resetButton = GetNode<Button>($"{FigmaBottomBarPath}/ActionRow/RightActions/AlertButton");
-
-        _figmaBuildAgricultureButton = GetNode<Button>($"{FigmaCenterPath}/TopActionRow/LeftActionButton");
-        _figmaBuildWorkshopButton = GetNode<Button>($"{FigmaCenterPath}/TopActionRow/MiddleActionButton");
-        _figmaCraftToolsButton = GetNode<Button>($"{FigmaCenterPath}/TopActionRow/RightActionButton");
-
-        _figmaCenterTitleLabel = GetNode<Label>($"{FigmaCenterPath}/CenterInfoBox/CenterInfoColumn/CenterTitleLabel");
-        _figmaCenterDescriptionLabel = GetNode<Label>($"{FigmaCenterPath}/CenterInfoBox/CenterInfoColumn/CenterDescriptionLabel");
-        _figmaEquipmentTitleLabel = GetNode<Label>($"{FigmaEquipmentPath}/TitleLabel");
-        _figmaEquipmentSummaryLabel = GetNode<Label>($"{FigmaEquipmentPath}/SummaryPanel/SummaryLabel");
-
-        _worldMapButton = null;
-        _prefectureMapButton = null;
-        _countyTownMapButton = null;
-        _eventPanelButton = null;
-        _reportPanelButton = null;
-        _expeditionMapButton = null;
-        _mapZoomResetButton = null;
-        _mapZoomSlider = null;
-        _worldMapView = null;
-        _worldMapRenderer = null;
-        _worldSiteMapView = null;
-        _prefectureMapView = null;
-        _countyTownMapView = null;
-        _eventPanelView = null;
-        _reportPanelView = null;
-        _expeditionMapView = null;
-        _mineUpgradeButton = null;
-        _sectMapRenderer = null;
-        ClearMapOperationalNodes();
-        ClearLegacyJobsPaddingBindings();
-        ClearSectTileInspectorNodes();
-        ClearWorldSitePanelNodes();
-        ClearSectChronicleNodes();
-    }
-
-    private void ApplyLayoutSwitch()
-    {
-        _legacyLayoutRoot.Visible = !_useFigmaLayout;
-        _figmaLayoutRoot.Visible = _useFigmaLayout;
     }
 
     private void BindUiEvents()
@@ -628,11 +454,20 @@ public partial class Main : Control
             };
         }
 
-        if (_worldMapButton != null &&
-            _countyTownMapButton != null)
+        if (_worldMapButton != null)
+
         {
-            _worldMapButton.Pressed += () => SetMapTab(MapTab.World);
-            _countyTownMapButton.Pressed += () => SetMapTab(MapTab.Sect);
+
+            _worldMapButton.Pressed += () =>
+
+            {
+
+                var targetTab = _currentMapTab == MapTab.World ? MapTab.Sect : MapTab.World;
+
+                SetMapTab(targetTab);
+
+            };
+
         }
 
         if (_mapZoomResetButton != null)
@@ -652,9 +487,7 @@ public partial class Main : Control
 
         _resetButton.Pressed += () => _gameLoop.ResetState();
 
-        if (_isUsingFigmaLayout)
         {
-            BindFigmaIndustryButtons();
             return;
         }
 
@@ -673,29 +506,6 @@ public partial class Main : Control
         _peakSupportButton = null;
         _peakSupportResetButton = null;
         _peakCurrentDetailLabel = null;
-    }
-
-    private void BindFigmaIndustryButtons()
-    {
-        if (_figmaBuildAgricultureButton != null)
-        {
-            _figmaBuildAgricultureButton.Pressed += () => _gameLoop.BuildIndustryBuilding(IndustryBuildingType.Agriculture);
-        }
-
-        if (_figmaBuildWorkshopButton != null)
-        {
-            _figmaBuildWorkshopButton.Pressed += () => _gameLoop.BuildIndustryBuilding(IndustryBuildingType.Workshop);
-        }
-
-        if (_figmaCraftToolsButton != null)
-        {
-            _figmaCraftToolsButton.Pressed += _gameLoop.CraftIndustryTools;
-        }
-
-        _saveButton.Text = "【存】";
-        _loadButton.Text = "【读】";
-        _settingsButton.Text = "【设】";
-        _resetButton.Text = "【重】";
     }
 
     private void BindLegacyIndustryButtons()
@@ -807,13 +617,15 @@ public partial class Main : Control
             mapTab = MapTab.Sect;
         }
 
-        if (_worldMapView == null ||
-            _worldSiteMapView == null ||
-            _countyTownMapView == null ||
-            _worldMapButton == null ||
-            _countyTownMapButton == null)
+        if (_worldMapView == null ||
+            _worldSiteMapView == null ||
+            _countyTownMapView == null ||
+            _worldMapButton == null)
+
         {
+
             return;
+
         }
 
         _worldMapView.Visible = mapTab == MapTab.World;
@@ -840,7 +652,32 @@ public partial class Main : Control
         }
 
         _worldMapButton.ButtonPressed = mapTab == MapTab.World;
-        _countyTownMapButton.ButtonPressed = mapTab == MapTab.Sect;
+
+        if (_worldMapButton != null)
+
+        {
+
+            if (mapTab == MapTab.World)
+
+            {
+
+                _worldMapButton.Text = "返回山门沙盘";
+
+                _worldMapButton.TooltipText = "返回天衍峰山门沙盘，继续山门布局与内务经营。";
+
+            }
+
+            else
+
+            {
+
+                _worldMapButton.Text = "返回世界地图";
+
+                _worldMapButton.TooltipText = "查看卷外山河舆图，选择外域点位进入不同区域。";
+
+            }
+
+        }
         if (_prefectureMapButton != null)
         {
             _prefectureMapButton.ButtonPressed = false;
@@ -924,12 +761,6 @@ public partial class Main : Control
 
     private void ConfigureDualMapMode()
     {
-        if (_countyTownMapButton != null)
-        {
-            _countyTownMapButton.Text = "山门沙盘";
-            _countyTownMapButton.TooltipText = "查看天衍峰卷内六边形山门图、门人活动与场所状态";
-        }
-
         if (_worldMapButton != null)
         {
             _worldMapButton.Text = "展 全景舆图";
@@ -1162,6 +993,8 @@ public partial class Main : Control
         GetNodeOrNull<Node>("LanternFx")?.Call("bind_hover_fx");
     }
 }
+
+
 
 
 

@@ -6,10 +6,6 @@ public partial class Main
 {
     private void ConfigureLegacyFocusNavigation()
     {
-        if (_useFigmaLayout)
-        {
-            return;
-        }
 
         SetLegacyMapSurfaceFocusMode(Control.FocusModeEnum.None);
 
@@ -20,13 +16,9 @@ public partial class Main
         Control? mapZoomSliderControl = _mapZoomSlider;
         Control? mapZoomResetButtonControl = _mapZoomResetButton;
         Control? worldMapButtonControl = _worldMapButton;
-        Control? countyTownMapButtonControl = _countyTownMapButton;
 
-        LinkFocusNeighbors(_countyTownMapButton,
-            left: _tileInspectorPrimaryButton ?? taskQuickButton,
-            down: taskQuickButton);
         LinkFocusNeighbors(_worldMapButton,
-            left: _countyTownMapButton,
+            left: _tileInspectorPrimaryButton ?? taskQuickButton,
             down: organizationQuickButton ?? taskQuickButton);
         LinkFocusNeighbors(_mapZoomSlider,
             left: _worldMapButton,
@@ -38,7 +30,7 @@ public partial class Main
 
         LinkFocusNeighbors(_mapPrimaryActionButton,
             left: _tileInspectorSecondaryButton ?? taskQuickButton,
-            top: _countyTownMapButton,
+            top: _worldMapButton,
             right: _mapSecondaryActionButton,
             down: taskQuickButton);
         LinkFocusNeighbors(_mapSecondaryActionButton,
@@ -47,18 +39,18 @@ public partial class Main
             down: discipleQuickButton ?? organizationQuickButton ?? taskQuickButton);
 
         LinkFocusNeighbors(_tileInspectorPrimaryButton,
-            right: _countyTownMapButton);
+            right: _worldMapButton);
         LinkFocusNeighbors(_tileInspectorSecondaryButton,
             right: _mapPrimaryActionButton ?? taskQuickButton);
         LinkFocusNeighbors(_tileInspectorTertiaryButton,
             right: _mapSecondaryActionButton ?? organizationQuickButton ?? taskQuickButton);
 
         LinkFocusNeighbors(warehouseQuickButton,
-            top: _countyTownMapButton);
+            top: _worldMapButton);
         LinkFocusNeighbors(taskQuickButton,
-            top: _countyTownMapButton);
+            top: _worldMapButton);
         LinkFocusNeighbors(organizationQuickButton,
-            top: mapZoomSliderControl ?? worldMapButtonControl ?? countyTownMapButtonControl);
+            top: mapZoomSliderControl ?? worldMapButtonControl);
         LinkFocusNeighbors(discipleQuickButton,
             top: mapZoomResetButtonControl ?? mapZoomSliderControl ?? worldMapButtonControl);
     }

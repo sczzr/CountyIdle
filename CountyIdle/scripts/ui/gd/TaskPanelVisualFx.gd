@@ -178,25 +178,21 @@ func play_open() -> void:
 	_kill_tween()
 	_overlay.modulate.a = 0.0
 	_frame.modulate.a = 0.0
-	_frame.scale = Vector2(0.988, 0.988)
+	_frame.scale = Vector2.ONE
 	_current_tween = create_tween()
 	_current_tween.set_parallel(true)
 	_current_tween.tween_property(_overlay, "modulate:a", 1.0, 0.18)
 	_current_tween.tween_property(_frame, "modulate:a", 1.0, 0.2)
-	_current_tween.tween_property(_frame, "scale", Vector2.ONE, 0.22)
 
 
 func play_tab_switch(tab_name: String) -> void:
 	_kill_tween()
 	var target_tab: Control = _resolve_tab(tab_name)
 	target_tab.modulate.a = 0.74
-	target_tab.scale = Vector2(0.996, 0.996)
+	target_tab.scale = Vector2.ONE
 	_current_tween = create_tween()
 	_current_tween.set_parallel(true)
 	_current_tween.tween_property(target_tab, "modulate:a", 1.0, 0.14)
-	_current_tween.tween_property(target_tab, "scale", Vector2.ONE, 0.18)
-	_current_tween.tween_property(_frame, "scale", Vector2.ONE * 1.004, 0.07)
-	_current_tween.chain().tween_property(_frame, "scale", Vector2.ONE, 0.1)
 
 
 func apply_tab_button_state(tab_name: String) -> void:
@@ -218,9 +214,7 @@ func pulse_task_detail() -> void:
 	_affairs_detail_panel.modulate.a = 0.86
 	_current_tween = create_tween()
 	_current_tween.set_parallel(true)
-	_current_tween.tween_property(_affairs_detail_panel, "scale", Vector2.ONE * 1.01, 0.08)
 	_current_tween.tween_property(_affairs_detail_panel, "modulate:a", 1.0, 0.1)
-	_current_tween.chain().tween_property(_affairs_detail_panel, "scale", Vector2.ONE, 0.12)
 
 
 func reset_state() -> void:
@@ -410,3 +404,4 @@ func _kill_tween() -> void:
 	if _current_tween != null and _current_tween.is_running():
 		_current_tween.kill()
 	_current_tween = null
+

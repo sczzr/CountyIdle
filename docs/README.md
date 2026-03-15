@@ -20,6 +20,10 @@
 8. `11_map_asset_production_spec.md`：地图素材生产规格（分层、命名、锚点、拼接与交付规范）
 9. `14_map_layer_rendering_implementation_plan.md`：地图 L1-L5 绘制实施方案（Godot 接法、绘制顺序、阶段实施）
 
+### 1.1 其他专题（按需）
+
+- `16_cultivator_classification_design.md`：修仙者分类/修为/技艺与现行系统对齐
+
 ## 2) 推荐阅读顺序
 
 ### 2.1 理解背景与目标
@@ -98,5 +102,6 @@
 - **看板驱动开发**：实现状态看 `05`，顺序推进看 `08`
 - **历史归档化**：阶段性过程进入 `feature-cards/`、`change-proposals/`、`balance-logs/`
 - **先对齐后编码**：涉及机制、术语、边界的改动，先改文档再写代码
+
 
 

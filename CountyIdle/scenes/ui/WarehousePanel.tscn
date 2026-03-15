@@ -1,11 +1,11 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://dbxx6h83e6htv"]
 
-[ext_resource type="Script" path="res://scripts/ui/WarehousePanel.cs" id="1_ware"]
-[ext_resource type="Script" path="res://scripts/ui/gd/WarehousePanelTransition.gd" id="2_warehouse_fx"]
+[ext_resource type="Script" uid="uid://ca18hx6q6ys0b" path="res://scripts/ui/WarehousePanel.cs" id="1_ware"]
+[ext_resource type="Script" uid="uid://cw6burt7tuet5" path="res://scripts/ui/gd/WarehousePanelTransition.gd" id="2_warehouse_fx"]
 
-[node name="WarehousePanel" type="Control"]
+[node name="WarehousePanel" type="Control" unique_id=45709030]
 visible = false
-layout_mode = 1
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -14,10 +14,10 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_ware")
 
-[node name="VisualFx" type="Node" parent="."]
+[node name="VisualFx" type="Node" parent="." unique_id=1138069804]
 script = ExtResource("2_warehouse_fx")
 
-[node name="Backdrop" type="ColorRect" parent="."]
+[node name="Backdrop" type="ColorRect" parent="." unique_id=1712655746]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -26,7 +26,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.101961, 0.0862745, 0.0745098, 0.94)
 
-[node name="CenterLayer" type="CenterContainer" parent="."]
+[node name="CenterLayer" type="CenterContainer" parent="." unique_id=1148067976]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -34,139 +34,134 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="LedgerWrapper" type="Control" parent="CenterLayer"]
+[node name="LedgerWrapper" type="Control" parent="CenterLayer" unique_id=743845529]
 custom_minimum_size = Vector2(1400, 640)
 layout_mode = 2
 
-[node name="TopTrim" type="ColorRect" parent="CenterLayer/LedgerWrapper"]
+[node name="TopTrim" type="ColorRect" parent="CenterLayer/LedgerWrapper" unique_id=628581716]
+layout_mode = 0
 offset_left = 10.0
 offset_top = 12.0
 offset_right = 1390.0
 offset_bottom = 22.0
 color = Color(0.831373, 0.686275, 0.215686, 1)
 
-[node name="BottomTrim" type="ColorRect" parent="CenterLayer/LedgerWrapper"]
+[node name="BottomTrim" type="ColorRect" parent="CenterLayer/LedgerWrapper" unique_id=68501338]
+layout_mode = 0
 offset_left = 10.0
 offset_top = 618.0
 offset_right = 1390.0
 offset_bottom = 628.0
 color = Color(0.831373, 0.686275, 0.215686, 1)
 
-[node name="FrameRow" type="HBoxContainer" parent="CenterLayer/LedgerWrapper"]
+[node name="FrameRow" type="HBoxContainer" parent="CenterLayer/LedgerWrapper" unique_id=2089936167]
+layout_mode = 0
 offset_left = 10.0
 offset_top = 24.0
 offset_right = 1390.0
 offset_bottom = 616.0
 theme_override_constants/separation = 0
 
-[node name="LeftRoller" type="PanelContainer" parent="CenterLayer/LedgerWrapper/FrameRow"]
+[node name="LeftRoller" type="PanelContainer" parent="CenterLayer/LedgerWrapper/FrameRow" unique_id=786379213]
 custom_minimum_size = Vector2(24, 0)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="LeftTopCap" type="ColorRect" parent="CenterLayer/LedgerWrapper/FrameRow/LeftRoller"]
-layout_mode = 0
-offset_left = -3.0
-offset_top = -6.0
-offset_right = 27.0
-offset_bottom = 6.0
+[node name="LeftTopCap" type="ColorRect" parent="CenterLayer/LedgerWrapper/FrameRow/LeftRoller" unique_id=2124898496]
+layout_mode = 2
 color = Color(0.831373, 0.686275, 0.215686, 1)
 
-[node name="LeftBottomCap" type="ColorRect" parent="CenterLayer/LedgerWrapper/FrameRow/LeftRoller"]
-layout_mode = 0
-offset_left = -3.0
-offset_top = 574.0
-offset_right = 27.0
-offset_bottom = 586.0
+[node name="LeftBottomCap" type="ColorRect" parent="CenterLayer/LedgerWrapper/FrameRow/LeftRoller" unique_id=1293246648]
+layout_mode = 2
 color = Color(0.831373, 0.686275, 0.215686, 1)
 
-[node name="Paper" type="PanelContainer" parent="CenterLayer/LedgerWrapper/FrameRow"]
+[node name="Paper" type="PanelContainer" parent="CenterLayer/LedgerWrapper/FrameRow" unique_id=1589847313]
 custom_minimum_size = Vector2(880, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="PaperMargin" type="MarginContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper"]
+[node name="PaperMargin" type="MarginContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper" unique_id=514375243]
 layout_mode = 2
 theme_override_constants/margin_left = 28
 theme_override_constants/margin_top = 28
 theme_override_constants/margin_right = 28
 theme_override_constants/margin_bottom = 24
 
-[node name="MainColumn" type="VBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin"]
+[node name="MainColumn" type="VBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin" unique_id=1743362028]
 layout_mode = 2
 theme_override_constants/separation = 18
 
-[node name="HeaderRow" type="HBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn"]
+[node name="HeaderRow" type="HBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn" unique_id=702209146]
 layout_mode = 2
 alignment = 1
 
-[node name="TitleGroup" type="HBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/HeaderRow"]
+[node name="TitleGroup" type="HBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/HeaderRow" unique_id=208618013]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
-[node name="TitleLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/HeaderRow/TitleGroup"]
+[node name="TitleLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/HeaderRow/TitleGroup" unique_id=367401343]
 layout_mode = 2
 text = "天衍峰库藏卷"
 
-[node name="SubtitleLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/HeaderRow/TitleGroup"]
+[node name="SubtitleLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/HeaderRow/TitleGroup" unique_id=1331277134]
 layout_mode = 2
 text = "（总库）"
 
-[node name="CloseButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/HeaderRow"]
+[node name="CloseButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/HeaderRow" unique_id=660057542]
 custom_minimum_size = Vector2(36, 32)
 layout_mode = 2
 text = "✖"
 
-[node name="StatusSection" type="PanelContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn"]
+[node name="StatusSection" type="PanelContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn" unique_id=553129293]
 layout_mode = 2
 
-[node name="StatusMargin" type="MarginContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection"]
+[node name="StatusMargin" type="MarginContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection" unique_id=871287652]
 layout_mode = 2
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 10
 
-[node name="StatusContent" type="VBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin"]
+[node name="StatusContent" type="VBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin" unique_id=796068417]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="StatusRow" type="HBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent"]
+[node name="StatusRow" type="HBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent" unique_id=734604948]
 layout_mode = 2
 theme_override_constants/separation = 14
 alignment = 1
 
-[node name="WarningStampLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/StatusRow"]
+[node name="WarningStampLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/StatusRow" unique_id=815193148]
 layout_mode = 2
 text = "满溢"
 
-[node name="StatusTextColumn" type="VBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/StatusRow"]
+[node name="StatusTextColumn" type="VBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/StatusRow" unique_id=51366908]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 2
 
-[node name="HintLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/StatusRow/StatusTextColumn"]
+[node name="HintLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/StatusRow/StatusTextColumn" unique_id=1835077941]
 layout_mode = 2
-autowrap_mode = 3
 text = "仓廪将满，亟需扩建或消耗度支。"
+autowrap_mode = 3
 
-[node name="WarehouseStatusValue" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/StatusRow/StatusTextColumn"]
+[node name="WarehouseStatusValue" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/StatusRow/StatusTextColumn" unique_id=2012291731]
 layout_mode = 2
 text = "仓储壹级 · 矿坑壹级"
 
-[node name="CapacityValueLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/StatusRow"]
+[node name="CapacityValueLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/StatusRow" unique_id=1093576269]
 layout_mode = 2
-horizontal_alignment = 2
 text = "已占 0 / 1200"
+horizontal_alignment = 2
 
-[node name="CapacityBarFrame" type="Panel" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent"]
+[node name="CapacityBarFrame" type="Panel" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent" unique_id=343182364]
 custom_minimum_size = Vector2(0, 12)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="CapacityBar" type="ProgressBar" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/CapacityBarFrame"]
+[node name="CapacityBar" type="ProgressBar" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/CapacityBarFrame" unique_id=1893551192]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -174,7 +169,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="CapacityTickOverlay" type="TextureRect" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/CapacityBarFrame"]
+[node name="CapacityTickOverlay" type="TextureRect" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/CapacityBarFrame" unique_id=144953067]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -183,235 +178,224 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="BodyRow" type="HBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn"]
+[node name="BodyRow" type="HBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn" unique_id=1773600108]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 24
 
-[node name="InventoryArea" type="VBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow"]
+[node name="InventoryArea" type="VBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow" unique_id=927065932]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 14
 
-[node name="TabRow" type="HBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea"]
+[node name="TabRow" type="HBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea" unique_id=1787820981]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="AllTabButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/TabRow"]
+[node name="AllTabButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/TabRow" unique_id=1561387101]
 custom_minimum_size = Vector2(72, 54)
 layout_mode = 2
 text = "全览"
 
-[node name="BasicTabButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/TabRow"]
+[node name="BasicTabButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/TabRow" unique_id=760143598]
 custom_minimum_size = Vector2(106, 54)
 layout_mode = 2
 text = "农桑（基础）"
 
-[node name="MaterialsTabButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/TabRow"]
+[node name="MaterialsTabButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/TabRow" unique_id=1794883168]
 custom_minimum_size = Vector2(106, 54)
 layout_mode = 2
 text = "金石（资材）"
 
-[node name="CraftedTabButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/TabRow"]
+[node name="CraftedTabButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/TabRow" unique_id=67758145]
 custom_minimum_size = Vector2(106, 54)
 layout_mode = 2
 text = "百工（造物）"
 
-[node name="InventoryUnderline" type="ColorRect" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea"]
+[node name="InventoryUnderline" type="ColorRect" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea" unique_id=808595488]
 custom_minimum_size = Vector2(0, 1)
 layout_mode = 2
 color = Color(0.294118, 0.247059, 0.207843, 1)
 
-[node name="InventoryScroll" type="ScrollContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea"]
+[node name="InventoryScroll" type="ScrollContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea" unique_id=529776580]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="InventoryGrid" type="GridContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/InventoryScroll"]
+[node name="InventoryGrid" type="GridContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/InventoryScroll" unique_id=23290100]
 layout_mode = 2
-columns = 2
 size_flags_horizontal = 3
 theme_override_constants/h_separation = 20
 theme_override_constants/v_separation = 18
+columns = 2
 
-[node name="ResourceSlotTemplate" type="PanelContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea"]
+[node name="ResourceSlotTemplate" type="PanelContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea" unique_id=490096933]
 visible = false
-layout_mode = 2
 custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="SlotMargin" type="MarginContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/ResourceSlotTemplate"]
+[node name="SlotMargin" type="MarginContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/ResourceSlotTemplate" unique_id=1654895091]
 layout_mode = 2
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 10
 
-[node name="SlotRow" type="HBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/ResourceSlotTemplate/SlotMargin"]
+[node name="SlotRow" type="HBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/ResourceSlotTemplate/SlotMargin" unique_id=1664566368]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 12
 
-[node name="Token" type="PanelContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/ResourceSlotTemplate/SlotMargin/SlotRow"]
-layout_mode = 2
+[node name="Token" type="PanelContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/ResourceSlotTemplate/SlotMargin/SlotRow" unique_id=541566829]
 custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
 
-[node name="TokenCenter" type="CenterContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/ResourceSlotTemplate/SlotMargin/SlotRow/Token"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="TokenCenter" type="CenterContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/ResourceSlotTemplate/SlotMargin/SlotRow/Token" unique_id=656135911]
+layout_mode = 2
 mouse_filter = 2
 
-[node name="TokenGlyph" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/ResourceSlotTemplate/SlotMargin/SlotRow/Token/TokenCenter"]
+[node name="TokenGlyph" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/ResourceSlotTemplate/SlotMargin/SlotRow/Token/TokenCenter" unique_id=738571209]
 layout_mode = 2
 text = "?"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="InfoColumn" type="VBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/ResourceSlotTemplate/SlotMargin/SlotRow"]
+[node name="InfoColumn" type="VBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/ResourceSlotTemplate/SlotMargin/SlotRow" unique_id=86938581]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 2
 
-[node name="NameLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/ResourceSlotTemplate/SlotMargin/SlotRow/InfoColumn"]
+[node name="NameLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/ResourceSlotTemplate/SlotMargin/SlotRow/InfoColumn" unique_id=338907138]
 layout_mode = 2
 text = "物资名"
 autowrap_mode = 2
 
-[node name="TypeLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/ResourceSlotTemplate/SlotMargin/SlotRow/InfoColumn"]
+[node name="TypeLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/ResourceSlotTemplate/SlotMargin/SlotRow/InfoColumn" unique_id=1430432337]
 layout_mode = 2
 text = "分类"
 autowrap_mode = 2
 
-[node name="AmountLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/ResourceSlotTemplate/SlotMargin/SlotRow"]
+[node name="AmountLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/ResourceSlotTemplate/SlotMargin/SlotRow" unique_id=2011609274]
 layout_mode = 2
 text = "0"
 horizontal_alignment = 2
 vertical_alignment = 1
 
-[node name="BodyDivider" type="ColorRect" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow"]
+[node name="BodyDivider" type="ColorRect" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow" unique_id=130540498]
 visible = false
 custom_minimum_size = Vector2(1, 0)
 layout_mode = 2
 size_flags_vertical = 3
 color = Color(0.639216, 0.584314, 0.505882, 0.85)
 
-[node name="ActionArea" type="ScrollContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow"]
+[node name="ActionArea" type="ScrollContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow" unique_id=1600130381]
 visible = false
 custom_minimum_size = Vector2(290, 0)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="ActionColumn" type="VBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea"]
+[node name="ActionColumn" type="VBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea" unique_id=1908103660]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 22
 
-[node name="ManufactureSection" type="VBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn"]
+[node name="ManufactureSection" type="VBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn" unique_id=1648152059]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="ManufactureTitle" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ManufactureSection"]
+[node name="ManufactureTitle" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ManufactureSection" unique_id=1331644440]
 layout_mode = 2
 text = "◈ 天工造物（制造）"
 
-[node name="LockedForgeButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ManufactureSection"]
+[node name="LockedForgeButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ManufactureSection" unique_id=749866467]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
-text = "锻制法器（未解锁）"
 disabled = true
+text = "锻制法器（未解锁）"
 
-[node name="CraftToolsButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ManufactureSection"]
+[node name="CraftToolsButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ManufactureSection" unique_id=842462415]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 text = "锻制工器"
 
-[node name="BuildSection" type="VBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn"]
+[node name="BuildSection" type="VBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn" unique_id=1488360730]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="BuildTitle" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/BuildSection"]
+[node name="BuildTitle" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/BuildSection" unique_id=1300836476]
 layout_mode = 2
 text = "◈ 宗门土木（扩建）"
 
-[node name="UpgradeButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/BuildSection"]
+[node name="UpgradeButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/BuildSection" unique_id=2090871679]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 text = "矿仓联建"
 
-[node name="BuildWorkshopButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/BuildSection"]
+[node name="BuildWorkshopButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/BuildSection" unique_id=1643694770]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 text = "扩建傀儡工坊"
 
-[node name="BuildAdministrationButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/BuildSection"]
+[node name="BuildAdministrationButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/BuildSection" unique_id=566847329]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 text = "扩建庶务殿"
 
-[node name="ChainSection" type="VBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn"]
+[node name="ChainSection" type="VBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn" unique_id=2063039304]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="ChainTitle" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection"]
+[node name="ChainTitle" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection" unique_id=1897588516]
 layout_mode = 2
 text = "◈ 供养法旨（生产链）"
 
-[node name="ChainInfoFrame" type="PanelContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection"]
+[node name="ChainInfoFrame" type="PanelContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection" unique_id=572104987]
 layout_mode = 2
 
-[node name="ChainInfoMargin" type="MarginContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection/ChainInfoFrame"]
+[node name="ChainInfoMargin" type="MarginContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection/ChainInfoFrame" unique_id=377464624]
 layout_mode = 2
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 12
 
-[node name="TierZeroStatusValue" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection/ChainInfoFrame/ChainInfoMargin"]
+[node name="TierZeroStatusValue" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection/ChainInfoFrame/ChainInfoMargin" unique_id=828491941]
 layout_mode = 2
+text = "当前运作纲要：
+灵材：灵木链 贰阶 · 石陶链 壹阶
+丹鼎：盐丹链 壹阶 · 织裘链 壹阶"
 autowrap_mode = 3
-text = "当前运作纲要：\n灵材：灵木链 贰阶 · 石陶链 壹阶\n丹鼎：盐丹链 壹阶 · 织裘链 壹阶"
 
-[node name="BuildForestryChainButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection"]
+[node name="BuildForestryChainButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection" unique_id=384643953]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 text = "配置 灵木链"
 
-[node name="BuildMasonryChainButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection"]
+[node name="BuildMasonryChainButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection" unique_id=308351591]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 text = "配置 石陶链"
 
-[node name="BuildMedicinalChainButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection"]
+[node name="BuildMedicinalChainButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection" unique_id=868712974]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 text = "配置 盐丹链"
 
-[node name="BuildFiberChainButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection"]
+[node name="BuildFiberChainButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection" unique_id=1193874398]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 text = "配置 织裘链"
 
-[node name="RightRoller" type="PanelContainer" parent="CenterLayer/LedgerWrapper/FrameRow"]
+[node name="RightRoller" type="PanelContainer" parent="CenterLayer/LedgerWrapper/FrameRow" unique_id=375130381]
 custom_minimum_size = Vector2(24, 0)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="RightTopCap" type="ColorRect" parent="CenterLayer/LedgerWrapper/FrameRow/RightRoller"]
-layout_mode = 0
-offset_left = -3.0
-offset_top = -6.0
-offset_right = 27.0
-offset_bottom = 6.0
+[node name="RightTopCap" type="ColorRect" parent="CenterLayer/LedgerWrapper/FrameRow/RightRoller" unique_id=1787539634]
+layout_mode = 2
 color = Color(0.831373, 0.686275, 0.215686, 1)
 
-[node name="RightBottomCap" type="ColorRect" parent="CenterLayer/LedgerWrapper/FrameRow/RightRoller"]
-layout_mode = 0
-offset_left = -3.0
-offset_top = 574.0
-offset_right = 27.0
-offset_bottom = 586.0
+[node name="RightBottomCap" type="ColorRect" parent="CenterLayer/LedgerWrapper/FrameRow/RightRoller" unique_id=2077240565]
+layout_mode = 2
 color = Color(0.831373, 0.686275, 0.215686, 1)

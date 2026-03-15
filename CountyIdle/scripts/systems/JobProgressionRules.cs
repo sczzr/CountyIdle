@@ -3,203 +3,57 @@ using CountyIdle.Models;
 
 namespace CountyIdle.Systems;
 
+/// <summary>
+/// 旧版职业系统兼容层 - 保留以支持旧代码
+/// 实际逻辑已迁移到 SkillProgressionRules
+/// </summary>
 public static class JobProgressionRules
 {
-    private sealed class RoleStage
+    // JobType 到 CraftSkillType 的映射（迁移规则）
+    private static CraftSkillType MapJobToSkill(JobType jobType)
     {
-        public RoleStage(
-            string roleName,
-            int minTechLevel,
-            int minPrimaryBuildings,
-            int minSecondaryBuildings,
-            string unlockConditionText)
+        return jobType switch
         {
-            RoleName = roleName;
-            MinTechLevel = minTechLevel;
-            MinPrimaryBuildings = minPrimaryBuildings;
-            MinSecondaryBuildings = minSecondaryBuildings;
-            UnlockConditionText = unlockConditionText;
-        }
-
-        public string RoleName { get; }
-
-        public int MinTechLevel { get; }
-
-        public int MinPrimaryBuildings { get; }
-
-        public int MinSecondaryBuildings { get; }
-
-        public string UnlockConditionText { get; }
+            JobType.Farmer => CraftSkillType.SpiritPlant,  // 农 → 灵植
+            JobType.Worker => CraftSkillType.Forging,       // 工 → 炼器
+            JobType.Merchant => CraftSkillType.Golem,       // 商 → 傀儡
+            JobType.Scholar => CraftSkillType.Arcane,       // 学 → 天机
+            _ => CraftSkillType.SpiritPlant
+        };
     }
 
-    private static readonly Dictionary<JobType, RoleStage[]> StageDefinitions = new()
-    {
-        [JobType.Farmer] =
-        [
-            new RoleStage("田亩农户", 0, 1, 0, "默认解锁"),
-            new RoleStage("垄作农师", 1, 3, 0, $"{SectMapSemanticRules.GetTechnologyTrackName()} T1 且 {SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Agriculture)} ≥ 3"),
-            new RoleStage("农械整备员", 2, 3, 2, $"{SectMapSemanticRules.GetTechnologyTrackName()} T2、{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Agriculture)} ≥ 3、{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Workshop)} ≥ 2"),
-            new RoleStage("良种司圃", 3, 5, 2, $"{SectMapSemanticRules.GetTechnologyTrackName()} T3、{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Agriculture)} ≥ 5、{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Workshop)} ≥ 2")
-        ],
-        [JobType.Worker] =
-        [
-            new RoleStage("宗务书吏", 0, 1, 0, "默认解锁"),
-            new RoleStage("营造执事", 1, 3, 0, $"{SectMapSemanticRules.GetTechnologyTrackName()} T1 且 {SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Administration)} ≥ 3"),
-            new RoleStage("炼器监造", 2, 3, 3, $"{SectMapSemanticRules.GetTechnologyTrackName()} T2、{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Administration)} ≥ 3、{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Workshop)} ≥ 3"),
-            new RoleStage("都料匠正", 3, 5, 3, $"{SectMapSemanticRules.GetTechnologyTrackName()} T3、{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Administration)} ≥ 5、{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Workshop)} ≥ 3")
-        ],
-        [JobType.Merchant] =
-        [
-            new RoleStage("坊市行商", 0, 1, 0, "默认解锁"),
-            new RoleStage("商路牙郎", 1, 2, 0, $"{SectMapSemanticRules.GetTechnologyTrackName()} T1 且 {SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Trade)} ≥ 2"),
-            new RoleStage("坊市账房", 2, 3, 2, $"{SectMapSemanticRules.GetTechnologyTrackName()} T2、{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Trade)} ≥ 3、{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Administration)} ≥ 2"),
-            new RoleStage("商栈掌柜", 3, 5, 3, $"{SectMapSemanticRules.GetTechnologyTrackName()} T3、{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Trade)} ≥ 5、{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Administration)} ≥ 3")
-        ],
-        [JobType.Scholar] =
-        [
-            new RoleStage("蒙学塾师", 0, 1, 0, "默认解锁"),
-            new RoleStage("藏经讲郎", 1, 2, 0, $"{SectMapSemanticRules.GetTechnologyTrackName()} T1 且 {SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Research)} ≥ 2"),
-            new RoleStage("格物博士", 2, 3, 0, $"{SectMapSemanticRules.GetTechnologyTrackName()} T2 且 {SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Research)} ≥ 3"),
-            new RoleStage("司天校书", 3, 4, 3, $"{SectMapSemanticRules.GetTechnologyTrackName()} T3、{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Research)} ≥ 4、{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Administration)} ≥ 3")
-        ]
-    };
-
+    /// <summary>
+    /// 获取面板信息 - 兼容旧接口，内部调用 SkillProgressionRules
+    /// </summary>
     public static JobPanelInfo GetPanelInfo(GameState state, JobType jobType)
     {
-        var stages = StageDefinitions[jobType];
-        var activeStageIndex = ResolveStageIndex(state, jobType);
-        var activeStage = stages[activeStageIndex];
-        var nextStage = activeStageIndex + 1 < stages.Length ? stages[activeStageIndex + 1] : null;
-        var assigned = IndustryRules.GetAssigned(state, jobType);
-        var capacity = IndustryRules.GetCapacity(state, jobType);
-
+        var skillType = MapJobToSkill(jobType);
+        var skillPanel = SkillProgressionRules.GetPanelInfo(state, skillType);
+        
         return new JobPanelInfo(
             jobType,
-            activeStage.RoleName,
-            $"{GetIcon(jobType)} {activeStage.RoleName}",
-            BuildSummaryText(state, jobType, assigned, capacity),
-            BuildDetailText(state, jobType, assigned, capacity, nextStage),
-            GetDefaultPriorityText(jobType));
+            skillPanel.ActiveSkillName,
+            skillPanel.TitleText,
+            skillPanel.SummaryText,
+            skillPanel.DetailText,
+            skillPanel.DefaultPriorityText);
     }
 
+    /// <summary>
+    /// 获取当前激活的职业名称 - 兼容旧接口
+    /// </summary>
     public static string GetActiveRoleName(GameState state, JobType jobType)
     {
-        return GetPanelInfo(state, jobType).ActiveRoleName;
+        var skillType = MapJobToSkill(jobType);
+        return SkillProgressionRules.GetActiveSkillName(state, skillType);
     }
 
+    /// <summary>
+    /// 获取默认优先级 - 兼容旧接口
+    /// </summary>
     public static string GetDefaultPriorityText(JobType jobType)
     {
-        return jobType switch
-        {
-            JobType.Farmer => "★ 粮务优先",
-            JobType.Worker => "☆ 工务常序",
-            JobType.Merchant => "☆ 商务常序",
-            JobType.Scholar => "☆ 学务常序",
-            _ => "☆ 常序"
-        };
-    }
-
-    private static int ResolveStageIndex(GameState state, JobType jobType)
-    {
-        var stages = StageDefinitions[jobType];
-        var primaryBuildings = GetPrimaryBuildingCount(state, jobType);
-        var secondaryBuildings = GetSecondaryBuildingCount(state, jobType);
-
-        for (var index = stages.Length - 1; index >= 0; index--)
-        {
-            var stage = stages[index];
-            if (state.TechLevel >= stage.MinTechLevel &&
-                primaryBuildings >= stage.MinPrimaryBuildings &&
-                secondaryBuildings >= stage.MinSecondaryBuildings)
-            {
-                return index;
-            }
-        }
-
-        return 0;
-    }
-
-    private static string BuildSummaryText(GameState state, JobType jobType, int assigned, int capacity)
-    {
-        return $"{BuildBuildingSnapshot(state, jobType)} · 已派 {assigned}/{capacity} · {GetTechnologyLabel(state.TechLevel)}";
-    }
-
-    private static string BuildDetailText(
-        GameState state,
-        JobType jobType,
-        int assigned,
-        int capacity,
-        RoleStage? nextStage)
-    {
-        var nextStageText = nextStage == null
-            ? "已达当前岗位最高阶。"
-            : $"下一阶：{nextStage.RoleName}（需 {nextStage.UnlockConditionText}）。";
-
-        return $"规则：{BuildCapacityFormula(state, jobType)}；已派 {assigned}/{capacity}；{GetTechnologyLabel(state.TechLevel)}；{nextStageText}";
-    }
-
-    private static string BuildCapacityFormula(GameState state, JobType jobType)
-    {
-        return jobType switch
-        {
-            JobType.Farmer => $"{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Agriculture)} {state.AgricultureBuildings}×{IndustryRules.ProductionPerAgricultureBuilding} + {SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Workshop)} {state.WorkshopBuildings}×{IndustryRules.ProductionPerWorkshopBuilding} = {IndustryRules.GetProductionCapacity(state)}",
-            JobType.Worker => $"{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Administration)} {state.AdministrationBuildings}×{IndustryRules.ManagementPerBuilding} = {IndustryRules.GetManagementCapacity(state)}",
-            JobType.Merchant => $"{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Trade)} {state.TradeBuildings}×{IndustryRules.CommercePerBuilding} = {IndustryRules.GetCommerceCapacity(state)}",
-            JobType.Scholar => $"{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Research)} {state.ResearchBuildings}×{IndustryRules.ResearchPerBuilding} = {IndustryRules.GetResearchCapacity(state)}",
-            _ => $"容量 {IndustryRules.GetCapacity(state, jobType)}"
-        };
-    }
-
-    private static string BuildBuildingSnapshot(GameState state, JobType jobType)
-    {
-        return jobType switch
-        {
-            JobType.Farmer => $"{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Agriculture)} {state.AgricultureBuildings} / {SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Workshop)} {state.WorkshopBuildings}",
-            JobType.Worker => $"{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Administration)} {state.AdministrationBuildings} / {SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Workshop)} {state.WorkshopBuildings}",
-            JobType.Merchant => $"{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Trade)} {state.TradeBuildings} / {SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Administration)} {state.AdministrationBuildings}",
-            JobType.Scholar => $"{SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Research)} {state.ResearchBuildings} / {SectMapSemanticRules.GetBuildingDisplayName(IndustryBuildingType.Administration)} {state.AdministrationBuildings}",
-            _ => "岗位"
-        };
-    }
-
-    private static int GetPrimaryBuildingCount(GameState state, JobType jobType)
-    {
-        return jobType switch
-        {
-            JobType.Farmer => state.AgricultureBuildings,
-            JobType.Worker => state.AdministrationBuildings,
-            JobType.Merchant => state.TradeBuildings,
-            JobType.Scholar => state.ResearchBuildings,
-            _ => 0
-        };
-    }
-
-    private static int GetSecondaryBuildingCount(GameState state, JobType jobType)
-    {
-        return jobType switch
-        {
-            JobType.Farmer => state.WorkshopBuildings,
-            JobType.Worker => state.WorkshopBuildings,
-            JobType.Merchant => state.AdministrationBuildings,
-            JobType.Scholar => state.AdministrationBuildings,
-            _ => 0
-        };
-    }
-
-    private static string GetTechnologyLabel(int techLevel)
-    {
-        return SectMapSemanticRules.GetTechnologyLevelLabel(techLevel);
-    }
-
-    private static string GetIcon(JobType jobType)
-    {
-        return jobType switch
-        {
-            JobType.Farmer => "🌾",
-            JobType.Worker => "⛏",
-            JobType.Merchant => "💰",
-            JobType.Scholar => "📜",
-            _ => "👥"
-        };
+        var skillType = MapJobToSkill(jobType);
+        return SkillProgressionRules.GetDefaultPriorityText(skillType);
     }
 }

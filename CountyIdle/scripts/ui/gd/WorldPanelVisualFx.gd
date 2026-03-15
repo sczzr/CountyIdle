@@ -1,4 +1,4 @@
-extends Node
+﻿extends Node
 
 const INK_MAIN := Color(0.176471, 0.145098, 0.12549, 1.0)
 const INK_MUTED := Color(0.368627, 0.313725, 0.258824, 1.0)
@@ -23,6 +23,11 @@ var _world_site_subtitle: Label
 var _world_site_hint: Label
 var _world_site_back_button: Button
 var _world_site_action_button: Button
+var _world_site_header: Control
+var _world_site_summary: Control
+var _world_site_template: Control
+var _world_site_description: Control
+var _world_site_action_row: Control
 var _current_tween: Tween
 
 
@@ -38,6 +43,11 @@ func _ready() -> void:
 	_secondary_map_view = root.get_node("MapViewport/MapPages/SecondaryMapView")
 	_county_town_map_view = root.get_node("MapViewport/MapPages/CountyTownMapView")
 	_world_site_vbox = root.get_node("MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox")
+	_world_site_header = root.get_node("MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/HeaderBox")
+	_world_site_summary = root.get_node("MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/SummaryBox")
+	_world_site_template = root.get_node("MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/TemplateGrid")
+	_world_site_description = root.get_node("MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/DescriptionCard")
+	_world_site_action_row = root.get_node("MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/ActionRow")
 	_world_site_title = root.get_node("MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/HeaderBox/TitleLabel")
 	_world_site_subtitle = root.get_node("MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/HeaderBox/SubtitleLabel")
 	_world_site_hint = root.get_node("MapViewport/MapPages/SecondaryMapView/SecondaryMapPadding/SecondaryMapVBox/HintLabel")
@@ -113,16 +123,20 @@ func set_world_site_sandbox_visible(visible: bool) -> void:
 	_kill_tween()
 	if visible:
 		sandbox_view.visible = true
-		sandbox_view.modulate.a = 0.0
-		sandbox_view.scale = Vector2(0.996, 0.996)
-		_current_tween = create_tween()
-		_current_tween.set_parallel(true)
-		_current_tween.tween_property(sandbox_view, "modulate:a", 1.0, 0.14)
-		_current_tween.tween_property(sandbox_view, "scale", Vector2.ONE, 0.18)
+		sandbox_view.modulate.a = 1.0
+		sandbox_view.scale = Vector2.ONE
 	else:
 		sandbox_view.visible = false
 		sandbox_view.modulate.a = 1.0
 		sandbox_view.scale = Vector2.ONE
+
+func set_world_site_intro_visible(visible: bool) -> void:
+	_world_site_header.visible = visible
+	_world_site_summary.visible = visible
+	_world_site_template.visible = visible
+	_world_site_description.visible = visible
+	_world_site_action_row.visible = visible
+	_world_site_hint.visible = visible
 
 
 func apply_world_site_tone(primary_type: String) -> void:
@@ -162,15 +176,11 @@ func play_tab_switch(tab_name: String) -> void:
 	_top_tab_row.modulate.a = 0.88
 	_map_viewport.scale = Vector2.ONE
 	target_view.modulate.a = 0.76
-	target_view.scale = Vector2(0.996, 0.996)
+	target_view.scale = Vector2.ONE
 	_current_tween = create_tween()
 	_current_tween.set_parallel(true)
 	_current_tween.tween_property(_top_tab_row, "modulate:a", 1.0, 0.12)
-	_current_tween.tween_property(_map_viewport, "scale", Vector2.ONE * 1.004, 0.07)
 	_current_tween.tween_property(target_view, "modulate:a", 1.0, 0.14)
-	_current_tween.tween_property(target_view, "scale", Vector2.ONE, 0.18)
-	_current_tween.chain().tween_property(_map_viewport, "scale", Vector2.ONE, 0.1)
-
 
 func pulse_world_site_panel() -> void:
 	if not _secondary_map_view.visible:
@@ -181,9 +191,7 @@ func pulse_world_site_panel() -> void:
 	_secondary_map_view.modulate.a = 0.85
 	_current_tween = create_tween()
 	_current_tween.set_parallel(true)
-	_current_tween.tween_property(_secondary_map_view, "scale", Vector2.ONE * 1.01, 0.08)
 	_current_tween.tween_property(_secondary_map_view, "modulate:a", 1.0, 0.1)
-	_current_tween.chain().tween_property(_secondary_map_view, "scale", Vector2.ONE, 0.12)
 
 
 func reset_state() -> void:

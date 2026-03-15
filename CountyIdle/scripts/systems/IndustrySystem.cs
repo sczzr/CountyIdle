@@ -312,22 +312,26 @@ public class IndustrySystem
 
     private static void EnsureJobCap(GameState state, List<string> logs)
     {
-        ClampJob(state, JobType.Worker, IndustryRules.GetManagementCapacity(state), logs);
-        ClampJob(state, JobType.Scholar, IndustryRules.GetResearchCapacity(state), logs);
-        ClampJob(state, JobType.Merchant, IndustryRules.GetCommerceCapacity(state), logs);
-        ClampJob(state, JobType.Farmer, IndustryRules.GetProductionCapacity(state), logs);
+        ClampSkill(state, CraftSkillType.SpiritPlant, IndustryRules.GetSpiritPlantCapacity(state), logs);
+        ClampSkill(state, CraftSkillType.SpiritBeast, IndustryRules.GetSpiritBeastCapacity(state), logs);
+        ClampSkill(state, CraftSkillType.Alchemy, IndustryRules.GetAlchemyCapacity(state), logs);
+        ClampSkill(state, CraftSkillType.Forging, IndustryRules.GetForgingCapacity(state), logs);
+        ClampSkill(state, CraftSkillType.Talisman, IndustryRules.GetTalismanCapacity(state), logs);
+        ClampSkill(state, CraftSkillType.Formation, IndustryRules.GetFormationCapacity(state), logs);
+        ClampSkill(state, CraftSkillType.Golem, IndustryRules.GetGolemCapacity(state), logs);
+        ClampSkill(state, CraftSkillType.Arcane, IndustryRules.GetArcaneCapacity(state), logs);
     }
 
-    private static void ClampJob(GameState state, JobType jobType, int capacity, List<string> logs)
+    private static void ClampSkill(GameState state, CraftSkillType skillType, int capacity, List<string> logs)
     {
-        var assigned = IndustryRules.GetAssigned(state, jobType);
+        var assigned = IndustryRules.GetAssigned(state, skillType);
         if (assigned <= capacity)
         {
             return;
         }
 
-        IndustryRules.SetAssigned(state, jobType, capacity);
-        logs.Add($"{JobProgressionRules.GetActiveRoleName(state, jobType)}超编，已按岗位容量回退至 {capacity}。");
+        IndustryRules.SetAssigned(state, skillType, capacity);
+        logs.Add($"{SkillProgressionRules.GetActiveSkillName(state, skillType)}道额超编，已按道额容量回退至 {capacity}。");
     }
 
     private static bool TryBuildByType(GameState state, IndustryBuildingType buildingType, out string log)
@@ -376,7 +380,13 @@ public class IndustrySystem
 
     private static void ResolveToolConsumption(GameState state, List<string> logs)
     {
-        var toolCost = (state.Farmers * 0.12) + (state.Scholars * 0.18) + (state.Merchants * 0.12);
+        var toolCost = 
+            (state.FollowersSpiritPlant * 0.10) + 
+            (state.FollowersForging * 0.24) + 
+            (state.FollowersAlchemy * 0.18) +
+            (state.FollowersTalisman * 0.16) + 
+            (state.FollowersArcane * 0.26) + 
+            (state.FollowersGolem * 0.21);
         if (state.IndustryTools > 0)
         {
             InventoryRules.ApplyDelta(state, nameof(GameState.IndustryTools), -toolCost);

@@ -1,7 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://cqkhjnclmdi24"]
+[gd_scene format=3 uid="uid://cqkhjnclmdi24"]
 
 [ext_resource type="Script" uid="uid://chx6vtko8luwr" path="res://scripts/ui/SaveSlotsPanel.cs" id="1_save"]
-[ext_resource type="Script" path="res://scripts/ui/gd/SavePreviewCrossfade.gd" id="2_preview_fx"]
+[ext_resource type="Script" uid="uid://d0f3p13a75uvb" path="res://scripts/ui/gd/SavePreviewCrossfade.gd" id="2_preview_fx"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dialog"]
 bg_color = Color(0.0823529, 0.0862745, 0.101961, 1)
@@ -26,7 +26,7 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_save")
 
-[node name="PreviewVisualFx" type="Node" parent="."]
+[node name="PreviewVisualFx" type="Node" parent="." unique_id=2010707121]
 script = ExtResource("2_preview_fx")
 
 [node name="Backdrop" type="ColorRect" parent="." unique_id=549940749]

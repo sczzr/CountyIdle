@@ -89,12 +89,11 @@ func play_open() -> void:
 	_kill_tween()
 	_overlay.modulate.a = 0.0
 	_wrapper.modulate.a = 0.0
-	_wrapper.scale = Vector2(0.992, 0.992)
+	_wrapper.scale = Vector2.ONE
 	_current_tween = create_tween()
 	_current_tween.set_parallel(true)
 	_current_tween.tween_property(_overlay, "modulate:a", 1.0, 0.18)
 	_current_tween.tween_property(_wrapper, "modulate:a", 1.0, 0.2)
-	_current_tween.tween_property(_wrapper, "scale", Vector2.ONE, 0.22)
 
 
 func pulse_roster_refresh() -> void:
@@ -103,9 +102,7 @@ func pulse_roster_refresh() -> void:
 	_roster_frame.modulate.a = 0.82
 	_current_tween = create_tween()
 	_current_tween.set_parallel(true)
-	_current_tween.tween_property(_roster_frame, "scale", Vector2.ONE * 1.01, 0.08)
 	_current_tween.tween_property(_roster_frame, "modulate:a", 1.0, 0.1)
-	_current_tween.chain().tween_property(_roster_frame, "scale", Vector2.ONE, 0.12)
 
 
 func transition_profile_card() -> void:
@@ -115,10 +112,8 @@ func transition_profile_card() -> void:
 	_right_panel.modulate.a = 0.9
 	_current_tween = create_tween()
 	_current_tween.set_parallel(true)
-	_current_tween.tween_property(_profile_panel, "scale", Vector2.ONE * 1.012, 0.08)
 	_current_tween.tween_property(_profile_panel, "modulate:a", 1.0, 0.12)
 	_current_tween.tween_property(_right_panel, "modulate:a", 1.0, 0.12)
-	_current_tween.chain().tween_property(_profile_panel, "scale", Vector2.ONE, 0.12)
 
 
 func apply_metric_value_tone(value_label: Label, value: int) -> void:

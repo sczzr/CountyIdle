@@ -126,12 +126,11 @@ func play_open() -> void:
 	_kill_tween()
 	_overlay.modulate.a = 0.0
 	_paper_frame.modulate.a = 0.0
-	_paper_frame.scale = Vector2(0.99, 0.99)
+	_paper_frame.scale = Vector2.ONE
 	_current_tween = create_tween()
 	_current_tween.set_parallel(true)
 	_current_tween.tween_property(_overlay, "modulate:a", 1.0, 0.18)
 	_current_tween.tween_property(_paper_frame, "modulate:a", 1.0, 0.2)
-	_current_tween.tween_property(_paper_frame, "scale", Vector2.ONE, 0.22)
 
 
 func pulse_peak_nav() -> void:
@@ -140,9 +139,7 @@ func pulse_peak_nav() -> void:
 	_left_column.modulate.a = 0.84
 	_current_tween = create_tween()
 	_current_tween.set_parallel(true)
-	_current_tween.tween_property(_left_column, "scale", Vector2.ONE * 1.01, 0.08)
 	_current_tween.tween_property(_left_column, "modulate:a", 1.0, 0.1)
-	_current_tween.chain().tween_property(_left_column, "scale", Vector2.ONE, 0.12)
 
 
 func pulse_job_cards() -> void:
@@ -151,9 +148,7 @@ func pulse_job_cards() -> void:
 	_right_column.modulate.a = 0.86
 	_current_tween = create_tween()
 	_current_tween.set_parallel(true)
-	_current_tween.tween_property(_right_column, "scale", Vector2.ONE * 1.01, 0.08)
 	_current_tween.tween_property(_right_column, "modulate:a", 1.0, 0.1)
-	_current_tween.chain().tween_property(_right_column, "scale", Vector2.ONE, 0.12)
 
 
 func reset_state() -> void:
@@ -309,3 +304,4 @@ func _kill_tween() -> void:
 	if _current_tween != null and _current_tween.is_running():
 		_current_tween.kill()
 	_current_tween = null
+

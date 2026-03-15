@@ -18,6 +18,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     private const float DefaultMaxZoom = 15.0f;
     private const float PrefectureMaxZoom = 5.0f;
     private const float PrefectureUrbanTextureZoom = 4.0f;
+    private const Key ToggleConfigKey = Key.F8;
     private const float ZoomVelocityDamping = 8.0f;
     private const float ZoomLerpSpeed = 10.0f;
     private const float PanSpeed = 520f;
@@ -27,6 +28,13 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     private const int SettlementBucketSize = 6;
     private const float HexGridFillAlphaEven = 0.08f;
     private const float HexGridFillAlphaOdd = 0.12f;
+    private const float WorldHexSeamPaddingFactor = 0.022f;
+    private const float WorldHexSeamPaddingMin = 0.36f;
+    private const float WorldHexSeamPaddingMax = 1.40f;
+    private const float WorldHexSeamUvInsetPx = 0.90f;
+    private const float WorldHexUnderlayPaddingFactor = 0.020f;
+    private const float WorldHexUnderlayPaddingMin = 0.25f;
+    private const float WorldHexUnderlayPaddingMax = 2.50f;
     private const string Layer1TileSetPath = "res://assets/ui/tilemap/L1_hex_tileset.tres";
     private const string WorldHexTileClipShaderPath = "res://assets/ui/tilemap/world_hex_tile_clip.gdshader";
     private static readonly Vector2I[] WorldPlainTileCoords =
@@ -76,6 +84,9 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     [Export]
     private StrategicMapMode _mode = StrategicMapMode.World;
 
+    [Export]
+    private bool _useConfigDefinition;
+
     private readonly StrategicMapConfigSystem _configSystem = new();
     private readonly PrefectureMapGeneratorSystem _prefectureGenerator = new();
     private readonly XianxiaWorldGeneratorSystem _xianxiaWorldGenerator = new();
@@ -102,6 +113,10 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     private int? _housingBucket;
     private int? _threatBucket;
     private int? _settlementBucket;
+    private int _lastPopulationHint = 120;
+    private int _lastHousingHint = 180;
+    private double _lastThreatHint = 10d;
+    private int _lastSettlementHint;
     private MapViewStyle _operationalStyle = new();
     private XianxiaSiteData? _selectedWorldSite;
 
@@ -131,34 +146,9 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         _toneFx = GetNodeOrNull<Node>("ToneFx");
         LoadAtlases();
         EnsureWorldTerrainLayerInfrastructure();
-        if (_mode == StrategicMapMode.World)
-        {
-            try
-            {
-                _mapDefinition = _xianxiaWorldGenerator.GenerateStrategicDefinition(out var worldMap);
-                CacheWorldLayout(worldMap);
-            }
-            catch (Exception exception)
-            {
-                GD.PushWarning($"Xianxia world generation failed, fallback to configured world map: {exception.Message}");
-                _mapDefinition = _configSystem.GetWorldDefinition();
-                _xianxiaWorldMap = null;
-                _xianxiaWorldCellLookup = [];
-                _xianxiaWorldCenters = [];
-                _xianxiaWorldHexRadius = 0.01f;
-                ClearWorldTerrainTileLayer();
-            }
-        }
-        else
-        {
-            _mapDefinition = _prefectureGenerator.Generate(120, 180, 10, 0);
-            _populationBucket = 120 / PopulationBucketSize;
-            _housingBucket = 180 / HousingBucketSize;
-            _threatBucket = 10 / ThreatBucketSize;
-            _settlementBucket = 0;
-        }
+        ReloadMapDefinition();
 
-        ConfigureTitleLabel();
+                ConfigureTitleLabel();
         _targetZoom = _zoom;
         UpdateTitle();
         UpdateWorldTerrainLayerLayout();
@@ -246,6 +236,12 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
 
         if (keyEvent.Keycode is Key.Up or Key.Down or Key.Left or Key.Right)
         {
+            GetViewport().SetInputAsHandled();
+        }
+
+        if (keyEvent.Keycode == ToggleConfigKey)
+        {
+            ToggleMapDefinitionSource();
             GetViewport().SetInputAsHandled();
         }
     }
@@ -449,6 +445,15 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         var safeHousing = Math.Max(housingHint, 0);
         var safeThreat = Math.Max(threatHint, 0d);
         var safeSettlements = Math.Max(hourSettlements, 0);
+        _lastPopulationHint = safePopulation;
+        _lastHousingHint = safeHousing;
+        _lastThreatHint = safeThreat;
+        _lastSettlementHint = safeSettlements;
+
+        if (_useConfigDefinition)
+        {
+            return;
+        }
 
         var nextPopulationBucket = safePopulation / PopulationBucketSize;
         var nextHousingBucket = safeHousing / HousingBucketSize;
@@ -463,15 +468,89 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
             return;
         }
 
-        _populationBucket = nextPopulationBucket;
-        _housingBucket = nextHousingBucket;
-        _threatBucket = nextThreatBucket;
-        _settlementBucket = nextSettlementBucket;
-
-        _mapDefinition = _prefectureGenerator.Generate(safePopulation, safeHousing, safeThreat, safeSettlements);
+        ApplyPrefectureGeneratorDefinition(safePopulation, safeHousing, safeThreat, safeSettlements);
         UpdateTitle();
         UpdateWorldTerrainLayerLayout();
         QueueRedraw();
+    }
+
+    private void ToggleMapDefinitionSource()
+    {
+        _useConfigDefinition = !_useConfigDefinition;
+        ReloadMapDefinition();
+        UpdateTitle();
+        UpdateWorldTerrainLayerLayout();
+        QueueRedraw();
+        GD.PushWarning($"Strategic map mode '{_mode}' switched to {(_useConfigDefinition ? "config" : "generator")} source.");
+    }
+
+    private void ReloadMapDefinition()
+    {
+        if (_mode == StrategicMapMode.World)
+        {
+            if (_useConfigDefinition)
+            {
+                ApplyWorldConfigDefinition();
+            }
+            else
+            {
+                ApplyWorldGeneratorDefinition();
+            }
+
+            return;
+        }
+
+        if (_useConfigDefinition)
+        {
+            ApplyPrefectureConfigDefinition();
+        }
+        else
+        {
+            ApplyPrefectureGeneratorDefinition(_lastPopulationHint, _lastHousingHint, _lastThreatHint, _lastSettlementHint);
+        }
+    }
+
+    private void ApplyWorldGeneratorDefinition()
+    {
+        try
+        {
+            _mapDefinition = _xianxiaWorldGenerator.GenerateStrategicDefinition(out var worldMap);
+            CacheWorldLayout(worldMap);
+        }
+        catch (Exception exception)
+        {
+            GD.PushWarning($"Xianxia world generation failed, fallback to configured world map: {exception.Message}");
+            _useConfigDefinition = true;
+            ApplyWorldConfigDefinition();
+        }
+    }
+
+    private void ApplyWorldConfigDefinition()
+    {
+        _mapDefinition = _configSystem.GetWorldDefinition();
+        _xianxiaWorldMap = null;
+        _xianxiaWorldCellLookup = [];
+        _xianxiaWorldCenters = [];
+        _xianxiaWorldTileCells = [];
+        _xianxiaWorldHexRadius = 0.01f;
+        _xianxiaWorldTileCenterLocal = Vector2.Zero;
+        _xianxiaWorldTileLayoutScale = 1f;
+        ClearWorldTerrainTileLayer();
+        ClearWorldSiteSelection();
+    }
+
+    private void ApplyPrefectureGeneratorDefinition(int populationHint, int housingHint, double threatHint, int hourSettlements)
+    {
+        _mapDefinition = _prefectureGenerator.Generate(populationHint, housingHint, threatHint, hourSettlements);
+        _populationBucket = populationHint / PopulationBucketSize;
+        _housingBucket = housingHint / HousingBucketSize;
+        _threatBucket = (int)Math.Floor(threatHint / ThreatBucketSize);
+        _settlementBucket = hourSettlements / SettlementBucketSize;
+    }
+
+    private void ApplyPrefectureConfigDefinition()
+    {
+        _mapDefinition = _configSystem.GetPrefectureDefinition();
     }
 
     private void ConfigureTitleLabel()
@@ -627,6 +706,8 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         }
 
         var hexRadius = Math.Max(_xianxiaWorldHexRadius * unit, 2f);
+        var renderRadius = hexRadius + ResolveWorldSeamPadding(hexRadius);
+        var underlayRadius = renderRadius + ResolveWorldUnderlayPadding(hexRadius);
         var tint = _operationalStyle.TerrainTint;
         foreach (var cell in _xianxiaWorldMap.Cells)
         {
@@ -636,7 +717,9 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
             }
 
             var canvasCenter = ToCanvas(center, unit, normalizedCenter.X, normalizedCenter.Y);
-            var hex = BuildHexPolygon(canvasCenter, hexRadius);
+            var underlayHex = BuildHexPolygon(canvasCenter, underlayRadius);
+            DrawFilledPolygon(underlayHex, tint);
+            var hex = BuildHexPolygon(canvasCenter, renderRadius);
             if (!TryDrawWorldLayer1TileSetHex(hex, cell, tint))
             {
                 DrawFilledPolygon(hex, tint);
@@ -670,10 +753,13 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
             _hexTintColors[index] = tint;
         }
 
+        var uvRegion = ClipAtlasRegionToTileSize(new Rect2(textureRegion.Position, textureRegion.Size), _worldLayer1TileSet.TileSize);
+        uvRegion = InsetAtlasRegion(uvRegion, WorldHexSeamUvInsetPx);
+
         DrawPolygon(
             hex,
             _hexTintColors,
-            CreateAtlasRegionUv(new Rect2(textureRegion.Position, textureRegion.Size), atlasSource.Texture),
+            CreateAtlasRegionUv(uvRegion, atlasSource.Texture),
             atlasSource.Texture);
         return true;
     }
@@ -736,6 +822,60 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
             new Vector2(region.Position.X / atlasWidth, (region.Position.Y + (region.Size.Y * 0.25f)) / atlasHeight)
         ];
     }
+
+    private static Rect2 ClipAtlasRegionToTileSize(Rect2 region, Vector2I tileSize)
+    {
+        if (tileSize.X <= 0 || tileSize.Y <= 0)
+        {
+            return region;
+        }
+
+        var targetWidth = MathF.Min(region.Size.X, tileSize.X);
+        var targetHeight = MathF.Min(region.Size.Y, tileSize.Y);
+        if (targetWidth <= 0f || targetHeight <= 0f)
+        {
+            return region;
+        }
+
+        var targetSize = new Vector2(targetWidth, targetHeight);
+        var padding = (region.Size - targetSize) * 0.5f;
+        if (padding.X < 0f || padding.Y < 0f)
+        {
+            return region;
+        }
+
+        return new Rect2(region.Position + padding, targetSize);
+    }
+
+    private static Rect2 InsetAtlasRegion(Rect2 region, float insetPx)
+    {
+        if (insetPx <= 0f)
+        {
+            return region;
+        }
+
+        var maxInset = MathF.Min(region.Size.X, region.Size.Y) * 0.25f;
+        var inset = MathF.Min(insetPx, maxInset);
+        if (inset <= 0f)
+        {
+            return region;
+        }
+
+        var insetVector = new Vector2(inset, inset);
+        var newSize = region.Size - (insetVector * 2f);
+        if (newSize.X <= 0f || newSize.Y <= 0f)
+        {
+            return region;
+        }
+
+        return new Rect2(region.Position + insetVector, newSize);
+    }
+
+    private static float ResolveWorldSeamPadding(float radius)
+    {
+        return Mathf.Clamp(radius * WorldHexSeamPaddingFactor, WorldHexSeamPaddingMin, WorldHexSeamPaddingMax);
+    }
+
 
     private float ResolveNodeRadius(StrategicNodeDefinition node)
     {
@@ -1865,8 +2005,9 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         }
 
         var hexRadius = Math.Max(_xianxiaWorldHexRadius * unit, 2f);
+        var renderRadius = hexRadius + ResolveWorldSeamPadding(hexRadius);
         var canvasCenter = ToCanvas(center, unit, normalizedCenter.X, normalizedCenter.Y);
-        var hex = BuildHexPolygon(canvasCenter, hexRadius);
+        var hex = BuildHexPolygon(canvasCenter, renderRadius);
         DrawFilledPolygon(hex, new Color(0.96f, 0.93f, 0.78f, 0.10f));
         DrawPath(hex, new Color(0.97f, 0.92f, 0.68f, 0.92f), Math.Max(1.3f, hexRadius * 0.12f), true);
     }
@@ -1914,4 +2055,22 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         var column = coord.Q + (row >> 1);
         return new Vector2I(column, row);
     }
+
+    private static float ResolveWorldUnderlayPadding(float radius)
+    {
+        return Mathf.Clamp(radius * WorldHexUnderlayPaddingFactor, WorldHexUnderlayPaddingMin, WorldHexUnderlayPaddingMax);
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+

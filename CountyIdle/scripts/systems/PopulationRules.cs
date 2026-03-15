@@ -38,5 +38,15 @@ public static class PopulationRules
 
         state.SickPopulation = Math.Clamp(state.SickPopulation, 0, state.AdultPopulation);
         state.ClothingStock = Math.Max(state.ClothingStock, 0);
+        
+        // 八大技艺迁移 - 如果旧字段有数据但新字段全为0，执行迁移
+        if (state.FollowersSpiritPlant == 0 && 
+            state.FollowersForging == 0 && 
+            state.FollowersGolem == 0 && 
+            state.FollowersArcane == 0 &&
+            (state.Farmers != 0 || state.Workers != 0 || state.Merchants != 0 || state.Scholars != 0))
+        {
+            state.MigrateFromOldJobs();
+        }
     }
 }
