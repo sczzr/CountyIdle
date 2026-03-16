@@ -7,8 +7,10 @@ namespace CountyIdle.Systems;
 
 public partial class CountyTownMapViewSystem
 {
+    // 建筑阴影色
     private static readonly Color AnchorShadowColor = new(0.04f, 0.05f, 0.05f, 0.18f);
 
+    // 绘制活动锚点建筑（含屋顶、墙体、选中效果）
     private void DrawActivityAnchorBuilding(TownActivityAnchorData anchor, Vector2 origin)
     {
         var baseColor = GetAnchorColor(anchor.AnchorType);
@@ -33,6 +35,7 @@ public partial class CountyTownMapViewSystem
         var roofBottom = baseBottom + wallOffset;
         var roofLeft = baseLeft + wallOffset;
 
+        // 选中状态绘制光环与描边
         if (isSelected)
         {
             var pulse = 1.0f + (Mathf.Sin(Time.GetTicksMsec() / 180.0f) * 0.045f);
@@ -56,11 +59,13 @@ public partial class CountyTownMapViewSystem
         var shadow = CreateHex(center + new Vector2(ScaleValue(2.4f), ScaleValue(3.6f)), foundationRadius * 0.76f);
         DrawColoredPolygon(shadow, AnchorShadowColor);
 
+        // 基础墙体/屋顶配色
         var wallBright = WallBrightColor.Lerp(baseColor, 0.18f);
         var wallDark = WallDarkColor.Lerp(baseColor.Darkened(0.28f), 0.22f);
         var roofMain = RoofMainColor.Lerp(baseColor, 0.58f);
         var roofShade = RoofShadeColor.Lerp(baseColor.Darkened(0.18f), 0.44f);
 
+        // 绘制道路连接路径
         DrawAnchorPath(anchor, origin, baseBottom, baseColor);
 
         var leftWall = new[] { baseLeft, baseBottom, roofBottom, roofLeft };
@@ -89,14 +94,17 @@ public partial class CountyTownMapViewSystem
         DrawLine(eaveBottom, eaveLeft, GridLineColor, edgeWidth);
         DrawLine(eaveLeft, eaveTop, GridLineColor, edgeWidth);
 
+        // 选中状态描边屋檐
         if (isSelected)
         {
             DrawPolyline(roofFace, baseColor.Lightened(0.35f), Math.Max(1.0f, ScaleValue(1.3f)), true);
         }
 
+        // 绘制不同类型的装饰细节
         DrawAnchorAccent(anchor, baseColor, wallBright, roofMain, ridgeStart, ridgeEnd, eaveTop, eaveRight, eaveBottom, eaveLeft);
     }
 
+    // 绘制建筑与道路的连接小径
     private void DrawAnchorPath(TownActivityAnchorData anchor, Vector2 origin, Vector2 baseBottom, Color baseColor)
     {
         var roadCenter = GetTownCellCenter(anchor.RoadCell, origin) + new Vector2(0f, ScaleValue(0.8f));
@@ -112,18 +120,21 @@ public partial class CountyTownMapViewSystem
         DrawLine(roadCenter, entrancePoint, pathColor, pathWidth);
         DrawCircle(entrancePoint, Math.Max(0.9f, ScaleValue(isSelected ? 2.1f : 1.6f)), isSelected ? pathColor.Lightened(0.10f) : baseColor * 0.78f);
 
+        // 选中时强调道路端点
         if (isSelected)
         {
             DrawCircle(roadCenter, Math.Max(0.9f, ScaleValue(1.6f)), TownActivityAnchorVisualRules.GetSelectionGlowColor(anchor.AnchorType));
         }
     }
 
+    // 计算建筑入口在屋檐底边附近的位置
     private Vector2 GetAnchorEntrancePoint(TownActivityAnchorData anchor, Vector2 baseBottom)
     {
         var roadOffset = GetRoadOffset(anchor.Facing);
         return baseBottom + new Vector2(ScaleValue(roadOffset.X * 2.2f), ScaleValue(roadOffset.Y * 1.1f) - ScaleValue(2.4f));
     }
 
+    // 生成选中锚点的提示文本
     private string BuildSelectedAnchorHint(TownActivityAnchorData anchor)
     {
         var anchorTypeText = SectMapSemanticRules.GetAnchorTypeText(anchor.AnchorType);
@@ -135,6 +146,7 @@ public partial class CountyTownMapViewSystem
         return $"{anchor.Label}（{anchorTypeText}）· {statusText} · 可视 {presentResidents}/{assignedResidents} · 前往中 {inboundResidents}";
     }
 
+    // 生成选中锚点的状态文本
     private string GetSelectedAnchorStatusText(TownActivityAnchorData anchor)
     {
         if (anchor.AnchorType == TownActivityAnchorType.Administration)
@@ -179,6 +191,7 @@ public partial class CountyTownMapViewSystem
         return SectMapSemanticRules.GetWorkIdleStatusText();
     }
 
+    // 根据点击位置选择锚点（取遮挡更靠前者）
     private TownActivityAnchorData? PickActivityAnchorAt(Vector2 localPosition, Vector2 origin)
     {
         if (_mapData == null || _mapData.ActivityAnchors.Count == 0)
@@ -210,6 +223,7 @@ public partial class CountyTownMapViewSystem
         return selectedAnchor;
     }
 
+    // 判断点是否落入锚点 hitbox
     private bool IsPointInsideActivityAnchor(TownActivityAnchorData anchor, Vector2 origin, Vector2 point)
     {
         var center = GetTownCellCenter(anchor.LotCell, origin) + new Vector2(0f, -ScaleValue(anchor.Floors == 1 ? 7f : 10f));
@@ -217,6 +231,7 @@ public partial class CountyTownMapViewSystem
         return Geometry2D.IsPointInPolygon(point, hitbox);
     }
 
+    // 判断锚点是否为当前选中
     private bool IsSelectedActivityAnchor(TownActivityAnchorData anchor)
     {
         return _selectedActivityAnchor != null &&
@@ -225,6 +240,7 @@ public partial class CountyTownMapViewSystem
                string.Equals(_selectedActivityAnchor.Label, anchor.Label, StringComparison.Ordinal);
     }
 
+    // 绘制不同锚点的装饰细节
     private void DrawAnchorAccent(
         TownActivityAnchorData anchor,
         Color baseColor,
@@ -308,6 +324,7 @@ public partial class CountyTownMapViewSystem
         }
     }
 
+    // 根据锚点类型获取建筑占地比例
     private static float GetAnchorFootprintScale(TownActivityAnchorType anchorType)
     {
         return anchorType switch
@@ -320,11 +337,13 @@ public partial class CountyTownMapViewSystem
         };
     }
 
+    // 获取锚点基础颜色
     private static Color GetAnchorColor(TownActivityAnchorType anchorType)
     {
         return TownActivityAnchorVisualRules.GetMapBaseColor(anchorType);
     }
 
+    // 尝试在地图上放置指定建筑锚点
     public bool TryPlaceBuildingAnchor(
         IndustryBuildingType buildingType,
         out Vector2I? placedCell,
@@ -338,6 +357,7 @@ public partial class CountyTownMapViewSystem
             return false;
         }
 
+        // 决定落点：优先选中地块，其次自动推荐
         var targetCell = ResolvePlacementCell(buildingType, out var usedSelected, out var fallbackNote);
         if (targetCell == null)
         {
@@ -352,6 +372,7 @@ public partial class CountyTownMapViewSystem
         var visualVariant = GetCellHash(targetCell.Value, ((int)buildingType * 37) + 17) % 3;
         var label = BuildAnchorLabel(anchorType);
 
+        // 创建锚点并写入地图
         var anchor = new TownActivityAnchorData(
             anchorType,
             roadCell,
@@ -378,6 +399,7 @@ public partial class CountyTownMapViewSystem
         return true;
     }
 
+    // 记录已放置建筑信息
     private void RegisterPlacement(IndustryBuildingType buildingType, Vector2I cell)
     {
         for (var index = _placedBuildings.Count - 1; index >= 0; index--)
@@ -392,6 +414,7 @@ public partial class CountyTownMapViewSystem
         _placedBuildings.Add(new TownBuildingPlacement(buildingType, cell.X, cell.Y));
     }
 
+    // 将已放置建筑映射到地图（用于重建场景）
     private void ApplyPlacedBuildings(TownMapData mapData)
     {
         if (_placedBuildings.Count == 0)
@@ -434,6 +457,7 @@ public partial class CountyTownMapViewSystem
         }
     }
 
+    // 汇总已放置建筑数量，用于提示
     private TownMapBuildingHints GetPlacedBuildingCounts()
     {
         var agriculture = 0;
@@ -467,6 +491,7 @@ public partial class CountyTownMapViewSystem
         return new TownMapBuildingHints(agriculture, workshop, research, trade, administration);
     }
 
+    // 决定建筑落点（返回推荐地块与提示）
     private Vector2I? ResolvePlacementCell(IndustryBuildingType buildingType, out bool usedSelected, out string fallbackNote)
     {
         usedSelected = false;
@@ -496,6 +521,7 @@ public partial class CountyTownMapViewSystem
         return autoCell;
     }
 
+    // 判断地块是否可用
     private static bool IsCellAvailable(TownMapData mapData, Vector2I cell)
     {
         return mapData.IsInside(cell) &&
@@ -503,6 +529,7 @@ public partial class CountyTownMapViewSystem
                !IsCellOccupied(mapData, cell);
     }
 
+    // 判断地块是否已占用
     private static bool IsCellOccupied(TownMapData mapData, Vector2I cell)
     {
         foreach (var anchor in mapData.ActivityAnchors)
@@ -524,6 +551,7 @@ public partial class CountyTownMapViewSystem
         return false;
     }
 
+    // 清理指定地块上的结构
     private static void ClearStructuresAtCell(TownMapData mapData, Vector2I cell)
     {
         for (var index = mapData.ActivityAnchors.Count - 1; index >= 0; index--)
@@ -543,6 +571,7 @@ public partial class CountyTownMapViewSystem
         }
     }
 
+    // 自动推荐落点：对推荐地块打分
     private Vector2I? FindAutoPlacementCell(TownMapData mapData, IndustryBuildingType buildingType)
     {
         var bestCell = (Vector2I?)null;
@@ -598,6 +627,7 @@ public partial class CountyTownMapViewSystem
         return bestCell;
     }
 
+    // 建筑类型映射为锚点类型
     private static TownActivityAnchorType ResolveAnchorType(IndustryBuildingType buildingType)
     {
         return buildingType switch
@@ -611,6 +641,7 @@ public partial class CountyTownMapViewSystem
         };
     }
 
+    // 根据建筑类型与精英提示决定楼层数
     private int ResolveAnchorFloors(IndustryBuildingType buildingType)
     {
         return buildingType switch
@@ -621,6 +652,7 @@ public partial class CountyTownMapViewSystem
         };
     }
 
+    // 生成锚点显示名称
     private string BuildAnchorLabel(TownActivityAnchorType anchorType)
     {
         var anchorCounts = new Dictionary<TownActivityAnchorType, int>();
@@ -635,6 +667,7 @@ public partial class CountyTownMapViewSystem
         return BuildAnchorLabel(anchorType, anchorCounts);
     }
 
+    // 按计数生成锚点名称
     private static string BuildAnchorLabel(TownActivityAnchorType anchorType, Dictionary<TownActivityAnchorType, int> anchorCounts)
     {
         var count = anchorCounts.GetValueOrDefault(anchorType, 0) + 1;
@@ -642,6 +675,7 @@ public partial class CountyTownMapViewSystem
         return $"{SectMapSemanticRules.GetAnchorLabelPrefix(anchorType)}·{count}号";
     }
 
+    // 寻找最近的道路格
     private static Vector2I? FindNearestRoadCell(TownMapData mapData, Vector2I lotCell)
     {
         Vector2I? bestRoadCell = null;
@@ -665,6 +699,7 @@ public partial class CountyTownMapViewSystem
         return bestRoadCell;
     }
 
+    // 根据道路位置推导建筑朝向
     private static TownFacing ResolveFacingFromRoad(Vector2I lotCell, Vector2I roadCell)
     {
         var delta = roadCell - lotCell;

@@ -3,22 +3,37 @@ using CountyIdle.Models;
 
 namespace CountyIdle.Systems;
 
+// 游戏历法系统：将游戏分钟映射为节气/季节等文本
 public sealed class GameCalendarSystem
 {
+    // 年号名称
     private const string EraName = "景禾";
+    // 一小时对应分钟数
     private const int MinutesPerHour = 60;
+    // 一天小时数
     private const int HoursPerDay = 24;
+    // 一月天数
     private const int DaysPerMonth = 30;
+    // 一年月份数
     private const int MonthsPerYear = 12;
+    // 一季月份数
     private const int MonthsPerQuarter = 3;
+    // 一节气天数
     private const int DaysPerSolarTerm = 15;
+    // 一年节气数
     private const int SolarTermsPerYear = 24;
+    // 一天分钟数
     private const int MinutesPerDay = MinutesPerHour * HoursPerDay;
+    // 一月分钟数
     private const int MinutesPerMonth = MinutesPerDay * DaysPerMonth;
+    // 一季分钟数
     private const int MinutesPerQuarter = MinutesPerMonth * MonthsPerQuarter;
+    // 一节气分钟数
     private const int MinutesPerSolarTerm = MinutesPerDay * DaysPerSolarTerm;
+    // 一年分钟数
     private const int MinutesPerYear = MinutesPerDay * DaysPerMonth * MonthsPerYear;
 
+    // 月份中文名
     private static readonly string[] MonthNames =
     {
         "正月",
@@ -35,6 +50,7 @@ public sealed class GameCalendarSystem
         "腊月"
     };
 
+    // 日子中文名
     private static readonly string[] DayNames =
     {
         "初一",
@@ -69,6 +85,7 @@ public sealed class GameCalendarSystem
         "三十"
     };
 
+    // 二十四节气名
     private static readonly string[] SolarTermNames =
     {
         "立春",
@@ -97,6 +114,7 @@ public sealed class GameCalendarSystem
         "大寒"
     };
 
+    // 时辰名（双时辰）
     private static readonly string[] DoubleHourNames =
     {
         "子时",
@@ -113,6 +131,7 @@ public sealed class GameCalendarSystem
         "亥时"
     };
 
+    // 季节名称
     private static readonly string[] QuarterNames =
     {
         "春季",
@@ -121,6 +140,7 @@ public sealed class GameCalendarSystem
         "冬季"
     };
 
+    // 根据游戏分钟描述历法信息
     public GameCalendarInfo Describe(int gameMinutes)
     {
         var safeGameMinutes = Math.Max(gameMinutes, 0);
@@ -165,6 +185,7 @@ public sealed class GameCalendarSystem
         };
     }
 
+    // 获取当前季度索引
     public int GetQuarterIndex(int gameMinutes)
     {
         var safeGameMinutes = Math.Max(gameMinutes, 0);
@@ -172,16 +193,19 @@ public sealed class GameCalendarSystem
         return Math.Clamp(minuteOfYear / MinutesPerQuarter, 0, QuarterNames.Length - 1);
     }
 
+    // 获取当前季度名称
     public string GetQuarterLabel(int gameMinutes)
     {
         return QuarterNames[GetQuarterIndex(gameMinutes)];
     }
 
+    // 将年份转为年号表述
     private static string FormatRegnalYear(int yearNumber)
     {
         return yearNumber <= 1 ? "元" : ToChineseNumber(yearNumber);
     }
 
+    // 将数字转为中文数字
     private static string ToChineseNumber(int value)
     {
         if (value <= 0)
@@ -242,6 +266,7 @@ public sealed class GameCalendarSystem
         return result;
     }
 
+    // 数字转中文单字
     private static string DigitToChinese(int value)
     {
         return value switch

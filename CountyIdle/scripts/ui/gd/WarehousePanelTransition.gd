@@ -29,6 +29,10 @@ var _warning_stamp_label: Label
 var _hint_label: Label
 var _warehouse_status_value: Label
 var _capacity_value_label: Label
+var _backpack_summary_label: Label
+var _backpack_stash_button: Button
+var _workshop_summary_label: Label
+var _workshop_stash_button: Button
 var _tier_zero_chain_status_value: Label
 var _tab_buttons: Dictionary = {}
 var _current_tween: Tween
@@ -49,6 +53,10 @@ func _ready() -> void:
 	_hint_label = root.get_node("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/StatusRow/StatusTextColumn/HintLabel")
 	_warehouse_status_value = root.get_node("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/StatusRow/StatusTextColumn/WarehouseStatusValue")
 	_capacity_value_label = root.get_node("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/StatusRow/CapacityValueLabel")
+	_backpack_summary_label = root.get_node("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/BackpackRow/BackpackSummaryLabel")
+	_backpack_stash_button = root.get_node("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/BackpackRow/BackpackStashButton")
+	_workshop_summary_label = root.get_node("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/WorkshopRow/WorkshopSummaryLabel")
+	_workshop_stash_button = root.get_node("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/WorkshopRow/WorkshopStashButton")
 	_tier_zero_chain_status_value = root.get_node("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ChainSection/ChainInfoFrame/ChainInfoMargin/TierZeroStatusValue")
 	_tab_buttons = {
 		"All": root.get_node("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/TabRow/AllTabButton") as Button,
@@ -100,6 +108,12 @@ func apply_theme_styles() -> void:
 	_capacity_value_label.add_theme_color_override("font_color", INK_MAIN)
 	_tier_zero_chain_status_value.add_theme_font_size_override("font_size", 13)
 	_tier_zero_chain_status_value.add_theme_color_override("font_color", INK_MAIN)
+	_backpack_summary_label.add_theme_font_size_override("font_size", 13)
+	_backpack_summary_label.add_theme_color_override("font_color", INK_MAIN)
+	_apply_order_button_style(_backpack_stash_button, false)
+	_workshop_summary_label.add_theme_font_size_override("font_size", 13)
+	_workshop_summary_label.add_theme_color_override("font_color", INK_MAIN)
+	_apply_order_button_style(_workshop_stash_button, false)
 
 	for path in [
 		"CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/ActionArea/ActionColumn/ManufactureSection/ManufactureTitle",

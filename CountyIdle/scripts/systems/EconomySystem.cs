@@ -3,14 +3,17 @@ using CountyIdle.Models;
 
 namespace CountyIdle.Systems;
 
+// 小时经济预览数据
 public sealed record EconomyHourPreview(
     double FoodDeltaRaw,
     double GoldDeltaRaw,
     double ContributionDeltaRaw,
     double ResearchDeltaRaw);
 
+// 经济结算系统
 public class EconomySystem
 {
+    // 计算小时产出预览
     public static EconomyHourPreview BuildHourPreview(GameState state)
     {
         InventoryRules.EndTransaction(state);
@@ -93,6 +96,7 @@ public class EconomySystem
         return new EconomyHourPreview(foodDeltaRaw, goldDeltaRaw, contributionDeltaRaw, researchDeltaRaw);
     }
 
+    // 执行小时结算
     public void TickHour(GameState state)
     {
         var preview = BuildHourPreview(state);

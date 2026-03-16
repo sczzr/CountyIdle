@@ -8,10 +8,16 @@ using CountyIdle.Models;
 
 namespace CountyIdle.Core;
 
+/// <summary>
+/// 存档系统：负责 SQLite 存档与旧版 JSON 迁移。
+/// </summary>
 public class SaveSystem
 {
+    // SQLite 数据库路径
     private const string DatabasePath = "user://countyidle.db";
+    // 旧版 JSON 存档路径（用于迁移）
     private const string LegacySavePath = "user://savegame.json";
+    // 存档预览图目录
     private const string PreviewDirectoryPath = "user://save_previews";
     private const string PrimarySlotKey = "default";
     private const string PrimarySlotName = "主存档";
@@ -32,22 +38,32 @@ public class SaveSystem
 
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = false };
 
+    // SQLite 存档仓库
     private readonly SqliteSaveRepository _repository;
 
     public string DefaultSlotKey => PrimarySlotKey;
     public IReadOnlyList<string> AutoSaveSlotKeysView => AutoSaveSlotKeys;
 
+    /// <summary>
+    /// 初始化存档仓库并定位数据库文件。
+    /// </summary>
     public SaveSystem()
     {
         var globalDatabasePath = ProjectSettings.GlobalizePath(DatabasePath);
         _repository = new SqliteSaveRepository(globalDatabasePath);
     }
 
+    /// <summary>
+    /// 保存到默认槽。
+    /// </summary>
     public bool Save(GameState state, out string message)
     {
         return SaveToSlot(state, PrimarySlotKey, PrimarySlotName, out message);
     }
 
+    /// <summary>
+    /// 保存到指定槽（非自动槽）。
+    /// </summary>
     public bool SaveToSlot(GameState state, string slotKey, string slotName, out string message)
     {
         if (IsAutoSaveSlotKey(slotKey))
@@ -59,6 +75,9 @@ public class SaveSystem
         return SaveToSlotInternal(state, slotKey, slotName, false, out message);
     }
 
+    /// <summary>
+    /// 新建存档槽并保存当前状态。
+    /// </summary>
     public bool SaveToNewSlot(GameState state, string slotName, out string slotKey, out string message)
     {
         slotKey = string.Empty;
@@ -73,6 +92,9 @@ public class SaveSystem
         return SaveToSlot(state, slotKey, normalizedSlotName, out message);
     }
 
+    /// <summary>
+    /// 复制现有存档槽到新槽（包含预览图）。
+    /// </summary>
     public bool CopySlotToNewSlot(string sourceSlotKey, string targetSlotName, out string slotKey, out string message)
     {
         slotKey = string.Empty;
@@ -107,6 +129,9 @@ public class SaveSystem
         }
     }
 
+    /// <summary>
+    /// 自动存档（按轮换索引写入固定槽）。
+    /// </summary>
     public bool SaveAutoSlot(GameState state, int rotationIndex, out string slotKey, out string message)
     {
         var normalizedIndex = NormalizeAutoSaveIndex(rotationIndex);
@@ -115,6 +140,9 @@ public class SaveSystem
         return SaveToSlotInternal(state, slotKey, slotName, true, out message);
     }
 
+    /// <summary>
+    /// 读取默认槽；若不存在则尝试读取最新快照。
+    /// </summary>
     public bool TryLoad(out GameState state, out string message)
     {
         state = new GameState();
@@ -148,6 +176,9 @@ public class SaveSystem
         }
     }
 
+    /// <summary>
+    /// 读取指定存档槽。
+    /// </summary>
     public bool TryLoadSlot(string slotKey, out GameState state, out string message)
     {
         state = new GameState();
@@ -172,6 +203,9 @@ public class SaveSystem
         }
     }
 
+    /// <summary>
+    /// 列出所有存档槽摘要（并补齐预览图路径）。
+    /// </summary>
     public IReadOnlyList<SaveSlotSummary> ListSlots()
     {
         try
@@ -190,6 +224,9 @@ public class SaveSystem
         }
     }
 
+    /// <summary>
+    /// 重命名存档槽（保护槽不可改名）。
+    /// </summary>
     public bool RenameSlot(string slotKey, string slotName, out string message)
     {
         if (IsProtectedSlotKey(slotKey))
@@ -223,6 +260,9 @@ public class SaveSystem
         }
     }
 
+    /// <summary>
+    /// 删除存档槽（保护槽不可删除）。
+    /// </summary>
     public bool DeleteSlot(string slotKey, out string message)
     {
         if (IsProtectedSlotKey(slotKey))
@@ -250,6 +290,9 @@ public class SaveSystem
         }
     }
 
+    /// <summary>
+    /// 保存存档预览图（PNG）。
+    /// </summary>
     public bool SavePreview(string slotKey, Image image, out string message)
     {
         if (string.IsNullOrWhiteSpace(slotKey))
@@ -279,6 +322,9 @@ public class SaveSystem
         }
     }
 
+    /// <summary>
+    /// 若存在旧版 JSON 且数据库为空，则迁移到 SQLite。
+    /// </summary>
     private bool TryMigrateLegacyJsonIfNeeded(out string message)
     {
         message = string.Empty;
@@ -312,6 +358,9 @@ public class SaveSystem
         return true;
     }
 
+    /// <summary>
+    /// 规范化槽位名称（去空白，回退默认名）。
+    /// </summary>
     private static string NormalizeSlotName(string? slotName, string fallbackName)
     {
         var trimmedName = (slotName ?? string.Empty).Trim();
@@ -323,6 +372,9 @@ public class SaveSystem
         return fallbackName;
     }
 
+    /// <summary>
+    /// 复制槽位时的命名规范（避免与源名相同）。
+    /// </summary>
     private static string NormalizeCopiedSlotName(string? requestedSlotName, string sourceSlotName)
     {
         var normalizedRequestedName = NormalizeSlotName(requestedSlotName, string.Empty);
@@ -335,17 +387,26 @@ public class SaveSystem
         return normalizedRequestedName;
     }
 
+    /// <summary>
+    /// 生成预览图相对路径。
+    /// </summary>
     private static string GetPreviewPath(string slotKey)
     {
         return $"{PreviewDirectoryPath}/{SanitizeSlotKey(slotKey)}.png";
     }
 
+    /// <summary>
+    /// 清理槽位 key 中的非法文件名字符。
+    /// </summary>
     private static string SanitizeSlotKey(string slotKey)
     {
         var invalidChars = Path.GetInvalidFileNameChars();
         return string.Concat(slotKey.Select(character => Array.IndexOf(invalidChars, character) >= 0 ? '_' : character));
     }
 
+    /// <summary>
+    /// 删除指定槽位的预览图文件。
+    /// </summary>
     private static void DeletePreviewFile(string slotKey)
     {
         var previewPath = ProjectSettings.GlobalizePath(GetPreviewPath(slotKey));
@@ -355,6 +416,9 @@ public class SaveSystem
         }
     }
 
+    /// <summary>
+    /// 复制预览图文件（若存在）。
+    /// </summary>
     private static bool TryCopyPreviewFile(string sourceSlotKey, string targetSlotKey)
     {
         var sourcePreviewPath = ProjectSettings.GlobalizePath(GetPreviewPath(sourceSlotKey));
@@ -381,6 +445,9 @@ public class SaveSystem
         }
     }
 
+    /// <summary>
+    /// 是否为保护槽（默认槽或自动槽）。
+    /// </summary>
     public bool IsProtectedSlotKey(string? slotKey)
     {
         if (string.IsNullOrWhiteSpace(slotKey))
@@ -396,6 +463,9 @@ public class SaveSystem
         return IsAutoSaveSlotKey(slotKey);
     }
 
+    /// <summary>
+    /// 判断是否自动存档槽。
+    /// </summary>
     private static bool IsAutoSaveSlotKey(string? slotKey)
     {
         if (string.IsNullOrWhiteSpace(slotKey))
@@ -414,6 +484,9 @@ public class SaveSystem
         return false;
     }
 
+    /// <summary>
+    /// 轮换索引标准化（负数归零）。
+    /// </summary>
     private static int NormalizeAutoSaveIndex(int rotationIndex)
     {
         if (rotationIndex < 0)
@@ -424,6 +497,9 @@ public class SaveSystem
         return rotationIndex % AutoSaveSlotCount;
     }
 
+    /// <summary>
+    /// 实际写入存档快照的内部入口。
+    /// </summary>
     private bool SaveToSlotInternal(GameState state, string slotKey, string slotName, bool isAutosave, out string message)
     {
         try

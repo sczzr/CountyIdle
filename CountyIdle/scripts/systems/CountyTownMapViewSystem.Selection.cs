@@ -1,3 +1,4 @@
+using System;
 using CountyIdle.Models;
 using System.Linq;
 
@@ -5,16 +6,19 @@ namespace CountyIdle.Systems;
 
 public partial class CountyTownMapViewSystem
 {
+    // 通知选中信息变化
     private void NotifySelectionSummaryChanged()
     {
         SelectionSummaryChanged?.Invoke(BuildSelectionSummary());
     }
 
+    // 将名称替换为当前宗门命名
     private string ResolveNamedText(string text)
     {
         return SectNamingRules.ReplaceKnownNames(_nameMap, text);
     }
 
+    // 构建选中摘要（地块或锚点）
     private TownMapSelectionSummary BuildSelectionSummary()
     {
         if (_selectedActivityAnchor != null)
@@ -40,6 +44,7 @@ public partial class CountyTownMapViewSystem
         return BuildCellSelectionSummary(compound);
     }
 
+    // 构建锚点选中摘要
     private TownMapSelectionSummary BuildAnchorSelectionSummary(TownActivityAnchorData anchor)
     {
         var anchorTypeText = SectMapSemanticRules.GetAnchorTypeText(anchor.AnchorType, _nameMap);
@@ -49,6 +54,7 @@ public partial class CountyTownMapViewSystem
         var statusText = GetSelectedAnchorStatusText(anchor);
         var selectedWalker = GetSelectedResidentWalker();
         var buildingListText = BuildAnchorBuildingListText(anchor);
+        var buildingList = new[] { ResolveNamedText(buildingListText) };
         var anchorLabel = ResolveNamedText(anchor.Label);
 
         return new TownMapSelectionSummary(
@@ -61,6 +67,7 @@ public partial class CountyTownMapViewSystem
             $"{anchorTypeText} · 归属：{SectMapSemanticRules.GetSettlementName(_nameMap)}",
             "建筑列表",
             ResolveNamedText(buildingListText),
+            buildingList,
             "当前态势",
             statusText,
             "驻守门人",
@@ -72,11 +79,15 @@ public partial class CountyTownMapViewSystem
             ResolveNamedText(BuildSelectionDescription(anchor, statusText, selectedWalker)));
     }
 
+    // 构建地块选中摘要
     private TownMapSelectionSummary BuildCellSelectionSummary(TownCellCompoundData compound)
     {
-        var buildingSummary = compound.SubBuildings.Length == 0
+        var buildingList = compound.SubBuildings.Length == 0
+            ? Array.Empty<string>()
+            : compound.SubBuildings.Select(building => ResolveNamedText(building.DisplayName)).ToArray();
+        var buildingSummary = buildingList.Length == 0
             ? "待规划"
-            : string.Join(" / ", compound.SubBuildings.Select(building => ResolveNamedText(building.DisplayName)));
+            : string.Join(" / ", buildingList);
         var statusText = GetCompoundStatusText(compound);
         var qiText = $"{compound.BaseQiCapacity} 池 · 需求 {compound.TotalQiDemand:0.#} · 拥堵 {compound.QiCongestion:0.00}";
         var slotText = $"{compound.SubBuildings.Length}/{compound.BuildSlotCount} 坊位 · 协同 {compound.SynergyScore:+0.00;-0.00;0.00}";
@@ -96,6 +107,7 @@ public partial class CountyTownMapViewSystem
             $"{compound.QiAffinityText} · {GetPlanStyleText(compound.PlanStyle)} · 坊局：{buildingSummary}",
             "建筑列表",
             buildingSummary,
+            buildingList,
             "当前态势",
             statusText,
             "坊位格局",
@@ -107,6 +119,7 @@ public partial class CountyTownMapViewSystem
             ResolveNamedText(BuildCompoundDescription(compound, featureSummary, buildingSummary, statusText)));
     }
 
+    // 生成锚点描述文本
     private string BuildSelectionDescription(TownActivityAnchorData anchor, string statusText, object? selectedWalker)
     {
         var anchorDescription = anchor.AnchorType switch
@@ -129,6 +142,7 @@ public partial class CountyTownMapViewSystem
         return $"{anchorDescription} 当前状态：{statusText}。代表门人：{walker.Profile.Name} · {walker.Profile.DutyDisplayName} · {walker.Profile.RealmName}。";
     }
 
+    // 计算地块状态文本
     private static string GetCompoundStatusText(TownCellCompoundData compound)
     {
         if (compound.BuildSlotCount <= 1 || compound.SubBuildings.Length <= 1)
@@ -174,6 +188,7 @@ public partial class CountyTownMapViewSystem
         return compound.QiRecoveryPerHour >= 8 ? "回灵顺畅" : "可稳步经营";
     }
 
+    // 组合地块描述文本
     private static string BuildCompoundDescription(
         TownCellCompoundData compound,
         string featureSummary,
@@ -196,12 +211,14 @@ public partial class CountyTownMapViewSystem
         return $"{compound.RegionName}以{compound.QiAffinityText}为主，天然特征为：{featureSummary}。当前院域态势：{statusText}，坊局为【{buildingSummary}】，稳定度 {compound.Stability:0.00}。{efficiencyHint}{stabilityHint}";
     }
 
+    // 锚点建筑列表文案
     private static string BuildAnchorBuildingListText(TownActivityAnchorData anchor)
     {
         var floorText = anchor.Floors > 1 ? $"{anchor.Floors}层" : "1层";
         return $"{anchor.Label}（{floorText}）";
     }
 
+    // 内容类型文本
     private static string GetContentKindText(TownCellContentKind contentKind)
     {
         return contentKind switch
@@ -215,6 +232,7 @@ public partial class CountyTownMapViewSystem
         };
     }
 
+    // 内容类型标题
     private static string GetContentKindTitle(TownCellContentKind contentKind)
     {
         return contentKind switch
@@ -228,6 +246,7 @@ public partial class CountyTownMapViewSystem
         };
     }
 
+    // 内容类型徽章文本
     private static string GetContentKindBadgeText(TownCellContentKind contentKind)
     {
         return contentKind switch
@@ -241,6 +260,7 @@ public partial class CountyTownMapViewSystem
         };
     }
 
+    // 坊局规划风格文本
     private static string GetPlanStyleText(TownCompoundPlanStyle planStyle)
     {
         return planStyle switch
@@ -252,6 +272,7 @@ public partial class CountyTownMapViewSystem
         };
     }
 
+    // 地形文本
     private static string GetTerrainText(TownTerrainType terrainType)
     {
         return terrainType switch

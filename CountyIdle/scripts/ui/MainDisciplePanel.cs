@@ -1,5 +1,6 @@
 ﻿using Godot;
 using CountyIdle.Models;
+using CountyIdle.Systems;
 using CountyIdle.UI;
 
 namespace CountyIdle;
@@ -50,17 +51,20 @@ public partial class Main
     private void OpenDisciplePanel()
     {
         CloseBlockingOverlayPopups(_disciplePanel);
+        DiscipleEquipmentRules.EnsureRosterEquipmentProfiles(_gameLoop.State);
         _disciplePanel?.Open(_gameLoop.State.Clone());
     }
 
     private void OpenDisciplePanelForMapSelection(int discipleId, JobType? preferredJobType)
     {
         CloseBlockingOverlayPopups(_disciplePanel);
+        DiscipleEquipmentRules.EnsureRosterEquipmentProfiles(_gameLoop.State);
         _disciplePanel?.Open(_gameLoop.State.Clone(), discipleId, preferredJobType);
     }
 
     private void RefreshDisciplePanelPopup(GameState state)
     {
+        DiscipleEquipmentRules.EnsureRosterEquipmentProfiles(state);
         _disciplePanel?.RefreshState(state);
     }
 

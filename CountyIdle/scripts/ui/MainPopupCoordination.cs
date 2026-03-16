@@ -11,6 +11,7 @@ public partial class Main
                _taskPanel?.Visible == true ||
                _disciplePanel?.Visible == true ||
                _cultivationPanel?.Visible == true ||
+               _constructionPanel?.Visible == true ||
                _sectOrganizationPanel?.Visible == true ||
                _sectNamePanel?.Visible == true ||
                _saveSlotsPanel?.Visible == true ||
@@ -42,6 +43,11 @@ public partial class Main
         if (_cultivationPanel != null && _cultivationPanel.Visible && !ReferenceEquals(_cultivationPanel, except))
         {
             _cultivationPanel.ClosePanel();
+        }
+
+        if (_constructionPanel != null && _constructionPanel.Visible && !ReferenceEquals(_constructionPanel, except))
+        {
+            _constructionPanel.ClosePanel();
         }
 
         if (_sectOrganizationPanel != null && _sectOrganizationPanel.Visible && !ReferenceEquals(_sectOrganizationPanel, except))

@@ -1,0 +1,610 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/ConstructionPanel.cs" id="1_construction"]
+
+[node name="ConstructionPanel" type="Control"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_construction")
+
+[node name="Backdrop" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.101961, 0.0862745, 0.0745098, 0.9)
+
+[node name="CenterLayer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Dialog" type="PanelContainer" parent="CenterLayer"]
+custom_minimum_size = Vector2(1120, 680)
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="CenterLayer/Dialog"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 22
+
+[node name="MainColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="HeaderRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/HeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 20
+text = "文明式营建卷"
+
+[node name="CloseButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/HeaderRow"]
+custom_minimum_size = Vector2(44, 28)
+layout_mode = 2
+text = "✖"
+
+[node name="HintLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn"]
+layout_mode = 2
+text = "挑选宗门营建并与院域坊局联动，建造会优先落点到当前选中院域。"
+autowrap_mode = 3
+
+[node name="HeaderDivider" type="ColorRect" parent="CenterLayer/Dialog/Margin/MainColumn"]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+color = Color(0.294118, 0.247059, 0.207843, 1)
+
+[node name="SummaryRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TileCard" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CardMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/TileCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="CardColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/TileCard/CardMargin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TileTitle" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/TileCard/CardMargin/CardColumn"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "未选中地块"
+
+[node name="TileSubtitle" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/TileCard/CardMargin/CardColumn"]
+layout_mode = 2
+text = "点击任意院域检视地块详情"
+
+[node name="TileStatus" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/TileCard/CardMargin/CardColumn"]
+layout_mode = 2
+text = "当前态势：未检视"
+
+[node name="TileLocation" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/TileCard/CardMargin/CardColumn"]
+layout_mode = 2
+text = "地气坐标：Hex 坐标待定"
+
+[node name="TileDescription" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/TileCard/CardMargin/CardColumn"]
+layout_mode = 2
+text = "山门图现已支持全格检视，左键点选任意六角地块后可查看其院域底盘、灵气和推荐坊局。"
+autowrap_mode = 3
+
+[node name="BuildingCard" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow"]
+layout_mode = 2
+size_flags_horizontal = 2
+
+[node name="CardMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/BuildingCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="CardColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/BuildingCard/CardMargin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="BuildingLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/BuildingCard/CardMargin/CardColumn"]
+layout_mode = 2
+text = "当前坊局"
+
+[node name="BuildingValue" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/BuildingCard/CardMargin/CardColumn"]
+layout_mode = 2
+text = "待选中"
+autowrap_mode = 3
+
+[node name="RecommendationLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/BuildingCard/CardMargin/CardColumn"]
+layout_mode = 2
+text = "推荐：待评估"
+
+[node name="ContentRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="BuildingListCard" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="CardMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="ListColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="BuildingListHeader" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ListTitle" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "营建清单"
+
+[node name="ListHint" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListHeader"]
+layout_mode = 2
+text = "可对比收益并快速建造"
+
+[node name="CategoryRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CategoryAll" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/CategoryRow"]
+custom_minimum_size = Vector2(54, 26)
+layout_mode = 2
+text = "全部"
+
+[node name="CategoryProduction" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/CategoryRow"]
+custom_minimum_size = Vector2(54, 26)
+layout_mode = 2
+text = "产务"
+
+[node name="CategoryResearchTrade" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/CategoryRow"]
+custom_minimum_size = Vector2(54, 26)
+layout_mode = 2
+text = "研商"
+
+[node name="CategoryGovernance" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/CategoryRow"]
+custom_minimum_size = Vector2(54, 26)
+layout_mode = 2
+text = "治务"
+
+[node name="BuildingListScroll" type="ScrollContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 360)
+
+[node name="BuildingRows" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="GroupProduction" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.403922, 0.352941, 0.301961, 0.9)
+theme_override_font_sizes/font_size = 12
+text = "产务营建"
+
+[node name="RowAgriculture" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RowMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="RowColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="HeaderRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin/RowColumn"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="NameLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin/RowColumn/HeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "阵材圃"
+
+[node name="CountLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin/RowColumn/HeaderRow"]
+layout_mode = 2
+text = "×0"
+
+[node name="TagLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin/RowColumn/HeaderRow"]
+layout_mode = 2
+text = "推荐"
+
+[node name="EffectLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin/RowColumn"]
+layout_mode = 2
+text = "灵植容量 +16"
+autowrap_mode = 3
+
+[node name="RequirementLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin/RowColumn"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.403922, 0.352941, 0.301961, 0.92)
+theme_override_font_sizes/font_size = 12
+text = "前置：坊位与灵气待判定"
+autowrap_mode = 3
+
+[node name="ActionRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin/RowColumn"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CostLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin/RowColumn/ActionRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "木24 / 石12 / 灵石10"
+autowrap_mode = 3
+
+[node name="DetailButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin/RowColumn/ActionRow"]
+custom_minimum_size = Vector2(60, 28)
+layout_mode = 2
+text = "详情"
+
+[node name="BuildButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin/RowColumn/ActionRow"]
+custom_minimum_size = Vector2(72, 28)
+layout_mode = 2
+text = "建造"
+
+[node name="RowWorkshop" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RowMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="RowColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="HeaderRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin/RowColumn"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="NameLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin/RowColumn/HeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "工务坊"
+
+[node name="CountLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin/RowColumn/HeaderRow"]
+layout_mode = 2
+text = "×0"
+
+[node name="TagLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin/RowColumn/HeaderRow"]
+layout_mode = 2
+text = "推荐"
+
+[node name="EffectLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin/RowColumn"]
+layout_mode = 2
+text = "炼器容量 +12\n灵植容量 +6"
+autowrap_mode = 3
+
+[node name="RequirementLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin/RowColumn"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.403922, 0.352941, 0.301961, 0.92)
+theme_override_font_sizes/font_size = 12
+text = "前置：坊位与灵气待判定"
+autowrap_mode = 3
+
+[node name="ActionRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin/RowColumn"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CostLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin/RowColumn/ActionRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "木26 / 石18 / 灵石12"
+autowrap_mode = 3
+
+[node name="DetailButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin/RowColumn/ActionRow"]
+custom_minimum_size = Vector2(60, 28)
+layout_mode = 2
+text = "详情"
+
+[node name="BuildButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin/RowColumn/ActionRow"]
+custom_minimum_size = Vector2(72, 28)
+layout_mode = 2
+text = "建造"
+
+[node name="GroupResearchTrade" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.403922, 0.352941, 0.301961, 0.9)
+theme_override_font_sizes/font_size = 12
+text = "研修与商贸"
+
+[node name="RowResearch" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RowMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="RowColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="HeaderRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin/RowColumn"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="NameLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin/RowColumn/HeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "传法院"
+
+[node name="CountLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin/RowColumn/HeaderRow"]
+layout_mode = 2
+text = "×0"
+
+[node name="TagLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin/RowColumn/HeaderRow"]
+layout_mode = 2
+text = "推荐"
+
+[node name="EffectLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin/RowColumn"]
+layout_mode = 2
+text = "符箓容量 +10\n天机容量 +10"
+autowrap_mode = 3
+
+[node name="RequirementLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin/RowColumn"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.403922, 0.352941, 0.301961, 0.92)
+theme_override_font_sizes/font_size = 12
+text = "前置：坊位与灵气待判定"
+autowrap_mode = 3
+
+[node name="ActionRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin/RowColumn"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CostLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin/RowColumn/ActionRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "木16 / 石22 / 灵石22"
+autowrap_mode = 3
+
+[node name="DetailButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin/RowColumn/ActionRow"]
+custom_minimum_size = Vector2(60, 28)
+layout_mode = 2
+text = "详情"
+
+[node name="BuildButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin/RowColumn/ActionRow"]
+custom_minimum_size = Vector2(72, 28)
+layout_mode = 2
+text = "建造"
+
+[node name="RowTrade" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RowMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="RowColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="HeaderRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin/RowColumn"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="NameLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin/RowColumn/HeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "总坊"
+
+[node name="CountLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin/RowColumn/HeaderRow"]
+layout_mode = 2
+text = "×0"
+
+[node name="TagLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin/RowColumn/HeaderRow"]
+layout_mode = 2
+text = "推荐"
+
+[node name="EffectLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin/RowColumn"]
+layout_mode = 2
+text = "灵兽容量 +8\n傀儡容量 +14"
+autowrap_mode = 3
+
+[node name="RequirementLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin/RowColumn"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.403922, 0.352941, 0.301961, 0.92)
+theme_override_font_sizes/font_size = 12
+text = "前置：坊位与灵气待判定"
+autowrap_mode = 3
+
+[node name="ActionRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin/RowColumn"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CostLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin/RowColumn/ActionRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "木18 / 石14 / 灵石24"
+autowrap_mode = 3
+
+[node name="DetailButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin/RowColumn/ActionRow"]
+custom_minimum_size = Vector2(60, 28)
+layout_mode = 2
+text = "详情"
+
+[node name="BuildButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin/RowColumn/ActionRow"]
+custom_minimum_size = Vector2(72, 28)
+layout_mode = 2
+text = "建造"
+
+[node name="GroupGovernance" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.403922, 0.352941, 0.301961, 0.9)
+theme_override_font_sizes/font_size = 12
+text = "治务中枢"
+
+[node name="RowAdministration" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RowMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="RowColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="HeaderRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin/RowColumn"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="NameLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin/RowColumn/HeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "庶务殿"
+
+[node name="CountLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin/RowColumn/HeaderRow"]
+layout_mode = 2
+text = "×0"
+
+[node name="TagLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin/RowColumn/HeaderRow"]
+layout_mode = 2
+text = "推荐"
+
+[node name="EffectLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin/RowColumn"]
+layout_mode = 2
+text = "炼丹容量 +8\n阵法容量 +6\n仓储上限 +45"
+autowrap_mode = 3
+
+[node name="RequirementLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin/RowColumn"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.403922, 0.352941, 0.301961, 0.92)
+theme_override_font_sizes/font_size = 12
+text = "前置：坊位与灵气待判定"
+autowrap_mode = 3
+
+[node name="ActionRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin/RowColumn"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CostLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin/RowColumn/ActionRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "木20 / 石20 / 灵石20"
+autowrap_mode = 3
+
+[node name="DetailButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin/RowColumn/ActionRow"]
+custom_minimum_size = Vector2(60, 28)
+layout_mode = 2
+text = "详情"
+
+[node name="BuildButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin/RowColumn/ActionRow"]
+custom_minimum_size = Vector2(72, 28)
+layout_mode = 2
+text = "建造"
+
+[node name="DetailCard" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="CardMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="DetailColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailCard/CardMargin"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="DetailTitle" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailCard/CardMargin/DetailColumn"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "建筑详览"
+
+[node name="DetailEffect" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailCard/CardMargin/DetailColumn"]
+layout_mode = 2
+text = "建筑效果将在此展示。"
+autowrap_mode = 3
+
+[node name="DetailCost" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailCard/CardMargin/DetailColumn"]
+layout_mode = 2
+text = "建造消耗：—"
+autowrap_mode = 3
+
+[node name="DetailHint" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailCard/CardMargin/DetailColumn"]
+layout_mode = 2
+text = "建筑选择影响坊位协同与产出节奏。"
+autowrap_mode = 3
+
+[node name="QueueCard" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow"]
+layout_mode = 2
+size_flags_horizontal = 2
+size_flags_vertical = 3
+
+[node name="CardMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/QueueCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="QueueColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/QueueCard/CardMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="QueueTitle" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/QueueCard/CardMargin/QueueColumn"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "营建队列"
+
+[node name="QueueHint" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/QueueCard/CardMargin/QueueColumn"]
+layout_mode = 2
+text = "队列与时辰进度将在后续接入。当前点击“建造”将立即执行落点。"
+autowrap_mode = 3

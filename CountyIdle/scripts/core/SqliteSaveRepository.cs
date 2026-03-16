@@ -7,6 +7,9 @@ using Microsoft.Data.Sqlite;
 
 namespace CountyIdle.Core;
 
+/// <summary>
+/// SQLite 存档仓库：封装存档槽与快照的读写。
+/// </summary>
 public sealed class SqliteSaveRepository
 {
     private readonly string _databasePath;
@@ -16,6 +19,9 @@ public sealed class SqliteSaveRepository
     private static readonly object NativeInitLock = new();
     private static bool _nativeSqliteInitialized;
 
+    /// <summary>
+    /// 初始化仓库与连接字符串。
+    /// </summary>
     public SqliteSaveRepository(string databasePath)
     {
         _databasePath = databasePath;
@@ -27,6 +33,9 @@ public sealed class SqliteSaveRepository
         _migrationRunner = new SqliteMigrationRunner(_connectionString);
     }
 
+    /// <summary>
+    /// 确保原生 SQLite 已初始化并完成结构迁移。
+    /// </summary>
     public void EnsureInitialized()
     {
         EnsureNativeSqliteInitialized();
@@ -40,6 +49,9 @@ public sealed class SqliteSaveRepository
         _migrationRunner.EnsureMigrated();
     }
 
+    /// <summary>
+    /// 判断是否存在任何存档快照。
+    /// </summary>
     public bool HasAnySnapshots()
     {
         EnsureInitialized();
@@ -51,6 +63,9 @@ public sealed class SqliteSaveRepository
         return count > 0;
     }
 
+    /// <summary>
+    /// 保存存档快照并返回槽摘要。
+    /// </summary>
     public SaveSlotSummary SaveSnapshot(
         string slotKey,
         string slotName,
@@ -97,6 +112,9 @@ public sealed class SqliteSaveRepository
         return summary;
     }
 
+    /// <summary>
+    /// 读取指定槽位的最新快照。
+    /// </summary>
     public bool TryLoadLatestSnapshot(string slotKey, out SaveSnapshotRecord? snapshot, out SaveSlotSummary? slotSummary)
     {
         EnsureInitialized();
@@ -147,6 +165,9 @@ public sealed class SqliteSaveRepository
         return true;
     }
 
+    /// <summary>
+    /// 读取最新的一条快照（任意槽位）。
+    /// </summary>
     public bool TryLoadLatestSnapshot(out SaveSnapshotRecord? snapshot, out SaveSlotSummary? slotSummary)
     {
         EnsureInitialized();
@@ -195,6 +216,9 @@ public sealed class SqliteSaveRepository
         return true;
     }
 
+    /// <summary>
+    /// 列出全部存档槽摘要。
+    /// </summary>
     public IReadOnlyList<SaveSlotSummary> ListSlots()
     {
         EnsureInitialized();
@@ -233,6 +257,9 @@ public sealed class SqliteSaveRepository
         return slots;
     }
 
+    /// <summary>
+    /// 重命名存档槽。
+    /// </summary>
     public bool RenameSlot(string slotKey, string slotName)
     {
         EnsureInitialized();
@@ -252,6 +279,9 @@ public sealed class SqliteSaveRepository
         return command.ExecuteNonQuery() > 0;
     }
 
+    /// <summary>
+    /// 删除指定存档槽（联动删除快照）。
+    /// </summary>
     public bool DeleteSlot(string slotKey)
     {
         EnsureInitialized();
@@ -263,6 +293,9 @@ public sealed class SqliteSaveRepository
         return command.ExecuteNonQuery() > 0;
     }
 
+    /// <summary>
+    /// 初始化原生 SQLite（避免多线程重复初始化）。
+    /// </summary>
     private static void EnsureNativeSqliteInitialized()
     {
         if (_nativeSqliteInitialized)
@@ -282,6 +315,9 @@ public sealed class SqliteSaveRepository
         }
     }
 
+    /// <summary>
+    /// 打开连接并启用外键约束。
+    /// </summary>
     private SqliteConnection OpenConnection()
     {
         var connection = new SqliteConnection(_connectionString);
@@ -294,6 +330,9 @@ public sealed class SqliteSaveRepository
         return connection;
     }
 
+    /// <summary>
+    /// 插入或更新存档槽，返回槽位 ID。
+    /// </summary>
     private static long UpsertSlot(
         SqliteConnection connection,
         SqliteTransaction transaction,
@@ -386,6 +425,9 @@ public sealed class SqliteSaveRepository
         return Convert.ToInt64(selectCommand.ExecuteScalar() ?? 0);
     }
 
+    /// <summary>
+    /// 新增一条存档快照。
+    /// </summary>
     private static void InsertSnapshot(
         SqliteConnection connection,
         SqliteTransaction transaction,
@@ -417,6 +459,9 @@ public sealed class SqliteSaveRepository
         command.ExecuteNonQuery();
     }
 
+    /// <summary>
+    /// 读取槽位摘要（用于 UI 展示）。
+    /// </summary>
     private static SaveSlotSummary GetSlotSummary(SqliteConnection connection, SqliteTransaction transaction, long slotId)
     {
         using var command = connection.CreateCommand();
@@ -454,6 +499,9 @@ public sealed class SqliteSaveRepository
         return ReadSlotSummary(reader);
     }
 
+    /// <summary>
+    /// 从 Reader 中解析槽位摘要。
+    /// </summary>
     private static SaveSlotSummary ReadSlotSummary(SqliteDataReader reader)
     {
         return new SaveSlotSummary
@@ -476,6 +524,9 @@ public sealed class SqliteSaveRepository
         };
     }
 
+    /// <summary>
+    /// 从 Reader 中解析快照记录。
+    /// </summary>
     private static SaveSnapshotRecord ReadSnapshotRecord(SqliteDataReader reader)
     {
         return new SaveSnapshotRecord
@@ -488,6 +539,9 @@ public sealed class SqliteSaveRepository
         };
     }
 
+    /// <summary>
+    /// 解析 UTC 时间戳（失败时回退当前时间）。
+    /// </summary>
     private static DateTime ReadUtcDateTime(SqliteDataReader reader, string columnName)
     {
         var raw = reader.GetString(reader.GetOrdinal(columnName));

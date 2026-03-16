@@ -180,6 +180,34 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
+[node name="BackpackRow" type="HBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent" unique_id=1208424189]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BackpackSummaryLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/BackpackRow" unique_id=248232655]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "外务行囊：灵石 0 · 天材 0"
+
+[node name="BackpackStashButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/BackpackRow" unique_id=1958746106]
+custom_minimum_size = Vector2(120, 36)
+layout_mode = 2
+text = "交回宗库"
+
+[node name="WorkshopRow" type="HBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent" unique_id=1029384756]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="WorkshopSummaryLabel" type="Label" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/WorkshopRow" unique_id=923847561]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "工坊成品：阵旗 0"
+
+[node name="WorkshopStashButton" type="Button" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/WorkshopRow" unique_id=1293847560]
+custom_minimum_size = Vector2(120, 36)
+layout_mode = 2
+text = "成品入库"
+
 [node name="BodyRow" type="HBoxContainer" parent="CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn" unique_id=1773600108]
 layout_mode = 2
 size_flags_vertical = 3

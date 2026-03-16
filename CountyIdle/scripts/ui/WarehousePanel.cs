@@ -114,6 +114,10 @@ private static readonly ResourceSlotDefinition[] ResourceSlots =
 	private Label _hintLabel = null!;
 	private Label _warehouseStatusValue = null!;
 	private Label _capacityValueLabel = null!;
+	private Label _backpackSummaryLabel = null!;
+	private Button _backpackStashButton = null!;
+	private Label _workshopCraftedSummaryLabel = null!;
+	private Button _workshopCraftedStashButton = null!;
 	private ScrollContainer _inventoryScroll = null!;
 	private GridContainer _inventoryGrid = null!;
 	private PanelContainer _resourceSlotTemplate = null!;
@@ -149,12 +153,18 @@ private static readonly ResourceSlotDefinition[] ResourceSlots =
 	public event Action? BuildMasonryChainRequested;
 	public event Action? BuildMedicinalChainRequested;
 	public event Action? BuildFiberChainRequested;
+	public event Action? StashBackpackRequested;
+	public event Action? StashWorkshopCraftedRequested;
 
 	public override void _Ready()
 	{
 		_hintLabel = GetNode<Label>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/StatusRow/StatusTextColumn/HintLabel");
 		_warehouseStatusValue = GetNode<Label>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/StatusRow/StatusTextColumn/WarehouseStatusValue");
 		_capacityValueLabel = GetNode<Label>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/StatusRow/CapacityValueLabel");
+		_backpackSummaryLabel = GetNode<Label>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/BackpackRow/BackpackSummaryLabel");
+		_backpackStashButton = GetNode<Button>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/BackpackRow/BackpackStashButton");
+		_workshopCraftedSummaryLabel = GetNode<Label>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/WorkshopRow/WorkshopSummaryLabel");
+		_workshopCraftedStashButton = GetNode<Button>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/StatusSection/StatusMargin/StatusContent/WorkshopRow/WorkshopStashButton");
 		_inventoryScroll = GetNode<ScrollContainer>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/InventoryScroll");
 		_inventoryGrid = GetNode<GridContainer>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/InventoryScroll/InventoryGrid");
 		_resourceSlotTemplate = GetNode<PanelContainer>("CenterLayer/LedgerWrapper/FrameRow/Paper/PaperMargin/MainColumn/BodyRow/InventoryArea/ResourceSlotTemplate");
@@ -238,6 +248,8 @@ private static readonly ResourceSlotDefinition[] ResourceSlots =
 		_capacityValueLabel.TooltipText = $"余量 {Math.Max(capacity - used, 0):0}";
 
 		CallVisualFx("apply_capacity_visual", _warehouseLoadRate);
+		RefreshBackpackState(state);
+		RefreshWorkshopCraftedState(state);
 		RefreshInventoryState(state);
 		RefreshActionButtons(state);
 		RefreshPopupHint();
@@ -260,6 +272,8 @@ private static readonly ResourceSlotDefinition[] ResourceSlots =
 		_buildMasonryChainButton.Pressed += () => HandleWarehouseAction("已改定引星阵章程，请留意青罡石料与护山构件盈缺。", BuildMasonryChainRequested);
 		_buildMedicinalChainButton.Pressed += () => HandleWarehouseAction("已改定五行阵章程，请留意灵草、卤水与丹散出入。", BuildMedicinalChainRequested);
 		_buildFiberChainButton.Pressed += () => HandleWarehouseAction("已改定炼魔阵章程，请留意麻料、皮裘与袍服出入。", BuildFiberChainRequested);
+		_backpackStashButton.Pressed += HandleBackpackStashPressed;
+		_workshopCraftedStashButton.Pressed += HandleWorkshopCraftedStashPressed;
 	}
 
 	protected override string GetPopupHintText()
@@ -389,6 +403,65 @@ private static readonly ResourceSlotDefinition[] ResourceSlots =
 		_buildMasonryChainButton.Text = $"布置 引星阵 · {ToChineseTier(state.MasonryChainLevel)}阶";
 		_buildMedicinalChainButton.Text = $"布置 五行阵 · {ToChineseTier(state.MedicinalChainLevel)}阶";
 		_buildFiberChainButton.Text = $"布置 炼魔阵 · {ToChineseTier(state.FiberChainLevel)}阶";
+	}
+
+	private void RefreshBackpackState(GameState state)
+	{
+		var (gold, rare) = DiscipleBackpackRules.GetSummary(state);
+		_backpackSummaryLabel.Text =
+			$"外务行囊：{MaterialSemanticRules.GetDisplayName(nameof(GameState.Gold))} {gold:N0} · {MaterialSemanticRules.GetDisplayName(nameof(GameState.RareMaterial))} {rare:N0}";
+		_backpackSummaryLabel.TooltipText = "外务与历练队伍随行携回的行囊物资，需交回宗库后方计入仓储。";
+
+		var hasLoot = gold > 0 || rare > 0;
+		_backpackStashButton.Disabled = !hasLoot;
+		_backpackStashButton.Text = hasLoot ? "交回宗库" : "行囊待空";
+		_backpackStashButton.TooltipText = hasLoot ? "将行囊物资交回宗库，纳入须弥库存。" : "当前暂无可交回物资。";
+	}
+
+	private void RefreshWorkshopCraftedState(GameState state)
+	{
+		var entries = WorkshopCraftedInventoryRules.GetSummaryEntries(state);
+		_workshopCraftedSummaryLabel.TooltipText = "工坊手动祭炼的成品先暂存于炉室，需交回宗库后方计入仓储。";
+
+		if (entries.Count == 0)
+		{
+			_workshopCraftedSummaryLabel.Text = "工坊成品：暂无";
+			_workshopCraftedStashButton.Disabled = true;
+			_workshopCraftedStashButton.Text = "成品待空";
+			_workshopCraftedStashButton.TooltipText = "当前暂无可入库成品。";
+			return;
+		}
+
+		var summary = string.Join("、", entries.Select(entry =>
+			$"{MaterialSemanticRules.GetDisplayName(entry.Key)} {entry.Amount:N0}"));
+		_workshopCraftedSummaryLabel.Text = $"工坊成品：{summary}";
+		_workshopCraftedStashButton.Disabled = false;
+		_workshopCraftedStashButton.Text = "成品入库";
+		_workshopCraftedStashButton.TooltipText = "将工坊成品交回宗库，纳入须弥库存。";
+	}
+
+	private void HandleBackpackStashPressed()
+	{
+		if (_latestState == null || !DiscipleBackpackRules.HasAnyLoot(_latestState))
+		{
+			CallVisualFx("play_invalid_feedback");
+			ShowPopupStatusMessage("外务行囊暂无可交回物资。");
+			return;
+		}
+
+		HandleWarehouseAction("已交回外务行囊，请查收入库记录。", StashBackpackRequested);
+	}
+
+	private void HandleWorkshopCraftedStashPressed()
+	{
+		if (_latestState == null || !WorkshopCraftedInventoryRules.HasAnyCrafted(_latestState))
+		{
+			CallVisualFx("play_invalid_feedback");
+			ShowPopupStatusMessage("工坊成品暂无可入库成品。");
+			return;
+		}
+
+		HandleWarehouseAction("已交回工坊成品，请查收入库记录。", StashWorkshopCraftedRequested);
 	}
 
 	private Control CreateResourceSlot(ResourceSlotDefinition slot)

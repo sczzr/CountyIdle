@@ -4,21 +4,26 @@ using CountyIdle.Models;
 
 namespace CountyIdle.Systems;
 
+// 装备掉落与评分系统
 public class EquipmentSystem
 {
+    // 掉落概率控制
     private const double MinDropChance = 0.35;
     private const double MaxDropChance = 0.80;
     private const double BaseDropChance = 0.35;
     private const double DepthDropChanceFactor = 0.03;
 
+    // 词缀概率与评分控制
     private const double MinAffixChance = 0.22;
     private const double MaxAffixChance = 0.60;
     private const double BaseAffixChance = 0.22;
     private const double DepthAffixChanceFactor = 0.015;
     private const double AffixScoreMultiplier = 1.35;
 
+    // 随机数发生器
     private readonly RandomNumberGenerator _rng = new();
 
+    // 装备稀有度
     private enum GearRarity
     {
         Common,
@@ -27,11 +32,13 @@ public class EquipmentSystem
         Legendary
     }
 
+    // 初始化随机种子
     public EquipmentSystem()
     {
         _rng.Randomize();
     }
 
+    // 尝试结算探索掉落
     public bool TryResolveExplorationDrop(GameState state, out string? log)
     {
         log = null;
@@ -58,6 +65,7 @@ public class EquipmentSystem
         return true;
     }
 
+    // 根据深度滚动稀有度
     private GearRarity RollRarity(int depth)
     {
         var commonWeight = Math.Max(20.0, 62.0 - (depth * 2.0));
@@ -88,6 +96,7 @@ public class EquipmentSystem
         return GearRarity.Legendary;
     }
 
+    // 获取稀有度基础评分
     private static double GetBaseScoreGain(GearRarity rarity)
     {
         return rarity switch
@@ -100,6 +109,7 @@ public class EquipmentSystem
         };
     }
 
+    // 获取稀有度显示名
     private static string GetRarityDisplayName(GearRarity rarity)
     {
         return rarity switch
@@ -112,6 +122,7 @@ public class EquipmentSystem
         };
     }
 
+    // 递增对应稀有度数量
     private static void IncrementGearCount(GameState state, GearRarity rarity)
     {
         switch (rarity)
@@ -131,6 +142,7 @@ public class EquipmentSystem
         }
     }
 
+    // 随机词缀名称
     private string RollAffixName()
     {
         return _rng.RandiRange(0, 3) switch

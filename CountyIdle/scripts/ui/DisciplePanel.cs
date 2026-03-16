@@ -456,7 +456,7 @@ public partial class DisciplePanel : PopupPanelBase
 
 		_profileNameLabel.Text = profile.Name;
 		_profileMetaLabel.Text =
-			$"身份：{identityTag}  |  功法：{techniqueTag}  |  技艺：{skillTag}\n骨龄：{profile.AgeText}  |  籍录：{ResolveRosterPeakTitle(profile)} / {ResolveRosterHallTitle(profile)}  |  职：{profile.DutyDisplayName}  |  谱位：{profile.RankName}\n交互：{directiveText}";
+			$"身份：{identityTag}  |  修为：{profile.RealmName}  |  功法：{techniqueTag}  |  技艺：{skillTag}\n骨龄：{profile.AgeText}  |  籍录：{ResolveRosterPeakTitle(profile)} / {ResolveRosterHallTitle(profile)}  |  职：{profile.DutyDisplayName}  |  谱位：{profile.RankName}\n交互：{directiveText}";
 		_rootCircleLabel.Text = ResolveRootSummary(profile);
 		_realmStatusLabel.Text = $"修为境界：{profile.RealmName}";
 		_realmProgressBar.Value = ResolveRealmProgress(profile);
@@ -981,6 +981,18 @@ public partial class DisciplePanel : PopupPanelBase
 				: "待符种蕴养中";
 	}
 
+	private static string ResolveEquipmentSummary(DiscipleProfile profile)
+	{
+		var equipment = profile.EquipmentProfile;
+		if (equipment == null)
+		{
+			return "暂无记载";
+		}
+
+		var summary = $"{equipment.WeaponName} / {equipment.ArmorName} · {equipment.RelicName} · {equipment.TalismanName}";
+		return $"{summary}（{equipment.QualityTag} · 战备 {equipment.GearScore}）";
+	}
+
 	private static int ResolveQiSeaProgress(DiscipleProfile profile)
 	{
 		var progress = ((profile.Health * 2) + profile.Mood + profile.Potential + (profile.RealmTier * 10)) / 5;
@@ -992,7 +1004,126 @@ public partial class DisciplePanel : PopupPanelBase
 		return ToChineseProgressText(ResolveQiSeaProgress(profile));
 	}
 
-	private static string BuildAnnotation(DiscipleProfile profile)
+	private static string ResolvePotentialSeal(DiscipleProfile profile)
+	{
+		return profile.Potential switch
+		{
+			>= 88 => "根骨上乘",
+			>= 72 => "根骨中上",
+			>= 56 => "根骨可塑",
+			>= 40 => "根骨尚稳",
+			_ => "根骨薄弱"
+		};
+	}
+
+	private static string ResolveBodySeal(DiscipleProfile profile)
+	{
+		return profile.Health switch
+		{
+			>= 82 => "气血充盈",
+			>= 64 => "气血稳实",
+			>= 46 => "气血稍浮",
+			_ => "气血失衡"
+		};
+	}
+
+	private static string ResolveHeartSeal(DiscipleProfile profile)
+	{
+		var heartState = ResolveHeartState(profile);
+		return heartState switch
+		{
+			>= 82 => "心境澄明",
+			>= 64 => "心境安定",
+			>= 46 => "心境浮动",
+			_ => "心境躁乱"
+		};
+	}
+
+	private static string ResolveTrainingFocus(DiscipleProfile profile)
+	{
+		var focuses = new (string Label, int Value)[]
+		{
+			("悟性", profile.Insight),
+			("潜力", profile.Potential),
+			("匠艺", profile.Craft),
+			("战修", profile.Combat),
+			("执行", profile.Execution),
+			("贡献", profile.Contribution)
+		};
+
+		var topFocuses = focuses
+			.OrderByDescending(item => item.Value)
+			.ThenBy(item => item.Label, StringComparer.Ordinal)
+			.Take(2)
+			.Select(item => item.Label)
+			.ToArray();
+
+		return topFocuses.Length == 0 ? "暂无判定" : string.Join(" · ", topFocuses);
+	}
+
+	private static string ResolveCultivationPlan(DiscipleProfile profile)
+	{
+		if (profile.AgeBand == DiscipleAgeBand.Seedling)
+		{
+			return "启蒙课业为主，稳固根基。";
+		}
+
+		var focus = ResolveTrainingFocus(profile);
+		var focusText = focus == "暂无判定" ? "主线稳修" : $"兼修 {focus}";
+		return profile.DirectiveType switch
+		{
+			DiscipleDirectiveType.OuterMissionCandidate => $"外务历练为主，{focusText}。",
+			DiscipleDirectiveType.StewardCandidate => $"内务磨砺为主，{focusText}。",
+			_ => $"常制稳修，{focusText}。"
+		};
+	}
+
+	private static string ResolveRealmStageTag(DiscipleProfile profile)
+	{
+		var realmName = profile.RealmName;
+		if (realmName.Contains("炼气", StringComparison.Ordinal))
+		{
+			return "初阶·炼气";
+		}
+
+		if (realmName.Contains("筑基", StringComparison.Ordinal))
+		{
+			return "初阶·筑基";
+		}
+
+		if (realmName.Contains("金丹", StringComparison.Ordinal))
+		{
+			return "中阶·金丹";
+		}
+
+		if (realmName.Contains("元婴", StringComparison.Ordinal))
+		{
+			return "中阶·元婴";
+		}
+
+		if (realmName.Contains("化神", StringComparison.Ordinal))
+		{
+			return "高阶·化神";
+		}
+
+		return realmName.Contains("凡俗", StringComparison.Ordinal) ? "未入门" : "境界未明";
+	}
+
+	private static string BuildResumeDigest(DiscipleProfile profile)
+	{
+		if (profile.AgeBand == DiscipleAgeBand.Seedling)
+		{
+			return $"启蒙新苗，随“{profile.CurrentAssignment}”研习，居 {profile.ResidenceName}。";
+		}
+
+		var peakSummary = string.IsNullOrWhiteSpace(profile.LinkedPeakSummary)
+			? "峰脉未定"
+			: profile.LinkedPeakSummary;
+
+		return $"现任{profile.DutyDisplayName}，主线“{profile.CurrentAssignment}”，居 {profile.ResidenceName}，归 {peakSummary}。";
+	}
+
+	private string BuildAnnotation(DiscipleProfile profile)
 	{
 		var primaryTrait = profile.TraitSummary
 			.Split('/', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
@@ -1001,29 +1132,49 @@ public partial class DisciplePanel : PopupPanelBase
 		return $"观其气机，{primaryTrait}，骨相与心识相济。现下以“{profile.CurrentAssignment}”为主线，{profile.Note} 若能继续借 {ResolveRosterPeakTitle(profile)} {ResolveRosterHallTitle(profile)} 之务磨砺，则在 {profile.RealmName} 上尚可再进一步。";
 	}
 
-	private static string BuildFullInfoText(DiscipleProfile profile, string identityTag, string techniqueTag, string skillTag)
+	private string BuildFullInfoText(DiscipleProfile profile, string identityTag, string techniqueTag, string skillTag)
 	{
 		var secondarySkillTag = ResolveSecondarySkillTag(profile);
 		var eliteText = profile.IsElite ? "已入真传卷" : "未入真传卷";
 		var directiveText = DiscipleDirectiveRules.GetDirectiveDisplayName(profile.DirectiveType);
 		var directiveEffect = DiscipleDirectiveRules.GetDirectiveShortEffect(profile.DirectiveType);
+		var overviewLine = $"{identityTag} · {profile.RealmName} · {techniqueTag} · {skillTag}";
+		var rootSummaryLine = ResolveRootSummary(profile).Replace("\n", " · ");
 		var detailLines = new[]
 		{
+			$"[b]概览[/b]：{overviewLine}",
 			$"[b]卷册编号[/b]：第 {profile.Id} 号",
+			string.Empty,
+			"[b]身份与籍录[/b]",
 			$"[b]姓名[/b]：{profile.Name}",
-			$"[b]身份[/b]：{identityTag}",
 			$"[b]谱位[/b]：{profile.RankName} · {eliteText}",
 			$"[b]骨龄[/b]：{profile.AgeText}",
-			$"[b]修为[/b]：{profile.RealmName}（层级 {profile.RealmTier}）",
-			$"[b]功法[/b]：{techniqueTag}",
-			$"[b]主修技艺[/b]：{skillTag}",
-			$"[b]辅修技艺[/b]：{secondarySkillTag}",
-			$"[b]交互指令[/b]：{directiveText}（{directiveEffect}）",
 			$"[b]职司[/b]：{profile.DutyDisplayName}",
 			$"[b]当前差事[/b]：{profile.CurrentAssignment}",
 			$"[b]居所[/b]：{profile.ResidenceName}",
 			$"[b]关联峰脉[/b]：{profile.LinkedPeakSummary}",
+			$"[b]履历侧记[/b]：{BuildResumeDigest(profile)}",
+			string.Empty,
+			"[b]修为与功法[/b]",
+			$"[b]修为[/b]：{profile.RealmName}（层级 {profile.RealmTier}）",
+			$"[b]修行阶段[/b]：{ResolveRealmStageTag(profile)}",
+			$"[b]修为进度[/b]：{ResolveRealmProgressText(profile)}",
+			$"[b]气海蓄量[/b]：{ResolveQiSeaText(profile)}",
+			$"[b]战力评定[/b]：{ResolveCombatSeal(profile)}（{ResolveCombatSealHint(profile)}）",
+			$"[b]装备/法器[/b]：{ResolveEquipmentSummary(profile)}",
+			$"[b]灵根摘要[/b]：{rootSummaryLine}",
+			$"[b]根骨评语[/b]：{ResolvePotentialSeal(profile)}",
+			$"[b]功法[/b]：{techniqueTag}",
+			$"[b]主修技艺[/b]：{skillTag}",
+			$"[b]辅修技艺[/b]：{secondarySkillTag}",
+			$"[b]修行安排[/b]：{ResolveCultivationPlan(profile)}",
+			string.Empty,
+			"[b]性情与指标[/b]",
+			$"[b]交互指令[/b]：{directiveText}（{directiveEffect}）",
 			$"[b]性情印记[/b]：{profile.TraitSummary}",
+			$"[b]心境评语[/b]：{ResolveHeartSeal(profile)}",
+			$"[b]体魄评语[/b]：{ResolveBodySeal(profile)}",
+			$"[b]培养侧重[/b]：{ResolveTrainingFocus(profile)}",
 			$"[b]气血 / 心境 / 潜力 / 战力[/b]：{profile.Health} / {profile.Mood} / {profile.Potential} / {profile.Combat}",
 			$"[b]匠艺 / 悟性 / 执行 / 贡献[/b]：{profile.Craft} / {profile.Insight} / {profile.Execution} / {profile.Contribution}",
 			$"[b]培养批注[/b]：{profile.Note}"

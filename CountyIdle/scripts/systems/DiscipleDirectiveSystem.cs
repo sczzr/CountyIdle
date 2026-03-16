@@ -3,13 +3,16 @@ using CountyIdle.Models;
 
 namespace CountyIdle.Systems;
 
+// 弟子指令业务流程
 public sealed class DiscipleDirectiveSystem
 {
+    // 确保指令数据结构初始化
     public void EnsureDefaults(GameState state)
     {
         DiscipleDirectiveRules.EnsureDefaults(state);
     }
 
+    // 设置弟子指令并输出日志
     public bool SetDirective(GameState state, int discipleId, DiscipleDirectiveType directiveType, out string log)
     {
         DiscipleDirectiveRules.EnsureDefaults(state);

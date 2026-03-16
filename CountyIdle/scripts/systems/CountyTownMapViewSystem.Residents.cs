@@ -7,12 +7,15 @@ namespace CountyIdle.Systems;
 
 public partial class CountyTownMapViewSystem
 {
+    // 居民贴图路径
     private const string FarmerResidentSpritePath = "res://assets/characters/residents/resident_farmer.png";
     private const string WorkerResidentSpritePath = "res://assets/characters/residents/resident_worker.png";
     private const string MerchantResidentSpritePath = "res://assets/characters/residents/resident_merchant.png";
     private const string ScholarResidentSpritePath = "res://assets/characters/residents/resident_scholar.png";
+    // 一日分钟数
     private const int MinutesPerDay = 24 * 60;
 
+    // 居民活动阶段
     private enum ResidentActivityPhase
     {
         AtHome,
@@ -23,6 +26,7 @@ public partial class CountyTownMapViewSystem
         CommuteHome
     }
 
+    // 居民日程时间表
     private readonly record struct ResidentSchedule(
         int LeaveHomeMinute,
         int ArriveWorkMinute,
@@ -31,11 +35,13 @@ public partial class CountyTownMapViewSystem
         int LeaveLeisureMinute,
         int ArriveHomeMinute);
 
+    // 居民绘制姿态
     private readonly record struct ResidentPose(
         Vector2 Position,
         Color Modulate,
         float ShadowScale);
 
+    // 居民行走实体
     private sealed class ResidentWalker
     {
         public JobType JobType { get; init; }
@@ -54,21 +60,31 @@ public partial class CountyTownMapViewSystem
         public Color BadgeColor { get; init; }
     }
 
+    // 居民阴影颜色
     private static readonly Color ResidentShadowColor = new(0.08f, 0.07f, 0.06f, 0.34f);
+    // 居民绘制列表
     private readonly List<ResidentWalker> _residentWalkers = new();
+    // 职业贴图缓存
     private readonly Dictionary<JobType, Texture2D> _residentTextures = new();
 
+    // 分配提示
     private int _residentFarmerHint;
     private int _residentWorkerHint;
     private int _residentMerchantHint;
     private int _residentScholarHint;
+    // 居民总量分桶
     private int _residentPopulationBucket;
+    // 当前居民时钟（游戏分钟）
     private int _currentResidentGameMinutes;
     private int _lastResidentClockMinute = -1;
+    // 分钟内插值
     private float _currentMinuteInterpolation;
+    // 居民时间流速
     private float _residentTimeScale = 1.0f;
+    // 数据来源快照
     private GameState _residentSourceState = new();
 
+    // 每帧更新：处理平移、缩放、居民动画
     public override void _Process(double delta)
     {
         var dt = (float)delta;
@@ -106,6 +122,7 @@ public partial class CountyTownMapViewSystem
             }
         }
 
+        // 居民存在时推进时间插值
         if (_residentWalkers.Count > 0)
         {
             _currentMinuteInterpolation = Math.Clamp(_currentMinuteInterpolation + (dt * _residentTimeScale), 0f, 0.999f);
@@ -123,6 +140,7 @@ public partial class CountyTownMapViewSystem
         }
     }
 
+    // 设置居民时钟（外部驱动）
     public void SetResidentClock(int gameMinutes, float timeScale)
     {
         if (_residentWalkers.Count == 0)
@@ -142,6 +160,7 @@ public partial class CountyTownMapViewSystem
         _residentTimeScale = Math.Clamp(timeScale, 1.0f, 4.0f);
     }
 
+    // 刷新居民数据（通常在状态变化后调用）
     public void RefreshResidents(GameState state)
     {
         _residentSourceState = state.Clone();
@@ -154,6 +173,7 @@ public partial class CountyTownMapViewSystem
         QueueRedraw();
     }
 
+    // 重新生成居民行走列表
     private void RebuildResidents()
     {
         _residentWalkers.Clear();
@@ -175,6 +195,7 @@ public partial class CountyTownMapViewSystem
 
         EnsureResidentTextures();
 
+        // 根据人口提示估算可见人数
         var visibleResidents = Math.Clamp(_populationHint / 12, 8, 24);
         var allocations = BuildResidentAllocations(visibleResidents);
         var residenceCursor = 0;
@@ -191,6 +212,7 @@ public partial class CountyTownMapViewSystem
                 var leisureRoadCell = PickLeisureRoadCell(roadCells, leisureAnchors, walkerIndex);
                 var profile = DequeueResidentProfile(profileQueues, allocation.Key, walkerIndex);
 
+                // 构造居民行走实体
                 _residentWalkers.Add(new ResidentWalker
                 {
                     JobType = allocation.Key,
@@ -221,6 +243,7 @@ public partial class CountyTownMapViewSystem
         }
     }
 
+    // 按职业占比生成可见居民分配
     private Dictionary<JobType, int> BuildResidentAllocations(int visibleResidents)
     {
         var source = new Dictionary<JobType, int>
@@ -282,6 +305,7 @@ public partial class CountyTownMapViewSystem
         return result;
     }
 
+    // 构建锚点类型索引
     private Dictionary<TownActivityAnchorType, List<TownActivityAnchorData>> BuildActivityAnchorLookup()
     {
         var lookup = new Dictionary<TownActivityAnchorType, List<TownActivityAnchorData>>();
@@ -304,6 +328,7 @@ public partial class CountyTownMapViewSystem
         return lookup;
     }
 
+    // 绘制居民
     private void DrawResidents(TownMapData mapData, Vector2 origin)
     {
         if (_residentWalkers.Count == 0)
@@ -337,6 +362,7 @@ public partial class CountyTownMapViewSystem
                 Math.Max(1.0f, ScaleValue(1.3f)),
                 entry.Walker.BadgeColor * entry.Pose.Modulate.A);
 
+            // 选中弟子描边
             if (_selectedResidentDiscipleId.HasValue && entry.Walker.Profile.Id == _selectedResidentDiscipleId.Value)
             {
                 DrawArc(
@@ -352,6 +378,7 @@ public partial class CountyTownMapViewSystem
         }
     }
 
+    // 处理居民点击选中
     private bool HandleResidentSelection(Vector2 localPosition)
     {
         if (_mapData == null || _residentWalkers.Count == 0)
@@ -374,6 +401,7 @@ public partial class CountyTownMapViewSystem
         return true;
     }
 
+    // 构建选中居民提示文本
     private string? TryBuildSelectedResidentHint()
     {
         var walker = GetSelectedResidentWalker();
@@ -386,6 +414,7 @@ public partial class CountyTownMapViewSystem
         return $"{walker.Profile.Name} · {walker.Profile.RankName} · {walker.Profile.DutyDisplayName} · {walker.Profile.RealmName}\n当前{phaseText}，已联动弟子谱定位该弟子。";
     }
 
+    // 选中锚点时尝试定位代表居民
     private void TryInspectAnchorResidents(TownActivityAnchorData anchor)
     {
         var representativeWalker = ResolveRepresentativeWalkerForAnchor(anchor);
@@ -399,6 +428,7 @@ public partial class CountyTownMapViewSystem
         RequestDiscipleInspection(representativeWalker.Profile.Id, representativeWalker.JobType);
     }
 
+    // 获取居民在当前时刻的姿态
     private ResidentPose GetResidentPose(ResidentWalker walker, Vector2 origin)
     {
         var minuteOfDay = GetResidentMinuteOfDay(walker);
@@ -443,12 +473,14 @@ public partial class CountyTownMapViewSystem
         return new ResidentPose(homewardPosition, Colors.White, 1.0f);
     }
 
+    // 计算居民当前日内分钟数
     private float GetResidentMinuteOfDay(ResidentWalker walker)
     {
         var totalMinutes = _currentResidentGameMinutes + _currentMinuteInterpolation;
         return Modulo(totalMinutes + walker.ScheduleOffsetMinutes, MinutesPerDay);
     }
 
+    // 获取居民所处阶段
     private ResidentActivityPhase GetResidentActivityPhase(ResidentWalker walker)
     {
         var minuteOfDay = GetResidentMinuteOfDay(walker);
@@ -482,6 +514,7 @@ public partial class CountyTownMapViewSystem
         return ResidentActivityPhase.CommuteHome;
     }
 
+    // 统计锚点分配人数
     private int GetAssignedResidentCount(TownActivityAnchorData anchor)
     {
         var count = 0;
@@ -496,6 +529,7 @@ public partial class CountyTownMapViewSystem
         return count;
     }
 
+    // 统计锚点当前到场人数
     private int GetPresentResidentCount(TownActivityAnchorData anchor)
     {
         var count = 0;
@@ -517,6 +551,7 @@ public partial class CountyTownMapViewSystem
         return count;
     }
 
+    // 统计锚点在途人数
     private int GetInboundResidentCount(TownActivityAnchorData anchor)
     {
         var count = 0;
@@ -538,6 +573,7 @@ public partial class CountyTownMapViewSystem
         return count;
     }
 
+    // 判断居民是否分配到锚点
     private static bool IsResidentAssignedToAnchor(ResidentWalker walker, TownActivityAnchorData anchor)
     {
         return anchor.AnchorType == TownActivityAnchorType.Leisure
@@ -545,12 +581,14 @@ public partial class CountyTownMapViewSystem
             : walker.WorkRoadCell == anchor.RoadCell;
     }
 
+    // 模运算（处理负数）
     private static float Modulo(float value, int mod)
     {
         var result = value % mod;
         return result < 0 ? result + mod : result;
     }
 
+    // 获取职业对应的日程
     private static ResidentSchedule GetScheduleForJob(JobType jobType)
     {
         return jobType switch
@@ -563,6 +601,7 @@ public partial class CountyTownMapViewSystem
         };
     }
 
+    // 活动阶段文本
     private string GetResidentActivityPhaseText(ResidentWalker walker)
     {
         return GetResidentActivityPhase(walker) switch
@@ -577,12 +616,14 @@ public partial class CountyTownMapViewSystem
         };
     }
 
+    // 计算阶段进度
     private static float GetPhaseProgress(float minuteOfDay, int phaseStartMinute, int phaseEndMinute)
     {
         var duration = Math.Max(phaseEndMinute - phaseStartMinute, 1);
         return Math.Clamp((minuteOfDay - phaseStartMinute) / duration, 0f, 1f);
     }
 
+    // 根据路线与进度获取插值位置
     private Vector2 GetRoutePosition(List<Vector2I> routeCells, float progress, Vector2 origin)
     {
         if (routeCells.Count == 0)
@@ -604,6 +645,7 @@ public partial class CountyTownMapViewSystem
         return from.Lerp(to, localProgress);
     }
 
+    // 根据点击位置选择居民
     private ResidentWalker? PickResidentAt(Vector2 localPosition, Vector2 origin)
     {
         ResidentWalker? selectedWalker = null;
@@ -631,6 +673,7 @@ public partial class CountyTownMapViewSystem
         return selectedWalker;
     }
 
+    // 构建居民点击判定矩形
     private Rect2 BuildResidentHitRect(ResidentWalker walker, ResidentPose pose)
     {
         var residentSize = new Vector2(
@@ -641,6 +684,7 @@ public partial class CountyTownMapViewSystem
             residentSize).Grow(Math.Max(2.0f, ScaleValue(2.4f)));
     }
 
+    // 根据建筑朝向获取入口道路格
     private Vector2I GetEntranceRoadCell(TownBuildingData building, List<Vector2I> roadCells)
     {
         var expectedRoadCell = building.Cell + GetRoadOffset(building.Facing);
@@ -654,6 +698,7 @@ public partial class CountyTownMapViewSystem
         return FindNearestRoadCell(building.Cell, roadCells);
     }
 
+    // 选择工作道路格
     private Vector2I PickWorkRoadCell(
         JobType jobType,
         List<Vector2I> roadCells,
@@ -711,6 +756,7 @@ public partial class CountyTownMapViewSystem
         return bestCell;
     }
 
+    // 选择休闲道路格
     private Vector2I PickLeisureRoadCell(List<Vector2I> roadCells, List<TownActivityAnchorData> leisureAnchors, int walkerIndex)
     {
         if (leisureAnchors.Count > 0)
@@ -742,6 +788,7 @@ public partial class CountyTownMapViewSystem
         return bestCell;
     }
 
+    // 根据职业映射工作锚点类型
     private static TownActivityAnchorType GetWorkAnchorType(JobType jobType)
     {
         return jobType switch
@@ -754,6 +801,7 @@ public partial class CountyTownMapViewSystem
         };
     }
 
+    // 获取职业徽章颜色
     private static Color GetResidentBadgeColor(JobType jobType)
     {
         return jobType switch
@@ -766,6 +814,7 @@ public partial class CountyTownMapViewSystem
         };
     }
 
+    // 构建弟子档案队列
     private Dictionary<JobType, Queue<DiscipleProfile>> BuildResidentProfileQueues()
     {
         var lookup = new Dictionary<JobType, Queue<DiscipleProfile>>
@@ -789,12 +838,22 @@ public partial class CountyTownMapViewSystem
         return lookup;
     }
 
+    // 取出一个弟子档案（没有则生成占位）
     private DiscipleProfile DequeueResidentProfile(Dictionary<JobType, Queue<DiscipleProfile>> profileQueues, JobType jobType, int walkerIndex)
     {
         if (profileQueues.TryGetValue(jobType, out var queue) && queue.Count > 0)
         {
             return queue.Dequeue();
         }
+
+        var equipmentProfile = DiscipleEquipmentRules.BuildPreviewEquipmentProfile(
+            100000 + walkerIndex,
+            _residentSourceState,
+            jobType,
+            DiscipleAgeBand.Young,
+            1,
+            false,
+            DiscipleDirectiveType.None);
 
         return new DiscipleProfile(
             100000 + walkerIndex,
@@ -820,9 +879,11 @@ public partial class CountyTownMapViewSystem
             "外门居舍",
             SectOrganizationRules.GetLinkedPeakSummary(jobType),
             "状态平稳 / 服从调度",
+            equipmentProfile,
             "当前为地图占位弟子。");
     }
 
+    // 获取当前选中居民
     private ResidentWalker? GetSelectedResidentWalker()
     {
         if (!_selectedResidentDiscipleId.HasValue)
@@ -841,6 +902,7 @@ public partial class CountyTownMapViewSystem
         return null;
     }
 
+    // 为锚点选择一个代表居民
     private ResidentWalker? ResolveRepresentativeWalkerForAnchor(TownActivityAnchorData anchor)
     {
         ResidentWalker? inboundWalker = null;
@@ -872,6 +934,7 @@ public partial class CountyTownMapViewSystem
         return inboundWalker ?? assignedWalker;
     }
 
+    // 根据居民当前阶段找到对应锚点
     private TownActivityAnchorData? FindAnchorForResident(ResidentWalker walker)
     {
         if (_mapData == null)
@@ -909,6 +972,7 @@ public partial class CountyTownMapViewSystem
         return null;
     }
 
+    // 生成占位姓氏
     private static string GetFallbackSurname(int walkerIndex)
     {
         return (walkerIndex % 4) switch
@@ -920,6 +984,7 @@ public partial class CountyTownMapViewSystem
         };
     }
 
+    // 占位职司名称
     private static string GetFallbackDutyDisplayName(JobType jobType)
     {
         return jobType switch
@@ -932,6 +997,7 @@ public partial class CountyTownMapViewSystem
         };
     }
 
+    // 确保居民贴图已加载
     private void EnsureResidentTextures()
     {
         if (_residentTextures.Count > 0)
@@ -957,6 +1023,7 @@ public partial class CountyTownMapViewSystem
             new Color(0.70f, 0.78f, 0.92f, 1.0f));
     }
 
+    // 加载贴图失败时生成占位贴图
     private static Texture2D LoadResidentTextureOrFallback(string path, Color robeColor, Color trimColor)
     {
         if (ResourceLoader.Exists(path))
@@ -971,6 +1038,7 @@ public partial class CountyTownMapViewSystem
         return CreateFallbackResidentTexture(robeColor, trimColor);
     }
 
+    // 生成简单像素占位贴图
     private static Texture2D CreateFallbackResidentTexture(Color robeColor, Color trimColor)
     {
         var image = Image.CreateEmpty(16, 20, false, Image.Format.Rgba8);
@@ -992,6 +1060,7 @@ public partial class CountyTownMapViewSystem
         return ImageTexture.CreateFromImage(image);
     }
 
+    // 在图像上绘制矩形
     private static void FillRect(Image image, int x, int y, int width, int height, Color color)
     {
         for (var drawX = x; drawX < x + width; drawX++)
@@ -1003,6 +1072,7 @@ public partial class CountyTownMapViewSystem
         }
     }
 
+    // 构建直角路线（简化路径）
     private static List<Vector2I> BuildRoute(Vector2I start, Vector2I end)
     {
         var route = new List<Vector2I> { start };
@@ -1023,6 +1093,7 @@ public partial class CountyTownMapViewSystem
         return route;
     }
 
+    // 从道路列表寻找最近道路格
     private Vector2I FindNearestRoadCell(Vector2I source, List<Vector2I> roadCells)
     {
         var bestCell = roadCells[0];
@@ -1041,6 +1112,7 @@ public partial class CountyTownMapViewSystem
         return bestCell;
     }
 
+    // 朝向转换为道路偏移
     private static Vector2I GetRoadOffset(TownFacing facing)
     {
         return facing switch
@@ -1052,6 +1124,7 @@ public partial class CountyTownMapViewSystem
         };
     }
 
+    // 计算格子分布扰动（让居民分散）
     private float GetCellSpread(Vector2I cell, int walkerIndex)
     {
         var hash = (cell.X * 73856093) ^ (cell.Y * 19349663) ^ ((_layoutSeed + walkerIndex) * 83492791);
@@ -1059,6 +1132,7 @@ public partial class CountyTownMapViewSystem
         return normalized * 0.16f;
     }
 
+    // 画椭圆阴影
     private void DrawEllipse(Vector2 center, Vector2 radius, Color color)
     {
         const int steps = 14;

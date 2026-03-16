@@ -117,6 +117,7 @@ public partial class Main : Control
         CreateTaskPanel();
         CreateDisciplePanel();
         CreateCultivationPanel();
+        CreateConstructionPanel();
         CreateSectOrganizationPanel();
         CreateSectNamePanel();
         CreateSaveSlotsPanel();
@@ -147,6 +148,7 @@ public partial class Main : Control
         UnbindTaskPanelEvents();
         UnbindDisciplePanelEvents();
         UnbindCultivationPanelEvents();
+        UnbindConstructionPanelEvents();
         UnbindSectOrganizationPanelEvents();
         UnbindSaveSlotsPanelEvents();
         UnbindSectChroniclePanelEvents();
@@ -227,6 +229,7 @@ public partial class Main : Control
         RefreshTaskPanelPopup(state);
         RefreshDisciplePanelPopup(state);
         RefreshCultivationPanelPopup(state);
+        RefreshConstructionPanelPopup(state);
         RefreshSectOrganizationPanelPopup(state);
         RefreshSectChroniclePanelPopup(state);
         RefreshDemoPanel(state);
@@ -450,6 +453,7 @@ private void ConfigureLegacyBackground()
         BindTaskButtonEvent();
         BindDiscipleButtonEvent();
         BindCultivationButtonEvent();
+        BindConstructionPanelButtonEvent();
         BindSectOrganizationButtonEvent();
         BindSectChronicleEntry();
         BindDiscipleMapInspectionEvent();

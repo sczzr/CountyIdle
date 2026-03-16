@@ -3,8 +3,12 @@ using System.Collections.Generic;
 
 namespace CountyIdle.Models;
 
+/// <summary>
+/// 游戏主状态：存档与结算的权威数据源。
+/// </summary>
 public class GameState
 {
+    // 人口与通勤基础状态
     public int Population { get; set; } = 120;
     public int HousingCapacity { get; set; } = 180;
     public int ElitePopulation { get; set; } = 8;
@@ -45,9 +49,11 @@ public class GameState
     public int Scholars { get; set; } = 8;
     #endregion
 
+    // 民心与威胁
     public double Happiness { get; set; } = 72.0;
     public double Threat { get; set; } = 10.0;
 
+    // 资源与库存（含原料、加工品与产能物资）
     public double Food { get; set; } = 680;
     public double Wood { get; set; } = 220;
     public double Stone { get; set; } = 140;
@@ -81,12 +87,14 @@ public class GameState
     public double IndustrialParts { get; set; } = 0;
     public double ConstructionMaterials { get; set; } = 6;
 
+    // 科技与产出倍率
     public int TechLevel { get; set; } = 0;
     public double FoodProductionMultiplier { get; set; } = 1.0;
     public double IndustryProductionMultiplier { get; set; } = 1.0;
     public double TradeProductionMultiplier { get; set; } = 1.0;
     public double PopulationGrowthMultiplier { get; set; } = 1.0;
 
+    // 探险与装备掉落状态
     public int ExplorationDepth { get; set; } = 1;
     public bool ExplorationEnabled { get; set; } = true;
     public int ExplorationProgressHours { get; set; } = 0;
@@ -97,6 +105,7 @@ public class GameState
     public int LegendaryGearCount { get; set; } = 0;
     public int EventCooldownHours { get; set; } = 0;
 
+    // 建筑与仓储
     public int AgricultureBuildings { get; set; } = 3;
     public int WorkshopBuildings { get; set; } = 2;
     public int ResearchBuildings { get; set; } = 1;
@@ -108,13 +117,19 @@ public class GameState
     public int WarehouseLevel { get; set; } = 1;
     public double WarehouseCapacity { get; set; } = 1200;
 
+    // 时间与运行期状态
     public int GameMinutes { get; set; } = 0;
     public int HourSettlements { get; set; } = 0;
     public Dictionary<string, double> DiscreteInventoryProgress { get; set; } = new();
+    public Dictionary<string, int> DiscipleBackpackInventory { get; set; } = new();
+    public Dictionary<string, int> WorkshopCraftedInventory { get; set; } = new();
+    public Dictionary<string, double> WorkshopCraftedProgress { get; set; } = new();
     public Dictionary<string, int> TaskOrderUnits { get; set; } = new();
     public Dictionary<string, int> TaskResolvedWorkers { get; set; } = new();
     public Dictionary<int, string> DiscipleDirectives { get; set; } = new();
+    public Dictionary<int, DiscipleEquipmentProfile> DiscipleEquipmentProfiles { get; set; } = new();
     public Dictionary<string, int> FormalStewardAppointments { get; set; } = new();
+    // 宗主治理与门规状态
     public string ActiveDevelopmentDirection { get; set; } = string.Empty;
     public string ActiveSectLaw { get; set; } = string.Empty;
     public string ActiveTalentPlan { get; set; } = string.Empty;
@@ -126,6 +141,9 @@ public class GameState
     public string ActivePeakSupport { get; set; } = string.Empty;
     public Dictionary<string, string> SectNameMap { get; set; } = new();
 
+    /// <summary>
+    /// 获取当前已分配到八大技艺的人数总和。
+    /// </summary>
     public int GetAssignedPopulation()
     {
         return FollowersSpiritPlant + 
@@ -138,6 +156,9 @@ public class GameState
                FollowersArcane;
     }
 
+    /// <summary>
+    /// 获取未分配人口（不为负）。
+    /// </summary>
     public int GetUnassignedPopulation()
     {
         return Math.Max(Population - GetAssignedPopulation(), 0);
@@ -161,6 +182,9 @@ public class GameState
         if (FollowersFormation == 0) FollowersFormation = 0;
     }
 
+    /// <summary>
+    /// 计算当前仓储占用（按非负库存累计）。
+    /// </summary>
     public double GetWarehouseUsed()
     {
         return Math.Max(Food, 0) +
@@ -229,19 +253,30 @@ public class GameState
         }
     }
 
+    /// <summary>
+    /// 深拷贝运行态集合，避免 UI 订阅误改原状态。
+    /// </summary>
     public GameState Clone()
     {
         var clone = (GameState)MemberwiseClone();
         clone.DiscreteInventoryProgress = new Dictionary<string, double>(DiscreteInventoryProgress ?? new Dictionary<string, double>());
+        clone.DiscipleBackpackInventory = new Dictionary<string, int>(DiscipleBackpackInventory ?? new Dictionary<string, int>());
+        clone.WorkshopCraftedInventory = new Dictionary<string, int>(WorkshopCraftedInventory ?? new Dictionary<string, int>());
+        clone.WorkshopCraftedProgress = new Dictionary<string, double>(WorkshopCraftedProgress ?? new Dictionary<string, double>());
         clone.TaskOrderUnits = new Dictionary<string, int>(TaskOrderUnits ?? new Dictionary<string, int>());
         clone.TaskResolvedWorkers = new Dictionary<string, int>(TaskResolvedWorkers ?? new Dictionary<string, int>());
         clone.DiscipleDirectives = new Dictionary<int, string>(DiscipleDirectives ?? new Dictionary<int, string>());
+        clone.DiscipleEquipmentProfiles = new Dictionary<int, DiscipleEquipmentProfile>(
+            DiscipleEquipmentProfiles ?? new Dictionary<int, DiscipleEquipmentProfile>());
         clone.FormalStewardAppointments = new Dictionary<string, int>(FormalStewardAppointments ?? new Dictionary<string, int>());
         clone.SectNameMap = new Dictionary<string, string>(SectNameMap ?? new Dictionary<string, string>());
         clone.TownBuildingPlacements = CloneTownBuildingPlacements(TownBuildingPlacements);
         return clone;
     }
 
+    /// <summary>
+    /// 克隆地块建筑落点列表。
+    /// </summary>
     private static List<TownBuildingPlacement> CloneTownBuildingPlacements(
         List<TownBuildingPlacement>? placements)
     {

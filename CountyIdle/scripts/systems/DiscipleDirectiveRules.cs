@@ -5,6 +5,7 @@ using CountyIdle.Models;
 
 namespace CountyIdle.Systems;
 
+// 执事任务指派信息
 public sealed record StewardTaskAppointment(
     int DiscipleId,
     string DiscipleName,
@@ -14,6 +15,7 @@ public sealed record StewardTaskAppointment(
     int Insight,
     int Contribution);
 
+// 执事候补与指派快照
 public sealed class StewardAppointmentSnapshot
 {
     public StewardAppointmentSnapshot(
@@ -30,19 +32,26 @@ public sealed class StewardAppointmentSnapshot
         AverageExecutionModifier = averageExecutionModifier;
     }
 
+    // 按任务索引的指派
     public IReadOnlyDictionary<SectTaskType, StewardTaskAppointment> AppointmentsByTask { get; }
 
+    // 按弟子 ID 索引的指派
     public IReadOnlyDictionary<int, StewardTaskAppointment> AppointmentsByDiscipleId { get; }
 
+    // 候补总数
     public int TotalCandidates { get; }
 
+    // 已指派总数
     public int TotalAssigned { get; }
 
+    // 平均执行修正
     public double AverageExecutionModifier { get; }
 }
 
+// 弟子指令规则（外务候补/执事培养）
 public static class DiscipleDirectiveRules
 {
+    // 确保指令字典有效且规范化
     public static void EnsureDefaults(GameState state)
     {
         state.DiscipleDirectives ??= new Dictionary<int, string>();
@@ -67,6 +76,7 @@ public static class DiscipleDirectiveRules
         state.DiscipleDirectives = normalized;
     }
 
+    // 获取指定弟子的指令类型
     public static DiscipleDirectiveType GetDirective(GameState state, int discipleId)
     {
         EnsureDefaults(state);
@@ -78,6 +88,7 @@ public static class DiscipleDirectiveRules
         return NormalizeDirective(rawDirective);
     }
 
+    // 设置指定弟子的指令类型
     public static void SetDirective(GameState state, int discipleId, DiscipleDirectiveType directiveType)
     {
         EnsureDefaults(state);
@@ -95,6 +106,7 @@ public static class DiscipleDirectiveRules
         state.DiscipleDirectives[discipleId] = directiveType.ToString();
     }
 
+    // 统计某类指令的弟子数量
     public static int GetDirectiveCount(GameState state, DiscipleDirectiveType directiveType)
     {
         if (directiveType == DiscipleDirectiveType.None)
@@ -106,6 +118,7 @@ public static class DiscipleDirectiveRules
         return state.DiscipleDirectives.Count(item => NormalizeDirective(item.Value) == directiveType);
     }
 
+    // 构建指令概览文本
     public static string BuildDirectiveSummary(GameState state)
     {
         EnsureDefaults(state);
@@ -114,6 +127,7 @@ public static class DiscipleDirectiveRules
         return $"外务候补 {outerCount} · 执事培养 {stewardCount}";
     }
 
+    // 获取指令显示名
     public static string GetDirectiveDisplayName(DiscipleDirectiveType directiveType)
     {
         return directiveType switch
@@ -124,6 +138,7 @@ public static class DiscipleDirectiveRules
         };
     }
 
+    // 获取指令短描述
     public static string GetDirectiveShortEffect(DiscipleDirectiveType directiveType)
     {
         return directiveType switch
@@ -134,6 +149,7 @@ public static class DiscipleDirectiveRules
         };
     }
 
+    // 获取指令效果概述
     public static string BuildDirectiveEffectSummary(GameState state, DiscipleDirectiveType directiveType)
     {
         return directiveType switch
@@ -144,6 +160,7 @@ public static class DiscipleDirectiveRules
         };
     }
 
+    // 外务候补带来的队伍战力加成
     public static double GetOuterMissionTeamPowerBonus(GameState state)
     {
         var candidates = GetCandidateProfiles(state, DiscipleDirectiveType.OuterMissionCandidate, 3);
@@ -162,6 +179,7 @@ public static class DiscipleDirectiveRules
         return Math.Min(bonus, 6.0);
     }
 
+    // 外务候补带来的收益修正
     public static double GetOuterMissionLootModifier(GameState state)
     {
         var candidates = GetCandidateProfiles(state, DiscipleDirectiveType.OuterMissionCandidate, 3);
@@ -178,6 +196,7 @@ public static class DiscipleDirectiveRules
         return 1.0 + Math.Min(bonus, 0.12);
     }
 
+    // 执事候补带来的贡献修正
     public static double GetStewardContributionModifier(GameState state)
     {
         var candidates = GetCandidateProfiles(state, DiscipleDirectiveType.StewardCandidate, 4);
@@ -196,6 +215,7 @@ public static class DiscipleDirectiveRules
         return 1.0 + Math.Min(bonus, 0.12);
     }
 
+    // 执事候补带来的执行修正
     public static double GetStewardExecutionModifier(GameState state)
     {
         var appointmentSnapshot = BuildStewardAppointmentSnapshot(state);
@@ -207,6 +227,7 @@ public static class DiscipleDirectiveRules
         return appointmentSnapshot.AverageExecutionModifier;
     }
 
+    // 构建执事指派快照
     public static StewardAppointmentSnapshot BuildStewardAppointmentSnapshot(GameState state)
     {
         var candidates = GetCandidateProfiles(state, DiscipleDirectiveType.StewardCandidate, 6);
@@ -284,11 +305,13 @@ public static class DiscipleDirectiveRules
             averageExecutionModifier);
     }
 
+    // 获取指定任务的执行修正（按当前快照）
     public static double GetStewardTaskExecutionModifier(GameState state, SectTaskType taskType)
     {
         return GetStewardTaskExecutionModifier(BuildStewardAppointmentSnapshot(state), taskType);
     }
 
+    // 从快照中获取指定任务的执行修正
     public static double GetStewardTaskExecutionModifier(StewardAppointmentSnapshot snapshot, SectTaskType taskType)
     {
         return snapshot.AppointmentsByTask.TryGetValue(taskType, out var appointment)
@@ -296,6 +319,7 @@ public static class DiscipleDirectiveRules
             : 1.0;
     }
 
+    // 获取指定任务的执事指派
     public static bool TryGetStewardAppointment(GameState state, SectTaskType taskType, out StewardTaskAppointment? appointment)
     {
         var snapshot = BuildStewardAppointmentSnapshot(state);
@@ -309,6 +333,7 @@ public static class DiscipleDirectiveRules
         return false;
     }
 
+    // 获取指定弟子的执事指派
     public static bool TryGetDiscipleStewardAppointment(GameState state, int discipleId, out StewardTaskAppointment? appointment)
     {
         var snapshot = BuildStewardAppointmentSnapshot(state);
@@ -322,6 +347,7 @@ public static class DiscipleDirectiveRules
         return false;
     }
 
+    // 构建弟子指令效果摘要
     public static string BuildDiscipleDirectiveEffectSummary(GameState state, DiscipleProfile profile)
     {
         return profile.DirectiveType switch
@@ -332,6 +358,7 @@ public static class DiscipleDirectiveRules
         };
     }
 
+    // 外务候补整体效果说明
     private static string BuildOuterMissionSummary(GameState state)
     {
         var count = GetDirectiveCount(state, DiscipleDirectiveType.OuterMissionCandidate);
@@ -345,6 +372,7 @@ public static class DiscipleDirectiveRules
         return $"当前外务候补 {count} 人；历练队伍战力额外 +{teamPowerBonus:0.0}，外务回流额外 +{(lootModifier - 1.0) * 100.0:0.#}%。";
     }
 
+    // 执事候补整体效果说明
     private static string BuildStewardSummary(GameState state)
     {
         var count = GetDirectiveCount(state, DiscipleDirectiveType.StewardCandidate);
@@ -364,6 +392,7 @@ public static class DiscipleDirectiveRules
         return $"当前执事培养 {count} 人；其中 {appointmentSnapshot.TotalAssigned} 人正补位内务，执行效率额外 +{(executionModifier - 1.0) * 100.0:0.#}%，贡献回流额外 +{(contributionModifier - 1.0) * 100.0:0.#}%。";
     }
 
+    // 外务候补弟子效果说明
     private static string BuildOuterMissionDiscipleSummary(GameState state, DiscipleProfile profile)
     {
         var activeCandidates = GetCandidateProfiles(state, DiscipleDirectiveType.OuterMissionCandidate, 3);
@@ -376,6 +405,7 @@ public static class DiscipleDirectiveRules
         return "已入外务候补名册，但当前仍在后备序列，待前列人手轮换时补入。";
     }
 
+    // 执事候补弟子效果说明
     private static string BuildStewardDiscipleSummary(GameState state, DiscipleProfile profile)
     {
         if (TryGetDiscipleStewardAppointment(state, profile.Id, out var appointment) && appointment != null)
@@ -387,6 +417,7 @@ public static class DiscipleDirectiveRules
         return "已入执事培养名册，但当前尚未轮到具体庶务补位。";
     }
 
+    // 计算候补弟子匹配任务的评分
     private static double ScoreStewardCandidateForTask(SectTaskDefinition taskDefinition, DiscipleProfile profile)
     {
         var score =
@@ -413,6 +444,7 @@ public static class DiscipleDirectiveRules
         return score;
     }
 
+    // 计算执事任务执行修正值
     private static double ComputeStewardTaskExecutionModifier(SectTaskDefinition taskDefinition, DiscipleProfile profile)
     {
         var bonus =
@@ -434,6 +466,7 @@ public static class DiscipleDirectiveRules
         return 1.0 + Math.Min(bonus, 0.10);
     }
 
+    // 获取符合条件的候补弟子列表
     private static List<DiscipleProfile> GetCandidateProfiles(GameState state, DiscipleDirectiveType directiveType, int maxCount)
     {
         if (directiveType == DiscipleDirectiveType.None || maxCount <= 0)
@@ -452,6 +485,7 @@ public static class DiscipleDirectiveRules
             .ToList();
     }
 
+    // 解析并规范化指令类型
     private static DiscipleDirectiveType NormalizeDirective(string? rawDirective)
     {
         return Enum.TryParse<DiscipleDirectiveType>(rawDirective, out var parsed)

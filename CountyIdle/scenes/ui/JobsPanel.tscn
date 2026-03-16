@@ -298,6 +298,21 @@ theme_override_font_sizes/font_size = 13
 text = "待选中"
 autowrap_mode = 3
 
+[node name="OpenConstructionButton" type="Button" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/BuildingListBox/BuildingListVBox"]
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_colors/font_pressed_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_colors/font_hover_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_colors/font_disabled_color = Color(0.176471, 0.145098, 0.12549, 0.48)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_action")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_action")
+theme_override_styles/hover = SubResource("StyleBoxFlat_action")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_action_disabled")
+theme_override_styles/focus = SubResource("StyleBoxFlat_action")
+text = "营建卷"
+
 [node name="InspectorDescription" type="Label" parent="PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox" unique_id=429685041]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.403922, 0.352941, 0.301961, 0.95)

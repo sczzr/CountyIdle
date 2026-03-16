@@ -5,64 +5,80 @@ using CountyIdle.Models;
 
 namespace CountyIdle.Systems;
 
+// 弟子名册生成与属性推导
 public static class DiscipleRosterSystem
 {
+    // 一天对应的游戏分钟数
     private const int MinutesPerDay = 24 * 60;
+    // 随机索引上限
     private const int RandomIndexUpperBound = 1_000_000;
+    // 随机命名重试次数
     private const int RandomNameRetryLimit = 24;
+    // 默认精英比例
     private const double DefaultEliteRate = 0.08;
 
+    // 姓氏库
     private static readonly string[] Surnames =
     [
         "沈", "陆", "顾", "程", "许", "叶", "秦", "宁", "苏", "白", "韩", "林", "谢", "周", "温", "岑"
     ];
 
+    // 名字首字库
     private static readonly string[] NameFirstChars =
     [
         "清", "玄", "景", "怀", "知", "云", "星", "若", "承", "照", "闻", "归", "静", "砚", "昭", "岚"
     ];
 
+    // 名字次字库
     private static readonly string[] NameSecondChars =
     [
         "尘", "音", "川", "岳", "宁", "遥", "衡", "川", "晖", "岑", "澜", "松", "辞", "舟", "珩", "岐"
     ];
 
+    // 通用性格词条
     private static readonly string[] CommonTraits =
     [
         "守纪稳当", "脚程轻快", "记事清楚", "耐心细密", "应变从容", "心气安定", "擅长配合", "能守长线"
     ];
 
+    // 农务性格词条
     private static readonly string[] FarmerTraits =
     [
         "识地脉", "善照料灵植", "熟悉阵材库位", "晨课后耐久轮值", "擅看天候"
     ];
 
+    // 工务性格词条
     private static readonly string[] WorkerTraits =
     [
         "阵基手稳", "擅修缮护山构件", "懂工序衔接", "能压住锻造节奏", "轮值响应快"
     ];
 
+    // 商务性格词条
     private static readonly string[] MerchantTraits =
     [
         "记账快", "善交涉", "熟悉商路", "能稳住外事节奏", "识别供需差价"
     ];
 
+    // 学术性格词条
     private static readonly string[] ScholarTraits =
     [
         "推演耐久", "静心久坐", "擅整理典册", "善总结阵图", "记忆力稳"
     ];
 
+    // 预备性格词条
     private static readonly string[] ReserveTraits =
     [
         "轮值灵活", "服从度高", "乐于补位", "基础均衡", "适应不同堂口"
     ];
 
+    // 构建当前宗门弟子名册
     public static IReadOnlyList<DiscipleProfile> BuildRoster(GameState sourceState)
     {
         var state = sourceState.Clone();
         PopulationRules.EnsureDefaults(state);
         SectGovernanceRules.EnsureDefaults(state);
         DiscipleDirectiveRules.EnsureDefaults(state);
+        DiscipleEquipmentRules.EnsureDefaults(sourceState);
 
         var population = Math.Max(state.Population, 0);
         if (population <= 0)
@@ -100,6 +116,14 @@ public static class DiscipleRosterSystem
             var linkedPeakSummary = ResolveLinkedPeakSummary(state, jobType, ageBand);
             var traitSummary = ResolveTraitSummary(index, jobType, ageBand, talentPlan, law);
             var note = ResolveNote(jobType, isElite, health, mood, potential, insight, currentAssignment, directiveType);
+            var equipmentProfile = DiscipleEquipmentRules.GetOrCreateEquipmentProfile(
+                sourceState,
+                index + 1,
+                jobType,
+                ageBand,
+                realmTier,
+                isElite,
+                directiveType);
 
             roster.Add(new DiscipleProfile(
                 index + 1,
@@ -125,12 +149,14 @@ public static class DiscipleRosterSystem
                 residenceName,
                 linkedPeakSummary,
                 traitSummary,
+                equipmentProfile,
                 note));
         }
 
         return roster;
     }
 
+    // 构建随机名册（用于预览/模拟）
     public static IReadOnlyList<DiscipleProfile> BuildRandomRoster(GameState sourceState, int count, int? seed = null)
     {
         var state = sourceState.Clone();
@@ -186,6 +212,14 @@ public static class DiscipleRosterSystem
             var linkedPeakSummary = ResolveLinkedPeakSummary(state, jobType, ageBand);
             var traitSummary = ResolveTraitSummary(indexSeed, jobType, ageBand, talentPlan, law);
             var note = ResolveNote(jobType, isElite, health, mood, potential, insight, currentAssignment, directiveType);
+            var equipmentProfile = DiscipleEquipmentRules.BuildPreviewEquipmentProfile(
+                indexSeed,
+                state,
+                jobType,
+                ageBand,
+                realmTier,
+                isElite,
+                directiveType);
 
             roster.Add(new DiscipleProfile(
                 index + 1,
@@ -211,12 +245,14 @@ public static class DiscipleRosterSystem
                 residenceName,
                 linkedPeakSummary,
                 traitSummary,
+                equipmentProfile,
                 note));
         }
 
         return roster;
     }
 
+    // 按人口与岗位数量生成岗位序列
     private static List<JobType?> BuildJobAssignments(GameState state, int population)
     {
         var farmerCount = Math.Max(state.Farmers, 0);
@@ -285,6 +321,7 @@ public static class DiscipleRosterSystem
             .ToList();
     }
 
+    // 生成年龄段分配序列
     private static List<DiscipleAgeBand> BuildAgeAssignments(GameState state, int population)
     {
         var seedlingCount = Math.Max(state.ChildPopulation, 0);
@@ -315,6 +352,7 @@ public static class DiscipleRosterSystem
             .ToList();
     }
 
+    // 构建精英弟子索引集合
     private static HashSet<int> BuildEliteSet(GameState state, int population)
     {
         var eliteCount = Math.Clamp(state.ElitePopulation, 0, population);
@@ -326,6 +364,7 @@ public static class DiscipleRosterSystem
             .ToHashSet();
     }
 
+    // 计算弟子年龄
     private static int ResolveAge(int index, DiscipleAgeBand ageBand)
     {
         return ageBand switch
@@ -338,6 +377,7 @@ public static class DiscipleRosterSystem
         };
     }
 
+    // 计算健康值
     private static int ResolveHealth(
         int index,
         GameState state,
@@ -366,6 +406,7 @@ public static class DiscipleRosterSystem
         return Math.Clamp((int)Math.Round(baseValue + SampleSigned(index, 233, 8)), 24, 100);
     }
 
+    // 计算心绪值
     private static int ResolveMood(
         int index,
         GameState state,
@@ -387,6 +428,7 @@ public static class DiscipleRosterSystem
         return Math.Clamp((int)Math.Round(baseValue + SampleSigned(index, 251, 9)), 18, 100);
     }
 
+    // 计算潜力值
     private static int ResolvePotential(
         int index,
         GameState state,
@@ -419,6 +461,7 @@ public static class DiscipleRosterSystem
         return Math.Clamp(baseValue + SampleSigned(index, 271, 12), 16, 100);
     }
 
+    // 计算战力值
     private static int ResolveCombat(
         int index,
         GameState state,
@@ -455,6 +498,7 @@ public static class DiscipleRosterSystem
         return Math.Clamp(baseValue + SampleSigned(index, 281, 11), 10, 100);
     }
 
+    // 计算工艺值
     private static int ResolveCraft(
         int index,
         GameState state,
@@ -479,6 +523,7 @@ public static class DiscipleRosterSystem
         return Math.Clamp(baseValue + SampleSigned(index, 307, 9), 10, 100);
     }
 
+    // 计算悟性值
     private static int ResolveInsight(
         int index,
         GameState state,
@@ -509,6 +554,7 @@ public static class DiscipleRosterSystem
         return Math.Clamp(baseValue + SampleSigned(index, 331, 10), 10, 100);
     }
 
+    // 计算执行值
     private static int ResolveExecution(int index, GameState state, JobType? jobType, SectLawType law, int mood)
     {
         var baseValue = GetJobBase(jobType, 52, 64, 56, 49, 44) +
@@ -527,6 +573,7 @@ public static class DiscipleRosterSystem
         return Math.Clamp(baseValue + SampleSigned(index, 353, 9), 10, 100);
     }
 
+    // 计算贡献值
     private static int ResolveContribution(int index, bool isElite, int execution, SectLawType law)
     {
         var lawBonus = law == SectLawType.Merit ? 9 : 2;
@@ -534,6 +581,7 @@ public static class DiscipleRosterSystem
         return Math.Clamp(baseValue + SampleSigned(index, 367, 8), 8, 100);
     }
 
+    // 计算境界阶
     private static int ResolveRealmTier(
         int index,
         GameState state,
@@ -573,6 +621,7 @@ public static class DiscipleRosterSystem
         return Math.Clamp(tier, 1, 7);
     }
 
+    // 计算当前差使描述
     private static string ResolveCurrentAssignment(
         GameState state,
         JobType? jobType,
@@ -639,6 +688,7 @@ public static class DiscipleRosterSystem
         return SectNamingRules.ReplaceKnownNames(state, AppendDirectiveSuffix(assignment, directiveType));
     }
 
+    // 计算居住院舍名称
     private static string ResolveResidenceName(GameState state, JobType? jobType, DiscipleAgeBand ageBand, bool isElite)
     {
         if (ageBand == DiscipleAgeBand.Seedling)
@@ -667,6 +717,7 @@ public static class DiscipleRosterSystem
         return SectNamingRules.ReplaceKnownNames(state, residence);
     }
 
+    // 计算关联峰/堂口摘要
     private static string ResolveLinkedPeakSummary(GameState state, JobType? jobType, DiscipleAgeBand ageBand)
     {
         if (ageBand == DiscipleAgeBand.Seedling)
@@ -682,6 +733,7 @@ public static class DiscipleRosterSystem
         return SectOrganizationRules.GetLinkedPeakSummary(state, jobType.Value);
     }
 
+    // 计算性格词条汇总
     private static string ResolveTraitSummary(int index, JobType? jobType, DiscipleAgeBand ageBand, SectTalentPlanType talentPlan, SectLawType law)
     {
         var primaryTrait = PickTrait(jobType, index);
@@ -707,6 +759,7 @@ public static class DiscipleRosterSystem
         return $"{primaryTrait} / {commonTrait} / {planTrait} / {lawTrait}";
     }
 
+    // 生成备注说明
     private static string ResolveNote(
         JobType? jobType,
         bool isElite,
@@ -746,6 +799,7 @@ public static class DiscipleRosterSystem
         return AppendDirectiveNote(baseNote, directiveType);
     }
 
+    // 生成称谓（新苗/真传等）
     private static string ResolveRankName(JobType? jobType, DiscipleAgeBand ageBand, bool isElite, int potential)
     {
         if (ageBand == DiscipleAgeBand.Seedling)
@@ -771,6 +825,7 @@ public static class DiscipleRosterSystem
         return jobType.HasValue ? "外门" : "候值";
     }
 
+    // 生成职司显示名
     private static string ResolveDutyDisplayName(JobType? jobType)
     {
         return jobType switch
@@ -783,6 +838,7 @@ public static class DiscipleRosterSystem
         };
     }
 
+    // 生成境界显示名
     private static string ResolveRealmName(int realmTier)
     {
         return realmTier switch
@@ -798,6 +854,7 @@ public static class DiscipleRosterSystem
         };
     }
 
+    // 生成弟子姓名
     private static string BuildName(int index)
     {
         var surname = Surnames[StableHash(index, 461) % Surnames.Length];
@@ -806,6 +863,7 @@ public static class DiscipleRosterSystem
         return $"{surname}{first}{second}";
     }
 
+    // 随机抽取不重复姓名索引
     private static int RollRandomIndex(Random random, HashSet<string> usedNames, out string name)
     {
         for (var attempt = 0; attempt < RandomNameRetryLimit; attempt++)
@@ -824,6 +882,7 @@ public static class DiscipleRosterSystem
         return fallback;
     }
 
+    // 按岗位挑选性格词条
     private static string PickTrait(JobType? jobType, int index)
     {
         var pool = jobType switch
@@ -838,6 +897,7 @@ public static class DiscipleRosterSystem
         return pool[StableHash(index, 487) % pool.Length];
     }
 
+    // 获取岗位对应的基础值
     private static int GetJobBase(JobType? jobType, int farmerValue, int workerValue, int merchantValue, int scholarValue, int reserveValue)
     {
         return jobType switch
@@ -850,11 +910,13 @@ public static class DiscipleRosterSystem
         };
     }
 
+    // 生成稳定的有符号偏移
     private static int SampleSigned(int index, int salt, int maxAbsoluteValue)
     {
         return (StableHash(index, salt) % (maxAbsoluteValue * 2 + 1)) - maxAbsoluteValue;
     }
 
+    // 稳定哈希生成器
     private static int StableHash(int index, int salt)
     {
         unchecked
@@ -868,6 +930,7 @@ public static class DiscipleRosterSystem
         }
     }
 
+    // 安全取模（允许负值）
     private static int Modulo(int value, int modulo)
     {
         if (modulo == 0)
@@ -879,6 +942,7 @@ public static class DiscipleRosterSystem
         return remainder < 0 ? remainder + modulo : remainder;
     }
 
+    // 向集合追加重复值
     private static void AppendRepeated<T>(ICollection<T> list, T value, int count)
     {
         for (var i = 0; i < count; i++)
@@ -887,6 +951,7 @@ public static class DiscipleRosterSystem
         }
     }
 
+    // 为差使添加指令后缀
     private static string AppendDirectiveSuffix(string assignment, DiscipleDirectiveType directiveType)
     {
         return directiveType switch
@@ -897,6 +962,7 @@ public static class DiscipleRosterSystem
         };
     }
 
+    // 为备注添加指令说明
     private static string AppendDirectiveNote(string baseNote, DiscipleDirectiveType directiveType)
     {
         var directiveNote = directiveType switch

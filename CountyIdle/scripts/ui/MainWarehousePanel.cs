@@ -27,6 +27,8 @@ public partial class Main
         _warehousePanel.BuildMasonryChainRequested += OnWarehouseBuildMasonryChainRequested;
         _warehousePanel.BuildMedicinalChainRequested += OnWarehouseBuildMedicinalChainRequested;
         _warehousePanel.BuildFiberChainRequested += OnWarehouseBuildFiberChainRequested;
+        _warehousePanel.StashBackpackRequested += OnWarehouseStashBackpackRequested;
+        _warehousePanel.StashWorkshopCraftedRequested += OnWarehouseStashWorkshopCraftedRequested;
         _warehousePanel.Opened += OnWarehousePanelOpened;
         _warehousePanel.Closed += OnWarehousePanelClosed;
         AddChild(_warehousePanel);
@@ -100,6 +102,16 @@ public partial class Main
         _gameLoop.BuildTierZeroChain(TierZeroMaterialChainType.Fiber);
     }
 
+    private void OnWarehouseStashBackpackRequested()
+    {
+        _gameLoop.StashDiscipleBackpack();
+    }
+
+    private void OnWarehouseStashWorkshopCraftedRequested()
+    {
+        _gameLoop.StashWorkshopCrafted();
+    }
+
     private void OnWarehousePanelOpened()
     {
         SetWarehouseQuickButtonState(true);
@@ -131,6 +143,8 @@ public partial class Main
         _warehousePanel.BuildMasonryChainRequested -= OnWarehouseBuildMasonryChainRequested;
         _warehousePanel.BuildMedicinalChainRequested -= OnWarehouseBuildMedicinalChainRequested;
         _warehousePanel.BuildFiberChainRequested -= OnWarehouseBuildFiberChainRequested;
+        _warehousePanel.StashBackpackRequested -= OnWarehouseStashBackpackRequested;
+        _warehousePanel.StashWorkshopCraftedRequested -= OnWarehouseStashWorkshopCraftedRequested;
         _warehousePanel.Opened -= OnWarehousePanelOpened;
         _warehousePanel.Closed -= OnWarehousePanelClosed;
     }

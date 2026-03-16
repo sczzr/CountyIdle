@@ -3,16 +3,26 @@ using Microsoft.Data.Sqlite;
 
 namespace CountyIdle.Core;
 
+/// <summary>
+/// SQLite 存档库的结构迁移器。
+/// </summary>
 public sealed class SqliteMigrationRunner
 {
+    // 当前数据库结构版本
     private const int CurrentSchemaVersion = 2;
     private readonly string _connectionString;
 
+    /// <summary>
+    /// 初始化迁移器，传入连接字符串。
+    /// </summary>
     public SqliteMigrationRunner(string connectionString)
     {
         _connectionString = connectionString;
     }
 
+    /// <summary>
+    /// 确保数据库已完成全部结构迁移。
+    /// </summary>
     public void EnsureMigrated()
     {
         using var connection = new SqliteConnection(_connectionString);
@@ -26,6 +36,9 @@ public sealed class SqliteMigrationRunner
         transaction.Commit();
     }
 
+    /// <summary>
+    /// 创建迁移记录表。
+    /// </summary>
     private static void CreateSchemaMigrationTable(SqliteConnection connection, SqliteTransaction transaction)
     {
         ExecuteNonQuery(
@@ -39,6 +52,9 @@ public sealed class SqliteMigrationRunner
             """);
     }
 
+    /// <summary>
+    /// 版本 1：建立存档槽与快照表。
+    /// </summary>
     private static void ApplySchemaVersion1(SqliteConnection connection, SqliteTransaction transaction)
     {
         if (HasMigrationVersion(connection, transaction, 1))
@@ -100,6 +116,9 @@ public sealed class SqliteMigrationRunner
             });
     }
 
+    /// <summary>
+    /// 版本 2：补充人口/威胁/仓储字段。
+    /// </summary>
     private static void ApplySchemaVersion2(SqliteConnection connection, SqliteTransaction transaction)
     {
         if (HasMigrationVersion(connection, transaction, 2))
@@ -142,6 +161,9 @@ public sealed class SqliteMigrationRunner
             });
     }
 
+    /// <summary>
+    /// 判断指定迁移版本是否已执行。
+    /// </summary>
     private static bool HasMigrationVersion(SqliteConnection connection, SqliteTransaction transaction, int version)
     {
         using var command = connection.CreateCommand();
@@ -152,6 +174,9 @@ public sealed class SqliteMigrationRunner
         return result > 0;
     }
 
+    /// <summary>
+    /// 启用外键约束。
+    /// </summary>
     private static void EnableForeignKeys(SqliteConnection connection)
     {
         using var pragma = connection.CreateCommand();
@@ -159,6 +184,9 @@ public sealed class SqliteMigrationRunner
         pragma.ExecuteNonQuery();
     }
 
+    /// <summary>
+    /// 执行一条非查询 SQL（可附带参数配置）。
+    /// </summary>
     private static void ExecuteNonQuery(
         SqliteConnection connection,
         SqliteTransaction transaction,

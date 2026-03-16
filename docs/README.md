@@ -23,6 +23,7 @@
 ### 1.1 其他专题（按需）
 
 - `16_cultivator_classification_design.md`：修仙者分类/修为/技艺与现行系统对齐
+- `17_code_structure_guide.md`：代码结构与入口定位指南
 
 ## 2) 推荐阅读顺序
 

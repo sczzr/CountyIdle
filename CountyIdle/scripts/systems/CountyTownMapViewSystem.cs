@@ -5,8 +5,10 @@ using CountyIdle.Models;
 
 namespace CountyIdle.Systems;
 
+// 山门沙盘地图视图系统
 public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
 {
+    // 尺寸与缩放参数
     private const float TileHalfWidth = 16f;
     private const float TileHalfHeight = 9f;
     private const float HexRadius = 18f;
@@ -25,6 +27,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
     private const float TerrainHexFillScale = 1.0f;
     private const float TerrainHexSeamUvInsetPx = 20.0f;
 
+    // 地形/道路/建筑配色
     private static readonly Color GroundColor = new(0.23f, 0.27f, 0.21f, 1.0f);
     private static readonly Color RoadColor = new(0.43f, 0.41f, 0.35f, 1.0f);
     private static readonly Color CourtyardColor = new(0.35f, 0.31f, 0.24f, 1.0f);
@@ -38,14 +41,17 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
     private static readonly Color BuildingFootprintColor = new(0.26f, 0.24f, 0.21f, 0.92f);
     private static readonly Color BuildingFootprintEdgeColor = new(0.58f, 0.51f, 0.42f, 0.86f);
 
+    // 建筑材质配色
     private static readonly Color WallBrightColor = new(0.86f, 0.78f, 0.64f, 1.0f);
     private static readonly Color WallDarkColor = new(0.72f, 0.64f, 0.52f, 1.0f);
     private static readonly Color RoofMainColor = new(0.27f, 0.34f, 0.45f, 1.0f);
     private static readonly Color RoofShadeColor = new(0.20f, 0.26f, 0.34f, 1.0f);
     private static readonly Color RoofRidgeColor = new(0.76f, 0.60f, 0.27f, 1.0f);
     private static readonly Color GateColor = new(0.58f, 0.20f, 0.19f, 1.0f);
+    // 图集回退尺寸
     private static readonly Vector2 AtlasFallbackTileSize = new(96f, 96f);
     private static readonly Vector2 AtlasFallbackAnchor = new(48f, 62f);
+    // L1 tilemap 坐标表
     private static readonly Vector2I[] Layer1TilemapAPlainCoords =
     [
         new Vector2I(0, 0),
@@ -111,6 +117,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         new Vector2I(2, 0)
     ];
 
+    // 资源路径
     private const string GeographyAtlasPath = "res://assets/ui/tilemap/tileset_geography.png";
     private const string Layer1TileSetPath = "res://assets/ui/tilemap/L1_hex_tileset.tres";
 
@@ -126,9 +133,12 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
     private const string RoofTexturePath = "";
     private const string GateTexturePath = "";
 
+    // 命名映射与生成器
     private IReadOnlyDictionary<string, string>? _nameMap;
     private readonly TownMapGeneratorSystem _generator = new();
+    // 地形贴图缓存
     private readonly Dictionary<TownTerrainType, Texture2D?> _terrainTextures = new();
+    // 图集缓存与索引
     private readonly Dictionary<string, Texture2D> _terrainAtlasTextures = new(StringComparer.Ordinal);
     private readonly Dictionary<string, MapLayerAtlasDefinition> _terrainAtlasDefinitions = new(StringComparer.Ordinal);
     private readonly Dictionary<string, MapLayerAtlasTileDefinition> _terrainAtlasTiles = new(StringComparer.Ordinal);
@@ -137,6 +147,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
     private readonly Dictionary<TownTerrainVisualFamily, List<Layer1TileVariant>> _layer1VisualVariants = new();
     private readonly Color[] _hexTintColors = new Color[6];
 
+    // 运行时地图数据与节点引用
     private TownMapData? _mapData;
     private Button _regenerateButton = null!;
     private Label _mapHintLabel = null!;
@@ -150,6 +161,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
     private Texture2D? _gateTexture;
     private Texture2D? _roadLinkTexture;
     private Texture2D? _waterLinkTexture;
+    // 状态与提示
     private int _layoutSeed;
     private int _populationHint = 120;
     private int _housingHint = 180;
@@ -162,6 +174,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
     private Vector2 _panOffset = Vector2.Zero;
     private bool _isInitialized;
     private MapViewStyle _operationalStyle = new();
+    // 选中与外部地图状态
     private TownActivityAnchorData? _selectedActivityAnchor;
     private Vector2I? _selectedCell;
     private Vector2I? _hoveredCell;
@@ -170,14 +183,17 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
     private string _externalMapTitle = string.Empty;
     private string _externalMapInteractionHint = string.Empty;
 
+    // 缩放参数
     public float Zoom => _zoom;
     public float MinZoom => 0.6f;
     public float MaxZoom => MaxZoomLevel;
     public float DefaultZoom => 1.22f;
 
+    // 事件回调
     public event Action<int, JobType?>? DiscipleInspectionRequested;
     public event Action<TownMapSelectionSummary>? SelectionSummaryChanged;
 
+    // 切换到外部地图模式
     public void SetExternalMap(TownMapData mapData, string titleText, string interactionHint)
     {
         _usesExternalMap = true;
@@ -204,6 +220,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         QueueRedraw();
     }
 
+    // 退出外部地图模式并清理状态
     public void ClearExternalMap()
     {
         _usesExternalMap = false;
@@ -230,6 +247,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         QueueRedraw();
     }
 
+    // 节点初始化
     public override void _Ready()
     {
         ClipContents = true;
@@ -248,6 +266,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         RebuildMap();
     }
 
+    // 处理鼠标与滚轮输入
     public override void _GuiInput(InputEvent @event)
     {
         if (@event is InputEventMouseMotion mouseMotion)
@@ -289,6 +308,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         }
     }
 
+    // 处理窗口与鼠标退出通知
     public override void _Notification(int what)
     {
         if (what == NotificationResized)
@@ -302,6 +322,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         }
     }
 
+    // 绘制沙盘图层
     public override void _Draw()
     {
         if (_mapData == null)
@@ -315,6 +336,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         DrawSelectedCellOverlay(_mapData, origin);
     }
 
+    // 设置缩放
     public void SetZoom(float zoom)
     {
         var clampedZoom = Mathf.Clamp(zoom, MinZoom, MaxZoom);
@@ -331,22 +353,26 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         RefreshHoverVisual();
     }
 
+    // 增量调整缩放
     public void AdjustZoom(float delta)
     {
         SetZoom(_zoomTarget + delta);
     }
 
+    // 重置视图
     public void ResetView()
     {
         _panOffset = Vector2.Zero;
         SetZoomTarget(DefaultZoom, null, true);
     }
 
+    // 以鼠标位置为锚点调整缩放
     private void AdjustZoomAt(Vector2 anchorPosition, float delta)
     {
         SetZoomTarget(_zoomTarget + delta, anchorPosition);
     }
 
+    // 设置缩放目标并保持锚点位置
     private void SetZoomTarget(float zoom, Vector2? anchorPosition = null, bool force = false)
     {
         var clampedZoom = Mathf.Clamp(zoom, MinZoom, MaxZoom);
@@ -372,6 +398,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         RefreshHoverVisual();
     }
 
+    // 获取键盘平移方向
     private Vector2 GetPanDirection()
     {
         var direction = Vector2.Zero;
@@ -418,6 +445,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         return direction;
     }
 
+    // 刷新地图参数并重建
     public void RefreshMap(
         int populationHint,
         int housingHint,
@@ -477,6 +505,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         RebuildMap();
     }
 
+    // 同步外部传入的已放置建筑列表
     private bool SyncPlacedBuildings(IReadOnlyList<TownBuildingPlacement>? placements)
     {
         placements ??= Array.Empty<TownBuildingPlacement>();
@@ -499,6 +528,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         return true;
     }
 
+    // 判断放置列表是否完全一致
     private static bool ArePlacementsEqual(
         List<TownBuildingPlacement> existing,
         IReadOnlyList<TownBuildingPlacement> incoming)
@@ -528,6 +558,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         return true;
     }
 
+    // 刷新作战/运营风格参数
     public void RefreshOperationalState(MapViewStyle style)
     {
         _operationalStyle = style ?? new MapViewStyle();
@@ -535,6 +566,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         QueueRedraw();
     }
 
+    // 刷新命名映射
     public void RefreshNaming(GameState state)
     {
         if (state == null)
@@ -550,6 +582,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         QueueRedraw();
     }
 
+    // 处理重新生成按钮
     private void OnRegeneratePressed()
     {
         if (!_isInitialized || _usesExternalMap)
@@ -561,6 +594,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         RebuildMap();
     }
 
+    // 重新生成沙盘地图
     private void RebuildMap()
     {
         if (_usesExternalMap)
@@ -582,6 +616,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         QueueRedraw();
     }
 
+    // 更新顶部提示与选中摘要
     private void UpdateMapHint()
     {
         if (_mapData == null)
@@ -612,16 +647,19 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         NotifySelectionSummaryChanged();
     }
 
+    // 调用色调特效节点
     private void CallToneFx(string methodName, params Variant[] args)
     {
         _toneFx?.Call(methodName, args);
     }
 
+    // 计算地图绘制原点（含平移）
     private Vector2 CalculateMapOrigin(TownMapData mapData)
     {
         return CalculateBaseMapOrigin(mapData, _zoom) + _panOffset;
     }
 
+    // 计算地图基础原点（不含平移）
     private Vector2 CalculateBaseMapOrigin(TownMapData mapData, float zoom)
     {
         var radius = GetScaledHexRadius(zoom);
@@ -638,6 +676,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         return new Vector2(offsetX, offsetY);
     }
 
+    // 处理点击选中锚点或地块
     private bool HandleAnchorSelection(Vector2 localPosition)
     {
         if (_mapData == null)
@@ -680,6 +719,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         return true;
     }
 
+    // 尝试恢复上次选中的锚点
     private TownActivityAnchorData? TryRestoreSelectedAnchor(TownActivityAnchorType? anchorType, string? label)
     {
         if (_mapData == null || anchorType == null || string.IsNullOrWhiteSpace(label))
@@ -699,16 +739,19 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         return null;
     }
 
+    // 发起弟子检视请求
     private void RequestDiscipleInspection(int discipleId, JobType? preferredJobType)
     {
         DiscipleInspectionRequested?.Invoke(discipleId, preferredJobType);
     }
 
+    // 获取地块中心点
     private Vector2 GetTownCellCenter(Vector2I cell, Vector2 origin)
     {
         return GetProjectedTownCellCenter(cell, origin);
     }
 
+    // 投影到屏幕的地块中心
     private Vector2 GetProjectedTownCellCenter(Vector2I cell, Vector2 origin)
     {
         var hexWidth = GetScaledHexWidth();
@@ -719,6 +762,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         return new Vector2(centerX, centerY);
     }
 
+    // 根据坐标拾取地块
     private Vector2I? PickCellAt(Vector2 localPosition, Vector2 origin)
     {
         if (_mapData == null)
@@ -739,6 +783,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         return null;
     }
 
+    // 更新 hover 状态
     private void UpdateHoverState(Vector2 localPosition)
     {
         if (_mapData == null)
@@ -764,6 +809,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         RefreshHoverVisual();
     }
 
+    // 刷新 hover 特效
     private void RefreshHoverVisual()
     {
         if (_hoverFx == null || _mapData == null || _hoveredCell == null)
@@ -779,17 +825,20 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         _hoverFx.Call("show_hover", polygon, "default");
     }
 
+    // 清理 hover 状态与特效
     private void ClearHoverState()
     {
         _hoveredCell = null;
         _hoverFx?.Call("hide_hover");
     }
 
+    // 判断是否需要绘制 L2 语义叠加
     private bool ShouldDrawTerrainDetails()
     {
         return ShowLayer2TerrainOverlay && _zoom >= TerrainDetailZoomThreshold;
     }
 
+    // 绘制地形底图与细节
     private void DrawTerrain(TownMapData mapData, Vector2 origin)
     {
         var showTerrainDetails = ShouldDrawTerrainDetails();
@@ -814,6 +863,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         }
     }
 
+    // 绘制地形基础层，优先使用图集/tileset
     private void DrawTerrainBaseLayer(
         TownMapData mapData,
         Vector2I cell,
@@ -846,6 +896,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
             GetTerrainColor(terrainType));
     }
 
+    // 尝试使用 L1 地形图集绘制地块
     private bool TryDrawLayer1TerrainAtlas(
         Vector2I cell,
         Vector2[] tile,
@@ -865,6 +916,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         return DrawAtlasTile(atlasKey, tile, GetTerrainAtlasTint(terrainType));
     }
 
+    // 尝试使用 tileset 绘制地块
     private bool TryDrawLayer1TileSetHex(
         Vector2I cell,
         Vector2[] tile,
@@ -898,6 +950,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         return true;
     }
 
+    // 选择地形图集的具体素材键
     private bool TryGetTerrainAtlasKey(
         Vector2I cell,
         TownTerrainType terrainType,
@@ -935,6 +988,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         return true;
     }
 
+    // 按视觉族系构建图集候选列表
     private List<string> BuildTerrainAtlasCandidatesForVisualFamily(TownTerrainVisualFamily visualFamily)
     {
         return visualFamily switch
@@ -949,6 +1003,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         };
     }
 
+    // 根据地形类型约束视觉族系
     private static TownTerrainVisualFamily ResolvePreferredVisualFamily(
         TownTerrainType terrainType,
         TownTerrainVisualFamily visualFamily)
@@ -971,6 +1026,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         };
     }
 
+    // 获取 L1 tile 变体（含语义与视觉族系）
     private bool TryGetLayer1TileVariant(
         Vector2I cell,
         TownTerrainType terrainType,
@@ -988,6 +1044,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         return TryGetSemanticLayer1Variant(cell, terrainType, out variant);
     }
 
+    // 获取语义地形的 tile 变体
     private bool TryGetSemanticLayer1Variant(Vector2I cell, TownTerrainType terrainType, out Layer1TileVariant variant)
     {
         variant = default;
@@ -1000,6 +1057,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         return true;
     }
 
+    // 获取视觉族系的 tile 变体
     private bool TryGetLayer1VisualVariant(
         Vector2I cell,
         TownTerrainVisualFamily visualFamily,
@@ -1015,6 +1073,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         return true;
     }
 
+    // 获取图集绘制时的地形色调
     private Color GetTerrainAtlasTint(TownTerrainType terrainType)
     {
         var terrainTint = terrainType switch
@@ -1027,6 +1086,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         return TintColor(terrainTint, _operationalStyle.TerrainTint);
     }
 
+    // 绘制选中地块的高亮叠加
     private void DrawSelectedCellOverlay(TownMapData mapData, Vector2 origin)
     {
         if (_selectedCell == null || !mapData.IsInside(_selectedCell.Value))
@@ -1047,6 +1107,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         DrawClosedPolyline(innerHex, outlineColor, Math.Max(1.1f, ScaleValue(1.4f)));
     }
 
+    // 处理方向键按下，避免 UI 穿透
     public override void _Input(InputEvent @event)
     {
         if (!IsVisibleInTree() || @event is not InputEventKey keyEvent || !keyEvent.Pressed || keyEvent.Echo)
@@ -1060,6 +1121,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         }
     }
 
+    // 使用旧版图集绘制地形（备用路径）
     private void DrawAtlasTerrain(TownMapData mapData, Vector2 origin)
     {
         if (_geographyAtlas == null)
@@ -1085,6 +1147,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         }
     }
 
+    // 绘制六边形网格边线
     private void DrawGrid(Vector2[] tile)
     {
         var lineWidth = Math.Max(0.5f, ScaleValue(0.7f));
@@ -1094,6 +1157,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         }
     }
 
+    // 绘制道路/水体/庭院语义叠加层
     private void DrawTerrainSemanticOverlay(TownMapData mapData, Vector2I cell, Vector2 center, Vector2 origin)
     {
         var terrainType = mapData.GetTerrain(cell.X, cell.Y);
@@ -1111,6 +1175,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         }
     }
 
+    // 绘制道路语义叠加（主干与连接）
     private void DrawRoadSemanticOverlay(TownMapData mapData, Vector2I cell, Vector2 center, Vector2 origin)
     {
         DrawTerrainDecal(TownTerrainType.Road, center, new Vector2(GetScaledHexWidth() * 0.84f, GetScaledHexRadius() * 0.86f), Colors.White);
@@ -1137,6 +1202,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         }
     }
 
+    // 绘制道路连接贴花
     private void DrawRoadConnectorTexture(Vector2 fromCenter, Vector2 toCenter)
     {
         if (TryDrawConnectorTexture(
@@ -1176,6 +1242,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         DrawOpenPolyline(connector, TintColor(RoadEdgeColor, _operationalStyle.TerrainTint), Math.Max(0.7f, ScaleValue(0.8f)));
     }
 
+    // 绘制庭院语义叠加
     private void DrawCourtyardSemanticOverlay(Vector2 center)
     {
         DrawTerrainDecal(TownTerrainType.Courtyard, center, new Vector2(GetScaledHexWidth() * 0.88f, GetScaledHexRadius() * 0.90f), Colors.White);
@@ -1184,6 +1251,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         DrawClosedPolyline(courtyardHex, TintColor(new Color(0.61f, 0.53f, 0.42f, 0.46f), _operationalStyle.TerrainTint), Math.Max(0.7f, ScaleValue(0.8f)));
     }
 
+    // 绘制水体语义叠加（岸线与连接）
     private void DrawWaterSemanticOverlay(TownMapData mapData, Vector2I cell, Vector2 center, Vector2 origin)
     {
         DrawTerrainDecal(TownTerrainType.Water, center, new Vector2(GetScaledHexWidth() * 0.92f, GetScaledHexRadius() * 0.92f), Colors.White);
@@ -1217,6 +1285,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         DrawOpenPolyline(rippleHex, TintColor(WaterRippleColor, _operationalStyle.TerrainTint), Math.Max(0.7f, ScaleValue(0.8f)));
     }
 
+    // 绘制水道连接贴花
     private void DrawWaterConnectorTexture(Vector2 fromCenter, Vector2 toCenter)
     {
         if (TryDrawConnectorTexture(
@@ -1256,6 +1325,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         DrawOpenPolyline(connector, TintColor(WaterShoreColor, _operationalStyle.TerrainTint), Math.Max(0.7f, ScaleValue(0.8f)));
     }
 
+    // 绘制建筑与锚点实体（按深度排序）
     private void DrawStructures(TownMapData mapData, Vector2 origin)
     {
         var sortedStructures = new List<(float DepthY, float DepthX, int Priority, TownBuildingData? Building, TownActivityAnchorData? Anchor)>();
@@ -1303,6 +1373,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         }
     }
 
+    // 绘制常规建筑
     private void DrawBuilding(TownBuildingData building, Vector2 origin)
     {
         var center = GetTownCellCenter(building.Cell, origin);
@@ -1360,6 +1431,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         }
     }
 
+    // 绘制月门与装饰
     private void DrawMoonGate(Vector2 baseBottom, TownFacing facing)
     {
         var offset = facing switch
@@ -1382,6 +1454,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         DrawArc(gateCenter, Math.Max(1.4f, ScaleValue(2.8f)), 0f, Mathf.Tau, 14, TintColor(RoofRidgeColor, _operationalStyle.BuildingTint), Math.Max(0.6f, ScaleValue(0.9f)));
     }
 
+    // 加载各类贴图与图集资源
     private void LoadTextures()
     {
         _terrainTextures.Clear();
@@ -1405,6 +1478,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         _gateTexture = null;
     }
 
+    // 绘制带贴图多边形（无贴图则回退纯色）
     private void DrawTexturedPolygon(Vector2[] polygon, Texture2D? texture, Color fallbackColor)
     {
         if (texture == null)
@@ -1418,6 +1492,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         DrawPolygon(polygon, vertexColors, uvs, texture);
     }
 
+    // 生成整图 UV 坐标
     private static Vector2[] CreateTextureUv(Texture2D texture)
     {
         var width = texture.GetWidth();
@@ -1431,6 +1506,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         ];
     }
 
+    // 绘制图集六边形
     private void DrawAtlasHex(Vector2[] hex, HexAtlas5x4 atlas, int row, int col, Color tint)
     {
         for (var index = 0; index < _hexTintColors.Length; index++)
@@ -1441,6 +1517,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         DrawPolygon(hex, _hexTintColors, atlas.GetUv(col, row), atlas.Texture);
     }
 
+    // 安全加载贴图资源
     private static Texture2D? LoadTextureOrNull(string path)
     {
         if (!ResourceLoader.Exists(path))
@@ -1451,6 +1528,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         return ResourceLoader.Load<Texture2D>(path);
     }
 
+    // 生成菱形顶点
     private static Vector2[] CreateDiamond(Vector2 center, float halfWidth, float halfHeight)
     {
         return
@@ -1462,6 +1540,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         ];
     }
 
+    // 生成六边形顶点
     private static Vector2[] CreateHex(Vector2 center, float radius)
     {
         var halfWidth = radius * HexHalfWidthFactor;
@@ -1477,6 +1556,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         ];
     }
 
+    // 获取地形在图集中的行号
     private static int GetTownAtlasRow(TownTerrainType terrainType)
     {
         return terrainType switch
@@ -1489,6 +1569,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
     }
 
 
+    // 绘制闭合折线
     private void DrawClosedPolyline(Vector2[] polygon, Color color, float width)
     {
         for (var index = 0; index < polygon.Length; index++)
@@ -1497,6 +1578,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         }
     }
 
+    // 绘制开放折线
     private void DrawOpenPolyline(Vector2[] polygon, Color color, float width)
     {
         for (var index = 0; index < polygon.Length - 1; index++)
@@ -1505,6 +1587,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         }
     }
 
+    // 构建图集候选列表
     private List<string> BuildTerrainAtlasCandidates(params string[] families)
     {
         var candidates = new List<string>();
@@ -1519,6 +1602,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         return candidates;
     }
 
+    // 读取图集清单并建立索引
     private void LoadAtlasManifest()
     {
         var manifest = MapLayerAtlasManifest.TryLoad(TerrainAtlasManifestPath);
@@ -1558,6 +1642,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         }
     }
 
+    // 加载 L1 tileset 并构建索引
     private void LoadLayer1TileSet()
     {
         _layer1TileSet = null;
@@ -1577,6 +1662,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         BuildLayer1TileVariantLookup(tileSet);
     }
 
+    // 构建 L1 tile 变体索引
     private void BuildLayer1TileVariantLookup(TileSet tileSet)
     {
         for (var index = 0; index < tileSet.GetSourceCount(); index++)
@@ -1625,6 +1711,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         }
     }
 
+    // 按地形类型注册 tile 变体
     private void AddLayer1TileVariants(TownTerrainType terrainType, int sourceId, Vector2I[] atlasCoords)
     {
         if (!_layer1TileVariants.TryGetValue(terrainType, out var variants))
@@ -1639,6 +1726,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         }
     }
 
+    // 按视觉族系注册 tile 变体
     private void AddLayer1VisualVariants(TownTerrainVisualFamily visualFamily, int sourceId, Vector2I[] atlasCoords)
     {
         if (!_layer1VisualVariants.TryGetValue(visualFamily, out var variants))
@@ -1652,6 +1740,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
             variants.Add(new Layer1TileVariant(sourceId, atlasCoord, 0));
         }
     }
+    // 绘制地形贴花
     private void DrawTerrainDecal(TownTerrainType terrainType, Vector2 center, Vector2 size, Color tint)
     {
         if (!_terrainTextures.TryGetValue(terrainType, out var texture) || texture == null)
@@ -1663,6 +1752,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         DrawTextureRect(texture, rect, false, TintColor(tint, _operationalStyle.TerrainTint));
     }
 
+    // 获取六方向邻接偏移
     private static Vector2I[] GetHexNeighborOffsets(int row)
     {
         var isOddRow = (row & 1) == 1;
@@ -1687,6 +1777,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
             ];
     }
 
+    // 尝试绘制连接贴图（不足则回退）
     private bool TryDrawConnectorTexture(
         Texture2D? texture,
         Vector2 fromCenter,
@@ -1719,11 +1810,13 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         return true;
     }
 
+    // 判断地块是否为指定地形
     private static bool IsTerrain(TownMapData mapData, Vector2I cell, TownTerrainType terrainType)
     {
         return mapData.IsInside(cell) && mapData.GetTerrain(cell.X, cell.Y) == terrainType;
     }
 
+    // 判断指定半径内是否存在目标地形
     private static bool IsNearTerrain(TownMapData mapData, Vector2I cell, TownTerrainType terrainType, int radius)
     {
         for (var offsetX = -radius; offsetX <= radius; offsetX++)
@@ -1751,6 +1844,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         return false;
     }
 
+    // 判断地形边界（邻接地形不一致）
     private static bool HasTerrainBoundary(TownMapData mapData, Vector2I cell, TownTerrainType terrainType)
     {
         foreach (var neighborOffset in GetHexNeighborOffsets(cell.Y))
@@ -1765,6 +1859,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         return false;
     }
 
+    // 基于地块与种子生成稳定哈希
     private int GetCellHash(Vector2I cell, int salt)
     {
         unchecked
@@ -1776,6 +1871,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         }
     }
 
+    // 绘制图集中的单个 tile
     private bool DrawAtlasTile(string atlasKey, Vector2[] tile, Color tint)
     {
         if (!_terrainAtlasTiles.TryGetValue(atlasKey, out var tileDefinition) ||
@@ -1793,6 +1889,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         return true;
     }
 
+    // 生成图集区域 UV
     private static Vector2[] CreateAtlasRegionUv(Rect2 region, Texture2D texture)
     {
         var atlasWidth = texture.GetWidth();
@@ -1809,6 +1906,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         ];
     }
 
+    // 裁剪图集区域到 tile 大小
     private static Rect2 ClipAtlasRegionToTileSize(Rect2 region, Vector2I tileSize)
     {
         if (tileSize.X <= 0 || tileSize.Y <= 0)
@@ -1833,6 +1931,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         return new Rect2(region.Position + padding, targetSize);
     }
 
+    // 收缩图集区域以减少缝隙
     private static Rect2 InsetAtlasRegion(Rect2 region, float insetPx)
     {
         if (insetPx <= 0f)
@@ -1857,6 +1956,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         return new Rect2(region.Position + insetVector, newSize);
     }
 
+    // 获取地形基础颜色
     private Color GetTerrainColor(TownTerrainType terrainType)
     {
         var baseColor = terrainType switch
@@ -1869,6 +1969,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         return TintColor(baseColor, _operationalStyle.TerrainTint);
     }
 
+    // 将基础颜色与色调相乘
     private static Color TintColor(Color baseColor, Color tint)
     {
         return new Color(
@@ -1878,47 +1979,56 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
             baseColor.A);
     }
 
+    // 按当前缩放比例缩放数值
     private float ScaleValue(float baseValue)
     {
         return baseValue * _zoom;
     }
 
+    // 按指定缩放比例缩放数值
     private static float ScaleValue(float baseValue, float zoom)
     {
         return baseValue * zoom;
     }
 
+    // 获取当前六边形半径
     private float GetScaledHexRadius()
     {
         return GetScaledHexRadius(_zoom);
     }
 
+    // 计算六边形半径
     private static float GetScaledHexRadius(float zoom)
     {
         return HexRadius * zoom;
     }
 
+    // 获取当前六边形宽度
     private float GetScaledHexWidth()
     {
         return GetScaledHexWidth(_zoom);
     }
 
+    // 计算六边形宽度
     private static float GetScaledHexWidth(float zoom)
     {
         return GetScaledHexRadius(zoom) * (HexHalfWidthFactor * 2f);
     }
 
+    // 获取当前六边形纵向步长
     private float GetScaledHexVerticalStep()
     {
         return GetScaledHexVerticalStep(_zoom);
     }
 
+    // 计算六边形纵向步长
     private static float GetScaledHexVerticalStep(float zoom)
     {
         return GetScaledHexRadius(zoom) * HexVerticalStepFactor;
     }
 }
 
+// L1 tile 变体描述
 internal readonly record struct Layer1TileVariant(int SourceId, Vector2I AtlasCoords, int AlternativeTile);
 
 
