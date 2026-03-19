@@ -389,6 +389,7 @@ public partial class CountyTownMapViewSystem
         _selectedCell = targetCell.Value;
         placedCell = targetCell.Value;
         UpdateMapHint();
+        NotifySelectionSummaryChanged();
         QueueRedraw();
 
         var locationText = $"[{targetCell.Value.X},{targetCell.Value.Y}]";

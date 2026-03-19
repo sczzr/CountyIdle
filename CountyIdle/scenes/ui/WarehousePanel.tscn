@@ -8,8 +8,6 @@ layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_right = 768.0
-offset_bottom = 432.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -27,41 +25,41 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.0588235, 0.0666667, 0.0823529, 0.95)
 
-[node name="CenterLayer" type="CenterContainer" parent="." unique_id=1148067976]
+[node name="CenterLayer" type="MarginContainer" parent="." unique_id=1148067976]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 20
 
-[node name="LedgerWrapper" type="Control" parent="CenterLayer" unique_id=743845529]
-custom_minimum_size = Vector2(1920, 1080)
+[node name="LedgerWrapper" type="VBoxContainer" parent="CenterLayer" unique_id=743845529]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 10
 
 [node name="TopTrim" type="ColorRect" parent="CenterLayer/LedgerWrapper" unique_id=628581716]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 12.0
-offset_right = 1390.0
-offset_bottom = 22.0
-color = Color(0.768627, 0.603922, 0.270588, 1)
-
-[node name="BottomTrim" type="ColorRect" parent="CenterLayer/LedgerWrapper" unique_id=68501338]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 618.0
-offset_right = 1390.0
-offset_bottom = 628.0
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+size_flags_horizontal = 3
 color = Color(0.768627, 0.603922, 0.270588, 1)
 
 [node name="FrameRow" type="HBoxContainer" parent="CenterLayer/LedgerWrapper" unique_id=2089936167]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 24.0
-offset_right = 1390.0
-offset_bottom = 616.0
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_constants/separation = 0
+
+[node name="BottomTrim" type="ColorRect" parent="CenterLayer/LedgerWrapper" unique_id=68501338]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.768627, 0.603922, 0.270588, 1)
 
 [node name="LeftRoller" type="PanelContainer" parent="CenterLayer/LedgerWrapper/FrameRow" unique_id=786379213]
 visible = false

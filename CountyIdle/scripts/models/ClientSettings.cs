@@ -1,14 +1,16 @@
 namespace CountyIdle.Models;
 
 /// <summary>
-/// 客户端设置模型（语言、分辨率、音量与快捷键）。
+/// 客户端设置模型（语言、显示模式、窗口分辨率、画面缩放、音量与快捷键）。
 /// </summary>
 public class ClientSettings
 {
     // 默认语言与显示参数
     public const string DefaultLanguage = "zh_CN";
-    public const int DefaultResolutionWidth = 1600;
-    public const int DefaultResolutionHeight = 900;
+    public const bool DefaultIsFullscreen = false;
+    public const int DefaultResolutionWidth = 1280;
+    public const int DefaultResolutionHeight = 720;
+    // 历史字段名仍保留为 FontScale，但现已承接“画面缩放”含义，兼容旧设置存档。
     public const float DefaultFontScale = 1.0f;
     public const float DefaultMasterVolume = 0.8f;
     // 默认快捷键
@@ -22,11 +24,13 @@ public class ClientSettings
 
     // 当前语言
     public string Language { get; set; } = DefaultLanguage;
+    // 是否使用全屏模式
+    public bool IsFullscreen { get; set; } = DefaultIsFullscreen;
     // 当前分辨率宽度
     public int ResolutionWidth { get; set; } = DefaultResolutionWidth;
     // 当前分辨率高度
     public int ResolutionHeight { get; set; } = DefaultResolutionHeight;
-    // UI 字体缩放
+    // 画面缩放倍率（沿用历史 FontScale 字段名以兼容旧档）
     public float FontScale { get; set; } = DefaultFontScale;
     // 主音量
     public float MasterVolume { get; set; } = DefaultMasterVolume;

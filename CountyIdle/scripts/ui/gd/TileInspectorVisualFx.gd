@@ -13,10 +13,11 @@ var _status_value_label: Label
 
 func _ready() -> void:
 	var root: Node = get_parent()
-	_title_label = root.get_node("RootMargin/MainLayout/BodyRow/LeftPanel/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/InspectorHeader/TileTitle")
-	_subtitle_label = root.get_node("RootMargin/MainLayout/BodyRow/LeftPanel/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/InspectorHeader/TileSubtitle")
-	_badge_label = root.get_node("RootMargin/MainLayout/BodyRow/LeftPanel/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/InspectorHeader/TileBadgeBox/TileBadgeLabel")
-	_status_value_label = root.get_node("RootMargin/MainLayout/BodyRow/LeftPanel/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/AttrGrid/StatusBox/AttrVBox/AttrValue")
+	# 主界面左栏现在通过 ContentScroll 承载检视卷内容，路径需同步到新的滚动层级。
+	_title_label = root.get_node("RootMargin/MainLayout/LayoutVBox/BodyRow/LeftPanel/PanelContent/ContentScroll/JobsVBox/IndustryEfficiency/InspectorVBox/InspectorHeader/TileTitle")
+	_subtitle_label = root.get_node("RootMargin/MainLayout/LayoutVBox/BodyRow/LeftPanel/PanelContent/ContentScroll/JobsVBox/IndustryEfficiency/InspectorVBox/InspectorHeader/TileSubtitle")
+	_badge_label = root.get_node("RootMargin/MainLayout/LayoutVBox/BodyRow/LeftPanel/PanelContent/ContentScroll/JobsVBox/IndustryEfficiency/InspectorVBox/InspectorHeader/TileBadgeBox/TileBadgeLabel")
+	_status_value_label = root.get_node("RootMargin/MainLayout/LayoutVBox/BodyRow/LeftPanel/PanelContent/ContentScroll/JobsVBox/IndustryEfficiency/InspectorVBox/AttrGrid/StatusBox/AttrVBox/AttrValue")
 
 
 func apply_world_inspector_tone(primary_type: String, has_selection: bool) -> void:

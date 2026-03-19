@@ -14,7 +14,7 @@ public partial class DisciplePanel : PopupPanelBase
 	private static readonly Color CinnabarColor = new(0.651f, 0.192f, 0.165f, 1f);
 	private static readonly Color CeladonColor = new(0.439f, 0.553f, 0.506f, 1f);
 	private const string MetricGridPath =
-		"Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid";
+		"ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/MiddlePanel/MiddleMargin/MiddleColumn/MetricGrid";
 	private const int RandomRosterMinCount = 12;
 	private const int RandomRosterMaxCount = 48;
 	private const string RandomRosterButtonIdleText = "调试：随机名册";
@@ -52,11 +52,21 @@ public partial class DisciplePanel : PopupPanelBase
 
 	private Label _summaryLabel = null!;
 	private Label _governanceLabel = null!;
+	private Label _treeCountLabel = null!;
+	private Label _sectRootTitleLabel = null!;
+	private Label _sectRootMetaLabel = null!;
 	private OptionButton _filterOption = null!;
 	private OptionButton _sortOption = null!;
 	private Control? _debugPanel;
 	private Button _randomRosterButton = null!;
-	private Tree _rosterTree = null!;
+	private ScrollContainer _rosterScroll = null!;
+	private HBoxContainer _peakRow = null!;
+	private VBoxContainer _peakColumnTemplate = null!;
+	private VBoxContainer _hallGroupTemplate = null!;
+	private PanelContainer _discipleCardTemplate = null!;
+	private Control _treePage = null!;
+	private Control _profilePage = null!;
+	private Button _backButton = null!;
 	private Label _profileNameLabel = null!;
 	private Label _profileMetaLabel = null!;
 	private Label _profileStatusLabel = null!;
@@ -67,6 +77,7 @@ public partial class DisciplePanel : PopupPanelBase
 	private Button _directiveNoneButton = null!;
 	private Button _directiveOuterButton = null!;
 	private Button _directiveStewardButton = null!;
+	private Button _cultivationJumpButton = null!;
 	private Button _closeButton = null!;
 	private Label _hintLabel = null!;
 	private FlowContainer _traitFlow = null!;
@@ -84,7 +95,7 @@ public partial class DisciplePanel : PopupPanelBase
 	private readonly List<DiscipleProfile> _allProfiles = new();
 	private readonly List<DiscipleProfile> _visibleProfiles = new();
 	private readonly List<DiscipleProfile> _randomRosterProfiles = new();
-	private readonly Dictionary<int, TreeItem> _rosterItems = new();
+	private readonly Dictionary<int, PanelContainer> _rosterCardButtons = new();
 	private Node? _visualFx;
 	private bool _uiBound;
 	private bool _randomRosterPreviewActive;
@@ -96,6 +107,7 @@ public partial class DisciplePanel : PopupPanelBase
 	private SortMode _sortMode;
 
 	public event Action<int, DiscipleDirectiveType>? DirectiveRequested;
+	public event Action<int>? CultivationRequested;
 
 	public override void _Ready()
 	{
@@ -138,6 +150,7 @@ public partial class DisciplePanel : PopupPanelBase
 		PopulationRules.EnsureDefaults(_state);
 		SectGovernanceRules.EnsureDefaults(_state);
 		DiscipleDirectiveRules.EnsureDefaults(_state);
+		DiscipleCultivationRules.EnsureDefaults(_state);
 
 		_allProfiles.Clear();
 		if (_randomRosterPreviewActive)
@@ -176,10 +189,24 @@ public partial class DisciplePanel : PopupPanelBase
 			}
 		}
 
-		RefreshSummary();
 		RebuildDiscipleList();
+		RefreshSummary();
 		UpdateRandomRosterButton();
 		RefreshPopupHint();
+		// 地图点选弟子时直达命谱详情，其余情况保持宗门大谱视角。
+		if (_visibleProfiles.Count == 0)
+		{
+			ShowTreePage();
+			return;
+		}
+		if (preferredDiscipleId.HasValue)
+		{
+			ShowProfilePage();
+		}
+		else
+		{
+			ShowTreePage();
+		}
 	}
 
 	protected override string GetPopupHintText()
@@ -204,36 +231,47 @@ public partial class DisciplePanel : PopupPanelBase
 			return;
 		}
 
-		_summaryLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/SummaryPanel/SummaryMargin/SummaryColumn/SummaryLabel");
-		_governanceLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/SummaryPanel/SummaryMargin/SummaryColumn/GovernanceLabel");
-		_filterOption = GetNode<OptionButton>("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/FilterPanel/FilterMargin/FilterColumn/FilterOption");
-		_sortOption = GetNode<OptionButton>("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/FilterPanel/FilterMargin/FilterColumn/SortOption");
-		_debugPanel = GetNodeOrNull<Control>("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/DebugPanel");
-		_randomRosterButton = GetNode<Button>("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/DebugPanel/DebugMargin/DebugRow/RandomRosterButton");
-		_rosterTree = GetNode<Tree>("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/RosterFrame/RosterMargin/RosterTree");
-		_profileNameLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/ProfileHeader/ProfileTextColumn/ProfileName");
-		_profileMetaLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/ProfileHeader/ProfileTextColumn/ProfileMeta");
-		_profileStatusLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/ProfileHeader/ProfileTextColumn/ProfileStatus");
-		_directiveStatusLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveStatus");
-		_directiveEffectLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveEffect");
-		_rootCircleLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/ProfileHeader/RootCircle/RootCircleLabel");
-		_radarChart = GetNode<Control>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/RadarCenter/RadarChart");
-		_realmStatusLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/RealmBox/RealmStatus");
-		_realmProgressBar = GetNode<ProgressBar>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/RealmBox/RealmProgress");
-		_realmProgressHintLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/RealmBox/RealmHint");
-		_qiSeaProgressBar = GetNode<ProgressBar>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/QiSeaBox/QiSeaProgress");
-		_qiSeaHintLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/QiSeaBox/QiSeaHint");
-		_combatSealLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/CombatTag/CombatMargin/CombatColumn/CombatMain");
-		_combatSealHintLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/CombatTag/CombatMargin/CombatColumn/CombatHint");
-		_traitFlow = GetNode<FlowContainer>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel/TraitMargin/TraitColumn/TraitFlow");
-		_traitTagTemplate = GetNode<PanelContainer>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel/TraitTagTemplate");
-		_annotationLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/FullInfoPanel/FullInfoMargin/FullInfoColumn/AnnotationPanel/AnnotationMargin/AnnotationColumn/AnnotationText");
-		_fullInfoLabel = GetNode<RichTextLabel>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/FullInfoPanel/FullInfoMargin/FullInfoColumn/FullInfoScroll/FullInfoLabel");
-		_directiveNoneButton = GetNode<Button>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveButtonRow/DirectiveNoneButton");
-		_directiveOuterButton = GetNode<Button>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveButtonRow/DirectiveOuterButton");
-		_directiveStewardButton = GetNode<Button>("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveButtonRow/DirectiveStewardButton");
-		_hintLabel = GetNode<Label>("Overlay/Wrapper/RootColumn/HintLabel");
-		_closeButton = GetNode<Button>("Overlay/Wrapper/RootColumn/HeaderPanel/HeaderMargin/HeaderRow/CloseButton");
+		_summaryLabel = GetNode<Label>("ScreenMargin/ScreenRoot/TreePage/TreeColumn/SummaryPanel/SummaryMargin/SummaryColumn/SummaryLabel");
+		_governanceLabel = GetNode<Label>("ScreenMargin/ScreenRoot/TreePage/TreeColumn/SummaryPanel/SummaryMargin/SummaryColumn/GovernanceLabel");
+		_treeCountLabel = GetNode<Label>("ScreenMargin/ScreenRoot/TreePage/TreeColumn/HeaderRow/TreeCountBadge/TreeCountLabel");
+		_sectRootTitleLabel = GetNode<Label>("ScreenMargin/ScreenRoot/TreePage/TreeColumn/RosterPanel/RosterMargin/RosterScroll/ChartRoot/SectRootCenter/SectRootCard/SectRootMargin/SectRootColumn/SectTitleLabel");
+		_sectRootMetaLabel = GetNode<Label>("ScreenMargin/ScreenRoot/TreePage/TreeColumn/RosterPanel/RosterMargin/RosterScroll/ChartRoot/SectRootCenter/SectRootCard/SectRootMargin/SectRootColumn/SectMetaLabel");
+		_filterOption = GetNode<OptionButton>("ScreenMargin/ScreenRoot/TreePage/TreeColumn/FilterPanel/FilterMargin/FilterColumn/FilterOption");
+		_sortOption = GetNode<OptionButton>("ScreenMargin/ScreenRoot/TreePage/TreeColumn/FilterPanel/FilterMargin/FilterColumn/SortOption");
+		_debugPanel = GetNodeOrNull<Control>("ScreenMargin/ScreenRoot/TreePage/TreeColumn/DebugPanel");
+		_randomRosterButton = GetNode<Button>("ScreenMargin/ScreenRoot/TreePage/TreeColumn/DebugPanel/DebugMargin/DebugRow/RandomRosterButton");
+		_rosterScroll = GetNode<ScrollContainer>("ScreenMargin/ScreenRoot/TreePage/TreeColumn/RosterPanel/RosterMargin/RosterScroll");
+		_peakRow = GetNode<HBoxContainer>("ScreenMargin/ScreenRoot/TreePage/TreeColumn/RosterPanel/RosterMargin/RosterScroll/ChartRoot/BranchWrap/PeakRow");
+		_peakColumnTemplate = GetNode<VBoxContainer>("ScreenMargin/ScreenRoot/TreePage/TreeColumn/RosterPanel/RosterMargin/RosterScroll/ChartRoot/Templates/PeakColumnTemplate");
+		_hallGroupTemplate = GetNode<VBoxContainer>("ScreenMargin/ScreenRoot/TreePage/TreeColumn/RosterPanel/RosterMargin/RosterScroll/ChartRoot/Templates/HallGroupTemplate");
+		_discipleCardTemplate = GetNode<PanelContainer>("ScreenMargin/ScreenRoot/TreePage/TreeColumn/RosterPanel/RosterMargin/RosterScroll/ChartRoot/Templates/DiscipleCardTemplate");
+		_treePage = GetNode<Control>("ScreenMargin/ScreenRoot/TreePage");
+		_profilePage = GetNode<Control>("ScreenMargin/ScreenRoot/ProfilePage");
+		_backButton = GetNode<Button>("TopOverlay/BackButton");
+		_profileNameLabel = GetNode<Label>("ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/LeftPanel/LeftMargin/LeftColumn/ProfileName");
+		_profileMetaLabel = GetNode<Label>("ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/LeftPanel/LeftMargin/LeftColumn/ProfileMeta");
+		_profileStatusLabel = GetNode<Label>("ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/LeftPanel/LeftMargin/LeftColumn/ProfileStatus");
+		_directiveStatusLabel = GetNode<Label>("ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/DirectiveHeader/DirectiveStatus");
+		_directiveEffectLabel = GetNode<Label>("ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/DirectiveHeader/DirectiveEffect");
+		_rootCircleLabel = GetNode<Label>("ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/LeftPanel/LeftMargin/LeftColumn/RootCircleWrap/RootCircle/RootCircleLabel");
+		_radarChart = GetNode<Control>("ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/MiddlePanel/MiddleMargin/MiddleColumn/RadarWrap/RadarChart");
+		_realmStatusLabel = GetNode<Label>("ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/RealmBox/RealmMargin/RealmColumn/RealmStatus");
+		_realmProgressBar = GetNode<ProgressBar>("ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/RealmBox/RealmMargin/RealmColumn/RealmProgress");
+		_realmProgressHintLabel = GetNode<Label>("ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/RealmBox/RealmMargin/RealmColumn/RealmHint");
+		_qiSeaProgressBar = GetNode<ProgressBar>("ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/QiSeaBox/QiSeaMargin/QiSeaColumn/QiSeaProgress");
+		_qiSeaHintLabel = GetNode<Label>("ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/QiSeaBox/QiSeaMargin/QiSeaColumn/QiSeaHint");
+		_combatSealLabel = GetNode<Label>("ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/CombatTag/CombatMargin/CombatColumn/CombatMain");
+		_combatSealHintLabel = GetNode<Label>("ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/CombatTag/CombatMargin/CombatColumn/CombatHint");
+		_traitFlow = GetNode<FlowContainer>("ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/TraitPanel/TraitMargin/TraitColumn/TraitFlow");
+		_traitTagTemplate = GetNode<PanelContainer>("ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/TraitPanel/TraitMargin/TraitColumn/TraitTagTemplate");
+		_annotationLabel = GetNode<Label>("ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/LogPanel/LogMargin/LogColumn/LogSummary");
+		_fullInfoLabel = GetNode<RichTextLabel>("ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/LogPanel/LogMargin/LogColumn/LogScroll/LogText");
+		_directiveNoneButton = GetNode<Button>("ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/DirectiveActions/ActionMargin/ActionColumn/ActionGrid/DirectiveNoneButton");
+		_directiveOuterButton = GetNode<Button>("ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/DirectiveActions/ActionMargin/ActionColumn/ActionGrid/DirectiveOuterButton");
+		_directiveStewardButton = GetNode<Button>("ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/DirectiveActions/ActionMargin/ActionColumn/ActionGrid/DirectiveStewardButton");
+		_cultivationJumpButton = GetNode<Button>("ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/DirectiveActions/ActionMargin/ActionColumn/ActionGrid/CultivationJumpButton");
+		_hintLabel = GetNode<Label>("ScreenMargin/ScreenRoot/HintLabel");
+		_closeButton = GetNode<Button>("TopOverlay/CloseButton");
 		_visualFx = GetNodeOrNull<Node>("VisualFx");
 
 		_metrics.Clear();
@@ -250,13 +288,17 @@ public partial class DisciplePanel : PopupPanelBase
 		_filterOption.ItemSelected += OnFilterSelected;
 		_sortOption.ItemSelected += OnSortSelected;
 		_randomRosterButton.Pressed += ToggleRandomRosterPreview;
-		_rosterTree.ItemSelected += OnRosterTreeItemSelected;
+		_backButton.Pressed += ShowTreePage;
 		_directiveNoneButton.Pressed += () => RequestDirectiveChange(DiscipleDirectiveType.None);
 		_directiveOuterButton.Pressed += () => RequestDirectiveChange(DiscipleDirectiveType.OuterMissionCandidate);
 		_directiveStewardButton.Pressed += () => RequestDirectiveChange(DiscipleDirectiveType.StewardCandidate);
+		_cultivationJumpButton.Pressed += RequestCultivationOpen;
 		_closeButton.Pressed += ClosePopup;
 
 		_traitTagTemplate.Visible = false;
+		_peakColumnTemplate.Visible = false;
+		_hallGroupTemplate.Visible = false;
+		_discipleCardTemplate.Visible = false;
 
 		if (_debugPanel != null)
 		{
@@ -264,6 +306,7 @@ public partial class DisciplePanel : PopupPanelBase
 		}
 
 		UpdateRandomRosterButton();
+		ShowTreePage();
 
 		_uiBound = true;
 	}
@@ -383,6 +426,9 @@ public partial class DisciplePanel : PopupPanelBase
 		var talentPlan = SectGovernanceRules.GetActiveTalentPlanDefinition(_state);
 		var law = SectGovernanceRules.GetActiveLawDefinition(_state);
 		var direction = SectGovernanceRules.GetActiveDevelopmentDefinition(_state);
+		_treeCountLabel.Text = $"总录门人：{_allProfiles.Count} 人";
+		_sectRootTitleLabel.Text = SectNamingRules.GetName(_state, SectNamingRules.SectNameKey);
+		_sectRootMetaLabel.Text = $"谱系收录 {_allProfiles.Count} 人 · 当前筛读 {_visibleProfiles.Count} 人";
 
 		if (_randomRosterPreviewActive)
 		{
@@ -404,36 +450,19 @@ public partial class DisciplePanel : PopupPanelBase
 		_visibleProfiles.AddRange(_allProfiles.Where(MatchesFilter));
 		SortProfiles(_visibleProfiles);
 
-		_rosterItems.Clear();
-		_rosterTree.Clear();
-		var root = _rosterTree.CreateItem();
+		_rosterCardButtons.Clear();
+		ClearPeakColumns();
 
 		if (_visibleProfiles.Count == 0)
 		{
-			var emptyItem = _rosterTree.CreateItem(root);
-			emptyItem.SetText(0, "当前筛选下暂无弟子收录。");
-			emptyItem.SetSelectable(0, false);
+			_peakRow.AddChild(CreateEmptyPeakColumn());
 			ClearDetail();
 			return;
 		}
 
 		foreach (var peakGroup in BuildPeakSections(_visibleProfiles))
 		{
-			var peakItem = _rosterTree.CreateItem(root);
-			peakItem.SetText(0, $"◈ {ResolveRosterPeakTitle(peakGroup.Key)}");
-			peakItem.SetSelectable(0, false);
-			peakItem.Collapsed = false;
-
-			foreach (var profile in peakGroup
-						 .OrderBy(profile => ResolveRosterRankOrder(profile.RankName))
-						 .ThenBy(profile => profile.Name))
-			{
-				var discipleItem = _rosterTree.CreateItem(peakItem);
-				discipleItem.SetText(0, BuildListText(profile));
-				discipleItem.SetMetadata(0, profile.Id);
-				discipleItem.SetTooltipText(0, $"{profile.DutyDisplayName} · {profile.RealmName} · {profile.LinkedPeakSummary}");
-				_rosterItems[profile.Id] = discipleItem;
-			}
+			_peakRow.AddChild(CreatePeakColumn(peakGroup.Key, peakGroup.ToList()));
 		}
 
 		var selectedIndex = _visibleProfiles.FindIndex(profile => profile.Id == _selectedDiscipleId);
@@ -443,7 +472,7 @@ public partial class DisciplePanel : PopupPanelBase
 			_selectedDiscipleId = _visibleProfiles[0].Id;
 		}
 
-		SelectRosterTreeItem(_selectedDiscipleId);
+		SelectRosterCard(_selectedDiscipleId);
 		RefreshDetail(_visibleProfiles[selectedIndex]);
 	}
 
@@ -453,6 +482,16 @@ public partial class DisciplePanel : PopupPanelBase
 		var techniqueTag = ResolveTechniqueTag(profile);
 		var skillTag = ResolveSkillTag(profile);
 		var directiveText = DiscipleDirectiveRules.GetDirectiveDisplayName(profile.DirectiveType);
+		// 依据长期火候提炼当前弟子的专精路数，让详情页能直接读出培养方向差异。
+		var specializationSummary = DiscipleCultivationRules.BuildSpecializationSummary(_state, profile.Id);
+		var specializationSummaryText = specializationSummary == "路数未成" ? "尚在积累" : specializationSummary;
+		var specializationNarrative = DiscipleCultivationRules.BuildSpecializationNarrative(_state, profile.Id);
+		var branchSummary = DiscipleCultivationRules.BuildSpecializationBranchSummary(_state, profile.Id);
+		var branchNarrative = DiscipleCultivationRules.BuildSpecializationBranchNarrative(_state, profile.Id);
+		var dutyAffinitySummary = DiscipleCultivationRules.BuildDutyAffinitySummary(_state, profile);
+		var techniqueCraftSpecializationSummary = DiscipleCultivationRules.BuildTechniqueCraftSpecializationSummary(_state, profile.Id);
+		var specializationEffectSummary = DiscipleCultivationRules.BuildSpecializationEffectSummary(_state, profile.Id);
+		var latestInsightSummary = DiscipleCultivationRules.BuildLatestInsightSummary(_state, profile.Id);
 
 		_profileNameLabel.Text = profile.Name;
 		_profileMetaLabel.Text =
@@ -460,19 +499,26 @@ public partial class DisciplePanel : PopupPanelBase
 		_rootCircleLabel.Text = ResolveRootSummary(profile);
 		_realmStatusLabel.Text = $"修为境界：{profile.RealmName}";
 		_realmProgressBar.Value = ResolveRealmProgress(profile);
-		_realmProgressHintLabel.Text = $"进度：{ResolveRealmProgressText(profile)}";
+		var techniqueStage = DiscipleCultivationRules.GetTrackStageLabel(_state, profile.Id, DiscipleCultivationAssignmentType.TechniquePolish);
+		_realmProgressHintLabel.Text = string.IsNullOrWhiteSpace(techniqueStage)
+			? $"进度：{ResolveRealmProgressText(profile)}"
+			: $"进度：{ResolveRealmProgressText(profile)} · 功法{techniqueStage}";
 		_combatSealLabel.Text = ResolveCombatSeal(profile);
-		_combatSealHintLabel.Text = $"（{ResolveCombatSealHint(profile)}）";
+		_combatSealHintLabel.Text = $"（{ResolveCombatSealHint(profile)}；修炼反哺：{DiscipleCultivationRules.BuildPerformanceFeedbackSummary(_state, profile.Id)}）";
 		_qiSeaProgressBar.Value = ResolveQiSeaProgress(profile);
-		_qiSeaHintLabel.Text = $"蓄量：{ResolveQiSeaText(profile)}";
+		var meditationStage = DiscipleCultivationRules.GetTrackStageLabel(_state, profile.Id, DiscipleCultivationAssignmentType.Meditation);
+		_qiSeaHintLabel.Text = string.IsNullOrWhiteSpace(meditationStage)
+			? $"蓄量：{ResolveQiSeaText(profile)}"
+			: $"蓄量：{ResolveQiSeaText(profile)} · 静修{meditationStage}";
 		_profileStatusLabel.Text =
-			$"当前差事：{profile.CurrentAssignment}\n居所：{profile.ResidenceName}\n关联峰脉：{profile.LinkedPeakSummary}";
+			$"当前差事：{profile.CurrentAssignment}\n居所：{profile.ResidenceName}\n关联峰脉：{profile.LinkedPeakSummary}\n修炼积累：{DiscipleCultivationRules.BuildLongTermProgressSummary(_state, profile.Id)}\n培养路数：{specializationSummaryText}\n专修分支：{branchSummary}\n专精映照：{techniqueCraftSpecializationSummary}\n差事相性：{dutyAffinitySummary}\n专精效用：{specializationEffectSummary}\n最近修炼：{DiscipleCultivationRules.BuildLatestHistorySummary(_state, profile.Id)}\n最近感悟：{latestInsightSummary}";
 		_directiveStatusLabel.Text = $"当前批注：{directiveText}";
-		_directiveEffectLabel.Text = BuildDirectiveEffectText(profile);
+		_directiveEffectLabel.Text = $"{BuildDirectiveEffectText(profile)}\n修炼反哺：{DiscipleCultivationRules.BuildPerformanceFeedbackSummary(_state, profile.Id)}\n路数批注：{specializationNarrative}\n分支批注：{branchNarrative}";
 		_annotationLabel.Text = BuildAnnotation(profile);
 		_fullInfoLabel.Text = BuildFullInfoText(profile, identityTag, techniqueTag, skillTag);
 		RefreshTraits(profile);
 		UpdateDirectiveButtons(profile);
+		UpdateCultivationJumpButton(profile);
 
 		SetMetric("Insight", profile.Insight);
 		SetMetric("Potential", profile.Potential);
@@ -513,6 +559,7 @@ public partial class DisciplePanel : PopupPanelBase
 		_fullInfoLabel.Text = "[color=#5b4d42]卷中详录暂未展开，请先选中一名弟子。[/color]";
 		RefreshTraits(null);
 		UpdateDirectiveButtons(null);
+		UpdateCultivationJumpButton(null);
 
 		SetMetric("Insight", 0);
 		SetMetric("Potential", 0);
@@ -531,6 +578,24 @@ public partial class DisciplePanel : PopupPanelBase
 			("神魂", 0),
 			("心境", 0));
 		CallVisualFx("transition_profile_card");
+	}
+
+	private void ShowTreePage()
+	{
+		// 宗门大谱为宏观视角，收起返回按钮并保留名册选中。
+		_treePage.Visible = true;
+		_profilePage.Visible = false;
+		_backButton.Visible = false;
+		CallVisualFx("switch_to_tree");
+	}
+
+	private void ShowProfilePage()
+	{
+		// 命谱详情用于聚焦单人信息，开启返回按钮并触发过场动效。
+		_treePage.Visible = false;
+		_profilePage.Visible = true;
+		_backButton.Visible = true;
+		CallVisualFx("switch_to_profile");
 	}
 
 	private void RefreshTraits(DiscipleProfile? profile)
@@ -573,21 +638,8 @@ public partial class DisciplePanel : PopupPanelBase
 		CallVisualFx("pulse_roster_refresh");
 	}
 
-	private void OnRosterTreeItemSelected()
+	private void OnRosterCardPressed(int discipleId)
 	{
-		var selectedItem = _rosterTree.GetSelected();
-		if (selectedItem == null)
-		{
-			return;
-		}
-
-		var metadata = selectedItem.GetMetadata(0);
-		if (metadata.VariantType != Variant.Type.Int)
-		{
-			return;
-		}
-
-		var discipleId = metadata.AsInt32();
 		var profile = _visibleProfiles.FirstOrDefault(candidate => candidate.Id == discipleId);
 		if (profile == null)
 		{
@@ -595,7 +647,9 @@ public partial class DisciplePanel : PopupPanelBase
 		}
 
 		_selectedDiscipleId = discipleId;
+		SelectRosterCard(discipleId);
 		RefreshDetail(profile);
+		ShowProfilePage();
 	}
 
 	private void RequestDirectiveChange(DiscipleDirectiveType directiveType)
@@ -615,6 +669,24 @@ public partial class DisciplePanel : PopupPanelBase
 
 		DirectiveRequested?.Invoke(profile.Id, directiveType);
 		ShowPopupStatusMessage($"已将“{profile.Name}”的卷中批注提请执事层更新。");
+	}
+
+	private void RequestCultivationOpen()
+	{
+		if (_randomRosterPreviewActive)
+		{
+			ShowPopupStatusMessage("随机名册仅用于调试预览，暂不可转入修炼卷。");
+			return;
+		}
+
+		var profile = _visibleProfiles.FirstOrDefault(candidate => candidate.Id == _selectedDiscipleId);
+		if (profile == null)
+		{
+			ShowPopupStatusMessage("当前未选中弟子，无法转入修炼卷。");
+			return;
+		}
+
+		CultivationRequested?.Invoke(profile.Id);
 	}
 
 	private bool MatchesFilter(DiscipleProfile profile)
@@ -714,15 +786,133 @@ public partial class DisciplePanel : PopupPanelBase
 			.ThenBy(group => group.Key);
 	}
 
-	private void SelectRosterTreeItem(int discipleId)
+	private IEnumerable<IGrouping<string, DiscipleProfile>> BuildHallSections(IEnumerable<DiscipleProfile> profiles)
 	{
-		if (!_rosterItems.TryGetValue(discipleId, out var item))
+		return profiles
+			.GroupBy(ResolveRosterHallKey)
+			.OrderBy(group => ResolveRosterHallOrder(group.Key))
+			.ThenBy(group => group.Key);
+	}
+
+	private void ClearPeakColumns()
+	{
+		foreach (var child in _peakRow.GetChildren())
+		{
+			_peakRow.RemoveChild(child);
+			child.QueueFree();
+		}
+	}
+
+	private Control CreateEmptyPeakColumn()
+	{
+		var container = new VBoxContainer();
+		container.CustomMinimumSize = new Vector2(260f, 0f);
+		var label = new Label
+		{
+			Text = "当前筛选下暂无弟子收录。",
+			AutowrapMode = TextServer.AutowrapMode.WordSmart
+		};
+		container.AddChild(label);
+		return container;
+	}
+
+	private Control CreatePeakColumn(string peakKey, IReadOnlyList<DiscipleProfile> profiles)
+	{
+		var peakColumn = (VBoxContainer)_peakColumnTemplate.Duplicate();
+		peakColumn.Visible = true;
+		var peakTitleLabel = peakColumn.GetNode<Label>("PeakCard/PeakMargin/PeakColumn/PeakTitleLabel");
+		var peakCountLabel = peakColumn.GetNode<Label>("PeakCard/PeakMargin/PeakColumn/PeakCountLabel");
+		var hallStack = peakColumn.GetNode<VBoxContainer>("HallStack");
+
+		peakTitleLabel.Text = ResolveRosterPeakTitle(peakKey);
+		peakCountLabel.Text = $"{profiles.Count} 人";
+		CallVisualFx("style_peak_card", peakColumn.GetNode<PanelContainer>("PeakCard"));
+
+		foreach (var hallGroup in BuildHallSections(profiles))
+		{
+			hallStack.AddChild(CreateHallGroup(hallGroup.Key, hallGroup.ToList()));
+		}
+
+		return peakColumn;
+	}
+
+	private Control CreateHallGroup(string hallKey, IReadOnlyList<DiscipleProfile> profiles)
+	{
+		var hallGroup = (VBoxContainer)_hallGroupTemplate.Duplicate();
+		hallGroup.Visible = true;
+		var hallTitleLabel = hallGroup.GetNode<Label>("HallCard/HallMargin/HallColumn/HallTitleLabel");
+		var hallMetaLabel = hallGroup.GetNode<Label>("HallCard/HallMargin/HallColumn/HallMetaLabel");
+		var discipleColumn = hallGroup.GetNode<VBoxContainer>("DiscipleColumn");
+
+		hallTitleLabel.Text = SectNamingRules.GetName(_state, hallKey);
+		hallMetaLabel.Text = $"{profiles.Count} 人";
+		CallVisualFx("style_hall_card", hallGroup.GetNode<PanelContainer>("HallCard"));
+
+		foreach (var profile in profiles
+					 .OrderBy(profile => ResolveRosterRankOrder(profile.RankName))
+					 .ThenBy(profile => profile.Name))
+		{
+			discipleColumn.AddChild(CreateDiscipleCard(profile));
+		}
+
+		return hallGroup;
+	}
+
+	private PanelContainer CreateDiscipleCard(DiscipleProfile profile)
+	{
+		var card = (PanelContainer)_discipleCardTemplate.Duplicate();
+		card.Visible = true;
+		card.MouseFilter = Control.MouseFilterEnum.Stop;
+		card.CustomMinimumSize = new Vector2(0f, 82f);
+		card.TooltipText = $"{profile.DutyDisplayName} · {profile.RealmName} · {profile.LinkedPeakSummary}";
+		SetMouseIgnoreRecursive(card);
+		card.GetNode<Label>("CardMargin/CardColumn/DiscipleBadgeLabel").Text = profile.IsElite ? "真传" : profile.RankName;
+		card.GetNode<Label>("CardMargin/CardColumn/DiscipleNameLabel").Text = profile.Name;
+		card.GetNode<Label>("CardMargin/CardColumn/DiscipleRealmLabel").Text = profile.RealmName;
+		card.GetNode<Label>("CardMargin/CardColumn/DiscipleDutyLabel").Text = profile.CurrentAssignment;
+		card.GuiInput += @event => OnRosterCardGuiInput(@event, profile.Id);
+		_rosterCardButtons[profile.Id] = card;
+		CallVisualFx("style_roster_card", card, profile.Id == _selectedDiscipleId);
+		return card;
+	}
+
+	private static void SetMouseIgnoreRecursive(Node node)
+	{
+		foreach (var child in node.GetChildren())
+		{
+			if (child is Control control)
+			{
+				control.MouseFilter = Control.MouseFilterEnum.Ignore;
+			}
+
+			SetMouseIgnoreRecursive(child);
+		}
+	}
+
+	private void SelectRosterCard(int discipleId)
+	{
+		foreach (var entry in _rosterCardButtons)
+		{
+			CallVisualFx("style_roster_card", entry.Value, entry.Key == discipleId);
+		}
+
+		if (_rosterCardButtons.TryGetValue(discipleId, out var card))
+		{
+			_rosterScroll.EnsureControlVisible(card);
+		}
+	}
+
+	private void OnRosterCardGuiInput(InputEvent @event, int discipleId)
+	{
+		// 族谱卡片改为 PanelContainer 后，改用点击输入桥接详情跳转。
+		if (@event is not InputEventMouseButton mouseEvent ||
+			!mouseEvent.Pressed ||
+			mouseEvent.ButtonIndex != MouseButton.Left)
 		{
 			return;
 		}
 
-		item.Select(0);
-		_rosterTree.EnsureCursorIsVisible();
+		OnRosterCardPressed(discipleId);
 	}
 
 	private static int ResolveRosterPeakOrder(string peakKey)
@@ -1061,8 +1251,17 @@ public partial class DisciplePanel : PopupPanelBase
 		return topFocuses.Length == 0 ? "暂无判定" : string.Join(" · ", topFocuses);
 	}
 
-	private static string ResolveCultivationPlan(DiscipleProfile profile)
+	private string ResolveCultivationPlan(DiscipleProfile profile)
 	{
+		var cultivationAssignment = DiscipleCultivationRules.GetAssignment(_state, profile.Id);
+		if (cultivationAssignment != DiscipleCultivationAssignmentType.None)
+		{
+			return
+				$"{DiscipleCultivationRules.GetAssignmentDisplayName(cultivationAssignment)}为主，" +
+				$"{DiscipleCultivationRules.GetAssignmentShortEffect(cultivationAssignment)} " +
+				$"当前火候：{DiscipleCultivationRules.BuildTrackProgressSummary(_state, profile.Id, cultivationAssignment)}";
+		}
+
 		if (profile.AgeBand == DiscipleAgeBand.Seedling)
 		{
 			return "启蒙课业为主，稳固根基。";
@@ -1128,8 +1327,19 @@ public partial class DisciplePanel : PopupPanelBase
 		var primaryTrait = profile.TraitSummary
 			.Split('/', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
 			.FirstOrDefault() ?? "气机平和";
+		var specializationSummary = DiscipleCultivationRules.BuildSpecializationSummary(_state, profile.Id);
+		var specializationNarrative = DiscipleCultivationRules.BuildSpecializationNarrative(_state, profile.Id);
+		var branchSummary = DiscipleCultivationRules.BuildSpecializationBranchSummary(_state, profile.Id);
+		var branchNarrative = DiscipleCultivationRules.BuildSpecializationBranchNarrative(_state, profile.Id);
+		var specializationSentence = specializationSummary == "路数未成"
+			? "专精路数尚浅，当前仍以常制修行为主。"
+			: $"其路数已归作“{specializationSummary}”，并牵出“{branchSummary}”，{specializationNarrative} {branchNarrative}";
 
-		return $"观其气机，{primaryTrait}，骨相与心识相济。现下以“{profile.CurrentAssignment}”为主线，{profile.Note} 若能继续借 {ResolveRosterPeakTitle(profile)} {ResolveRosterHallTitle(profile)} 之务磨砺，则在 {profile.RealmName} 上尚可再进一步。";
+		return
+			$"观其气机，{primaryTrait}，骨相与心识相济。现下以“{profile.CurrentAssignment}”为主线，" +
+			$"修炼卷记为“{ResolveCultivationPlan(profile)}”，其长期积累为“{DiscipleCultivationRules.BuildLongTermProgressSummary(_state, profile.Id)}”。" +
+			$"{specializationSentence} 近时又记“{DiscipleCultivationRules.BuildLatestHistorySummary(_state, profile.Id)}”。" +
+			$"{profile.Note} 若能继续借 {ResolveRosterPeakTitle(profile)} {ResolveRosterHallTitle(profile)} 之务磨砺，则在 {profile.RealmName} 上尚可再进一步。";
 	}
 
 	private string BuildFullInfoText(DiscipleProfile profile, string identityTag, string techniqueTag, string skillTag)
@@ -1138,6 +1348,23 @@ public partial class DisciplePanel : PopupPanelBase
 		var eliteText = profile.IsElite ? "已入真传卷" : "未入真传卷";
 		var directiveText = DiscipleDirectiveRules.GetDirectiveDisplayName(profile.DirectiveType);
 		var directiveEffect = DiscipleDirectiveRules.GetDirectiveShortEffect(profile.DirectiveType);
+		var cultivationAssignment = DiscipleCultivationRules.GetAssignment(_state, profile.Id);
+		var cultivationEffect = DiscipleCultivationRules.GetAssignmentShortEffect(cultivationAssignment);
+		var cultivationProgressSummary = DiscipleCultivationRules.BuildLongTermProgressSummary(_state, profile.Id);
+		var cultivationActiveProgress = DiscipleCultivationRules.BuildActiveTrackProgressSummary(_state, profile.Id);
+		var cultivationHistoryText = DiscipleCultivationRules.BuildHistoryMultilineText(_state, profile.Id);
+		var cultivationInsightSummary = DiscipleCultivationRules.BuildLatestInsightSummary(_state, profile.Id);
+		var cultivationFeedbackSummary = DiscipleCultivationRules.BuildPerformanceFeedbackSummary(_state, profile.Id);
+		var cultivationSpecializationSummary = DiscipleCultivationRules.BuildSpecializationSummary(_state, profile.Id);
+		var cultivationSpecializationSummaryText = cultivationSpecializationSummary == "路数未成" ? "尚在积累" : cultivationSpecializationSummary;
+		var cultivationSpecializationNarrative = DiscipleCultivationRules.BuildSpecializationNarrative(_state, profile.Id);
+		var cultivationBranchSummary = DiscipleCultivationRules.BuildSpecializationBranchSummary(_state, profile.Id);
+		var cultivationBranchNarrative = DiscipleCultivationRules.BuildSpecializationBranchNarrative(_state, profile.Id);
+		var cultivationTechniqueSpecialization = DiscipleCultivationRules.BuildTechniqueSpecializationLabel(_state, profile.Id);
+		var cultivationPrimarySkillSpecialization = DiscipleCultivationRules.BuildPrimaryCraftSpecializationLabel(_state, profile.Id);
+		var cultivationSecondarySkillSpecialization = DiscipleCultivationRules.BuildSecondaryCraftSpecializationLabel(_state, profile.Id);
+		var cultivationDutyAffinitySummary = DiscipleCultivationRules.BuildDutyAffinitySummary(_state, profile);
+		var cultivationSpecializationEffectSummary = DiscipleCultivationRules.BuildSpecializationEffectSummary(_state, profile.Id);
 		var overviewLine = $"{identityTag} · {profile.RealmName} · {techniqueTag} · {skillTag}";
 		var rootSummaryLine = ResolveRootSummary(profile).Replace("\n", " · ");
 		var detailLines = new[]
@@ -1167,7 +1394,22 @@ public partial class DisciplePanel : PopupPanelBase
 			$"[b]功法[/b]：{techniqueTag}",
 			$"[b]主修技艺[/b]：{skillTag}",
 			$"[b]辅修技艺[/b]：{secondarySkillTag}",
+			$"[b]功法偏锋[/b]：{cultivationTechniqueSpecialization}",
+			$"[b]主艺偏锋[/b]：{cultivationPrimarySkillSpecialization}",
+			$"[b]辅艺映照[/b]：{cultivationSecondarySkillSpecialization}",
 			$"[b]修行安排[/b]：{ResolveCultivationPlan(profile)}",
+			$"[b]修炼卷批注[/b]：{cultivationEffect}",
+			$"[b]长期积累[/b]：{cultivationProgressSummary}",
+			$"[b]当前火候[/b]：{cultivationActiveProgress}",
+			$"[b]培养路数[/b]：{cultivationSpecializationSummaryText}",
+			$"[b]专修分支[/b]：{cultivationBranchSummary}",
+			$"[b]差事相性[/b]：{cultivationDutyAffinitySummary}",
+			$"[b]路数批注[/b]：{cultivationSpecializationNarrative}",
+			$"[b]分支批注[/b]：{cultivationBranchNarrative}",
+			$"[b]专精效用[/b]：{cultivationSpecializationEffectSummary}",
+			$"[b]火候反哺[/b]：{cultivationFeedbackSummary}",
+			$"[b]最近感悟[/b]：{cultivationInsightSummary}",
+			$"[b]修炼履历[/b]：\n{cultivationHistoryText}",
 			string.Empty,
 			"[b]性情与指标[/b]",
 			$"[b]交互指令[/b]：{directiveText}（{directiveEffect}）",
@@ -1190,7 +1432,9 @@ public partial class DisciplePanel : PopupPanelBase
 			return "启蒙新苗暂只记录成长，不纳入外务候补或执事培养重点名册。";
 		}
 
-		return DiscipleDirectiveRules.BuildDiscipleDirectiveEffectSummary(_state, profile);
+		var directiveSummary = DiscipleDirectiveRules.BuildDiscipleDirectiveEffectSummary(_state, profile);
+		var dutyAffinitySummary = DiscipleCultivationRules.BuildDutyAffinitySummary(_state, profile);
+		return $"{directiveSummary}\n当前差事相性：{dutyAffinitySummary}";
 	}
 
 	private static string ResolveIdentityTag(DiscipleProfile profile)
@@ -1218,14 +1462,16 @@ public partial class DisciplePanel : PopupPanelBase
 		return profile.JobType.HasValue ? "外门弟子" : "候值门人";
 	}
 
-	private static string ResolveTechniqueTag(DiscipleProfile profile)
+	private string ResolveTechniqueTag(DiscipleProfile profile)
 	{
+		string baseTechnique;
 		if (profile.AgeBand == DiscipleAgeBand.Seedling)
 		{
-			return "启蒙·养气篇";
+			baseTechnique = "启蒙·养气篇";
+			return baseTechnique;
 		}
 
-		return profile.JobType switch
+		baseTechnique = profile.JobType switch
 		{
 			JobType.Farmer => profile.IsElite ? "灵植·归元真诀" : "灵植·归元诀",
 			JobType.Worker => profile.CurrentAssignment.Contains("检修", StringComparison.Ordinal) ? "阵堂·承山诀" : "天工·锻机诀",
@@ -1233,16 +1479,22 @@ public partial class DisciplePanel : PopupPanelBase
 			JobType.Scholar => profile.CurrentAssignment.Contains("讲法", StringComparison.Ordinal) ? "青云·真诀" : "天机·明衍诀",
 			_ => "待定功法"
 		};
+		baseTechnique = DiscipleCultivationRules.DecorateTechniqueDisplayName(_state, profile.Id, baseTechnique);
+
+		var stageLabel = DiscipleCultivationRules.GetTrackStageLabel(_state, profile.Id, DiscipleCultivationAssignmentType.TechniquePolish);
+		return string.IsNullOrWhiteSpace(stageLabel) ? baseTechnique : $"{baseTechnique}（{stageLabel}）";
 	}
 
-	private static string ResolveSkillTag(DiscipleProfile profile)
+	private string ResolveSkillTag(DiscipleProfile profile)
 	{
+		string baseSkill;
 		if (profile.AgeBand == DiscipleAgeBand.Seedling)
 		{
-			return "待定技艺";
+			baseSkill = "待定技艺";
+			return baseSkill;
 		}
 
-		return profile.JobType switch
+		baseSkill = profile.JobType switch
 		{
 			JobType.Farmer => "灵植",
 			JobType.Worker => profile.CurrentAssignment.Contains("检修", StringComparison.Ordinal) ? "阵法" : "炼器",
@@ -1250,16 +1502,20 @@ public partial class DisciplePanel : PopupPanelBase
 			JobType.Scholar => profile.CurrentAssignment.Contains("讲法", StringComparison.Ordinal) ? "符箓" : "天机",
 			_ => "待定技艺"
 		};
+		baseSkill = DiscipleCultivationRules.DecoratePrimarySkillDisplayName(_state, profile.Id, baseSkill);
+
+		var stageLabel = DiscipleCultivationRules.GetTrackStageLabel(_state, profile.Id, DiscipleCultivationAssignmentType.CraftPractice);
+		return string.IsNullOrWhiteSpace(stageLabel) ? baseSkill : $"{baseSkill}（{stageLabel}）";
 	}
 
-	private static string ResolveSecondarySkillTag(DiscipleProfile profile)
+	private string ResolveSecondarySkillTag(DiscipleProfile profile)
 	{
 		if (profile.AgeBand == DiscipleAgeBand.Seedling)
 		{
 			return "基础课业";
 		}
 
-		return profile.JobType switch
+		var fallbackSkill = profile.JobType switch
 		{
 			JobType.Farmer => "医道",
 			JobType.Worker => "阵法",
@@ -1267,6 +1523,7 @@ public partial class DisciplePanel : PopupPanelBase
 			JobType.Scholar => "符箓",
 			_ => "基础庶务"
 		};
+		return DiscipleCultivationRules.DecorateSecondarySkillDisplayName(_state, profile.Id, fallbackSkill);
 	}
 
 	private void UpdateDirectiveButtons(DiscipleProfile? profile)
@@ -1301,6 +1558,31 @@ public partial class DisciplePanel : PopupPanelBase
 		_directiveNoneButton.Disabled = profile == null;
 		_directiveOuterButton.Disabled = !allowSpecialDirective;
 		_directiveStewardButton.Disabled = !allowSpecialDirective;
+	}
+
+	private void UpdateCultivationJumpButton(DiscipleProfile? profile)
+	{
+		if (_randomRosterPreviewActive)
+		{
+			_cultivationJumpButton.Disabled = true;
+			_cultivationJumpButton.Text = "修炼卷预览禁用";
+			return;
+		}
+
+		if (profile == null)
+		{
+			_cultivationJumpButton.Disabled = true;
+			_cultivationJumpButton.Text = "送入修炼卷";
+			return;
+		}
+
+		var cultivationAssignment = DiscipleCultivationRules.GetAssignment(_state, profile.Id);
+		var assignmentText = DiscipleCultivationRules.GetAssignmentDisplayName(cultivationAssignment);
+		_cultivationJumpButton.Disabled = false;
+		_cultivationJumpButton.Text = cultivationAssignment == DiscipleCultivationAssignmentType.None
+			? "送入修炼卷"
+			: $"修炼卷：{assignmentText}";
+		_cultivationJumpButton.TooltipText = $"打开修炼卷并定位到“{profile.Name}”。";
 	}
 
 	private static string ToChineseProgressText(int percent)

@@ -6,6 +6,11 @@ const INK_MAIN := Color(0.17, 0.15, 0.13, 1.0)
 const INK_MUTED := Color(0.42, 0.37, 0.33, 1.0)
 const SEAL_RED := Color(0.65, 0.16, 0.16, 1.0)
 const BORDER_INK := Color(0.29, 0.25, 0.21, 1.0)
+# 复用全局主题资源，避免设置卷再次退回运行时纯色手柄。
+const SLIDER_GRABBER_ICON := preload("res://assets/ui/icons/slider_grabber.svg")
+const SLIDER_GRABBER_HIGHLIGHT_ICON := preload("res://assets/ui/icons/slider_grabber_hl.svg")
+# 低分辨率下设置项会落入滚动区，因此统一维护设置区路径前缀。
+const SETTINGS_ROWS_PATH := "CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows"
 
 var _backdrop: ColorRect
 var _dialog: Control
@@ -25,7 +30,8 @@ func apply_theme_styles() -> void:
 	var dialog: PanelContainer = root.get_node("CenterLayer/Dialog")
 	dialog.add_theme_stylebox_override("panel", _create_paper_style())
 
-	for path in ["CenterLayer/DecorLayer/LeftRoller", "CenterLayer/DecorLayer/RightRoller"]:
+	# 装饰卷轴改为容器行，路径需包含 RollerRow。
+	for path in ["CenterLayer/DecorLayer/RollerRow/LeftRoller", "CenterLayer/DecorLayer/RollerRow/RightRoller"]:
 		var roller: PanelContainer = root.get_node(path)
 		roller.add_theme_stylebox_override("panel", _create_roller_style())
 
@@ -38,53 +44,58 @@ func apply_theme_styles() -> void:
 	hint_label.add_theme_font_size_override("font_size", 13)
 
 	for path in [
-		"CenterLayer/Dialog/Margin/MainColumn/SettingsRows/InstantHeader",
-		"CenterLayer/Dialog/Margin/MainColumn/SettingsRows/SavedHeader",
-		"CenterLayer/Dialog/Margin/MainColumn/SettingsRows/LanguageRow/LanguageLabel",
-		"CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ResolutionRow/ResolutionLabel",
-		"CenterLayer/Dialog/Margin/MainColumn/SettingsRows/FontScaleRow/FontScaleLabel",
-		"CenterLayer/Dialog/Margin/MainColumn/SettingsRows/VolumeRow/VolumeLabel",
-		"CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ShortcutHeader",
-		"CenterLayer/Dialog/Margin/MainColumn/SettingsRows/OpenSettingsKeyRow/OpenSettingsKeyLabel",
-		"CenterLayer/Dialog/Margin/MainColumn/SettingsRows/OpenWarehouseKeyRow/OpenWarehouseKeyLabel",
-		"CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ToggleExplorationKeyRow/ToggleExplorationKeyLabel",
-		"CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ToggleSpeedKeyRow/ToggleSpeedKeyLabel",
-		"CenterLayer/Dialog/Margin/MainColumn/SettingsRows/QuickSaveKeyRow/QuickSaveKeyLabel",
-		"CenterLayer/Dialog/Margin/MainColumn/SettingsRows/QuickLoadKeyRow/QuickLoadKeyLabel",
-		"CenterLayer/Dialog/Margin/MainColumn/SettingsRows/QuickResetKeyRow/QuickResetKeyLabel"
+		"%s/InstantHeader" % SETTINGS_ROWS_PATH,
+		"%s/SavedHeader" % SETTINGS_ROWS_PATH,
+		"%s/LanguageRow/LanguageLabel" % SETTINGS_ROWS_PATH,
+		"%s/ResolutionRow/ResolutionLabel" % SETTINGS_ROWS_PATH,
+		"%s/FullscreenRow/FullscreenLabel" % SETTINGS_ROWS_PATH,
+		"%s/ZoomRow/ZoomLabel" % SETTINGS_ROWS_PATH,
+		"%s/VolumeRow/VolumeLabel" % SETTINGS_ROWS_PATH,
+		"%s/ShortcutHeader" % SETTINGS_ROWS_PATH,
+		"%s/OpenSettingsKeyRow/OpenSettingsKeyLabel" % SETTINGS_ROWS_PATH,
+		"%s/OpenWarehouseKeyRow/OpenWarehouseKeyLabel" % SETTINGS_ROWS_PATH,
+		"%s/ToggleExplorationKeyRow/ToggleExplorationKeyLabel" % SETTINGS_ROWS_PATH,
+		"%s/ToggleSpeedKeyRow/ToggleSpeedKeyLabel" % SETTINGS_ROWS_PATH,
+		"%s/QuickSaveKeyRow/QuickSaveKeyLabel" % SETTINGS_ROWS_PATH,
+		"%s/QuickLoadKeyRow/QuickLoadKeyLabel" % SETTINGS_ROWS_PATH,
+		"%s/QuickResetKeyRow/QuickResetKeyLabel" % SETTINGS_ROWS_PATH
 	]:
 		var label: Label = root.get_node(path)
 		label.add_theme_color_override("font_color", INK_MAIN)
 		var is_header := label.name.ends_with("Header")
 		label.add_theme_font_size_override("font_size", 16 if is_header else 14)
 
-	var volume_value: Label = root.get_node("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/VolumeRow/VolumeValue")
-	volume_value.add_theme_color_override("font_color", INK_MAIN)
-	volume_value.add_theme_font_size_override("font_size", 14)
+	for path in [
+		"%s/ZoomRow/ZoomValue" % SETTINGS_ROWS_PATH,
+		"%s/VolumeRow/VolumeValue" % SETTINGS_ROWS_PATH
+	]:
+		var value_label: Label = root.get_node(path)
+		value_label.add_theme_color_override("font_color", INK_MAIN)
+		value_label.add_theme_font_size_override("font_size", 14)
 
 	_apply_close_button_style(root.get_node("CenterLayer/Dialog/Margin/MainColumn/HeaderRow/CloseButton"))
 
 	for path in [
 		"CenterLayer/Dialog/Margin/MainColumn/FooterRow/CancelButton",
 		"CenterLayer/Dialog/Margin/MainColumn/FooterRow/ApplyButton",
-		"CenterLayer/Dialog/Margin/MainColumn/SettingsRows/OpenSettingsKeyRow/OpenSettingsKeyOption",
-		"CenterLayer/Dialog/Margin/MainColumn/SettingsRows/OpenWarehouseKeyRow/OpenWarehouseKeyOption",
-		"CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ToggleExplorationKeyRow/ToggleExplorationKeyOption",
-		"CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ToggleSpeedKeyRow/ToggleSpeedKeyOption",
-		"CenterLayer/Dialog/Margin/MainColumn/SettingsRows/QuickSaveKeyRow/QuickSaveKeyOption",
-		"CenterLayer/Dialog/Margin/MainColumn/SettingsRows/QuickLoadKeyRow/QuickLoadKeyOption",
-		"CenterLayer/Dialog/Margin/MainColumn/SettingsRows/QuickResetKeyRow/QuickResetKeyOption"
+		"%s/OpenSettingsKeyRow/OpenSettingsKeyOption" % SETTINGS_ROWS_PATH,
+		"%s/OpenWarehouseKeyRow/OpenWarehouseKeyOption" % SETTINGS_ROWS_PATH,
+		"%s/ToggleExplorationKeyRow/ToggleExplorationKeyOption" % SETTINGS_ROWS_PATH,
+		"%s/ToggleSpeedKeyRow/ToggleSpeedKeyOption" % SETTINGS_ROWS_PATH,
+		"%s/QuickSaveKeyRow/QuickSaveKeyOption" % SETTINGS_ROWS_PATH,
+		"%s/QuickLoadKeyRow/QuickLoadKeyOption" % SETTINGS_ROWS_PATH,
+		"%s/QuickResetKeyRow/QuickResetKeyOption" % SETTINGS_ROWS_PATH
 	]:
 		_apply_action_button_style(root.get_node(path), false)
 
 	for path in [
-		"CenterLayer/Dialog/Margin/MainColumn/SettingsRows/LanguageRow/LanguageOption",
-		"CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ResolutionRow/ResolutionOption",
-		"CenterLayer/Dialog/Margin/MainColumn/SettingsRows/FontScaleRow/FontScaleOption"
+		"%s/LanguageRow/LanguageOption" % SETTINGS_ROWS_PATH,
+		"%s/ResolutionRow/ResolutionOption" % SETTINGS_ROWS_PATH
 	]:
 		_apply_field_style(root.get_node(path))
 
-	_apply_slider_style(root.get_node("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/VolumeRow/VolumeSlider"))
+	_apply_slider_style(root.get_node("%s/ZoomRow/ZoomSlider" % SETTINGS_ROWS_PATH))
+	_apply_slider_style(root.get_node("%s/VolumeRow/VolumeSlider" % SETTINGS_ROWS_PATH))
 
 
 func play_open() -> void:
@@ -157,8 +168,9 @@ func _apply_slider_style(slider: Range) -> void:
 	slider.add_theme_stylebox_override("slider", _create_slider_track_style())
 	slider.add_theme_stylebox_override("grabber_area", _create_transparent_style())
 	slider.add_theme_stylebox_override("grabber_area_highlight", _create_transparent_style())
-	slider.add_theme_icon_override("grabber", _create_slider_grabber())
-	slider.add_theme_icon_override("grabber_highlight", _create_slider_grabber())
+	slider.add_theme_icon_override("grabber", SLIDER_GRABBER_ICON)
+	slider.add_theme_icon_override("grabber_highlight", SLIDER_GRABBER_HIGHLIGHT_ICON)
+	slider.add_theme_icon_override("grabber_disabled", SLIDER_GRABBER_ICON)
 
 
 func _create_paper_style() -> StyleBoxFlat:
@@ -230,12 +242,6 @@ func _create_slider_track_style() -> StyleBoxFlat:
 	style.content_margin_top = 4
 	style.content_margin_bottom = 4
 	return style
-
-
-func _create_slider_grabber() -> Texture2D:
-	var image := Image.create_empty(14, 14, false, Image.FORMAT_RGBA8)
-	image.fill(SEAL_RED)
-	return ImageTexture.create_from_image(image)
 
 
 func _create_transparent_style() -> StyleBoxFlat:

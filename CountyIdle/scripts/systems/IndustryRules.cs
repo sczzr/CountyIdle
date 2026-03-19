@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using CountyIdle.Models;
 
 namespace CountyIdle.Systems;
@@ -37,6 +38,8 @@ public static class IndustryRules
         state.MiningLevel = Math.Max(state.MiningLevel, 1);
         state.WarehouseLevel = Math.Max(state.WarehouseLevel, 1);
         state.WarehouseCapacity = Math.Max(state.WarehouseCapacity, CalculateWarehouseCapacity(state));
+        state.ConstructionQueue ??= new List<ConstructionQueueItem>();
+        state.PendingConstructionCompletions ??= new List<IndustryBuildingType>();
     }
 
     /// <summary>

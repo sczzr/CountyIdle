@@ -1,0 +1,339 @@
+body {
+    color: #E8ECE8;
+    font-family: url("../assets/ui/fonts/NotoSerifSC[wght].ttf");
+    font-size: 16;
+    background: Color(0.043, 0.055, 0.051, 1);
+}
+
+PanelContainer {
+    background: Color(0.055, 0.071, 0.063, 0.86);
+    border-width: 1;
+    border-color: Color(0.42, 0.384, 0.267, 0.38);
+    border-radius: 8;
+    padding: 12;
+    shadow-color: Color(0, 0, 0, 0.52);
+    shadow-size: 14;
+    shadow-offset: 0 4;
+}
+
+PanelContainer.jade {
+    background: Color(0.094, 0.106, 0.102, 0.92);
+    border-width: 1;
+    border-color: Color(0.42, 0.384, 0.267, 0.72);
+    border-radius: 6;
+    padding: 10;
+    shadow-color: Color(0, 0, 0, 0.42);
+    shadow-size: 8;
+    shadow-offset: 0 2;
+}
+
+PanelContainer.seal {
+    background: Color(0.18, 0.08, 0.08, 0.94);
+    border-width: 2;
+    border-color: #E4C04F;
+    border-radius: 4;
+    padding: 8;
+    shadow-color: Color(0.894, 0.753, 0.31, 0.18);
+    shadow-size: 10;
+    shadow-offset: 0 2;
+}
+
+PanelContainer.badge {
+    background: Color(0.094, 0.11, 0.102, 0.84);
+    border-width: 1;
+    border-color: Color(0.894, 0.753, 0.31, 0.34);
+    border-radius: 999;
+    padding: 6 14;
+}
+
+PanelContainer.warning {
+    background: Color(0.176, 0.059, 0.051, 0.90);
+    border-width: 1;
+    border-color: #D94838;
+    border-radius: 8;
+    padding: 12;
+    shadow-color: Color(0.851, 0.282, 0.22, 0.16);
+    shadow-size: 10;
+    shadow-offset: 0 2;
+}
+
+PanelContainer.terminal {
+    background: Color(0.031, 0.043, 0.039, 0.92);
+    border-width: 1;
+    border-color: Color(0.247, 0.851, 0.659, 0.25);
+    border-radius: 10;
+    padding: 14;
+    shadow-color: Color(0.247, 0.851, 0.659, 0.08);
+    shadow-size: 12;
+    shadow-offset: 0 2;
+}
+
+PanelContainer.avatarframe {
+    background: Color(0.090, 0.106, 0.098, 0.96);
+    border-width: 2;
+    border-color: #E4C04F;
+    border-radius: 999;
+    padding: 8;
+    shadow-color: Color(0.894, 0.753, 0.31, 0.24);
+    shadow-size: 20;
+    shadow-offset: 0 0;
+}
+
+PanelContainer.realmtag {
+    background: #A32D2D;
+    border-width: 1;
+    border-color: #E4C04F;
+    border-radius: 10;
+    padding: 2 10;
+    shadow-color: Color(0.894, 0.753, 0.31, 0.18);
+    shadow-size: 8;
+    shadow-offset: 0 2;
+}
+
+PanelContainer.tracktag {
+    background: Color(0.090, 0.106, 0.098, 0.88);
+    border-width: 1;
+    border-color: Color(0.894, 0.753, 0.31, 0.38);
+    border-radius: 999;
+    padding: 2 10;
+}
+
+Button {
+    background: Color(0.094, 0.110, 0.102, 0.82);
+    border-width: 1;
+    border-color: Color(0.42, 0.384, 0.267, 0.6);
+    border-radius: 4;
+    padding: 8 14;
+    color: #8E9894;
+}
+
+Button:hover {
+    background: Color(0.157, 0.176, 0.165, 0.9);
+    border-color: #E4C04F;
+    color: #E4C04F;
+}
+
+Button:pressed {
+    background: Color(0.165, 0.169, 0.149, 0.95);
+    border-color: #E4C04F;
+    color: #E4C04F;
+}
+
+Button.jadecard {
+    background: Color(0.094, 0.110, 0.102, 0.92);
+    border-width: 1;
+    border-color: Color(0.42, 0.384, 0.267, 0.72);
+    border-radius: 8;
+    padding: 20;
+    color: #E8ECE8;
+    shadow-color: Color(0, 0, 0, 0.52);
+    shadow-size: 20;
+    shadow-offset: 0 10;
+}
+
+Button.jadecard:hover {
+    background: Color(0.145, 0.161, 0.150, 0.96);
+    border-color: #E4C04F;
+    color: #FFF3C8;
+    shadow-color: Color(0.894, 0.753, 0.31, 0.16);
+    shadow-size: 24;
+    shadow-offset: 0 0;
+}
+
+Button.jadeactive {
+    background: Color(0.157, 0.176, 0.165, 0.98);
+    border-width: 2;
+    border-color: #E4C04F;
+    border-radius: 8;
+    padding: 20;
+    color: #FFF3C8;
+    shadow-color: Color(0.894, 0.753, 0.31, 0.24);
+    shadow-size: 28;
+    shadow-offset: 0 0;
+}
+
+Button.jadeactive:hover {
+    background: Color(0.165, 0.184, 0.171, 1);
+    border-color: #F5D773;
+    color: #FFF8DE;
+}
+
+Button.ghost {
+    background: Color(0, 0, 0, 0.35);
+    border-width: 1;
+    border-color: Color(0.42, 0.384, 0.267, 0.55);
+    border-radius: 4;
+    padding: 8 12;
+    color: #C7CBC8;
+}
+
+Button.ghost:hover {
+    background: Color(0.055, 0.071, 0.063, 0.82);
+    border-color: #E4C04F;
+    color: #E4C04F;
+}
+
+LineEdit, TextEdit {
+    background: Color(0.020, 0.027, 0.024, 1);
+    border-width: 1;
+    border-color: Color(0.42, 0.384, 0.267, 0.3);
+    border-radius: 4;
+    padding: 6 12;
+    color: #E8EBE9;
+}
+
+LineEdit:focus, TextEdit:focus {
+    border-color: #E4C04F;
+    color: #E8EBE9;
+}
+
+OptionButton {
+    background: Color(0.094, 0.110, 0.102, 0.82);
+    border-width: 1;
+    border-color: Color(0.42, 0.384, 0.267, 0.6);
+    border-radius: 4;
+    padding: 8 28 8 14;
+    color: #8E9894;
+    --icons-arrow: url("../assets/ui/icons/arrow_down.svg");
+}
+
+OptionButton:hover {
+    background: Color(0.157, 0.176, 0.165, 0.9);
+    border-color: #E4C04F;
+    color: #E4C04F;
+}
+
+CheckBox {
+    color: #E8EBE9;
+    --const-h-separation: 8;
+    --icons-checked: url("../assets/ui/icons/checkbox_checked.svg");
+    --icons-checked-disabled: url("../assets/ui/icons/checkbox_checked.svg");
+    --icons-unchecked: url("../assets/ui/icons/checkbox_unchecked.svg");
+    --icons-unchecked-disabled: url("../assets/ui/icons/checkbox_unchecked.svg");
+    --icons-radio-checked: url("../assets/ui/icons/radio_checked.svg");
+    --icons-radio-checked-disabled: url("../assets/ui/icons/radio_checked.svg");
+    --icons-radio-unchecked: url("../assets/ui/icons/radio_unchecked.svg");
+    --icons-radio-unchecked-disabled: url("../assets/ui/icons/radio_unchecked.svg");
+}
+
+CheckButton {
+    color: #E8EBE9;
+    --icons-checked: url("../assets/ui/icons/toggle_on.svg");
+    --icons-checked-disabled: url("../assets/ui/icons/toggle_on.svg");
+    --icons-checked-mirrored: url("../assets/ui/icons/toggle_on.svg");
+    --icons-checked-disabled-mirrored: url("../assets/ui/icons/toggle_on.svg");
+    --icons-unchecked: url("../assets/ui/icons/toggle_off.svg");
+    --icons-unchecked-disabled: url("../assets/ui/icons/toggle_off.svg");
+    --icons-unchecked-mirrored: url("../assets/ui/icons/toggle_off.svg");
+    --icons-unchecked-disabled-mirrored: url("../assets/ui/icons/toggle_off.svg");
+}
+
+Label.title {
+    color: #E4C04F;
+    font-size: 24;
+}
+
+Label.subtitle {
+    color: #94A099;
+    font-size: 13;
+}
+
+Label.accent {
+    color: #E4C04F;
+}
+
+Label.muted {
+    color: #8E9894;
+}
+
+Label.danger {
+    color: #D94838;
+}
+
+ProgressBar {
+    color: #C7CBC8;
+    --styles-background-type: Flat;
+    --styles-background-bg-color: Color(0, 0, 0, 0.58);
+    --styles-background-border-width-left: 1;
+    --styles-background-border-width-top: 1;
+    --styles-background-border-width-right: 1;
+    --styles-background-border-width-bottom: 1;
+    --styles-background-border-color: Color(0.42, 0.384, 0.267, 0.26);
+    --styles-background-corner-radius-top-left: 4;
+    --styles-background-corner-radius-top-right: 4;
+    --styles-background-corner-radius-bottom-right: 4;
+    --styles-background-corner-radius-bottom-left: 4;
+    --styles-fill-type: Flat;
+    --styles-fill-bg-color: #3FD9A8;
+    --styles-fill-corner-radius-top-left: 4;
+    --styles-fill-corner-radius-top-right: 4;
+    --styles-fill-corner-radius-bottom-right: 4;
+    --styles-fill-corner-radius-bottom-left: 4;
+}
+
+HSlider, VSlider {
+    --styles-slider-type: Flat;
+    --styles-slider-bg-color: Color(0.42, 0.384, 0.267, 0.9);
+    --styles-slider-content-margin-top: 2;
+    --styles-slider-content-margin-bottom: 2;
+    --styles-slider-corner-radius-top-left: 2;
+    --styles-slider-corner-radius-top-right: 2;
+    --styles-slider-corner-radius-bottom-right: 2;
+    --styles-slider-corner-radius-bottom-left: 2;
+    --styles-grabber-area-type: Flat;
+    --styles-grabber-area-bg-color: Color(0.894, 0.753, 0.31, 0.26);
+    --styles-grabber-area-corner-radius-top-left: 2;
+    --styles-grabber-area-corner-radius-top-right: 2;
+    --styles-grabber-area-corner-radius-bottom-right: 2;
+    --styles-grabber-area-corner-radius-bottom-left: 2;
+    --icons-grabber: url("../assets/ui/icons/slider_grabber.svg");
+    --icons-grabber-disabled: url("../assets/ui/icons/slider_grabber.svg");
+    --icons-grabber-highlight: url("../assets/ui/icons/slider_grabber_hl.svg");
+}
+
+HBoxContainer.spiritbar {
+    --const-separation: 6;
+}
+
+Tree {
+    background: transparent;
+    border-width: 0;
+    color: #E8EBE9;
+    font-size: 14;
+    --icons-arrow: url("../assets/ui/icons/arrow_down.svg");
+    --icons-arrow-collapsed: url("../assets/ui/icons/arrow_right.svg");
+    --icons-arrow-collapsed-mirrored: url("../assets/ui/icons/arrow_right.svg");
+}
+
+Tree:selected {
+    background: Color(0.894, 0.753, 0.31, 0.10);
+    border-width: 0 0 0 2;
+    border-color: #E4C04F;
+    color: #E4C04F;
+}
+
+TabBar {
+    background: Color(0.055, 0.071, 0.063, 0.82);
+    border-width: 1;
+    border-color: Color(0.42, 0.384, 0.267, 0.3);
+    border-radius: 4;
+}
+
+TabBar:selected {
+    background: Color(0.894, 0.753, 0.31, 0.10);
+    border-width: 1 1 0 1;
+    border-color: #E4C04F;
+    color: #E4C04F;
+}
+
+TabBar:hover {
+    color: #E4C04F;
+}
+
+ScrollContainer {
+    --styles-panel-type: Empty;
+}
+
+RichTextLabel {
+    color: #AEB7B2;
+}

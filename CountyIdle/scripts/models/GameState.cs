@@ -112,6 +112,10 @@ public class GameState
     public int TradeBuildings { get; set; } = 1;
     public int AdministrationBuildings { get; set; } = 4;
     public List<TownBuildingPlacement> TownBuildingPlacements { get; set; } = new();
+    // 营建队列：记录正在排队的建造项目。
+    public List<ConstructionQueueItem> ConstructionQueue { get; set; } = new();
+    // 营建完工待落点：由主界面在山门图落地时消耗。
+    public List<IndustryBuildingType> PendingConstructionCompletions { get; set; } = new();
     public double IndustryTools { get; set; } = 120;
     public int MiningLevel { get; set; } = 1;
     public int WarehouseLevel { get; set; } = 1;
@@ -127,6 +131,14 @@ public class GameState
     public Dictionary<string, int> TaskOrderUnits { get; set; } = new();
     public Dictionary<string, int> TaskResolvedWorkers { get; set; } = new();
     public Dictionary<int, string> DiscipleDirectives { get; set; } = new();
+    public Dictionary<int, string> DiscipleCultivationAssignments { get; set; } = new();
+    // 弟子修炼卷长期成长进度（按弟子 ID 持久化）。
+    public Dictionary<int, double> DiscipleSkillTrainingProgress { get; set; } = new();
+    public Dictionary<int, double> DiscipleTechniquePolishProgress { get; set; } = new();
+    public Dictionary<int, double> DiscipleCraftPracticeProgress { get; set; } = new();
+    public Dictionary<int, double> DiscipleMeditationProgress { get; set; } = new();
+    // 弟子修炼卷的近时履历（按弟子 ID 存最近几条记录）。
+    public Dictionary<int, List<string>> DiscipleCultivationHistory { get; set; } = new();
     public Dictionary<int, DiscipleEquipmentProfile> DiscipleEquipmentProfiles { get; set; } = new();
     public Dictionary<string, int> FormalStewardAppointments { get; set; } = new();
     // 宗主治理与门规状态
@@ -266,11 +278,27 @@ public class GameState
         clone.TaskOrderUnits = new Dictionary<string, int>(TaskOrderUnits ?? new Dictionary<string, int>());
         clone.TaskResolvedWorkers = new Dictionary<string, int>(TaskResolvedWorkers ?? new Dictionary<string, int>());
         clone.DiscipleDirectives = new Dictionary<int, string>(DiscipleDirectives ?? new Dictionary<int, string>());
+        clone.DiscipleCultivationAssignments = new Dictionary<int, string>(
+            DiscipleCultivationAssignments ?? new Dictionary<int, string>());
+        clone.DiscipleSkillTrainingProgress = new Dictionary<int, double>(
+            DiscipleSkillTrainingProgress ?? new Dictionary<int, double>());
+        clone.DiscipleTechniquePolishProgress = new Dictionary<int, double>(
+            DiscipleTechniquePolishProgress ?? new Dictionary<int, double>());
+        clone.DiscipleCraftPracticeProgress = new Dictionary<int, double>(
+            DiscipleCraftPracticeProgress ?? new Dictionary<int, double>());
+        clone.DiscipleMeditationProgress = new Dictionary<int, double>(
+            DiscipleMeditationProgress ?? new Dictionary<int, double>());
+        clone.DiscipleCultivationHistory = CloneDiscipleCultivationHistory(
+            DiscipleCultivationHistory);
         clone.DiscipleEquipmentProfiles = new Dictionary<int, DiscipleEquipmentProfile>(
             DiscipleEquipmentProfiles ?? new Dictionary<int, DiscipleEquipmentProfile>());
         clone.FormalStewardAppointments = new Dictionary<string, int>(FormalStewardAppointments ?? new Dictionary<string, int>());
         clone.SectNameMap = new Dictionary<string, string>(SectNameMap ?? new Dictionary<string, string>());
         clone.TownBuildingPlacements = CloneTownBuildingPlacements(TownBuildingPlacements);
+        clone.ConstructionQueue = CloneConstructionQueue(ConstructionQueue);
+        clone.PendingConstructionCompletions = PendingConstructionCompletions == null
+            ? new List<IndustryBuildingType>()
+            : new List<IndustryBuildingType>(PendingConstructionCompletions);
         return clone;
     }
 
@@ -294,6 +322,63 @@ public class GameState
             }
 
             clone.Add(new TownBuildingPlacement(placement.BuildingType, placement.X, placement.Y));
+        }
+
+        return clone;
+    }
+
+    /// <summary>
+    /// 克隆营建队列列表，避免 UI 修改运行态。
+    /// </summary>
+    private static List<ConstructionQueueItem> CloneConstructionQueue(List<ConstructionQueueItem>? queue)
+    {
+        if (queue == null || queue.Count == 0)
+        {
+            return new List<ConstructionQueueItem>();
+        }
+
+        var clone = new List<ConstructionQueueItem>(queue.Count);
+        foreach (var item in queue)
+        {
+            if (item == null)
+            {
+                continue;
+            }
+
+            clone.Add(new ConstructionQueueItem(
+                item.BuildingType,
+                item.TotalHours,
+                item.RemainingHours,
+                item.WoodCost,
+                item.StoneCost,
+                item.GoldCost,
+                item.ContributionCost,
+                item.ConstructionCost));
+        }
+
+        return clone;
+    }
+
+    /// <summary>
+    /// 克隆弟子修炼履历字典，避免 UI 文本列表与运行态共享引用。
+    /// </summary>
+    private static Dictionary<int, List<string>> CloneDiscipleCultivationHistory(
+        Dictionary<int, List<string>>? history)
+    {
+        var clone = new Dictionary<int, List<string>>();
+        if (history == null || history.Count <= 0)
+        {
+            return clone;
+        }
+
+        foreach (var (discipleId, entries) in history)
+        {
+            if (discipleId <= 0 || entries == null)
+            {
+                continue;
+            }
+
+            clone[discipleId] = new List<string>(entries);
         }
 
         return clone;

@@ -12,37 +12,51 @@ public partial class Main
             return;
         }
 
-        var before = GetBuildingCount(_gameLoop.State, buildingType);
+        // 营建进入队列，落点在完工时由主界面统一处理。
         _gameLoop.BuildIndustryBuilding(buildingType);
-        var after = GetBuildingCount(_gameLoop.State, buildingType);
+    }
 
-        if (after <= before)
+    private void ApplyPendingConstructionPlacements()
+    {
+        if (_gameLoop == null || _sectMapRenderer == null)
         {
             return;
         }
 
-        if (_sectMapRenderer == null)
+        var pending = _gameLoop.State.PendingConstructionCompletions;
+        if (pending == null || pending.Count == 0)
         {
             return;
         }
 
-        if (_sectMapRenderer.TryPlaceBuildingAnchor(buildingType, out var placedCell, out var placementLog))
+        // 处理完工待落点，失败则保留待下一时辰重试。
+        var completed = pending.ToArray();
+        pending.Clear();
+        var failed = new System.Collections.Generic.List<IndustryBuildingType>();
+
+        foreach (var buildingType in completed)
         {
-            if (placedCell.HasValue)
+            if (_sectMapRenderer.TryPlaceBuildingAnchor(buildingType, out var placedCell, out var placementLog))
             {
-                RegisterBuildingPlacement(_gameLoop.State, buildingType, placedCell.Value);
+                if (placedCell.HasValue)
+                {
+                    RegisterBuildingPlacement(_gameLoop.State, buildingType, placedCell.Value);
+                }
+            }
+            else
+            {
+                failed.Add(buildingType);
             }
 
             if (!string.IsNullOrWhiteSpace(placementLog))
             {
                 AppendLog(placementLog);
             }
-            return;
         }
 
-        if (!string.IsNullOrWhiteSpace(placementLog))
+        if (failed.Count > 0)
         {
-            AppendLog(placementLog);
+            pending.AddRange(failed);
         }
     }
 

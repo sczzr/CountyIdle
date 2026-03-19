@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <!-- 修仙控件图标：未选中的阵眼单选框 -->
+  <polygon points="12,3 19.5,7.2 19.5,16.8 12,21 4.5,16.8 4.5,7.2" fill="#0A0E0C" stroke="#6B6244" stroke-width="1.5"/>
+  <polygon points="12,6.2 16.7,8.9 16.7,15.1 12,17.8 7.3,15.1 7.3,8.9" fill="#121614" opacity="0.5"/>
+</svg>

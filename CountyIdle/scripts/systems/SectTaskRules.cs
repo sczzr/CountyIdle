@@ -404,12 +404,17 @@ public static class SectTaskRules
         var resolved = snapshot.ResolvedWorkersByTask[taskType];
         var levelText = GetDirectiveLevelText(orders);
         var executionText = BuildDirectiveExecutionText(state, taskType, requested, resolved);
-        var stewardSuffix = definition.IsInternalTask &&
-                            DiscipleDirectiveRules.TryGetStewardAppointment(state, taskType, out var appointment) &&
-                            appointment != null
+        var appointment = (StewardTaskAppointment)null!;
+        var hasAppointment = definition.IsInternalTask &&
+                             DiscipleDirectiveRules.TryGetStewardAppointment(state, taskType, out appointment) &&
+                             appointment != null;
+        var stewardSuffix = hasAppointment
             ? $" · 执事：{appointment.DiscipleName}"
             : string.Empty;
-        return $"{definition.IconGlyph} {definition.DisplayName} · {levelText} · {executionText}{stewardSuffix}";
+        var routeSuffix = hasAppointment
+            ? $" · 路数：{DiscipleCultivationRules.BuildTaskAffinityNarrative(state, appointment.DiscipleId, taskType)}"
+            : string.Empty;
+        return $"{definition.IconGlyph} {definition.DisplayName} · {levelText} · {executionText}{stewardSuffix}{routeSuffix}";
     }
 
     public static string BuildTaskDetailText(GameState state, SectTaskType taskType)
@@ -457,8 +462,15 @@ public static class SectTaskRules
         {
             if (DiscipleDirectiveRules.TryGetStewardAppointment(state, taskType, out var appointment) && appointment != null)
             {
+                var routeExecutionBonus = DiscipleCultivationRules.GetTaskExecutionBonus(state, appointment.DiscipleId, taskType);
+                var specializationEffect = DiscipleCultivationRules.BuildSpecializationEffectLogSummary(state, appointment.DiscipleId);
+                var specializationEffectLine = string.IsNullOrWhiteSpace(specializationEffect)
+                    ? string.Empty
+                    : $"{specializationEffect}\n";
                 stewardText =
                     $"当前代行执事：{appointment.DiscipleName}（执行 {appointment.Execution} / 悟性 {appointment.Insight} / 贡献 {appointment.Contribution}），本条内务执行效率 +{(appointment.ExecutionModifier - 1.0) * 100.0:0.#}%。\n" +
+                    $"路数相性：{DiscipleCultivationRules.BuildTaskAffinityNarrative(state, appointment.DiscipleId, taskType)} 当前路数额外修正 +{routeExecutionBonus * 100.0:0.#}%。\n" +
+                    specializationEffectLine +
                     $"执事培养：当前重点名册 {stewardCount} 人，平均补位效率 +{(stewardExecutionModifier - 1.0) * 100.0:0.#}%。\n";
             }
             else

@@ -134,6 +134,8 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     public float MaxZoom => _mode == StrategicMapMode.Prefecture ? PrefectureMaxZoom : DefaultMaxZoom;
     public float DefaultZoom => 1.0f;
     public XianxiaSiteData? SelectedWorldSite => _selectedWorldSite;
+    // 对外暴露当前战略图定义来源，供调试入口同步按钮状态。
+    public bool IsUsingConfigDefinition => _useConfigDefinition;
 
     public XianxiaHexCellData? GetWorldCellForSite(XianxiaSiteData? site)
     {
@@ -484,12 +486,28 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
 
     private void ToggleMapDefinitionSource()
     {
-        _useConfigDefinition = !_useConfigDefinition;
+        // 调试快捷键切换配置/生成双轨入口。
+        SetDefinitionSource(!_useConfigDefinition);
+    }
+
+    // 统一对外入口，用于调试按钮在配置/生成双轨之间切换。
+    public void SetDefinitionSource(bool useConfigDefinition, bool emitLog = true)
+    {
+        if (_useConfigDefinition == useConfigDefinition)
+        {
+            return;
+        }
+
+        _useConfigDefinition = useConfigDefinition;
         ReloadMapDefinition();
         UpdateTitle();
         UpdateWorldTerrainLayerLayout();
         QueueRedraw();
-        GD.PushWarning($"Strategic map mode '{_mode}' switched to {(_useConfigDefinition ? "config" : "generator")} source.");
+
+        if (emitLog)
+        {
+            GD.PushWarning($"Strategic map mode '{_mode}' switched to {(_useConfigDefinition ? "config" : "generator")} source.");
+        }
     }
 
     private void ReloadMapDefinition()
@@ -1894,6 +1912,12 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
             return false;
         }
 
+        // 当前 L1 图块资源尚未补齐自定义数据层时，直接回退到代码内置坐标，避免运行期刷屏报错。
+        if (!HasCustomDataLayer(_worldLayer1TileSet, WorldTerrainFamilyCustomDataLayer))
+        {
+            return false;
+        }
+
         if (_worldLayer1TileSet.GetSource(_worldLayer1SourceId) is not TileSetAtlasSource atlasSource)
         {
             return false;
@@ -1974,6 +1998,21 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         _worldDeepWaterTileCoords = deepWater.Count > 0 ? new List<Vector2I>(deepWater).ToArray() : WorldWaterTileCoords;
         _worldShallowWaterTileCoords = shallowWater.Count > 0 ? new List<Vector2I>(shallowWater).ToArray() : WorldWaterTileCoords;
         return true;
+    }
+
+    private static bool HasCustomDataLayer(TileSet tileSet, StringName layerName)
+    {
+        // Godot 4 的 TileSet 自定义数据层按索引存放，这里先做名称探测，缺层时不要继续读 TileData。
+        var layerCount = tileSet.GetCustomDataLayersCount();
+        for (var index = 0; index < layerCount; index++)
+        {
+            if (tileSet.GetCustomDataLayerName(index) == layerName)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void ResetWorldTerrainTileBindings()

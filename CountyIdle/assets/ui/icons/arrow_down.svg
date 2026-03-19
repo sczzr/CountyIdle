@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <!-- 修仙控件图标：下拉箭头 -->
+  <polygon points="12,18 5.5,9.5 18.5,9.5" fill="#E4C04F" opacity="0.25"/>
+  <polygon points="12,16.2 7.2,10.1 16.8,10.1" fill="#F2D97E" opacity="0.52"/>
+  <polygon points="12,14.8 8.3,10.6 15.7,10.6" fill="#E4C04F"/>
+</svg>

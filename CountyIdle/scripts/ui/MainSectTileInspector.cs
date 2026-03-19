@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Godot;
 using CountyIdle.Models;
 using CountyIdle.Systems;
@@ -7,38 +6,11 @@ namespace CountyIdle;
 
 public partial class Main
 {
-	private sealed record TileInspectorActionBinding(
-		TileInspectorAction Action,
-		string Text,
-		string TooltipText,
-		bool Enabled);
-
-	private enum TileInspectorAction
-	{
-		None,
-		OpenWorldSitePlaceholder,
-		BuildAgriculture,
-		BuildWorkshop,
-		BuildResearch,
-		BuildTrade,
-		BuildAdministration,
-		PlanCompoundSpecialized,
-		PlanCompoundSynergy,
-		PlanCompoundBalanced,
-		OpenTaskPanel,
-		OpenDisciplePanel,
-		OpenWarehousePanel
-	}
-
 	private Label? _tileInspectorTitleLabel;
 	private Label? _tileInspectorSubtitleLabel;
 	private Label? _tileInspectorBadgeLabel;
 	private Label? _tileInspectorStatusLabel;
 	private Label? _tileInspectorStatusValueLabel;
-	private Label? _tileInspectorResidentLabel;
-	private Label? _tileInspectorResidentValueLabel;
-	private Label? _tileInspectorTransitLabel;
-	private Label? _tileInspectorTransitValueLabel;
 	private Label? _tileInspectorLocationLabel;
 	private Label? _tileInspectorLocationValueLabel;
 	private Label? _tileInspectorBuildingLabel;
@@ -46,37 +18,24 @@ public partial class Main
 	private Label? _tileInspectorDescriptionLabel;
 	private Label? _tileInspectorActionHintLabel;
 	private Button? _tileInspectorConstructionButton;
-	private Button? _tileInspectorPrimaryButton;
-	private Button? _tileInspectorSecondaryButton;
-	private Button? _tileInspectorTertiaryButton;
 	private Node? _tileInspectorVisualFx;
-
-	private TileInspectorAction _tileInspectorPrimaryAction = TileInspectorAction.OpenTaskPanel;
-	private TileInspectorAction _tileInspectorSecondaryAction = TileInspectorAction.OpenDisciplePanel;
-	private TileInspectorAction _tileInspectorTertiaryAction = TileInspectorAction.OpenWarehousePanel;
 
 	private void BindSectTileInspectorNodes()
 	{
+		const string InspectorRootPath = $"{LeftPanelPath}/PanelContent/ContentScroll/JobsVBox/IndustryEfficiency/InspectorVBox";
 		_tileInspectorVisualFx = GetNodeOrNull<Node>("TileInspectorVisualFx");
-		_tileInspectorTitleLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/InspectorHeader/TileTitle");
-		_tileInspectorSubtitleLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/InspectorHeader/TileSubtitle");
-		_tileInspectorBadgeLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/InspectorHeader/TileBadgeBox/TileBadgeLabel");
-		_tileInspectorStatusLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/AttrGrid/StatusBox/AttrVBox/AttrLabel");
-		_tileInspectorStatusValueLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/AttrGrid/StatusBox/AttrVBox/AttrValue");
-		_tileInspectorResidentLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/AttrGrid/ResidentBox/AttrVBox/AttrLabel");
-		_tileInspectorResidentValueLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/AttrGrid/ResidentBox/AttrVBox/AttrValue");
-		_tileInspectorTransitLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/AttrGrid/TransitBox/AttrVBox/AttrLabel");
-		_tileInspectorTransitValueLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/AttrGrid/TransitBox/AttrVBox/AttrValue");
-		_tileInspectorLocationLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/AttrGrid/LocationBox/AttrVBox/AttrLabel");
-		_tileInspectorLocationValueLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/AttrGrid/LocationBox/AttrVBox/AttrValue");
-		_tileInspectorBuildingLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/BuildingListBox/BuildingListVBox/BuildingListLabel");
-		_tileInspectorBuildingValueLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/BuildingListBox/BuildingListVBox/BuildingListValue");
-		_tileInspectorConstructionButton = GetNodeOrNull<Button>($"{LeftPanelPath}/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/BuildingListBox/BuildingListVBox/OpenConstructionButton");
-		_tileInspectorDescriptionLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/InspectorDescription");
-		_tileInspectorActionHintLabel = GetNodeOrNull<Label>($"{LeftPanelPath}/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/ActionHintPanel/ActionHintLabel");
-		_tileInspectorPrimaryButton = GetNodeOrNull<Button>($"{LeftPanelPath}/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/ActionList/PrimaryActionButton");
-		_tileInspectorSecondaryButton = GetNodeOrNull<Button>($"{LeftPanelPath}/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/ActionList/SecondaryActionButton");
-		_tileInspectorTertiaryButton = GetNodeOrNull<Button>($"{LeftPanelPath}/PanelContent/JobsVBox/IndustryEfficiency/InspectorVBox/ActionList/TertiaryActionButton");
+		_tileInspectorTitleLabel = GetNodeOrNull<Label>($"{InspectorRootPath}/InspectorHeader/TileTitle");
+		_tileInspectorSubtitleLabel = GetNodeOrNull<Label>($"{InspectorRootPath}/InspectorHeader/TileSubtitle");
+		_tileInspectorBadgeLabel = GetNodeOrNull<Label>($"{InspectorRootPath}/InspectorHeader/TileBadgeBox/TileBadgeLabel");
+		_tileInspectorStatusLabel = GetNodeOrNull<Label>($"{InspectorRootPath}/AttrGrid/StatusBox/AttrVBox/AttrLabel");
+		_tileInspectorStatusValueLabel = GetNodeOrNull<Label>($"{InspectorRootPath}/AttrGrid/StatusBox/AttrVBox/AttrValue");
+		_tileInspectorLocationLabel = GetNodeOrNull<Label>($"{InspectorRootPath}/AttrGrid/LocationBox/AttrVBox/AttrLabel");
+		_tileInspectorLocationValueLabel = GetNodeOrNull<Label>($"{InspectorRootPath}/AttrGrid/LocationBox/AttrVBox/AttrValue");
+		_tileInspectorBuildingLabel = GetNodeOrNull<Label>($"{InspectorRootPath}/BuildingListBox/BuildingListVBox/BuildingListLabel");
+		_tileInspectorBuildingValueLabel = GetNodeOrNull<Label>($"{InspectorRootPath}/BuildingListBox/BuildingListVBox/BuildingListValue");
+		_tileInspectorConstructionButton = GetNodeOrNull<Button>($"{InspectorRootPath}/BuildingListBox/BuildingListVBox/OpenConstructionButton");
+		_tileInspectorDescriptionLabel = GetNodeOrNull<Label>($"{InspectorRootPath}/InspectorDescription");
+		_tileInspectorActionHintLabel = GetNodeOrNull<Label>($"{InspectorRootPath}/ActionHintPanel/ActionHintLabel");
 
 		ApplySectTileInspectorSummary(TownMapSelectionSummary.CreateDefault());
 	}
@@ -89,10 +48,6 @@ public partial class Main
 		_tileInspectorBadgeLabel = null;
 		_tileInspectorStatusLabel = null;
 		_tileInspectorStatusValueLabel = null;
-		_tileInspectorResidentLabel = null;
-		_tileInspectorResidentValueLabel = null;
-		_tileInspectorTransitLabel = null;
-		_tileInspectorTransitValueLabel = null;
 		_tileInspectorLocationLabel = null;
 		_tileInspectorLocationValueLabel = null;
 		_tileInspectorBuildingLabel = null;
@@ -100,9 +55,6 @@ public partial class Main
 		_tileInspectorConstructionButton = null;
 		_tileInspectorDescriptionLabel = null;
 		_tileInspectorActionHintLabel = null;
-		_tileInspectorPrimaryButton = null;
-		_tileInspectorSecondaryButton = null;
-		_tileInspectorTertiaryButton = null;
 	}
 
 	private void BindSectTileInspectorEvents()
@@ -117,24 +69,9 @@ public partial class Main
 			_worldMapRenderer.WorldSiteSelectionChanged += OnWorldSiteSelectionChanged;
 		}
 
-		if (_tileInspectorPrimaryButton != null)
-		{
-			_tileInspectorPrimaryButton.Pressed += OnTileInspectorPrimaryPressed;
-		}
-
 		if (_tileInspectorConstructionButton != null)
 		{
 			_tileInspectorConstructionButton.Pressed += OpenConstructionPanel;
-		}
-
-		if (_tileInspectorSecondaryButton != null)
-		{
-			_tileInspectorSecondaryButton.Pressed += OnTileInspectorSecondaryPressed;
-		}
-
-		if (_tileInspectorTertiaryButton != null)
-		{
-			_tileInspectorTertiaryButton.Pressed += OnTileInspectorTertiaryPressed;
 		}
 	}
 
@@ -150,24 +87,9 @@ public partial class Main
 			_worldMapRenderer.WorldSiteSelectionChanged -= OnWorldSiteSelectionChanged;
 		}
 
-		if (_tileInspectorPrimaryButton != null)
-		{
-			_tileInspectorPrimaryButton.Pressed -= OnTileInspectorPrimaryPressed;
-		}
-
-		if (_tileInspectorSecondaryButton != null)
-		{
-			_tileInspectorSecondaryButton.Pressed -= OnTileInspectorSecondaryPressed;
-		}
-
 		if (_tileInspectorConstructionButton != null)
 		{
 			_tileInspectorConstructionButton.Pressed -= OpenConstructionPanel;
-		}
-
-		if (_tileInspectorTertiaryButton != null)
-		{
-			_tileInspectorTertiaryButton.Pressed -= OnTileInspectorTertiaryPressed;
 		}
 	}
 
@@ -194,15 +116,13 @@ public partial class Main
 
 	private void ApplySectTileInspectorSummary(TownMapSelectionSummary summary)
 	{
+		UpdateJobPanelVisibilityForSectSelection(summary);
+
 		if (_tileInspectorTitleLabel == null ||
 			_tileInspectorSubtitleLabel == null ||
 			_tileInspectorBadgeLabel == null ||
 			_tileInspectorStatusLabel == null ||
 			_tileInspectorStatusValueLabel == null ||
-			_tileInspectorResidentLabel == null ||
-			_tileInspectorResidentValueLabel == null ||
-			_tileInspectorTransitLabel == null ||
-			_tileInspectorTransitValueLabel == null ||
 			_tileInspectorLocationLabel == null ||
 			_tileInspectorLocationValueLabel == null ||
 			_tileInspectorBuildingLabel == null ||
@@ -220,10 +140,6 @@ public partial class Main
 		_tileInspectorSubtitleLabel.Text = Resolve(summary.Subtitle);
 		_tileInspectorStatusLabel.Text = summary.StatusLabel;
 		_tileInspectorStatusValueLabel.Text = Resolve(summary.StatusText);
-		_tileInspectorResidentLabel.Text = summary.ResidentLabel;
-		_tileInspectorResidentValueLabel.Text = Resolve(summary.ResidentText);
-		_tileInspectorTransitLabel.Text = summary.TransitLabel;
-		_tileInspectorTransitValueLabel.Text = Resolve(summary.TransitText);
 		_tileInspectorLocationLabel.Text = summary.LocationLabel;
 		_tileInspectorLocationValueLabel.Text = Resolve(summary.LocationText);
 		_tileInspectorBuildingLabel.Text = summary.BuildingLabel;
@@ -231,21 +147,19 @@ public partial class Main
 		_tileInspectorDescriptionLabel.Text = Resolve(summary.DescriptionText);
 
 		UpdateConstructionEntryHint(summary);
-		ConfigureTileInspectorActions(summary);
+		ConfigureBuildOnlyInspector(summary);
 		ApplyTileInspectorVisualTone(summary);
 	}
 
 	private void ApplyWorldSiteInspectorSummary(XianxiaSiteData? site)
 	{
+		UpdateJobPanelVisibilityForWorldSiteSelection(site);
+
 		if (_tileInspectorTitleLabel == null ||
 			_tileInspectorSubtitleLabel == null ||
 			_tileInspectorBadgeLabel == null ||
 			_tileInspectorStatusLabel == null ||
 			_tileInspectorStatusValueLabel == null ||
-			_tileInspectorResidentLabel == null ||
-			_tileInspectorResidentValueLabel == null ||
-			_tileInspectorTransitLabel == null ||
-			_tileInspectorTransitValueLabel == null ||
 			_tileInspectorLocationLabel == null ||
 			_tileInspectorLocationValueLabel == null ||
 			_tileInspectorBuildingLabel == null ||
@@ -265,29 +179,13 @@ public partial class Main
 			_tileInspectorBadgeLabel.Text = "世界层";
 			_tileInspectorStatusLabel.Text = "点位态势";
 			_tileInspectorStatusValueLabel.Text = "等待点选";
-			_tileInspectorResidentLabel.Text = "主类型";
-			_tileInspectorResidentValueLabel.Text = "未选中";
-			_tileInspectorTransitLabel.Text = "开放层级";
-			_tileInspectorTransitValueLabel.Text = "待判定";
 			_tileInspectorLocationLabel.Text = "所属区块";
 			_tileInspectorLocationValueLabel.Text = "待识别";
-			_tileInspectorBuildingLabel.Text = "建筑列表";
+			_tileInspectorBuildingLabel.Text = "建筑概况";
 			_tileInspectorBuildingValueLabel.Text = "世界层无院域建筑";
-			_tileInspectorDescriptionLabel.Text = "左键点选世界地图中的宗门、凡俗据点、坊市、世家、仙城或遗迹节点后，这里会显示对应的分层信息与建议去向。";
-			ApplyTileInspectorBinding(
-				CreateDisabledTileInspectorBinding("等待选中世界点位", "先从世界地图点选一个外域点位。"),
-				_tileInspectorPrimaryButton,
-				ref _tileInspectorPrimaryAction);
-			ApplyTileInspectorBinding(
-				CreateDisabledTileInspectorBinding("等待选中世界点位", "当前尚未选中外域点位。"),
-				_tileInspectorSecondaryButton,
-				ref _tileInspectorSecondaryAction);
-			ApplyTileInspectorBinding(
-				CreateDisabledTileInspectorBinding("等待选中世界点位", "选中点位后，这里会显示对应的联动入口。"),
-				_tileInspectorTertiaryButton,
-				ref _tileInspectorTertiaryAction);
-			ApplyTileInspectorActionHint("可执行项：左键点选世界点位查看分层信息；右键可清除当前选中。");
+			_tileInspectorDescriptionLabel.Text = "左键点选世界地图中的宗门、凡俗据点、坊市、世家、仙城或遗迹节点后，这里会显示对应点位的情报摘要。";
 			ApplyWorldInspectorVisualTone("world", false);
+			ConfigureBuildOnlyInspector(TownMapSelectionSummary.CreateDefault());
 			return;
 		}
 
@@ -298,23 +196,42 @@ public partial class Main
 		_tileInspectorBadgeLabel.Text = $"{primaryTypeText}点";
 		_tileInspectorStatusLabel.Text = "稀有度";
 		_tileInspectorStatusValueLabel.Text = rarityText;
-		_tileInspectorResidentLabel.Text = "主类型";
-		_tileInspectorResidentValueLabel.Text = primaryTypeText;
-		_tileInspectorTransitLabel.Text = "开放层级";
-		_tileInspectorTransitValueLabel.Text = site.UnlockTier switch
-		{
-			<= 0 => "开局可至",
-			1 => "中期开启",
-			_ => "后期开启"
-		};
 		_tileInspectorLocationLabel.Text = "所属区块";
 		_tileInspectorLocationValueLabel.Text = ResolveWorldRegionText(site.RegionId);
-		_tileInspectorBuildingLabel.Text = "建筑列表";
+		_tileInspectorBuildingLabel.Text = "建筑概况";
 		_tileInspectorBuildingValueLabel.Text = "世界层无院域建筑";
 		_tileInspectorDescriptionLabel.Text = BuildWorldSiteDescription(site, primaryTypeText, rarityText);
-
-		ConfigureWorldSiteInspectorActions(site, primaryTypeText);
+		ConfigureBuildOnlyInspector(TownMapSelectionSummary.CreateDefault());
 		ApplyWorldInspectorVisualTone(site.PrimaryType, true);
+	}
+
+	private void ConfigureBuildOnlyInspector(TownMapSelectionSummary summary)
+	{
+		if (_tileInspectorActionHintLabel == null)
+		{
+			return;
+		}
+
+		// 当前机宜卷已经收口为建造专用摘要，因此只维护建造提示，不再暴露旧的调度/仓储/弟子联动动作。
+		if (_currentMapTab is MapTab.World or MapTab.WorldSite)
+		{
+			ApplyTileInspectorActionHint("当前仅展示地块与点位情报；若要直接建造建筑，请先返回山门图并点选具体院域。");
+			return;
+		}
+
+		if (!summary.HasSelection)
+		{
+			ApplyTileInspectorActionHint("机宜卷已常驻展开。请先点选一块山门院域，再通过“对该地块营建”为该地块挑选建筑。");
+			return;
+		}
+
+		if (summary.AnchorType != null)
+		{
+			ApplyTileInspectorActionHint("当前选中为场所锚点，只能查阅现状；若要建造建筑，请改选一块可营建的空白院域。");
+			return;
+		}
+
+		ApplyTileInspectorActionHint("当前已锁定具体院域，可直接通过“对该地块营建”为这块地挑选建筑并发起营建排队。");
 	}
 
 	private static string BuildBuildingListText(TownMapSelectionSummary summary)
@@ -332,264 +249,6 @@ public partial class Main
 		}
 
 		return string.Join("\n", lines);
-	}
-
-	private void ConfigureTileInspectorActions(TownMapSelectionSummary summary)
-	{
-		var nameMap = _gameLoop != null ? _gameLoop.State.SectNameMap : null;
-		string Resolve(string text) => SectNamingRules.ReplaceKnownNames(nameMap, text);
-
-		if (!summary.HasSelection)
-		{
-			ApplyTileInspectorBinding(
-				CreateDisabledTileInspectorBinding(
-					"当前无选中院域",
-					Resolve("左键点选任意天衍峰六角地块后，即可查看对应院域详情。")),
-				_tileInspectorPrimaryButton,
-				ref _tileInspectorPrimaryAction);
-			ApplyTileInspectorBinding(
-				CreateDisabledTileInspectorBinding("等待选中地块", "当前尚未选中院域，暂不提供局部治理入口。"),
-				_tileInspectorSecondaryButton,
-				ref _tileInspectorSecondaryAction);
-			ApplyTileInspectorBinding(
-				CreateDisabledTileInspectorBinding("等待选中地块", "选中院域后，可继续打开仓储、弟子谱或宗主中枢联动视图。"),
-				_tileInspectorTertiaryButton,
-				ref _tileInspectorTertiaryAction);
-			ApplyTileInspectorActionHint("可执行项：左键点选任意院域后，可查看灵气、坊位、天然特征与推荐坊局；右键可清除当前选中。");
-			return;
-		}
-
-		var tileName = string.IsNullOrWhiteSpace(summary.Title) ? "当前地块" : Resolve(summary.Title);
-
-		if (summary.AnchorType == null)
-		{
-			ConfigureCompoundTileInspectorActions(summary, tileName);
-			return;
-		}
-
-		var primaryBinding = summary.AnchorType switch
-		{
-			TownActivityAnchorType.Farmstead => new TileInspectorActionBinding(
-				TileInspectorAction.BuildAgriculture,
-				"扩建阵材圃",
-				$"对【{tileName}】追加灵植 / 灵田产能，强化阵材与供养链路。",
-				true),
-			TownActivityAnchorType.Workshop => new TileInspectorActionBinding(
-				TileInspectorAction.BuildWorkshop,
-				"扩建傀儡工坊",
-				$"对【{tileName}】追加营造与工器位，强化阵务与建设链路。",
-				true),
-			TownActivityAnchorType.Market => new TileInspectorActionBinding(
-				TileInspectorAction.BuildTrade,
-				"扩建青云总坊",
-				$"对【{tileName}】追加流转与外事务位，提升总坊回流。",
-				true),
-			TownActivityAnchorType.Academy => new TileInspectorActionBinding(
-				TileInspectorAction.BuildResearch,
-				"扩建传法院",
-				$"对【{tileName}】追加讲法与推演位，强化研修与突破链路。",
-				true),
-			TownActivityAnchorType.Administration => new TileInspectorActionBinding(
-				TileInspectorAction.BuildAdministration,
-				"扩建庶务殿",
-				$"对【{tileName}】追加庶务与执事位，提升治理执行容量。",
-				true),
-			TownActivityAnchorType.Leisure => new TileInspectorActionBinding(
-				TileInspectorAction.OpenDisciplePanel,
-				"查阅驻留弟子",
-				$"打开弟子谱，查看【{tileName}】附近的休憩 / 论道门人。",
-				true),
-			_ => new TileInspectorActionBinding(
-				TileInspectorAction.OpenTaskPanel,
-				"前往宗主中枢",
-				$"打开宗主中枢，为【{tileName}】相关堂口调整治理侧重。",
-				true)
-		};
-
-		var secondaryBinding = summary.AnchorType switch
-		{
-			TownActivityAnchorType.Farmstead => new TileInspectorActionBinding(
-				TileInspectorAction.OpenTaskPanel,
-				"调度阵材法旨",
-				$"跳转到宗主中枢，为【{tileName}】调度阵材 / 供养相关法旨。",
-				true),
-			TownActivityAnchorType.Workshop => new TileInspectorActionBinding(
-				TileInspectorAction.OpenTaskPanel,
-				"调度阵务法旨",
-				$"跳转到宗主中枢，为【{tileName}】调度阵务 / 工坊执行侧重。",
-				true),
-			TownActivityAnchorType.Market => new TileInspectorActionBinding(
-				TileInspectorAction.OpenTaskPanel,
-				"调度外事法旨",
-				$"跳转到宗主中枢，为【{tileName}】调度总坊 / 外事务令。",
-				true),
-			TownActivityAnchorType.Academy => new TileInspectorActionBinding(
-				TileInspectorAction.OpenTaskPanel,
-				"调度推演法旨",
-				$"跳转到宗主中枢，为【{tileName}】调度传法院与推演任务。",
-				true),
-			TownActivityAnchorType.Administration => new TileInspectorActionBinding(
-				TileInspectorAction.OpenTaskPanel,
-				"打开宗主中枢",
-				$"从【{tileName}】直接进入宗主中枢，查看治理与法令。",
-				true),
-			TownActivityAnchorType.Leisure => new TileInspectorActionBinding(
-				TileInspectorAction.OpenTaskPanel,
-				"调整门规法令",
-				$"从【{tileName}】联动到宗主中枢，调整门规、法令与育才方向。",
-				true),
-			_ => new TileInspectorActionBinding(
-				TileInspectorAction.OpenDisciplePanel,
-				"查阅弟子谱",
-				$"打开弟子谱，查看与【{tileName}】相关的门人构成。",
-				true)
-		};
-
-		var tertiaryBinding = summary.AnchorType switch
-		{
-			TownActivityAnchorType.Farmstead => new TileInspectorActionBinding(
-				TileInspectorAction.OpenWarehousePanel,
-				"查阅粮仓",
-				$"打开仓储，检查【{tileName}】相关的灵谷与基础供养存量。",
-				true),
-			TownActivityAnchorType.Workshop => new TileInspectorActionBinding(
-				TileInspectorAction.OpenWarehousePanel,
-				"查阅工料仓",
-				$"打开仓储，检查【{tileName}】相关的工料、构件与器材储量。",
-				true),
-			TownActivityAnchorType.Market => new TileInspectorActionBinding(
-				TileInspectorAction.OpenWarehousePanel,
-				"查阅流转仓",
-				$"打开仓储，检查【{tileName}】相关的交易与流转物资储量。",
-				true),
-			TownActivityAnchorType.Academy => new TileInspectorActionBinding(
-				TileInspectorAction.OpenDisciplePanel,
-				"查阅研修弟子",
-				$"打开弟子谱，查看【{tileName}】周边的研修与讲法门人。",
-				true),
-			TownActivityAnchorType.Administration => new TileInspectorActionBinding(
-				TileInspectorAction.OpenWarehousePanel,
-				"查阅宗门内库",
-				$"打开仓储，检查【{tileName}】对应的内库与公共储备。",
-				true),
-			TownActivityAnchorType.Leisure => new TileInspectorActionBinding(
-				TileInspectorAction.OpenWarehousePanel,
-				"查阅供养储备",
-				$"打开仓储，确认【{tileName}】休憩与论道所需的供养储备是否充足。",
-				true),
-			_ => new TileInspectorActionBinding(
-				TileInspectorAction.OpenWarehousePanel,
-				"打开仓储",
-				$"打开仓储，检查【{tileName}】所依赖的供给与材料储量。",
-				true)
-		};
-
-		primaryBinding = ApplyNamingToBinding(primaryBinding, nameMap);
-		secondaryBinding = ApplyNamingToBinding(secondaryBinding, nameMap);
-		tertiaryBinding = ApplyNamingToBinding(tertiaryBinding, nameMap);
-
-		ApplyTileInspectorBinding(primaryBinding, _tileInspectorPrimaryButton, ref _tileInspectorPrimaryAction);
-		ApplyTileInspectorBinding(secondaryBinding, _tileInspectorSecondaryButton, ref _tileInspectorSecondaryAction);
-		ApplyTileInspectorBinding(tertiaryBinding, _tileInspectorTertiaryButton, ref _tileInspectorTertiaryAction);
-		ApplyTileInspectorActionHint(
-			$"可执行项：{primaryBinding.Text} / {secondaryBinding.Text} / {tertiaryBinding.Text}");
-	}
-
-	private void ConfigureCompoundTileInspectorActions(TownMapSelectionSummary summary, string tileName)
-	{
-		var nameMap = _gameLoop != null ? _gameLoop.State.SectNameMap : null;
-		var primaryBinding = summary.SuggestedBuildType switch
-		{
-			IndustryBuildingType.Agriculture => new TileInspectorActionBinding(
-				TileInspectorAction.PlanCompoundSpecialized,
-				"定为阵材主坊局",
-				$"将【{tileName}】切到阵材主修布局，优先拉高灵植、药材与仓储配套。",
-				true),
-			IndustryBuildingType.Workshop => new TileInspectorActionBinding(
-				TileInspectorAction.PlanCompoundSpecialized,
-				"定为工坊主坊局",
-				$"将【{tileName}】切到工务主修布局，优先拉高傀儡营造与转运配套。",
-				true),
-			IndustryBuildingType.Research => new TileInspectorActionBinding(
-				TileInspectorAction.PlanCompoundSpecialized,
-				"定为研修主坊局",
-				$"将【{tileName}】切到传法院主修布局，优先拉高研修、讲法与静修配套。",
-				true),
-			IndustryBuildingType.Trade => new TileInspectorActionBinding(
-				TileInspectorAction.PlanCompoundSpecialized,
-				"定为总坊主坊局",
-				$"将【{tileName}】切到总坊主修布局，优先拉高流转、吞吐与转运配套。",
-				true),
-			IndustryBuildingType.Administration => new TileInspectorActionBinding(
-				TileInspectorAction.PlanCompoundSpecialized,
-				"定为治务主坊局",
-				$"将【{tileName}】切到庶务主修布局，优先拉高治理、巡查与签押节点。",
-				true),
-			_ => new TileInspectorActionBinding(
-				TileInspectorAction.PlanCompoundSpecialized,
-				"定为主修坊局",
-				$"将【{tileName}】切到当前院域的主修布局，优先形成明确定位。",
-				true)
-		};
-
-		var secondaryBinding = new TileInspectorActionBinding(
-			TileInspectorAction.PlanCompoundSynergy,
-			"切为协同坊局",
-			$"将【{tileName}】改为共享标签更强的布局，优先追求坊位之间的连锁收益。",
-			true);
-
-		var tertiaryBinding = new TileInspectorActionBinding(
-			TileInspectorAction.PlanCompoundBalanced,
-			"切为稳态坊局",
-			$"将【{tileName}】改为更稳的布局，优先缓解灵池压力、互扰与波动。",
-			true);
-
-		primaryBinding = ApplyNamingToBinding(primaryBinding, nameMap);
-		secondaryBinding = ApplyNamingToBinding(secondaryBinding, nameMap);
-		tertiaryBinding = ApplyNamingToBinding(tertiaryBinding, nameMap);
-
-		ApplyTileInspectorBinding(primaryBinding, _tileInspectorPrimaryButton, ref _tileInspectorPrimaryAction);
-		ApplyTileInspectorBinding(secondaryBinding, _tileInspectorSecondaryButton, ref _tileInspectorSecondaryAction);
-		ApplyTileInspectorBinding(tertiaryBinding, _tileInspectorTertiaryButton, ref _tileInspectorTertiaryAction);
-		ApplyTileInspectorActionHint(
-			$"可执行项：{primaryBinding.Text} / {secondaryBinding.Text} / {tertiaryBinding.Text}。切换后会立即刷新坊位、灵气、协同与稳定度反馈。{GetCompoundActionFocus(summary.StatusText)}");
-	}
-
-	private static TileInspectorActionBinding CreateDisabledTileInspectorBinding(string text, string tooltipText)
-	{
-		return new TileInspectorActionBinding(TileInspectorAction.None, text, tooltipText, false);
-	}
-
-	private static TileInspectorActionBinding ApplyNamingToBinding(
-		TileInspectorActionBinding binding,
-		IReadOnlyDictionary<string, string>? nameMap)
-	{
-		if (nameMap == null)
-		{
-			return binding;
-		}
-
-		return new TileInspectorActionBinding(
-			binding.Action,
-			SectNamingRules.ReplaceKnownNames(nameMap, binding.Text),
-			SectNamingRules.ReplaceKnownNames(nameMap, binding.TooltipText),
-			binding.Enabled);
-	}
-
-	private void ApplyTileInspectorBinding(
-		TileInspectorActionBinding binding,
-		Button button,
-		ref TileInspectorAction targetAction)
-	{
-		targetAction = binding.Action;
-		ApplyTileInspectorButtonBinding(button, binding);
-	}
-
-	private static void ApplyTileInspectorButtonBinding(Button button, TileInspectorActionBinding binding)
-	{
-		button.Text = binding.Text;
-		button.TooltipText = binding.TooltipText;
-		button.Disabled = !binding.Enabled || binding.Action == TileInspectorAction.None;
 	}
 
 	private void ApplyTileInspectorActionHint(string hintText)
@@ -610,66 +269,31 @@ public partial class Main
 			return;
 		}
 
-		_tileInspectorConstructionButton.Text = "营建卷";
+		_tileInspectorConstructionButton.Text = "对该地块营建";
 
 		if (_currentMapTab is MapTab.World or MapTab.WorldSite)
 		{
 			_tileInspectorConstructionButton.Disabled = true;
-			_tileInspectorConstructionButton.TooltipText = "当前处于世界层视图，营建卷仅在山门图可用。";
+			_tileInspectorConstructionButton.TooltipText = "当前处于世界层视图，仅山门地块支持直接发起地块营建。";
 			return;
 		}
 
 		if (!summary.HasSelection)
 		{
 			_tileInspectorConstructionButton.Disabled = false;
-			_tileInspectorConstructionButton.TooltipText = "尚未选中院域地块，营建卷仅展示宗门总览与推荐提示。";
+			_tileInspectorConstructionButton.TooltipText = "尚未选中院域地块，请先点选具体地块后再对该地块发起营建。";
 			return;
 		}
 
 		if (summary.AnchorType != null)
 		{
 			_tileInspectorConstructionButton.Disabled = false;
-			_tileInspectorConstructionButton.TooltipText = "当前选中为场所锚点，请改选空白院域地块后再执行建造。";
+			_tileInspectorConstructionButton.TooltipText = "当前选中为场所锚点，请改选可营建的空白院域地块后再执行营建排队。";
 			return;
 		}
 
 		_tileInspectorConstructionButton.Disabled = false;
-		_tileInspectorConstructionButton.TooltipText = "已锁定院域地块，可打开营建卷挑选建筑并发起建造。";
-	}
-
-	private void ConfigureWorldSiteInspectorActions(XianxiaSiteData site, string primaryTypeText)
-	{
-		var primaryBinding = new TileInspectorActionBinding(
-			TileInspectorAction.OpenWorldSitePlaceholder,
-			"前往二级地图",
-			$"进入【{site.Label}】的下一层地图，并按该 world hex 的具体语义生成局部地图。",
-			true);
-
-		var secondaryBinding = site.PrimaryType switch
-		{
-			"Sect" => new TileInspectorActionBinding(TileInspectorAction.OpenTaskPanel, "查阅宗门交涉", $"打开宗主中枢，先从全局层面筹备与【{site.Label}】有关的宗门交涉与治理。", true),
-			"MortalRealm" => new TileInspectorActionBinding(TileInspectorAction.OpenWarehousePanel, "查阅供养储备", $"打开仓储，检查前往【{site.Label}】所需的供给与物资准备。", true),
-			"Market" => new TileInspectorActionBinding(TileInspectorAction.OpenWarehousePanel, "查阅贸易物资", $"打开仓储，查看适合带往【{site.Label}】流转的物资。", true),
-			"Wilderness" => new TileInspectorActionBinding(TileInspectorAction.OpenDisciplePanel, "查阅历练人选", $"打开弟子谱，查看适合前往【{site.Label}】探路、采集或护送的人手。", true),
-			"CultivatorClan" => new TileInspectorActionBinding(TileInspectorAction.OpenDisciplePanel, "查阅门人名录", $"打开弟子谱，查看适合前往【{site.Label}】接触世家的门人与真传。", true),
-			"ImmortalCity" => new TileInspectorActionBinding(TileInspectorAction.OpenWarehousePanel, "查阅远行补给", $"打开仓储，查看前往【{site.Label}】这类大型枢纽所需的补给与交易品。", true),
-			"Ruin" => new TileInspectorActionBinding(TileInspectorAction.OpenDisciplePanel, "查阅历练人选", $"打开弟子谱，查看适合前往【{site.Label}】的历练人选。", true),
-			_ => new TileInspectorActionBinding(TileInspectorAction.OpenTaskPanel, "查看外域筹备", $"打开宗主中枢，查看与【{site.Label}】相关的筹备事项。", true)
-		};
-
-		var tertiaryBinding = site.PrimaryType switch
-		{
-			"Sect" or "CultivatorClan" => new TileInspectorActionBinding(TileInspectorAction.OpenDisciplePanel, "查阅往来门人", $"打开弟子谱，查看适合与【{site.Label}】往来的门人。", true),
-			"Market" or "ImmortalCity" => new TileInspectorActionBinding(TileInspectorAction.OpenTaskPanel, "查看外务法旨", $"打开宗主中枢，筹备与【{site.Label}】相关的外事务令。", true),
-			"Wilderness" => new TileInspectorActionBinding(TileInspectorAction.OpenWarehousePanel, "查阅野外补给", $"打开仓储，确认前往【{site.Label}】所需的路粮、器具与应急物资。", true),
-			"Ruin" => new TileInspectorActionBinding(TileInspectorAction.OpenWarehousePanel, "查阅探险物资", $"打开仓储，确认前往【{site.Label}】所需的探险物资。", true),
-			_ => new TileInspectorActionBinding(TileInspectorAction.OpenTaskPanel, "查看外域法旨", $"打开宗主中枢，查看【{site.Label}】相关的外域法旨。", true)
-		};
-
-		ApplyTileInspectorBinding(primaryBinding, _tileInspectorPrimaryButton, ref _tileInspectorPrimaryAction);
-		ApplyTileInspectorBinding(secondaryBinding, _tileInspectorSecondaryButton, ref _tileInspectorSecondaryAction);
-		ApplyTileInspectorBinding(tertiaryBinding, _tileInspectorTertiaryButton, ref _tileInspectorTertiaryAction);
-		ApplyTileInspectorActionHint($"可执行项：{primaryBinding.Text} / {secondaryBinding.Text} / {tertiaryBinding.Text}。当前点位属于{primaryTypeText}分层。");
+		_tileInspectorConstructionButton.TooltipText = "已锁定当前院域地块，可直接打开营建卷并对该地块发起营建排队。";
 	}
 
 	private void ApplyWorldInspectorVisualTone(string primaryType, bool hasSelection)
@@ -697,92 +321,6 @@ public partial class Main
 	private void CallTileInspectorVisualFx(string methodName, params Variant[] args)
 	{
 		_tileInspectorVisualFx?.Call(methodName, args);
-	}
-
-	private static string GetCompoundActionFocus(string statusText)
-	{
-		return statusText switch
-		{
-			"灵池过载" => "当前更适合先缓解高耗坊位，再做扩建。",
-			"灵池分流" => "当前更适合补回灵或调整组合顺序。",
-			"坊局互扰" => "当前更适合拆散互相掣肘的坊位标签。",
-			"稳态成局" => "当前更适合沿既有组合继续叠加协同。",
-			"坊局协同" => "当前可以围绕核心坊位继续做配套放大收益。",
-			"坊位受限" => "当前优先确认地块定位，再决定是否投入核心建筑。",
-			_ => "当前可先按建议坊局落第一轮基础配置。"
-		};
-	}
-
-	private void OnTileInspectorPrimaryPressed()
-	{
-		ExecuteTileInspectorAction(_tileInspectorPrimaryAction);
-	}
-
-	private void OnTileInspectorSecondaryPressed()
-	{
-		ExecuteTileInspectorAction(_tileInspectorSecondaryAction);
-	}
-
-	private void OnTileInspectorTertiaryPressed()
-	{
-		ExecuteTileInspectorAction(_tileInspectorTertiaryAction);
-	}
-
-	private void ExecuteTileInspectorAction(TileInspectorAction action)
-	{
-		var tileName = _tileInspectorTitleLabel?.Text ?? "当前地块";
-
-		switch (action)
-		{
-			case TileInspectorAction.OpenWorldSitePlaceholder:
-				OpenSelectedWorldSitePanel();
-				break;
-			case TileInspectorAction.BuildAgriculture:
-				BuildIndustryBuildingWithPlacement(IndustryBuildingType.Agriculture);
-				break;
-			case TileInspectorAction.BuildWorkshop:
-				BuildIndustryBuildingWithPlacement(IndustryBuildingType.Workshop);
-				break;
-			case TileInspectorAction.BuildResearch:
-				BuildIndustryBuildingWithPlacement(IndustryBuildingType.Research);
-				break;
-			case TileInspectorAction.BuildTrade:
-				BuildIndustryBuildingWithPlacement(IndustryBuildingType.Trade);
-				break;
-			case TileInspectorAction.BuildAdministration:
-				BuildIndustryBuildingWithPlacement(IndustryBuildingType.Administration);
-				break;
-			case TileInspectorAction.PlanCompoundSpecialized:
-				if (_sectMapRenderer?.TryApplySelectedCompoundPlan(TownCompoundPlanStyle.Specialized, out var specializedLog) == true)
-				{
-					AppendLog(specializedLog);
-				}
-				break;
-			case TileInspectorAction.PlanCompoundSynergy:
-				if (_sectMapRenderer?.TryApplySelectedCompoundPlan(TownCompoundPlanStyle.Synergy, out var synergyLog) == true)
-				{
-					AppendLog(synergyLog);
-				}
-				break;
-			case TileInspectorAction.PlanCompoundBalanced:
-				if (_sectMapRenderer?.TryApplySelectedCompoundPlan(TownCompoundPlanStyle.Balanced, out var balancedLog) == true)
-				{
-					AppendLog(balancedLog);
-				}
-				break;
-			case TileInspectorAction.OpenTaskPanel:
-				OpenTaskPanel();
-				AppendLog($"已从地块检视器打开【{tileName}】对应的宗主中枢入口。");
-				break;
-			case TileInspectorAction.OpenDisciplePanel:
-				OpenDisciplePanel();
-				AppendLog($"已从地块检视器查看【{tileName}】相关弟子。");
-				break;
-			case TileInspectorAction.OpenWarehousePanel:
-				OpenWarehousePanel();
-				AppendLog($"已从地块检视器打开【{tileName}】相关仓储视图。");
-				break;
-		}
 	}
 
 	private static string ResolveWorldPrimaryTypeText(string primaryType)

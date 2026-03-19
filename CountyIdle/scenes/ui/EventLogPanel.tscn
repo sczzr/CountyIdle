@@ -51,11 +51,14 @@ border_color = Color(0.752941, 0.701961, 0.607843, 0.72)
 
 [node name="EventLogPanel" type="PanelContainer" unique_id=1403717425]
 clip_contents = true
+custom_minimum_size = Vector2(311, 532)
+size_flags_horizontal = 1
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
 [node name="PanelContent" type="MarginContainer" parent="." unique_id=1978472251]
 layout_mode = 2
+size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_top = 10
@@ -64,6 +67,7 @@ theme_override_constants/margin_bottom = 12
 
 [node name="MainVBox" type="VBoxContainer" parent="PanelContent" unique_id=2115762427]
 layout_mode = 2
+size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 10
 

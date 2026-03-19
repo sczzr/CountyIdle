@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://besw5r752ujvs" path="res://scripts/systems/SectMapViewSystem.cs" id="1_town_map"]
 [ext_resource type="Script" uid="uid://dih1wr3e2nle6" path="res://scripts/systems/StrategicMapViewSystem.cs" id="2_strategic_map"]
+[ext_resource type="Texture2D" uid="uid://xygyp7jguinj" path="res://assets/ui/background/background_map.png" id="3_map_background"]
 [ext_resource type="Script" uid="uid://drf7ordvght0l" path="res://scripts/map/gd/HexHoverHighlight.gd" id="9_town_hover_fx"]
 [ext_resource type="Script" uid="uid://oggfrulmuk65" path="res://scripts/ui/gd/WorldPanelVisualFx.gd" id="10_world_panel_fx"]
 [ext_resource type="Script" uid="uid://b20qvcemv4kby" path="res://scripts/ui/gd/MainTopTabVisualFx.gd" id="11_main_top_tab_fx"]
@@ -119,17 +120,15 @@ script = ExtResource("10_world_panel_fx")
 script = ExtResource("11_main_top_tab_fx")
 
 [node name="TopTabRow" type="HBoxContainer" parent="PanelContent" unique_id=981224588]
-custom_minimum_size = Vector2(240, 34)
 layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
+anchors_preset = 12
 anchor_top = 1.0
-anchor_right = 0.5
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -120.0
+offset_left = 16.0
 offset_top = -44.0
-offset_right = 120.0
-offset_bottom = -12.0
+offset_right = -16.0
+offset_bottom = -8.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_constants/separation = 8
@@ -248,19 +247,29 @@ theme_override_styles/disabled = SubResource("StyleBoxFlat_tab_disabled")
 theme_override_styles/focus = SubResource("StyleBoxFlat_tab_hover")
 text = "归中"
 
+[node name="MapDefinitionToggleButton" type="Button" parent="PanelContent/TopTabRow" unique_id=2125459718]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_tab_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_tab_disabled")
+theme_override_styles/focus = SubResource("StyleBoxFlat_tab_hover")
+text = "图源：生成"
+
 [node name="MapDirectiveRow" type="HBoxContainer" parent="PanelContent" unique_id=1284125199]
 visible = false
-custom_minimum_size = Vector2(580, 30)
 layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
+anchors_preset = 12
 anchor_top = 1.0
-anchor_right = 0.5
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -290.0
-offset_top = -78.0
-offset_right = 290.0
-offset_bottom = -46.0
+offset_left = 16.0
+offset_top = -82.0
+offset_right = -16.0
+offset_bottom = -48.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_constants/separation = 8
@@ -310,6 +319,29 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_map")
 
 [node name="MapPages" type="Control" parent="PanelContent/MapViewport" unique_id=941298102]
 layout_mode = 2
+
+[node name="MapBackground" type="TextureRect" parent="PanelContent/MapViewport/MapPages" unique_id=2026032001]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+self_modulate = Color(0.823529, 0.764706, 0.647059, 0.32)
+texture = ExtResource("3_map_background")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="MapBackgroundTint" type="ColorRect" parent="PanelContent/MapViewport/MapPages" unique_id=2026032002]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.168627, 0.137255, 0.109804, 0.2)
 
 [node name="WorldMapView" type="PanelContainer" parent="PanelContent/MapViewport/MapPages" unique_id=984430974]
 visible = false

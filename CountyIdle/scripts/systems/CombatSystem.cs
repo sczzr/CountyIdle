@@ -66,7 +66,7 @@ public class CombatSystem
             var lootText =
                 $"行囊收获：{MaterialSemanticRules.GetDisplayName(nameof(GameState.Gold))}+{visibleGoldGain}，{MaterialSemanticRules.GetDisplayName(nameof(GameState.RareMaterial))}+{visibleRareGain}";
             var combatLog = outerCandidateCount > 0
-                ? $"探险胜利：外务候补 {outerCandidateCount} 人协力，队伍战力额外 +{outerMissionTeamPowerBonus:0.0}，{lootText}，当前层数 {state.ExplorationDepth}。"
+                ? $"探险胜利：外务候补 {outerCandidateCount} 人协力，队伍战力额外 +{outerMissionTeamPowerBonus:0.0}，{lootText}，当前层数 {state.ExplorationDepth}。{DiscipleDirectiveRules.BuildOuterMissionRouteSummary(state)}"
                 : $"探险胜利：{lootText}，当前层数 {state.ExplorationDepth}。";
             if (_equipmentSystem.TryResolveExplorationDrop(state, out var gearLog) && !string.IsNullOrWhiteSpace(gearLog))
             {
@@ -86,7 +86,7 @@ public class CombatSystem
         }
 
         log = outerCandidateCount > 0
-            ? "探险受挫：虽有外务候补随行，但此次未能得手，队伍负伤撤退，郡内威胁上升。"
+            ? $"探险受挫：虽有外务候补随行，但此次未能得手，队伍负伤撤退，郡内威胁上升。{DiscipleDirectiveRules.BuildOuterMissionRouteSummary(state)}"
             : "探险受挫：队伍负伤撤退，郡内威胁上升。";
         return true;
     }

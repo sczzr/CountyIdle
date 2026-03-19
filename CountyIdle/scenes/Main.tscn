@@ -67,25 +67,38 @@ z_index = -100
 self_modulate = Color(1, 1, 1, 1)
 texture = ExtResource("2_jlsqs")
 
-[node name="RootMargin" type="Control" parent="." unique_id=659476772]
+[node name="RootMargin" type="MarginContainer" parent="." unique_id=659476772]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 8
 
 [node name="MainLayout" type="Control" parent="RootMargin" unique_id=732927133]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 20.0
-offset_top = 8.0
-offset_right = -20.0
-offset_bottom = -8.0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="LayoutVBox" type="VBoxContainer" parent="RootMargin/MainLayout"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
 
 [node name="PaperSheet" type="Panel" parent="RootMargin/MainLayout" unique_id=123721002]
 visible = false
@@ -232,76 +245,68 @@ grow_horizontal = 0
 grow_vertical = 2
 color = Color(0.752941, 0.701961, 0.607843, 0.45)
 
-[node name="BodyRow" type="Control" parent="RootMargin/MainLayout" unique_id=1475807803]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="BodyRow" type="HBoxContainer" parent="RootMargin/MainLayout/LayoutVBox" unique_id=1475807803]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 12
 
-[node name="CenterPanel" parent="RootMargin/MainLayout/BodyRow" unique_id=2096398785 instance=ExtResource("4_a8trh")]
+[node name="LeftPanel" parent="RootMargin/MainLayout/LayoutVBox/BodyRow" unique_id=2081890903 instance=ExtResource("3_7d4x0")]
+visible = false
+z_index = 20
+top_level = true
+custom_minimum_size = Vector2(294, 0)
+layout_mode = 1
+anchors_preset = 0
+offset_left = 18.0
+offset_top = 78.0
+offset_right = 329.0
+offset_bottom = 610.0
+size_flags_horizontal = 1
+size_flags_vertical = 3
+
+[node name="CenterPanel" parent="RootMargin/MainLayout/LayoutVBox/BodyRow" unique_id=2096398785 instance=ExtResource("4_a8trh")]
 z_index = 10
-layout_mode = 1
-offset_left = 326.0
-offset_top = 40.0
-offset_right = -326.0
-offset_bottom = -84.0
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
-[node name="LeftPanel" parent="RootMargin/MainLayout/BodyRow" unique_id=2081890903 instance=ExtResource("3_7d4x0")]
+[node name="RightPanel" parent="RootMargin/MainLayout/LayoutVBox/BodyRow" unique_id=1151408985 instance=ExtResource("5_2c9up")]
 z_index = 20
 custom_minimum_size = Vector2(294, 0)
-layout_mode = 1
-anchors_preset = 9
-anchor_bottom = 1.0
-offset_left = 8.0
-offset_top = 40.0
-offset_right = 302.0
-offset_bottom = -56.0
-grow_vertical = 2
+layout_mode = 2
+size_flags_horizontal = 1
+size_flags_vertical = 3
 
-[node name="RightPanel" parent="RootMargin/MainLayout/BodyRow" unique_id=1151408985 instance=ExtResource("5_2c9up")]
-z_index = 20
-custom_minimum_size = Vector2(294, 0)
-layout_mode = 1
-anchors_preset = 11
-anchor_left = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -302.0
-offset_top = 40.0
-offset_right = -8.0
-offset_bottom = -56.0
-grow_horizontal = 0
-grow_vertical = 2
-
-[node name="TopBar" parent="RootMargin/MainLayout" unique_id=786174656 instance=ExtResource("2_43kr5")]
+[node name="TopBar" parent="RootMargin/MainLayout/LayoutVBox" unique_id=786174656 instance=ExtResource("2_43kr5")]
 z_index = 30
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_left = 8.0
-offset_right = -8.0
-offset_bottom = 30.0
-grow_horizontal = 2
+layout_mode = 2
+size_flags_horizontal = 3
 
-[node name="BottomBar" parent="RootMargin/MainLayout" unique_id=175182135 instance=ExtResource("6_empmh")]
+[node name="BottomBar" parent="RootMargin/MainLayout/LayoutVBox" unique_id=175182135 instance=ExtResource("6_empmh")]
 z_index = 30
-layout_mode = 1
-anchors_preset = 12
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 8.0
-offset_top = -44.0
-offset_right = -8.0
-offset_bottom = -4.0
-grow_horizontal = 2
-grow_vertical = 0
+layout_mode = 2
+size_flags_horizontal = 3
 
 [node name="LanternFx" type="Node" parent="."]
 script = ExtResource("9_main_lantern_fx")
 
 [node name="TileInspectorVisualFx" type="Node" parent="."]
 script = ExtResource("10_tile_inspector_fx")
+
+[node name="RightPanelToggleButton" type="Button" parent="."]
+z_index = 40
+custom_minimum_size = Vector2(104, 34)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -118.0
+offset_top = 96.0
+offset_right = -14.0
+offset_bottom = 130.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 12
+text = "展开记事"
+flat = true
 

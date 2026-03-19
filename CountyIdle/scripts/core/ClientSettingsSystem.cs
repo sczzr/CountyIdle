@@ -13,15 +13,16 @@ public class ClientSettingsSystem
 {
     // 客户端设置存档路径（Godot user://）
     private const string SavePath = "user://client_settings.json";
-    // 字体缩放的软边界（UI 可读性约束）
-    private const float MinFontScale = 0.85f;
-    private const float MaxFontScale = 1.30f;
+    // 画面缩放的软边界：既允许缩小以查看更多内容，也允许放大便于阅读。
+    public const float MinContentZoom = 0.75f;
+    public const float MaxContentZoom = 1.50f;
     // JSON 美化输出，便于人工检查
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
-    // 允许的分辨率白名单
+    // 常用分辨率候选（运行时还会叠加当前屏幕上限）
     private static readonly Vector2I[] SupportedResolutions =
     {
         new Vector2I(1280, 720),
+        new Vector2I(1366, 768),
         new Vector2I(1600, 900),
         new Vector2I(1920, 1080),
         new Vector2I(2560, 1440)
@@ -112,10 +113,71 @@ public class ClientSettingsSystem
             normalized.ResolutionHeight = ClientSettings.DefaultResolutionHeight;
         }
 
-        normalized.FontScale = Mathf.Clamp(normalized.FontScale, MinFontScale, MaxFontScale);
+        normalized.FontScale = Mathf.Clamp(normalized.FontScale, MinContentZoom, MaxContentZoom);
         normalized.MasterVolume = Mathf.Clamp(normalized.MasterVolume, 0.0f, 1.0f);
         NormalizeShortcuts(normalized);
         return normalized;
+    }
+
+    /// <summary>
+    /// 读取当前窗口所在屏幕的最大分辨率；失败时回退到项目默认分辨率。
+    /// </summary>
+    public static Vector2I GetCurrentScreenMaxResolution()
+    {
+        var currentScreen = DisplayServer.WindowGetCurrentScreen();
+        var screenSize = DisplayServer.ScreenGetSize(currentScreen);
+        if (screenSize.X <= 0 || screenSize.Y <= 0)
+        {
+            return new Vector2I(ClientSettings.DefaultResolutionWidth, ClientSettings.DefaultResolutionHeight);
+        }
+
+        return screenSize;
+    }
+
+    /// <summary>
+    /// 获取当前设备可用的分辨率列表：保留 720p 下限，并自动补入当前屏幕上限。
+    /// </summary>
+    public static IReadOnlyList<Vector2I> GetAvailableResolutions()
+    {
+        var availableResolutions = new List<Vector2I>();
+        var currentScreenMaxResolution = GetCurrentScreenMaxResolution();
+
+        foreach (var supportedResolution in SupportedResolutions)
+        {
+            if (supportedResolution.X < ClientSettings.DefaultResolutionWidth ||
+                supportedResolution.Y < ClientSettings.DefaultResolutionHeight)
+            {
+                continue;
+            }
+
+            if (supportedResolution.X > currentScreenMaxResolution.X ||
+                supportedResolution.Y > currentScreenMaxResolution.Y)
+            {
+                continue;
+            }
+
+            availableResolutions.Add(supportedResolution);
+        }
+
+        if (currentScreenMaxResolution.X >= ClientSettings.DefaultResolutionWidth &&
+            currentScreenMaxResolution.Y >= ClientSettings.DefaultResolutionHeight &&
+            !availableResolutions.Contains(currentScreenMaxResolution))
+        {
+            availableResolutions.Add(currentScreenMaxResolution);
+        }
+
+        if (availableResolutions.Count == 0)
+        {
+            availableResolutions.Add(new Vector2I(ClientSettings.DefaultResolutionWidth, ClientSettings.DefaultResolutionHeight));
+        }
+
+        availableResolutions.Sort(static (left, right) =>
+        {
+            var areaComparison = (left.X * left.Y).CompareTo(right.X * right.Y);
+            return areaComparison != 0 ? areaComparison : left.X.CompareTo(right.X);
+        });
+
+        return availableResolutions;
     }
 
     /// <summary>
@@ -128,11 +190,11 @@ public class ClientSettingsSystem
     }
 
     /// <summary>
-    /// 是否属于分辨率白名单。
+    /// 是否属于当前设备允许的分辨率候选。
     /// </summary>
     private static bool IsSupportedResolution(Vector2I resolution)
     {
-        foreach (var supported in SupportedResolutions)
+        foreach (var supported in GetAvailableResolutions())
         {
             if (supported == resolution)
             {

@@ -171,12 +171,15 @@ public static class DiscipleDirectiveRules
 
         var averageCombat = candidates.Average(static profile => profile.Combat);
         var averageExecution = candidates.Average(static profile => profile.Execution);
+        // 修炼路数会继续影响重点外务名册的真实表现，让“专精更适合哪条差事”不止停留在文本上。
+        var routePowerBonus = candidates.Sum(profile => DiscipleCultivationRules.GetOuterMissionPowerBonus(state, profile.Id));
         var bonus =
             (candidates.Count * 0.55) +
             (Math.Max(averageCombat - 50.0, 0.0) * 0.05) +
-            (Math.Max(averageExecution - 50.0, 0.0) * 0.02);
+            (Math.Max(averageExecution - 50.0, 0.0) * 0.02) +
+            routePowerBonus;
 
-        return Math.Min(bonus, 6.0);
+        return Math.Min(bonus, 7.5);
     }
 
     // 外务候补带来的收益修正
@@ -189,11 +192,13 @@ public static class DiscipleDirectiveRules
         }
 
         var averageContribution = candidates.Average(static profile => profile.Contribution);
+        var routeLootBonus = candidates.Sum(profile => DiscipleCultivationRules.GetOuterMissionLootBonus(state, profile.Id));
         var bonus =
             (candidates.Count * 0.015) +
-            (Math.Max(averageContribution - 40.0, 0.0) * 0.0006);
+            (Math.Max(averageContribution - 40.0, 0.0) * 0.0006) +
+            routeLootBonus;
 
-        return 1.0 + Math.Min(bonus, 0.12);
+        return 1.0 + Math.Min(bonus, 0.15);
     }
 
     // 执事候补带来的贡献修正
@@ -207,12 +212,14 @@ public static class DiscipleDirectiveRules
 
         var averageExecution = candidates.Average(static profile => profile.Execution);
         var averageContribution = candidates.Average(static profile => profile.Contribution);
+        var routeContributionBonus = candidates.Sum(profile => DiscipleCultivationRules.GetStewardContributionBonus(state, profile.Id));
         var bonus =
             (candidates.Count * 0.015) +
             (Math.Max(averageExecution - 55.0, 0.0) * 0.0010) +
-            (Math.Max(averageContribution - 45.0, 0.0) * 0.0005);
+            (Math.Max(averageContribution - 45.0, 0.0) * 0.0005) +
+            routeContributionBonus;
 
-        return 1.0 + Math.Min(bonus, 0.12);
+        return 1.0 + Math.Min(bonus, 0.15);
     }
 
     // 执事候补带来的执行修正
@@ -271,7 +278,7 @@ public static class DiscipleDirectiveRules
             }
 
             var chosenCandidate = remainingCandidates
-                .OrderByDescending(candidate => ScoreStewardCandidateForTask(taskDefinition, candidate))
+                .OrderByDescending(candidate => ScoreStewardCandidateForTask(state, taskDefinition, candidate))
                 .ThenByDescending(candidate => candidate.Execution)
                 .ThenByDescending(candidate => candidate.Insight)
                 .ThenByDescending(candidate => candidate.Contribution)
@@ -279,7 +286,7 @@ public static class DiscipleDirectiveRules
                 .First();
 
             remainingCandidates.Remove(chosenCandidate);
-            var executionModifier = ComputeStewardTaskExecutionModifier(taskDefinition, chosenCandidate);
+            var executionModifier = ComputeStewardTaskExecutionModifier(state, taskDefinition, chosenCandidate);
             var appointment = new StewardTaskAppointment(
                 chosenCandidate.Id,
                 chosenCandidate.Name,
@@ -358,6 +365,27 @@ public static class DiscipleDirectiveRules
         };
     }
 
+    // 构建当前外务先遣名册的路数协同摘要，供日志与卷册提示读取。
+    public static string BuildOuterMissionRouteSummary(GameState state)
+    {
+        var candidates = GetCandidateProfiles(state, DiscipleDirectiveType.OuterMissionCandidate, 3);
+        if (candidates.Count <= 0)
+        {
+            return "当前外务线尚未形成额外路数协同。";
+        }
+
+        var parts = candidates
+            .Select(profile =>
+            {
+                var effectSummary = DiscipleCultivationRules.BuildSpecializationEffectLogSummary(state, profile.Id);
+                return string.IsNullOrWhiteSpace(effectSummary)
+                    ? $"{profile.Name}：{DiscipleCultivationRules.BuildDutyAffinitySummary(state, profile)}"
+                    : $"{profile.Name}：{DiscipleCultivationRules.BuildDutyAffinitySummary(state, profile)}；{effectSummary}";
+            })
+            .ToArray();
+        return $"外务相性：{string.Join("；", parts)}。";
+    }
+
     // 外务候补整体效果说明
     private static string BuildOuterMissionSummary(GameState state)
     {
@@ -369,7 +397,10 @@ public static class DiscipleDirectiveRules
 
         var teamPowerBonus = GetOuterMissionTeamPowerBonus(state);
         var lootModifier = GetOuterMissionLootModifier(state);
-        return $"当前外务候补 {count} 人；历练队伍战力额外 +{teamPowerBonus:0.0}，外务回流额外 +{(lootModifier - 1.0) * 100.0:0.#}%。";
+        var effectRollup = BuildDirectiveEffectRollup(state, DiscipleDirectiveType.OuterMissionCandidate);
+        return string.IsNullOrWhiteSpace(effectRollup)
+            ? $"当前外务候补 {count} 人；历练队伍战力额外 +{teamPowerBonus:0.0}，外务回流额外 +{(lootModifier - 1.0) * 100.0:0.#}%。"
+            : $"当前外务候补 {count} 人；历练队伍战力额外 +{teamPowerBonus:0.0}，外务回流额外 +{(lootModifier - 1.0) * 100.0:0.#}%。当前专精落点：{effectRollup}。";
     }
 
     // 执事候补整体效果说明
@@ -383,13 +414,18 @@ public static class DiscipleDirectiveRules
 
         var contributionModifier = GetStewardContributionModifier(state);
         var appointmentSnapshot = BuildStewardAppointmentSnapshot(state);
+        var effectRollup = BuildDirectiveEffectRollup(state, DiscipleDirectiveType.StewardCandidate);
         if (appointmentSnapshot.TotalAssigned <= 0)
         {
-            return $"当前执事培养 {count} 人；暂未轮到具体庶务补位，贡献回流额外 +{(contributionModifier - 1.0) * 100.0:0.#}%。";
+            return string.IsNullOrWhiteSpace(effectRollup)
+                ? $"当前执事培养 {count} 人；暂未轮到具体庶务补位，贡献回流额外 +{(contributionModifier - 1.0) * 100.0:0.#}%。"
+                : $"当前执事培养 {count} 人；暂未轮到具体庶务补位，贡献回流额外 +{(contributionModifier - 1.0) * 100.0:0.#}%。当前专精落点：{effectRollup}。";
         }
 
         var executionModifier = appointmentSnapshot.AverageExecutionModifier;
-        return $"当前执事培养 {count} 人；其中 {appointmentSnapshot.TotalAssigned} 人正补位内务，执行效率额外 +{(executionModifier - 1.0) * 100.0:0.#}%，贡献回流额外 +{(contributionModifier - 1.0) * 100.0:0.#}%。";
+        return string.IsNullOrWhiteSpace(effectRollup)
+            ? $"当前执事培养 {count} 人；其中 {appointmentSnapshot.TotalAssigned} 人正补位内务，执行效率额外 +{(executionModifier - 1.0) * 100.0:0.#}%，贡献回流额外 +{(contributionModifier - 1.0) * 100.0:0.#}%。"
+            : $"当前执事培养 {count} 人；其中 {appointmentSnapshot.TotalAssigned} 人正补位内务，执行效率额外 +{(executionModifier - 1.0) * 100.0:0.#}%，贡献回流额外 +{(contributionModifier - 1.0) * 100.0:0.#}%。当前专精落点：{effectRollup}。";
     }
 
     // 外务候补弟子效果说明
@@ -397,28 +433,65 @@ public static class DiscipleDirectiveRules
     {
         var activeCandidates = GetCandidateProfiles(state, DiscipleDirectiveType.OuterMissionCandidate, 3);
         var isActive = activeCandidates.Any(candidate => candidate.Id == profile.Id);
+        var specializationEffect = DiscipleCultivationRules.BuildSpecializationEffectLogSummary(state, profile.Id);
+        var effectSuffix = string.IsNullOrWhiteSpace(specializationEffect) ? string.Empty : $" {specializationEffect}";
         if (isActive)
         {
-            return "当前列入外务先遣名册前列，历练队伍会优先吸纳其战力与执行表现。";
+            return
+                "当前列入外务先遣名册前列，历练队伍会优先吸纳其战力与执行表现。 " +
+                DiscipleCultivationRules.BuildDirectiveAffinityNarrative(state, profile.Id, DiscipleDirectiveType.OuterMissionCandidate) +
+                effectSuffix;
         }
 
-        return "已入外务候补名册，但当前仍在后备序列，待前列人手轮换时补入。";
+        return
+            "已入外务候补名册，但当前仍在后备序列，待前列人手轮换时补入。 " +
+            DiscipleCultivationRules.BuildDirectiveAffinityNarrative(state, profile.Id, DiscipleDirectiveType.OuterMissionCandidate) +
+            effectSuffix;
     }
 
     // 执事候补弟子效果说明
     private static string BuildStewardDiscipleSummary(GameState state, DiscipleProfile profile)
     {
+        var specializationEffect = DiscipleCultivationRules.BuildSpecializationEffectLogSummary(state, profile.Id);
+        var effectSuffix = string.IsNullOrWhiteSpace(specializationEffect) ? string.Empty : $" {specializationEffect}";
         if (TryGetDiscipleStewardAppointment(state, profile.Id, out var appointment) && appointment != null)
         {
             var taskDefinition = SectTaskRules.GetDefinition(appointment.TaskType);
-            return $"当前正代行“{taskDefinition.DisplayName}”执事补位，本条内务执行效率 +{(appointment.ExecutionModifier - 1.0) * 100.0:0.#}%。";
+            return
+                $"当前正代行“{taskDefinition.DisplayName}”执事补位，本条内务执行效率 +{(appointment.ExecutionModifier - 1.0) * 100.0:0.#}%。 " +
+                DiscipleCultivationRules.BuildTaskAffinityNarrative(state, profile.Id, appointment.TaskType) +
+                effectSuffix;
         }
 
-        return "已入执事培养名册，但当前尚未轮到具体庶务补位。";
+        return
+            "已入执事培养名册，但当前尚未轮到具体庶务补位。 " +
+            DiscipleCultivationRules.BuildDirectiveAffinityNarrative(state, profile.Id, DiscipleDirectiveType.StewardCandidate) +
+            effectSuffix;
+    }
+
+    private static string BuildDirectiveEffectRollup(GameState state, DiscipleDirectiveType directiveType)
+    {
+        var candidates = GetCandidateProfiles(state, directiveType, 3);
+        if (candidates.Count <= 0)
+        {
+            return string.Empty;
+        }
+
+        var parts = candidates
+            .Select(profile =>
+            {
+                var effectSummary = DiscipleCultivationRules.BuildSpecializationEffectLogSummary(state, profile.Id);
+                return string.IsNullOrWhiteSpace(effectSummary)
+                    ? string.Empty
+                    : $"{profile.Name}：{effectSummary}";
+            })
+            .Where(text => !string.IsNullOrWhiteSpace(text))
+            .ToArray();
+        return parts.Length <= 0 ? string.Empty : string.Join("；", parts);
     }
 
     // 计算候补弟子匹配任务的评分
-    private static double ScoreStewardCandidateForTask(SectTaskDefinition taskDefinition, DiscipleProfile profile)
+    private static double ScoreStewardCandidateForTask(GameState state, SectTaskDefinition taskDefinition, DiscipleProfile profile)
     {
         var score =
             (profile.Execution * 2.2) +
@@ -441,11 +514,12 @@ public static class DiscipleDirectiveRules
             _ => 0.0
         };
 
+        score += DiscipleCultivationRules.GetTaskCandidateScoreBonus(state, profile.Id, taskDefinition.TaskType);
         return score;
     }
 
     // 计算执事任务执行修正值
-    private static double ComputeStewardTaskExecutionModifier(SectTaskDefinition taskDefinition, DiscipleProfile profile)
+    private static double ComputeStewardTaskExecutionModifier(GameState state, SectTaskDefinition taskDefinition, DiscipleProfile profile)
     {
         var bonus =
             0.015 +
@@ -463,7 +537,8 @@ public static class DiscipleDirectiveRules
             bonus += 0.008;
         }
 
-        return 1.0 + Math.Min(bonus, 0.10);
+        bonus += DiscipleCultivationRules.GetTaskExecutionBonus(state, profile.Id, taskDefinition.TaskType);
+        return 1.0 + Math.Min(bonus, 0.14);
     }
 
     // 获取符合条件的候补弟子列表
@@ -479,7 +554,11 @@ public static class DiscipleDirectiveRules
             .Where(profile =>
                 profile.DirectiveType == directiveType &&
                 profile.AgeBand != DiscipleAgeBand.Seedling)
-            .OrderByDescending(profile => profile.Combat + profile.Execution + profile.Contribution)
+            .OrderByDescending(profile =>
+                profile.Combat +
+                profile.Execution +
+                profile.Contribution +
+                DiscipleCultivationRules.GetDirectiveCandidateScoreBonus(state, profile.Id, directiveType))
             .ThenByDescending(profile => profile.Potential)
             .Take(maxCount)
             .ToList();

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <!-- 修仙控件图标：已选中的灵石单选框 -->
+  <polygon points="12,3 19.5,7.2 19.5,16.8 12,21 4.5,16.8 4.5,7.2" fill="#141716" stroke="#3FD9A8" stroke-width="1.5"/>
+  <polygon points="12,5.5 17.1,8.4 17.1,15.6 12,18.5 6.9,15.6 6.9,8.4" fill="#3FD9A8" opacity="0.22"/>
+  <polygon points="12,6.8 16,9.1 16,14.9 12,17.2 8,14.9 8,9.1" fill="#A8FFE3" opacity="0.38"/>
+  <polygon points="12,7.7 15.1,9.5 15.1,14.5 12,16.3 8.9,14.5 8.9,9.5" fill="#3FD9A8"/>
+</svg>

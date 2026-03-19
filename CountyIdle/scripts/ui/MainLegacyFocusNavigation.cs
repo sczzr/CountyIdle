@@ -19,7 +19,7 @@ public partial class Main
         Control? worldMapButtonControl = _worldMapButton;
 
         LinkFocusNeighbors(_worldMapButton,
-            left: _tileInspectorPrimaryButton ?? taskQuickButton,
+            left: taskQuickButton,
             down: organizationQuickButton ?? taskQuickButton);
         LinkFocusNeighbors(_mapZoomSlider,
             left: _worldMapButton,
@@ -30,21 +30,14 @@ public partial class Main
             down: cultivationQuickButton ?? discipleQuickButton ?? organizationQuickButton ?? taskQuickButton);
 
         LinkFocusNeighbors(_mapPrimaryActionButton,
-            left: _tileInspectorSecondaryButton ?? taskQuickButton,
+            left: taskQuickButton,
             top: _worldMapButton,
             right: _mapSecondaryActionButton,
             down: taskQuickButton);
         LinkFocusNeighbors(_mapSecondaryActionButton,
-            left: _tileInspectorTertiaryButton ?? organizationQuickButton ?? taskQuickButton,
+            left: organizationQuickButton ?? taskQuickButton,
             top: _mapZoomResetButton,
             down: cultivationQuickButton ?? discipleQuickButton ?? organizationQuickButton ?? taskQuickButton);
-
-        LinkFocusNeighbors(_tileInspectorPrimaryButton,
-            right: _worldMapButton);
-        LinkFocusNeighbors(_tileInspectorSecondaryButton,
-            right: _mapPrimaryActionButton ?? taskQuickButton);
-        LinkFocusNeighbors(_tileInspectorTertiaryButton,
-            right: _mapSecondaryActionButton ?? organizationQuickButton ?? taskQuickButton);
 
         LinkFocusNeighbors(warehouseQuickButton,
             top: _worldMapButton);

@@ -11,6 +11,8 @@ public partial class Main
     private const string MasterAudioBusName = "Master";
     private const float MuteThreshold = 0.001f;
     private const float MuteDb = -80.0f;
+    // 720p 是当前项目确认的基础分辨率下限，窗口不允许再缩到更小。
+    private static readonly Vector2I MinimumWindowSize = new(1280, 720);
 
     private readonly ClientSettingsSystem _clientSettingsSystem = new();
     private ClientSettings _clientSettings = new();
@@ -66,13 +68,23 @@ public partial class Main
     private void ApplyClientSettings(ClientSettings settings)
     {
         TranslationServer.SetLocale(settings.Language);
-        ApplyResolution(settings.ResolutionWidth, settings.ResolutionHeight);
-        ApplyFontScale(settings.FontScale);
+        ApplyDisplayMode(settings.IsFullscreen, settings.ResolutionWidth, settings.ResolutionHeight);
+        ApplyContentZoom(settings.FontScale);
         ApplyMasterVolume(settings.MasterVolume);
     }
 
-    private static void ApplyResolution(int width, int height)
+    private static void ApplyDisplayMode(bool isFullscreen, int width, int height)
     {
+        // 先声明窗口的最小可缩放边界，避免运行时被手动拖到 720p 以下造成布局溢出。
+        DisplayServer.WindowSetMinSize(MinimumWindowSize);
+
+        // 全屏时直接铺满当前屏幕；窗口化时再按所选分辨率回到居中窗口。
+        if (isFullscreen)
+        {
+            DisplayServer.WindowSetMode(DisplayServer.WindowMode.Fullscreen);
+            return;
+        }
+
         var targetSize = new Vector2I(width, height);
         DisplayServer.WindowSetMode(DisplayServer.WindowMode.Windowed);
         DisplayServer.WindowSetSize(targetSize);
@@ -83,7 +95,7 @@ public partial class Main
         DisplayServer.WindowSetPosition(centeredPosition);
     }
 
-    private void ApplyFontScale(float fontScale)
+    private void ApplyContentZoom(float contentZoom)
     {
         var window = GetWindow();
         if (window == null)
@@ -91,7 +103,8 @@ public partial class Main
             return;
         }
 
-        window.ContentScaleFactor = fontScale;
+        // 在 stretch=disabled 下，缩放倍率只控制内容放大/缩小；更高分辨率则负责展示更多区域。
+        window.ContentScaleFactor = contentZoom;
     }
 
     private static void ApplyMasterVolume(float volumeLinear)

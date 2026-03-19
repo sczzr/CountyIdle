@@ -19,6 +19,7 @@ public partial class Main
         }
 
         _cultivationPanel = panelScene.Instantiate<CultivationPanel>();
+        _cultivationPanel.AssignmentRequested += OnCultivationAssignmentRequested;
         _cultivationPanel.Opened += OnCultivationPanelOpened;
         _cultivationPanel.Closed += OnCultivationPanelClosed;
         AddChild(_cultivationPanel);
@@ -42,9 +43,20 @@ public partial class Main
         _cultivationPanel?.Open(_gameLoop.State.Clone());
     }
 
+    private void OpenCultivationPanelForDisciple(int discipleId)
+    {
+        CloseBlockingOverlayPopups(_cultivationPanel);
+        _cultivationPanel?.Open(_gameLoop.State.Clone(), discipleId);
+    }
+
     private void RefreshCultivationPanelPopup(GameState state)
     {
         _cultivationPanel?.RefreshState(state);
+    }
+
+    private void OnCultivationAssignmentRequested(int discipleId, DiscipleCultivationAssignmentType assignmentType)
+    {
+        _gameLoop.SetDiscipleCultivationAssignment(discipleId, assignmentType);
     }
 
     private void OnCultivationPanelOpened()
@@ -70,6 +82,7 @@ public partial class Main
             return;
         }
 
+        _cultivationPanel.AssignmentRequested -= OnCultivationAssignmentRequested;
         _cultivationPanel.Opened -= OnCultivationPanelOpened;
         _cultivationPanel.Closed -= OnCultivationPanelClosed;
     }

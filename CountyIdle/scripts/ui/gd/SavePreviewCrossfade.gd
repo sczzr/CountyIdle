@@ -41,7 +41,8 @@ func apply_theme_styles() -> void:
 	_dialog.add_theme_stylebox_override("panel", _create_paper_style())
 	_preview_frame.add_theme_stylebox_override("panel", _create_note_style())
 
-	for path in ["CenterLayer/DecorLayer/LeftRoller", "CenterLayer/DecorLayer/RightRoller"]:
+	# 装饰卷轴改为容器行，路径需包含 RollerRow。
+	for path in ["CenterLayer/DecorLayer/RollerRow/LeftRoller", "CenterLayer/DecorLayer/RollerRow/RightRoller"]:
 		var roller: PanelContainer = root.get_node(path)
 		roller.add_theme_stylebox_override("panel", _create_roller_style())
 

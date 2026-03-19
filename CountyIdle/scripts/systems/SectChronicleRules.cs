@@ -265,7 +265,7 @@ public static class SectChronicleRules
             return SectChronicleLogCategory.Resources;
         }
 
-        if (ContainsAny(logLine, "法令", "门规", "调拨", "人", "执事", "治宗", "讲法", "峰"))
+        if (ContainsAny(logLine, "法令", "门规", "调拨", "人", "执事", "治宗", "讲法", "峰", "修炼", "札记", "感悟", "火候"))
         {
             return SectChronicleLogCategory.Governance;
         }

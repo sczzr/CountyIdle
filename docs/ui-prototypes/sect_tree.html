@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>浮云宗 · 宗门大谱 (树状页)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-base: #060807; --gold-bright: #E4C04F; --gold-dim: #6B6244; 
+      --text-main: #E8EBE9; --text-dim: #8E9894; --yield-cyan: #3FD9A8;
+    }
+    body { font-family: 'Noto Serif SC', serif; background-color: var(--bg-base); color: var(--text-main); user-select: none; }
+    .font-title { font-family: 'Ma Shan Zheng', cursive; }
+    
+    /* 背景六边形微光阵列 */
+    .bg-hex-grid {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.08;
+      background-image: url("data:image/svg+xml,%3Csvg width='80' height='138.564' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M40 138.564L0 115.47L0 69.282L40 46.188L80 69.282L80 115.47Z' fill='none' stroke='%233FD9A8' stroke-width='1'/%3E%3C/svg%3E");
+    }
+
+    /* --- 纯 CSS 族谱树状连接线 --- */
+    .tree ul { padding-top: 30px; position: relative; transition: all 0.5s; display: flex; justify-content: center; }
+    .tree li { float: left; text-align: center; list-style-type: none; position: relative; padding: 30px 10px 0 10px; transition: all 0.5s; }
+    
+    /* 连接线绘制 */
+    .tree li::before, .tree li::after {
+      content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid var(--gold-dim);
+      width: 50%; height: 30px;
+    }
+    .tree li::after { right: auto; left: 50%; border-left: 2px solid var(--gold-dim); }
+    /* 移除第一个和最后一个兄弟节点的多余线条 */
+    .tree li:only-child::after, .tree li:only-child::before { display: none; }
+    .tree li:only-child { padding-top: 0; }
+    .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+    /* 修正首尾节点的线条连接圆角 */
+    .tree li:first-child::after { border-radius: 8px 0 0 0; }
+    .tree li:last-child::before { border-right: 2px solid var(--gold-dim); border-radius: 0 8px 0 0; }
+    
+    /* 向下延伸的线 */
+    .tree ul ul::before {
+      content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid var(--gold-dim);
+      width: 0; height: 30px; transform: translateX(-1px);
+    }
+
+    /* 树节点卡片样式 (玉牌质感) */
+    .node-card {
+      background: linear-gradient(180deg, rgba(20,24,22,0.9) 0%, rgba(10,14,12,0.95) 100%);
+      border: 1px solid rgba(107, 98, 68, 0.5); backdrop-filter: blur(8px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+      border-radius: 4px; padding: 12px 24px; display: inline-flex; flex-direction: column; align-items: center;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); cursor: pointer; text-decoration: none;
+      min-width: 140px; position: relative; z-index: 10;
+    }
+    .node-card:hover {
+      border-color: var(--gold-bright); box-shadow: 0 10px 30px rgba(228, 192, 79, 0.2); transform: translateY(-3px);
+    }
+    .node-card.master { border: 2px solid var(--gold-bright); background: linear-gradient(180deg, rgba(30,24,12,0.9) 0%, rgba(10,8,4,0.95) 100%); }
+    .node-card.peak { border-color: var(--yield-cyan); }
+    
+    /* 自定义滚动条 */
+    ::-webkit-scrollbar { height: 8px; width: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
+    ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 4px; }
+  </style>
+</head>
+<body class="w-screen h-screen flex flex-col relative overflow-hidden">
+  <!-- 说明：弟子谱双页拆分的 HTML 原型，仅用于视觉对齐与结构验证。 -->
+  <div class="bg-hex-grid"></div>
+
+  <!-- 全局页眉 -->
+  <header class="h-20 shrink-0 w-full px-12 flex items-center justify-between z-40 relative border-b border-[rgba(255,255,255,0.05)] bg-[rgba(6,8,7,0.85)] backdrop-blur-md">
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 border-2 border-[--gold-bright] bg-[#A32D2D] text-white flex items-center justify-center font-title text-3xl shadow-[0_0_15px_rgba(228,192,79,0.2)] rounded-sm rotate-[-3deg]">谱</div>
+      <div>
+        <h1 class="text-2xl font-bold tracking-[0.2em] text-[--gold-bright]">浮云宗 · 宗门大谱</h1>
+        <p class="text-[12px] text-[--text-dim] mt-1 tracking-widest">观天道流转，察宗门气象。一枝一叶，皆在命谱之中。</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-6">
+      <div class="text-[13px] text-[--text-dim] bg-[rgba(255,255,255,0.05)] border border-[rgba(107,98,68,0.3)] px-4 py-1.5 rounded-full">
+        总录门人：<span class="text-[--gold-bright] font-bold">140</span> 人
+      </div>
+      <button class="w-10 h-10 flex items-center justify-center border border-[--gold-dim] text-[--text-dim] hover:text-[--gold-bright] hover:border-[--gold-bright] transition-all rounded-sm text-xl bg-[rgba(0,0,0,0.5)]">✖</button>
+    </div>
+  </header>
+
+  <!-- 族谱树状结构区 (支持横向/纵向拖拽或滚动) -->
+  <main class="flex-1 w-full relative z-30 overflow-auto pt-10 pb-20 px-10">
+    <div class="tree inline-block min-w-full">
+      <ul>
+        <!-- 第一层：掌门 -->
+        <li>
+          <div class="node-card master">
+            <span class="text-[10px] text-[--gold-bright] border border-[--gold-bright] px-2 py-0.5 rounded-sm mb-2 opacity-80">一宗之主</span>
+            <div class="w-16 h-16 bg-[rgba(228,192,79,0.1)] border border-[--gold-bright] rounded-full flex items-center justify-center font-title text-3xl text-[--gold-bright] mb-2 shadow-[0_0_15px_rgba(228,192,79,0.4)]">极</div>
+            <h2 class="text-xl font-bold text-[--text-main] tracking-widest">虚极子</h2>
+            <span class="text-[11px] text-[--yield-cyan] mt-1">元婴大圆满</span>
+          </div>
+          
+          <!-- 第二层：各峰/殿 -->
+          <ul>
+            <!-- 分支 1：庶务殿 -->
+            <li>
+              <div class="node-card peak">
+                <span class="text-[10px] text-[--yield-cyan] mb-1">宗门枢纽</span>
+                <h3 class="text-lg font-title text-[--text-main] tracking-widest">庶务殿</h3>
+              </div>
+              <!-- 第三层：职位 -> 第四层：个人 -->
+              <ul>
+                <li>
+                  <div class="node-card">
+                    <span class="text-[10px] text-[--text-dim] mb-1">首座长老</span>
+                    <h4 class="text-[15px] font-bold text-[--text-main]">韩归衡</h4>
+                    <span class="text-[10px] text-[--gold-bright] mt-1">结丹后期</span>
+                  </div>
+                  <ul>
+                    <li>
+                      <div class="node-card">
+                        <span class="text-[10px] text-[--text-dim] mb-1">执事</span>
+                        <h4 class="text-[14px] font-bold text-[--text-main]">陆归舟</h4>
+                      </div>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <div class="node-card">
+                    <span class="text-[10px] text-[--text-dim] mb-1">外门轮值司</span>
+                    <h4 class="text-[14px] font-bold text-[--text-main]">巡值队</h4>
+                  </div>
+                  <ul>
+                    <!-- 这个卡片是玩家要点击的目标 -->
+                    <li>
+                      <a href="character_profile.html" class="node-card hover:!border-[--gold-bright] hover:!shadow-[0_0_20px_rgba(228,192,79,0.4)] transition-all">
+                        <span class="text-[10px] text-[#D94838] border border-[#D94838] bg-[rgba(217,72,56,0.1)] px-1.5 rounded-sm mb-1">五行未明</span>
+                        <h4 class="text-[16px] font-title text-[--gold-bright] tracking-widest">宁照宁</h4>
+                        <span class="text-[10px] text-[--yield-cyan] mt-1">炼气六层</span>
+                        <span class="text-[10px] text-[--text-dim] mt-0.5">候值 · 点卯整队</span>
+                      </a>
+                    </li>
+                    <li>
+                      <div class="node-card">
+                        <h4 class="text-[14px] font-bold text-[--text-dim]">温流澜</h4>
+                        <span class="text-[10px] text-[--text-dim] mt-1">炼气三层</span>
+                      </div>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+
+            <!-- 分支 2：启蒙院 -->
+            <li>
+              <div class="node-card peak">
+                <span class="text-[10px] text-[--yield-cyan] mb-1">新血摇篮</span>
+                <h3 class="text-lg font-title text-[--text-main] tracking-widest">启蒙院</h3>
+              </div>
+              <ul>
+                <li>
+                  <div class="node-card">
+                    <span class="text-[10px] text-[--text-dim] mb-1">传功教习</span>
+                    <h4 class="text-[15px] font-bold text-[--text-main]">林静晖</h4>
+                    <span class="text-[10px] text-[--gold-bright] mt-1">筑基中期</span>
+                  </div>
+                  <ul>
+                    <li>
+                      <div class="node-card">
+                        <span class="text-[10px] text-[--text-dim] mb-1">新苗</span>
+                        <h4 class="text-[14px] font-bold text-[--text-main]">岑玄舟</h4>
+                      </div>
+                    </li>
+                    <li>
+                      <div class="node-card">
+                        <span class="text-[10px] text-[--text-dim] mb-1">新苗</span>
+                        <h4 class="text-[14px] font-bold text-[--text-main]">秦怀舟</h4>
+                      </div>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+
+            <!-- 分支 3：天工峰 -->
+            <li>
+              <div class="node-card peak">
+                <span class="text-[10px] text-[--yield-cyan] mb-1">百工造化</span>
+                <h3 class="text-lg font-title text-[--text-main] tracking-widest">天工峰</h3>
+              </div>
+              <ul>
+                <li>
+                  <div class="node-card">
+                    <span class="text-[10px] text-[--text-dim] mb-1">首座长老</span>
+                    <h4 class="text-[15px] font-bold text-[--text-main]">沈云辞</h4>
+                    <span class="text-[10px] text-[--gold-bright] mt-1">结丹初期</span>
+                  </div>
+                </li>
+              </ul>
+            </li>
+            
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </main>
+</body>
+</html>

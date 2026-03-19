@@ -1,33 +1,22 @@
 using System;
 using System.Collections.Generic;
 using Godot;
+using CountyIdle.Core;
 using CountyIdle.Models;
 
 namespace CountyIdle.UI;
 
 public partial class SettingsPanel : PopupPanelBase
 {
+    /// <summary>
+    /// 机宜卷可滚动设置区路径；低分辨率下通过滚动承载完整条目。
+    /// </summary>
+    private const string SettingsRowsPath = "CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows";
+
     private static readonly (string Code, string Label)[] LanguageOptions =
     {
         ("zh_CN", "简体中文"),
         ("en", "English")
-    };
-
-    private static readonly Vector2I[] ResolutionOptions =
-    {
-        new Vector2I(1280, 720),
-        new Vector2I(1600, 900),
-        new Vector2I(1920, 1080),
-        new Vector2I(2560, 1440)
-    };
-
-    private static readonly float[] FontScaleOptions =
-    {
-        0.90f,
-        1.00f,
-        1.10f,
-        1.20f,
-        1.30f
     };
 
     private enum ShortcutAction
@@ -44,8 +33,10 @@ public partial class SettingsPanel : PopupPanelBase
 
     private PanelContainer _dialog = null!;
     private OptionButton _languageOption = null!;
+    private CheckBox _fullscreenCheckBox = null!;
     private OptionButton _resolutionOption = null!;
-    private OptionButton _fontScaleOption = null!;
+    private HSlider _zoomSlider = null!;
+    private Label _zoomValueLabel = null!;
     private HSlider _volumeSlider = null!;
     private Label _volumeValueLabel = null!;
     private Button _openSettingsKeyButton = null!;
@@ -61,6 +52,7 @@ public partial class SettingsPanel : PopupPanelBase
     private Node? _visualFx;
 
     private readonly Dictionary<ShortcutAction, Button> _shortcutButtons = new();
+    private readonly List<Vector2I> _resolutionOptions = new();
     private ClientSettings _editingSettings = new();
     private ShortcutAction _pendingShortcutAction = ShortcutAction.None;
 
@@ -70,18 +62,20 @@ public partial class SettingsPanel : PopupPanelBase
     public override void _Ready()
     {
         _dialog = GetNode<PanelContainer>("CenterLayer/Dialog");
-        _languageOption = GetNode<OptionButton>("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/LanguageRow/LanguageOption");
-        _resolutionOption = GetNode<OptionButton>("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ResolutionRow/ResolutionOption");
-        _fontScaleOption = GetNode<OptionButton>("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/FontScaleRow/FontScaleOption");
-        _volumeSlider = GetNode<HSlider>("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/VolumeRow/VolumeSlider");
-        _volumeValueLabel = GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/VolumeRow/VolumeValue");
-        _openSettingsKeyButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/OpenSettingsKeyRow/OpenSettingsKeyOption");
-        _openWarehouseKeyButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/OpenWarehouseKeyRow/OpenWarehouseKeyOption");
-        _toggleExplorationKeyButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ToggleExplorationKeyRow/ToggleExplorationKeyOption");
-        _toggleSpeedKeyButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ToggleSpeedKeyRow/ToggleSpeedKeyOption");
-        _quickSaveKeyButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/QuickSaveKeyRow/QuickSaveKeyOption");
-        _quickLoadKeyButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/QuickLoadKeyRow/QuickLoadKeyOption");
-        _quickResetKeyButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/SettingsRows/QuickResetKeyRow/QuickResetKeyOption");
+        _languageOption = GetNode<OptionButton>($"{SettingsRowsPath}/LanguageRow/LanguageOption");
+        _fullscreenCheckBox = GetNode<CheckBox>($"{SettingsRowsPath}/FullscreenRow/FullscreenCheckBox");
+        _resolutionOption = GetNode<OptionButton>($"{SettingsRowsPath}/ResolutionRow/ResolutionOption");
+        _zoomSlider = GetNode<HSlider>($"{SettingsRowsPath}/ZoomRow/ZoomSlider");
+        _zoomValueLabel = GetNode<Label>($"{SettingsRowsPath}/ZoomRow/ZoomValue");
+        _volumeSlider = GetNode<HSlider>($"{SettingsRowsPath}/VolumeRow/VolumeSlider");
+        _volumeValueLabel = GetNode<Label>($"{SettingsRowsPath}/VolumeRow/VolumeValue");
+        _openSettingsKeyButton = GetNode<Button>($"{SettingsRowsPath}/OpenSettingsKeyRow/OpenSettingsKeyOption");
+        _openWarehouseKeyButton = GetNode<Button>($"{SettingsRowsPath}/OpenWarehouseKeyRow/OpenWarehouseKeyOption");
+        _toggleExplorationKeyButton = GetNode<Button>($"{SettingsRowsPath}/ToggleExplorationKeyRow/ToggleExplorationKeyOption");
+        _toggleSpeedKeyButton = GetNode<Button>($"{SettingsRowsPath}/ToggleSpeedKeyRow/ToggleSpeedKeyOption");
+        _quickSaveKeyButton = GetNode<Button>($"{SettingsRowsPath}/QuickSaveKeyRow/QuickSaveKeyOption");
+        _quickLoadKeyButton = GetNode<Button>($"{SettingsRowsPath}/QuickLoadKeyRow/QuickLoadKeyOption");
+        _quickResetKeyButton = GetNode<Button>($"{SettingsRowsPath}/QuickResetKeyRow/QuickResetKeyOption");
         _closeButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/HeaderRow/CloseButton");
         _cancelButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/FooterRow/CancelButton");
         _applyButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/FooterRow/ApplyButton");
@@ -98,6 +92,8 @@ public partial class SettingsPanel : PopupPanelBase
     {
         _editingSettings = currentSettings.Clone();
         _pendingShortcutAction = ShortcutAction.None;
+        // 每次打开设置卷时都重建分辨率候选，确保切换显示器后能读取当前屏幕上限。
+        PopulateOptionItems();
         ApplySettingsToInputs(_editingSettings);
         OpenPopup();
         CallVisualFx("play_open");
@@ -165,22 +161,38 @@ public partial class SettingsPanel : PopupPanelBase
             _languageOption.AddItem(LanguageOptions[i].Label, i);
         }
 
+        // 分辨率候选会结合当前屏幕上限动态生成，而不是只显示固定白名单。
+        RebuildResolutionOptions();
         _resolutionOption.Clear();
-        for (var i = 0; i < ResolutionOptions.Length; i += 1)
+        var currentScreenMaxResolution = ClientSettingsSystem.GetCurrentScreenMaxResolution();
+        for (var i = 0; i < _resolutionOptions.Count; i += 1)
         {
-            var option = ResolutionOptions[i];
-            _resolutionOption.AddItem($"{option.X} × {option.Y}", i);
+            var option = _resolutionOptions[i];
+            var optionLabel = option == currentScreenMaxResolution
+                ? $"{option.X} × {option.Y}（当前屏幕上限）"
+                : $"{option.X} × {option.Y}";
+            _resolutionOption.AddItem(optionLabel, i);
         }
 
-        _fontScaleOption.Clear();
-        for (var i = 0; i < FontScaleOptions.Length; i += 1)
-        {
-            _fontScaleOption.AddItem($"{Mathf.RoundToInt(FontScaleOptions[i] * 100.0f)}%", i);
-        }
+        _zoomSlider.MinValue = ClientSettingsSystem.MinContentZoom * 100.0f;
+        _zoomSlider.MaxValue = ClientSettingsSystem.MaxContentZoom * 100.0f;
+        _zoomSlider.Step = 5;
 
         _volumeSlider.MinValue = 0;
         _volumeSlider.MaxValue = 100;
         _volumeSlider.Step = 1;
+    }
+
+    /// <summary>
+    /// 结合项目基础档位与当前屏幕上限，构建本次可选的分辨率列表。
+    /// </summary>
+    private void RebuildResolutionOptions()
+    {
+        _resolutionOptions.Clear();
+        foreach (var resolution in ClientSettingsSystem.GetAvailableResolutions())
+        {
+            _resolutionOptions.Add(resolution);
+        }
     }
 
     private void BuildShortcutButtonMap()
@@ -200,7 +212,9 @@ public partial class SettingsPanel : PopupPanelBase
         _closeButton.Pressed += OnCloseRequested;
         _cancelButton.Pressed += OnCloseRequested;
         _applyButton.Pressed += OnApplyPressed;
+        _fullscreenCheckBox.Toggled += OnFullscreenToggled;
         _volumeSlider.ValueChanged += OnVolumeSliderChanged;
+        _zoomSlider.ValueChanged += OnZoomSliderChanged;
         _resolutionOption.ItemSelected += OnResolutionSelected;
 
         _openSettingsKeyButton.Pressed += () => BeginShortcutCapture(ShortcutAction.OpenSettings);
@@ -216,7 +230,13 @@ public partial class SettingsPanel : PopupPanelBase
     {
         SelectLanguage(settings.Language);
         SelectResolution(settings.ResolutionWidth, settings.ResolutionHeight);
-        SelectFontScale(settings.FontScale);
+        _fullscreenCheckBox.ButtonPressed = settings.IsFullscreen;
+
+        var zoomPercent = Mathf.Clamp(Mathf.RoundToInt(settings.FontScale * 100.0f),
+            Mathf.RoundToInt(ClientSettingsSystem.MinContentZoom * 100.0f),
+            Mathf.RoundToInt(ClientSettingsSystem.MaxContentZoom * 100.0f));
+        _zoomSlider.Value = zoomPercent;
+        _zoomValueLabel.Text = $"{zoomPercent}%";
 
         var volumePercent = Mathf.Clamp(Mathf.RoundToInt(settings.MasterVolume * 100.0f), 0, 100);
         _volumeSlider.Value = volumePercent;
@@ -246,40 +266,37 @@ public partial class SettingsPanel : PopupPanelBase
 
     private void SelectResolution(int width, int height)
     {
-        var selectedIndex = 0;
-        for (var i = 0; i < ResolutionOptions.Length; i += 1)
+        if (_resolutionOptions.Count == 0)
         {
-            var option = ResolutionOptions[i];
-            if (option.X != width || option.Y != height)
+            return;
+        }
+
+        var selectedIndex = 0;
+        var hasExactMatch = false;
+        for (var i = 0; i < _resolutionOptions.Count; i += 1)
+        {
+            var option = _resolutionOptions[i];
+            if (option.X == width && option.Y == height)
             {
-                continue;
+                selectedIndex = i;
+                hasExactMatch = true;
+                break;
             }
 
-            selectedIndex = i;
-            break;
+            // 若旧设置超出当前屏幕上限，则自动退到“不超过目标值”的最高可用档。
+            if (option.X <= width && option.Y <= height)
+            {
+                selectedIndex = i;
+            }
         }
 
         _resolutionOption.Select(selectedIndex);
-    }
-
-    private void SelectFontScale(float fontScale)
-    {
-        var selectedIndex = 0;
-        var minimumDiff = float.MaxValue;
-
-        for (var i = 0; i < FontScaleOptions.Length; i += 1)
+        if (!hasExactMatch)
         {
-            var diff = Mathf.Abs(FontScaleOptions[i] - fontScale);
-            if (diff >= minimumDiff)
-            {
-                continue;
-            }
-
-            minimumDiff = diff;
-            selectedIndex = i;
+            var selectedResolution = _resolutionOptions[selectedIndex];
+            _editingSettings.ResolutionWidth = selectedResolution.X;
+            _editingSettings.ResolutionHeight = selectedResolution.Y;
         }
-
-        _fontScaleOption.Select(selectedIndex);
     }
 
     private void BeginShortcutCapture(ShortcutAction shortcutAction)
@@ -354,7 +371,12 @@ public partial class SettingsPanel : PopupPanelBase
             return PopupStatusMessage!;
         }
 
-        return "窗格与音律即时生效；其余条目需批复后收录。点选符令可录入新键。";
+        if (_editingSettings.IsFullscreen)
+        {
+            return "当前为全屏：会直接铺满所在屏幕；分辨率用于记忆窗口化尺寸，缩放滑条负责放大/缩小画面内容。";
+        }
+
+        return "更高分辨率会显示更多内容而不是把画面放大；缩放滑条可单独调整画面内容大小。";
     }
 
     private string GetShortcutActionLabel(ShortcutAction shortcutAction)
@@ -434,13 +456,13 @@ public partial class SettingsPanel : PopupPanelBase
 
         var buttonPath = shortcutAction switch
         {
-            ShortcutAction.OpenSettings => "CenterLayer/Dialog/Margin/MainColumn/SettingsRows/OpenSettingsKeyRow/OpenSettingsKeyOption",
-            ShortcutAction.OpenWarehouse => "CenterLayer/Dialog/Margin/MainColumn/SettingsRows/OpenWarehouseKeyRow/OpenWarehouseKeyOption",
-            ShortcutAction.ToggleExploration => "CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ToggleExplorationKeyRow/ToggleExplorationKeyOption",
-            ShortcutAction.ToggleSpeed => "CenterLayer/Dialog/Margin/MainColumn/SettingsRows/ToggleSpeedKeyRow/ToggleSpeedKeyOption",
-            ShortcutAction.QuickSave => "CenterLayer/Dialog/Margin/MainColumn/SettingsRows/QuickSaveKeyRow/QuickSaveKeyOption",
-            ShortcutAction.QuickLoad => "CenterLayer/Dialog/Margin/MainColumn/SettingsRows/QuickLoadKeyRow/QuickLoadKeyOption",
-            ShortcutAction.QuickReset => "CenterLayer/Dialog/Margin/MainColumn/SettingsRows/QuickResetKeyRow/QuickResetKeyOption",
+            ShortcutAction.OpenSettings => $"{SettingsRowsPath}/OpenSettingsKeyRow/OpenSettingsKeyOption",
+            ShortcutAction.OpenWarehouse => $"{SettingsRowsPath}/OpenWarehouseKeyRow/OpenWarehouseKeyOption",
+            ShortcutAction.ToggleExploration => $"{SettingsRowsPath}/ToggleExplorationKeyRow/ToggleExplorationKeyOption",
+            ShortcutAction.ToggleSpeed => $"{SettingsRowsPath}/ToggleSpeedKeyRow/ToggleSpeedKeyOption",
+            ShortcutAction.QuickSave => $"{SettingsRowsPath}/QuickSaveKeyRow/QuickSaveKeyOption",
+            ShortcutAction.QuickLoad => $"{SettingsRowsPath}/QuickLoadKeyRow/QuickLoadKeyOption",
+            ShortcutAction.QuickReset => $"{SettingsRowsPath}/QuickResetKeyRow/QuickResetKeyOption",
             _ => string.Empty
         };
 
@@ -458,11 +480,14 @@ public partial class SettingsPanel : PopupPanelBase
     private void OnApplyPressed()
     {
         _editingSettings.Language = LanguageOptions[Mathf.Clamp(_languageOption.Selected, 0, LanguageOptions.Length - 1)].Code;
+        _editingSettings.IsFullscreen = _fullscreenCheckBox.ButtonPressed;
 
-        var selectedResolution = ResolutionOptions[Mathf.Clamp(_resolutionOption.Selected, 0, ResolutionOptions.Length - 1)];
+        var selectedResolution = _resolutionOptions[Mathf.Clamp(_resolutionOption.Selected, 0, _resolutionOptions.Count - 1)];
         _editingSettings.ResolutionWidth = selectedResolution.X;
         _editingSettings.ResolutionHeight = selectedResolution.Y;
-        _editingSettings.FontScale = FontScaleOptions[Mathf.Clamp(_fontScaleOption.Selected, 0, FontScaleOptions.Length - 1)];
+        _editingSettings.FontScale = Mathf.Clamp((float)_zoomSlider.Value / 100.0f,
+            ClientSettingsSystem.MinContentZoom,
+            ClientSettingsSystem.MaxContentZoom);
         _editingSettings.MasterVolume = Mathf.Clamp((float)_volumeSlider.Value / 100.0f, 0.0f, 1.0f);
 
         ApplyRequested?.Invoke(_editingSettings.Clone());
@@ -482,10 +507,42 @@ public partial class SettingsPanel : PopupPanelBase
         PreviewRequested?.Invoke(_editingSettings.Clone());
     }
 
+    private void OnZoomSliderChanged(double value)
+    {
+        _zoomValueLabel.Text = $"{value:0}%";
+        var nextZoom = Mathf.Clamp((float)value / 100.0f,
+            ClientSettingsSystem.MinContentZoom,
+            ClientSettingsSystem.MaxContentZoom);
+        if (Mathf.Abs(_editingSettings.FontScale - nextZoom) < 0.0001f)
+        {
+            return;
+        }
+
+        _editingSettings.FontScale = nextZoom;
+        PreviewRequested?.Invoke(_editingSettings.Clone());
+    }
+
+    private void OnFullscreenToggled(bool isButtonPressed)
+    {
+        if (_editingSettings.IsFullscreen == isButtonPressed)
+        {
+            return;
+        }
+
+        _editingSettings.IsFullscreen = isButtonPressed;
+        RefreshPopupHint();
+        PreviewRequested?.Invoke(_editingSettings.Clone());
+    }
+
     private void OnResolutionSelected(long index)
     {
-        var selectedIndex = Mathf.Clamp((int)index, 0, ResolutionOptions.Length - 1);
-        var selectedResolution = ResolutionOptions[selectedIndex];
+        if (_resolutionOptions.Count == 0)
+        {
+            return;
+        }
+
+        var selectedIndex = Mathf.Clamp((int)index, 0, _resolutionOptions.Count - 1);
+        var selectedResolution = _resolutionOptions[selectedIndex];
         if (_editingSettings.ResolutionWidth == selectedResolution.X &&
             _editingSettings.ResolutionHeight == selectedResolution.Y)
         {

@@ -43,6 +43,12 @@ public partial class ConstructionPanel : PopupPanelBase
     private Label _detailEffectLabel = null!;
     private Label _detailCostLabel = null!;
     private Label _detailHintLabel = null!;
+    private Label _queueHintLabel = null!;
+    private Label _queueStatusLabel = null!;
+    private Label _queuePendingLabel = null!;
+    private ProgressBar _queueProgressBar = null!;
+    private Button _queueCancelCurrentButton = null!;
+    private Button _queueCancelPendingButton = null!;
     private Button _categoryAllButton = null!;
     private Button _categoryProductionButton = null!;
     private Button _categoryResearchTradeButton = null!;
@@ -58,6 +64,8 @@ public partial class ConstructionPanel : PopupPanelBase
     private TownMapSelectionSummary? _currentSummary;
 
     public event Action<IndustryBuildingType>? BuildRequested;
+    public event Action? CancelCurrentRequested;
+    public event Action? CancelPendingRequested;
 
     public override void _Ready()
     {
@@ -76,9 +84,15 @@ public partial class ConstructionPanel : PopupPanelBase
         _detailEffectLabel = GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailCard/CardMargin/DetailColumn/DetailEffect");
         _detailCostLabel = GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailCard/CardMargin/DetailColumn/DetailCost");
         _detailHintLabel = GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailCard/CardMargin/DetailColumn/DetailHint");
+        _queueHintLabel = GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/QueueCard/CardMargin/QueueColumn/QueueHint");
+        _queueStatusLabel = GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/QueueCard/CardMargin/QueueColumn/QueueStatusLabel");
+        _queueProgressBar = GetNode<ProgressBar>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/QueueCard/CardMargin/QueueColumn/QueueProgressBar");
+        _queuePendingLabel = GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/QueueCard/CardMargin/QueueColumn/QueuePendingLabel");
+        _queueCancelCurrentButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/QueueCard/CardMargin/QueueColumn/QueueActionRow/CancelCurrentButton");
+        _queueCancelPendingButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/QueueCard/CardMargin/QueueColumn/QueueActionRow/CancelPendingButton");
 
         _titleLabel.Text = "文明式营建卷";
-        _hintLabel.Text = "挑选宗门营建并与院域坊局联动，建造会优先落点到当前选中院域。";
+        _hintLabel.Text = "挑选宗门营建并与院域坊局联动，营建将进入队列并在时辰结算后落点。";
 
         InitializePopupHint(_hintLabel);
         BindEntries();
@@ -125,6 +139,7 @@ public partial class ConstructionPanel : PopupPanelBase
         _currentSummary = summary;
         RefreshSummary(state, summary);
         RefreshEntries(state, summary);
+        RefreshQueue(state);
     }
 
     protected override string GetPopupHintText()
@@ -134,12 +149,14 @@ public partial class ConstructionPanel : PopupPanelBase
             return PopupStatusMessage!;
         }
 
-        return "营建卷用于对比建筑收益与建造消耗，选中院域会优先承接新建落点。";
+        return "营建卷用于对比建筑收益与建造消耗，营建将进入队列并在时辰结算后落点。";
     }
 
     private void BindEvents()
     {
         _closeButton.Pressed += ClosePanel;
+        _queueCancelCurrentButton.Pressed += () => CancelCurrentRequested?.Invoke();
+        _queueCancelPendingButton.Pressed += () => CancelPendingRequested?.Invoke();
     }
 
     private void BindEntries()
@@ -256,6 +273,65 @@ public partial class ConstructionPanel : PopupPanelBase
         SelectBuilding(fallback);
     }
 
+    private void RefreshQueue(GameState state)
+    {
+        // 刷新营建队列展示。
+        var queue = state.ConstructionQueue ?? new List<ConstructionQueueItem>();
+        if (queue.Count == 0)
+        {
+            _queueStatusLabel.Text = "队列空置：暂无营建排队。";
+            _queuePendingLabel.Text = "排队：--";
+            _queueProgressBar.Visible = false;
+            _queueProgressBar.Value = 0;
+            _queueCancelCurrentButton.Disabled = true;
+            _queueCancelPendingButton.Disabled = true;
+            _queueCancelCurrentButton.Text = "停工";
+            _queueCancelCurrentButton.TooltipText = "当前无在建项目。";
+            _queueCancelPendingButton.TooltipText = "暂无排队项目可撤销。";
+            return;
+        }
+
+        var current = queue[0];
+        var total = Math.Max(current.TotalHours, 1);
+        var remaining = Math.Max(current.RemainingHours, 0);
+        var finished = Math.Clamp(total - remaining, 0, total);
+        var displayName = SectMapSemanticRules.GetBuildingDisplayName(current.BuildingType);
+        _queueStatusLabel.Text = $"当前施工：{displayName} · 进度 {finished}/{total} 时辰";
+        _queueProgressBar.Visible = true;
+        _queueProgressBar.MaxValue = total;
+        _queueProgressBar.Value = finished;
+
+        if (queue.Count > 1)
+        {
+            var pendingNames = new List<string>();
+            for (var index = 1; index < queue.Count && pendingNames.Count < 3; index++)
+            {
+                pendingNames.Add(SectMapSemanticRules.GetBuildingDisplayName(queue[index].BuildingType));
+            }
+
+            var suffix = queue.Count - 1 > pendingNames.Count
+                ? $" 等{queue.Count - 1}项"
+                : string.Empty;
+            _queuePendingLabel.Text = $"排队：{string.Join(" / ", pendingNames)}{suffix}";
+        }
+        else
+        {
+            _queuePendingLabel.Text = "排队：无";
+        }
+
+        var canRefundCurrent = remaining >= total;
+        _queueCancelCurrentButton.Disabled = false;
+        _queueCancelCurrentButton.Text = canRefundCurrent ? "撤销当前" : "停工";
+        _queueCancelCurrentButton.TooltipText = canRefundCurrent
+            ? "撤销当前营建（未开工可退回消耗）。"
+            : "停工不退费，仅终止当前建造。";
+
+        _queueCancelPendingButton.Disabled = queue.Count <= 1;
+        _queueCancelPendingButton.TooltipText = queue.Count > 1
+            ? "撤销排队中的营建，退回未开工消耗。"
+            : "暂无排队项目可撤销。";
+    }
+
     private void SelectBuilding(IndustryBuildingType buildingType)
     {
         _selectedBuildingType = buildingType;
@@ -337,7 +413,7 @@ public partial class ConstructionPanel : PopupPanelBase
             return "当前选中为场所锚点，请选中可用院域地块后再执行建造。";
         }
 
-        var placementHint = "当前院域已锁定，建造会优先落点到选中地块。";
+        var placementHint = "当前院域已锁定，营建入队后会优先落点到选中地块。";
 
         if (summary.SuggestedBuildType == buildingType)
         {

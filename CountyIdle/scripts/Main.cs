@@ -21,7 +21,8 @@ public partial class Main : Control
         Expedition
     }
 
-    private const string MainLayoutPath = "RootMargin/MainLayout";
+    // 主界面采用 LayoutVBox 容器化排版，所有路径统一从该层级起算。
+    private const string MainLayoutPath = "RootMargin/MainLayout/LayoutVBox";
     private const string BackgroundPath = "Background";
     private const string TopBarPath = $"{MainLayoutPath}/TopBar";
     private const string BodyRowPath = $"{MainLayoutPath}/BodyRow";
@@ -74,6 +75,7 @@ public partial class Main : Control
     private Button? _expeditionMapButton;
     private Button? _mapZoomResetButton;
     private HSlider? _mapZoomSlider;
+    private Button? _mapDefinitionToggleButton;
     private Node? _worldPanelVisualFx;
     private Node? _topTabVisualFx;
     private bool _isUpdatingMapZoomSlider;
@@ -81,6 +83,7 @@ public partial class Main : Control
     private StrategicMapViewSystem? _worldMapRenderer;
     private Control? _worldSiteMapView;
     private Control? _prefectureMapView;
+    private StrategicMapViewSystem? _prefectureMapRenderer;
     private Control? _countyTownMapView;
     private Control? _eventPanelView;
     private Control? _reportPanelView;
@@ -154,6 +157,7 @@ public partial class Main : Control
         UnbindSectChroniclePanelEvents();
         UnbindBuildingListPanelEvents();
         UnbindSectTileInspectorEvents();
+        UnbindSidePanelVisibilityNodes();
     }
 
     private void SetupGameLoop()
@@ -241,6 +245,12 @@ public partial class Main : Control
         RefreshSectChroniclePanel(state);
         UpdateCalendarUi(force: true);
         RefreshMapOperationalLinkUi(state);
+
+        if (state.HourSettlements != _lastObservedHourSettlements)
+        {
+            _lastObservedHourSettlements = state.HourSettlements;
+            ApplyPendingConstructionPlacements();
+        }
     }
 
     private static string FormatSigned(int value)
@@ -422,6 +432,7 @@ private void ConfigureLegacyBackground()
         _expeditionMapButton = GetNodeOrNull<Button>($"{CenterTopTabRowPath}/ExpeditionMapButton");
         _mapZoomResetButton = GetNode<Button>($"{CenterTopTabRowPath}/MapZoomResetButton");
         _mapZoomSlider = GetNode<HSlider>($"{CenterTopTabRowPath}/MapZoomSlider");
+        _mapDefinitionToggleButton = GetNodeOrNull<Button>($"{CenterTopTabRowPath}/MapDefinitionToggleButton");
         _worldPanelVisualFx = GetNodeOrNull<Node>($"{CenterPanelContentPath}/VisualFx");
         _topTabVisualFx = GetNodeOrNull<Node>($"{CenterPanelContentPath}/TopTabVisualFx");
         BindMapOperationalLegacyNodes();
@@ -430,6 +441,7 @@ private void ConfigureLegacyBackground()
         _worldMapRenderer = _worldMapView as StrategicMapViewSystem;
         _worldSiteMapView = GetNode<Control>($"{CenterMapPagesPath}/SecondaryMapView");
         _prefectureMapView = GetNodeOrNull<Control>($"{CenterMapPagesPath}/PrefectureMapView");
+        _prefectureMapRenderer = _prefectureMapView as StrategicMapViewSystem;
         _countyTownMapView = GetNode<Control>($"{CenterMapPagesPath}/CountyTownMapView");
         _eventPanelView = GetNodeOrNull<Control>($"{CenterMapPagesPath}/EventPanelView");
         _reportPanelView = GetNodeOrNull<Control>($"{CenterMapPagesPath}/ReportPanelView");
@@ -442,6 +454,7 @@ private void ConfigureLegacyBackground()
         BindDemoPanelNodes();
         BindBuildingListPanelNodes();
         ClearLegacyJobsPaddingBindings();
+        BindSidePanelVisibilityNodes();
 
     }
 
@@ -507,6 +520,11 @@ private void ConfigureLegacyBackground()
         if (_mapZoomSlider != null)
         {
             _mapZoomSlider.ValueChanged += OnMapZoomSliderChanged;
+        }
+
+        if (_mapDefinitionToggleButton != null)
+        {
+            _mapDefinitionToggleButton.Pressed += ToggleStrategicMapDefinitionSource;
         }
 
         BindMapOperationalEvents();
@@ -817,6 +835,7 @@ private void ConfigureLegacyBackground()
 
     private void RefreshMapZoomUi()
     {
+        RefreshMapDefinitionToggleUi();
         if (_mapZoomResetButton == null || _mapZoomSlider == null)
         {
             return;
@@ -845,6 +864,42 @@ private void ConfigureLegacyBackground()
 
         SetMapZoomSliderValue(mapView.Zoom);
         _mapZoomSlider.TooltipText = $"{(int)Mathf.Round(mapView.Zoom * 100f)}%";
+    }
+
+    // 调试入口：刷新战略地图配置/生成切换按钮的显示状态与文案。
+    private void RefreshMapDefinitionToggleUi()
+    {
+        if (_mapDefinitionToggleButton == null)
+        {
+            return;
+        }
+
+        if (!OS.IsDebugBuild())
+        {
+            _mapDefinitionToggleButton.Visible = false;
+            return;
+        }
+
+        var hasStrategicMap = _worldMapRenderer != null || _prefectureMapRenderer != null;
+        _mapDefinitionToggleButton.Visible = hasStrategicMap;
+        _mapDefinitionToggleButton.Disabled = !hasStrategicMap;
+
+        var useConfigDefinition = ResolveStrategicMapDefinitionSource();
+        _mapDefinitionToggleButton.Text = useConfigDefinition ? "图源：配置" : "图源：生成";
+        _mapDefinitionToggleButton.TooltipText = useConfigDefinition
+            ? "调试：当前使用配置驱动渲染，点击切回生成驱动（F8）。"
+            : "调试：当前使用生成驱动渲染，点击切到配置驱动（F8）。";
+    }
+
+    // 优先读取世界图，其次读取外域图的当前定义来源。
+    private bool ResolveStrategicMapDefinitionSource()
+    {
+        if (_worldMapRenderer != null)
+        {
+            return _worldMapRenderer.IsUsingConfigDefinition;
+        }
+
+        return _prefectureMapRenderer != null && _prefectureMapRenderer.IsUsingConfigDefinition;
     }
 
     private void OnMapZoomSliderChanged(double value)
@@ -879,6 +934,30 @@ private void ConfigureLegacyBackground()
         _isUpdatingMapZoomSlider = true;
         _mapZoomSlider.Value = value;
         _isUpdatingMapZoomSlider = false;
+    }
+
+    private void ToggleStrategicMapDefinitionSource()
+    {
+        if (!OS.IsDebugBuild())
+        {
+            return;
+        }
+
+        var nextUseConfig = !ResolveStrategicMapDefinitionSource();
+        // 调试入口：同时切换世界图与外域图的配置/生成双轨来源。
+        var logged = false;
+        if (_worldMapRenderer != null)
+        {
+            _worldMapRenderer.SetDefinitionSource(nextUseConfig);
+            logged = true;
+        }
+
+        if (_prefectureMapRenderer != null)
+        {
+            _prefectureMapRenderer.SetDefinitionSource(nextUseConfig, !logged);
+        }
+        RefreshMapDefinitionToggleUi();
+        AppendLog($"战略地图已切换为{(nextUseConfig ? "配置驱动" : "生成驱动")}。");
     }
 
     private void BindPeakDetailButtons()

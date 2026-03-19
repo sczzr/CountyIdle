@@ -1,18 +1,18 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene format=3 uid="uid://bqeypmhina7a7"]
 
-[ext_resource type="Script" path="res://scripts/ui/SectChroniclePanel.cs" id="1_panel"]
+[ext_resource type="Script" uid="uid://ddv3wj8jwfw6v" path="res://scripts/ui/SectChroniclePanel.cs" id="1_panel"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_frame"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
 bg_color = Color(0.941176, 0.917647, 0.854902, 0.98)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.298039, 0.247059, 0.2, 0.92)
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
 shadow_color = Color(0, 0, 0, 0.22)
 shadow_size = 14
 
@@ -22,44 +22,44 @@ border_width_bottom = 1
 border_color = Color(0.529412, 0.45098, 0.356863, 0.8)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_section"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
 bg_color = Color(0.972549, 0.94902, 0.898039, 0.72)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.756863, 0.682353, 0.576471, 0.72)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_alert"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_alert"]
 bg_color = Color(0.964706, 0.937255, 0.882353, 0.86)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.717647, 0.643137, 0.529412, 0.66)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_log"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_log"]
 bg_color = Color(0.968627, 0.945098, 0.894118, 0.82)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.619608, 0.556863, 0.454902, 0.68)
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_rich"]
 
-[node name="SectChroniclePanel" type="Control"]
+[node name="SectChroniclePanel" type="Control" unique_id=951990898]
 visible = false
 layout_mode = 3
 anchors_preset = 15
@@ -70,7 +70,7 @@ grow_vertical = 2
 mouse_filter = 1
 script = ExtResource("1_panel")
 
-[node name="Overlay" type="ColorRect" parent="."]
+[node name="Overlay" type="ColorRect" parent="." unique_id=185723306]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -80,7 +80,7 @@ grow_vertical = 2
 mouse_filter = 1
 color = Color(0.0588235, 0.054902, 0.0509804, 0.72)
 
-[node name="Center" type="CenterContainer" parent="Overlay"]
+[node name="Center" type="MarginContainer" parent="Overlay" unique_id=1411530775]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -88,82 +88,87 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+theme_override_constants/margin_left = 36
+theme_override_constants/margin_top = 28
+theme_override_constants/margin_right = 36
+theme_override_constants/margin_bottom = 28
 
-[node name="Frame" type="PanelContainer" parent="Overlay/Center"]
-custom_minimum_size = Vector2(980, 700)
+[node name="Frame" type="PanelContainer" parent="Overlay/Center" unique_id=1617617621]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 mouse_filter = 1
 theme_override_styles/panel = SubResource("StyleBoxFlat_frame")
 
-[node name="RootColumn" type="VBoxContainer" parent="Overlay/Center/Frame"]
+[node name="RootColumn" type="VBoxContainer" parent="Overlay/Center/Frame" unique_id=766625773]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 0
 
-[node name="HeaderPanel" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn"]
+[node name="HeaderPanel" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn" unique_id=55502045]
 custom_minimum_size = Vector2(0, 86)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_header")
 
-[node name="HeaderMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/HeaderPanel"]
+[node name="HeaderMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/HeaderPanel" unique_id=787564524]
 layout_mode = 2
 theme_override_constants/margin_left = 24
 theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 24
 theme_override_constants/margin_bottom = 12
 
-[node name="HeaderRow" type="HBoxContainer" parent="Overlay/Center/Frame/RootColumn/HeaderPanel/HeaderMargin"]
+[node name="HeaderRow" type="HBoxContainer" parent="Overlay/Center/Frame/RootColumn/HeaderPanel/HeaderMargin" unique_id=1690719316]
 layout_mode = 2
 theme_override_constants/separation = 18
 
-[node name="TitleColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/HeaderPanel/HeaderMargin/HeaderRow"]
+[node name="TitleColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/HeaderPanel/HeaderMargin/HeaderRow" unique_id=919338229]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 4
 
-[node name="TitleLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/HeaderPanel/HeaderMargin/HeaderRow/TitleColumn"]
+[node name="TitleLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/HeaderPanel/HeaderMargin/HeaderRow/TitleColumn" unique_id=1771422694]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
 theme_override_font_sizes/font_size = 24
 text = "浮云宗  ·  见闻报表卷"
 
-[node name="HeaderMetaLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/HeaderPanel/HeaderMargin/HeaderRow/TitleColumn"]
+[node name="HeaderMetaLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/HeaderPanel/HeaderMargin/HeaderRow/TitleColumn" unique_id=1393387664]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.341176, 0.294118, 0.243137, 0.92)
 theme_override_font_sizes/font_size = 13
 text = "待载入山门记事。"
 autowrap_mode = 3
 
-[node name="TabRow" type="HBoxContainer" parent="Overlay/Center/Frame/RootColumn/HeaderPanel/HeaderMargin/HeaderRow"]
+[node name="TabRow" type="HBoxContainer" parent="Overlay/Center/Frame/RootColumn/HeaderPanel/HeaderMargin/HeaderRow" unique_id=411692969]
 layout_mode = 2
-alignment = 1
 theme_override_constants/separation = 8
+alignment = 1
 
-[node name="ChronicleTabButton" type="Button" parent="Overlay/Center/Frame/RootColumn/HeaderPanel/HeaderMargin/HeaderRow/TabRow"]
+[node name="ChronicleTabButton" type="Button" parent="Overlay/Center/Frame/RootColumn/HeaderPanel/HeaderMargin/HeaderRow/TabRow" unique_id=981661296]
 custom_minimum_size = Vector2(108, 38)
 layout_mode = 2
 toggle_mode = true
 text = "宗门见闻"
 
-[node name="ReportTabButton" type="Button" parent="Overlay/Center/Frame/RootColumn/HeaderPanel/HeaderMargin/HeaderRow/TabRow"]
+[node name="ReportTabButton" type="Button" parent="Overlay/Center/Frame/RootColumn/HeaderPanel/HeaderMargin/HeaderRow/TabRow" unique_id=288418065]
 custom_minimum_size = Vector2(108, 38)
 layout_mode = 2
 toggle_mode = true
 text = "宗务报表"
 
-[node name="CloseButton" type="Button" parent="Overlay/Center/Frame/RootColumn/HeaderPanel/HeaderMargin/HeaderRow"]
+[node name="CloseButton" type="Button" parent="Overlay/Center/Frame/RootColumn/HeaderPanel/HeaderMargin/HeaderRow" unique_id=844855518]
 custom_minimum_size = Vector2(42, 42)
 layout_mode = 2
 text = "×"
 flat = true
 
-[node name="HeaderDivider" type="ColorRect" parent="Overlay/Center/Frame/RootColumn"]
+[node name="HeaderDivider" type="ColorRect" parent="Overlay/Center/Frame/RootColumn" unique_id=1451731895]
 custom_minimum_size = Vector2(0, 1)
 layout_mode = 2
 color = Color(0.494118, 0.423529, 0.341176, 0.78)
 
-[node name="BodyMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn"]
+[node name="BodyMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn" unique_id=1226552603]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/margin_left = 22
@@ -171,71 +176,71 @@ theme_override_constants/margin_top = 18
 theme_override_constants/margin_right = 22
 theme_override_constants/margin_bottom = 14
 
-[node name="ContentStack" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin"]
+[node name="ContentStack" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin" unique_id=1882814076]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 12
 
-[node name="ChronicleTab" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack"]
+[node name="ChronicleTab" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack" unique_id=1874164167]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 12
 
-[node name="ChronicleSummaryPanel" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab"]
+[node name="ChronicleSummaryPanel" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab" unique_id=198545938]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_section")
 
-[node name="ChronicleSummaryMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/ChronicleSummaryPanel"]
+[node name="ChronicleSummaryMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/ChronicleSummaryPanel" unique_id=502582206]
 layout_mode = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 12
 
-[node name="ChronicleSummaryLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/ChronicleSummaryPanel/ChronicleSummaryMargin"]
+[node name="ChronicleSummaryLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/ChronicleSummaryPanel/ChronicleSummaryMargin" unique_id=1712904216]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.286275, 0.239216, 0.196078, 0.98)
 theme_override_font_sizes/font_size = 14
 text = "卷首批注待载入。"
 autowrap_mode = 3
 
-[node name="FilterRow" type="HBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab"]
+[node name="FilterRow" type="HBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab" unique_id=1942871053]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="AllFilterButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/FilterRow"]
+[node name="AllFilterButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/FilterRow" unique_id=1331738305]
 custom_minimum_size = Vector2(72, 32)
 layout_mode = 2
 toggle_mode = true
 text = "全卷"
 
-[node name="GovernanceFilterButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/FilterRow"]
+[node name="GovernanceFilterButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/FilterRow" unique_id=2012463186]
 custom_minimum_size = Vector2(72, 32)
 layout_mode = 2
 toggle_mode = true
 text = "政务"
 
-[node name="ResourcesFilterButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/FilterRow"]
+[node name="ResourcesFilterButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/FilterRow" unique_id=1079905596]
 custom_minimum_size = Vector2(72, 32)
 layout_mode = 2
 toggle_mode = true
 text = "库藏"
 
-[node name="ExpeditionFilterButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/FilterRow"]
+[node name="ExpeditionFilterButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/FilterRow" unique_id=288924131]
 custom_minimum_size = Vector2(72, 32)
 layout_mode = 2
 toggle_mode = true
 text = "外务"
 
-[node name="ArchiveFilterButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/FilterRow"]
+[node name="ArchiveFilterButton" type="Button" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/FilterRow" unique_id=518312102]
 custom_minimum_size = Vector2(72, 32)
 layout_mode = 2
 toggle_mode = true
 text = "留档"
 
-[node name="FilterHintLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/FilterRow"]
+[node name="FilterHintLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/FilterRow" unique_id=365061976]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.356863, 0.305882, 0.254902, 0.92)
@@ -243,54 +248,51 @@ theme_override_font_sizes/font_size = 12
 text = "当前筛读：全卷"
 horizontal_alignment = 2
 
-[node name="AlertGrid" type="GridContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab"]
+[node name="AlertGrid" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab" unique_id=218881966]
 layout_mode = 2
-columns = 2
-theme_override_constants/h_separation = 12
-theme_override_constants/v_separation = 12
 
-[node name="PrimaryAlertCard" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/AlertGrid"]
+[node name="PrimaryAlertCard" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/AlertGrid" unique_id=855794694]
 custom_minimum_size = Vector2(0, 94)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_alert")
 
-[node name="PrimaryAlertMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/AlertGrid/PrimaryAlertCard"]
+[node name="PrimaryAlertMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/AlertGrid/PrimaryAlertCard" unique_id=1327237181]
 layout_mode = 2
 theme_override_constants/margin_left = 14
 theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 14
 theme_override_constants/margin_bottom = 12
 
-[node name="PrimaryAlertLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/AlertGrid/PrimaryAlertCard/PrimaryAlertMargin"]
+[node name="PrimaryAlertLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/AlertGrid/PrimaryAlertCard/PrimaryAlertMargin" unique_id=721263807]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "主警讯待载入。"
 autowrap_mode = 3
 
-[node name="SecondaryAlertCard" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/AlertGrid"]
+[node name="SecondaryAlertCard" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/AlertGrid" unique_id=247117006]
 custom_minimum_size = Vector2(0, 94)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_alert")
 
-[node name="SecondaryAlertMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/AlertGrid/SecondaryAlertCard"]
+[node name="SecondaryAlertMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/AlertGrid/SecondaryAlertCard" unique_id=1329908720]
 layout_mode = 2
 theme_override_constants/margin_left = 14
 theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 14
 theme_override_constants/margin_bottom = 12
 
-[node name="SecondaryAlertLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/AlertGrid/SecondaryAlertCard/SecondaryAlertMargin"]
+[node name="SecondaryAlertLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/AlertGrid/SecondaryAlertCard/SecondaryAlertMargin" unique_id=1353256038]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "副警讯待载入。"
 autowrap_mode = 3
 
-[node name="LogPanel" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab"]
+[node name="LogPanel" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab" unique_id=823450711]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_log")
 
-[node name="LogMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/LogPanel"]
+[node name="LogMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/LogPanel" unique_id=2115171600]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/margin_left = 16
@@ -298,85 +300,84 @@ theme_override_constants/margin_top = 14
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 14
 
-[node name="LogColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/LogPanel/LogMargin"]
+[node name="LogColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/LogPanel/LogMargin" unique_id=1239789774]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 8
 
-[node name="LogTitleLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/LogPanel/LogMargin/LogColumn"]
+[node name="LogTitleLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/LogPanel/LogMargin/LogColumn" unique_id=2026676833]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
 theme_override_font_sizes/font_size = 16
 text = "近时札记"
 
-[node name="LogLabel" type="RichTextLabel" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/LogPanel/LogMargin/LogColumn"]
+[node name="LogLabel" type="RichTextLabel" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ChronicleTab/LogPanel/LogMargin/LogColumn" unique_id=851740141]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_colors/default_color = Color(0.298039, 0.247059, 0.2, 0.98)
 theme_override_styles/normal = SubResource("StyleBoxEmpty_rich")
 bbcode_enabled = true
-scroll_active = true
 text = "[color=#5b4d42]卷中暂无札记。[/color]"
 
-[node name="ReportTab" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack"]
+[node name="ReportTab" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack" unique_id=666084417]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 12
 
-[node name="ReportSummaryPanel" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab"]
+[node name="ReportSummaryPanel" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab" unique_id=1721452322]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_section")
 
-[node name="ReportSummaryMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportSummaryPanel"]
+[node name="ReportSummaryMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportSummaryPanel" unique_id=118338303]
 layout_mode = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 12
 
-[node name="ReportSummaryLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportSummaryPanel/ReportSummaryMargin"]
+[node name="ReportSummaryLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportSummaryPanel/ReportSummaryMargin" unique_id=567720776]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.286275, 0.239216, 0.196078, 0.98)
 theme_override_font_sizes/font_size = 14
 text = "报表摘要待载入。"
 autowrap_mode = 3
 
-[node name="ReportGrid" type="GridContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab"]
+[node name="ReportGrid" type="GridContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab" unique_id=1981426889]
 layout_mode = 2
-columns = 2
 theme_override_constants/h_separation = 12
 theme_override_constants/v_separation = 12
+columns = 2
 
-[node name="PopulationCard" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid"]
+[node name="PopulationCard" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid" unique_id=288027983]
 custom_minimum_size = Vector2(0, 170)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_section")
 
-[node name="CardMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/PopulationCard"]
+[node name="CardMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/PopulationCard" unique_id=1786629974]
 layout_mode = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 14
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 14
 
-[node name="CardColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/PopulationCard/CardMargin"]
+[node name="CardColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/PopulationCard/CardMargin" unique_id=324977707]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="TitleLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/PopulationCard/CardMargin/CardColumn"]
+[node name="TitleLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/PopulationCard/CardMargin/CardColumn" unique_id=786142662]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "门人盘面"
 
-[node name="StatusLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/PopulationCard/CardMargin/CardColumn"]
+[node name="StatusLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/PopulationCard/CardMargin/CardColumn" unique_id=1095454301]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "状态待载入"
 autowrap_mode = 3
 
-[node name="DetailLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/PopulationCard/CardMargin/CardColumn"]
+[node name="DetailLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/PopulationCard/CardMargin/CardColumn" unique_id=1370418794]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.341176, 0.294118, 0.243137, 0.95)
@@ -384,34 +385,34 @@ theme_override_font_sizes/font_size = 13
 text = "详情待载入"
 autowrap_mode = 3
 
-[node name="StorageCard" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid"]
+[node name="StorageCard" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid" unique_id=699291608]
 custom_minimum_size = Vector2(0, 170)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_section")
 
-[node name="CardMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/StorageCard"]
+[node name="CardMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/StorageCard" unique_id=722604785]
 layout_mode = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 14
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 14
 
-[node name="CardColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/StorageCard/CardMargin"]
+[node name="CardColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/StorageCard/CardMargin" unique_id=98701440]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="TitleLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/StorageCard/CardMargin/CardColumn"]
+[node name="TitleLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/StorageCard/CardMargin/CardColumn" unique_id=1622804676]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "库藏供养"
 
-[node name="StatusLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/StorageCard/CardMargin/CardColumn"]
+[node name="StatusLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/StorageCard/CardMargin/CardColumn" unique_id=1803812590]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "状态待载入"
 autowrap_mode = 3
 
-[node name="DetailLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/StorageCard/CardMargin/CardColumn"]
+[node name="DetailLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/StorageCard/CardMargin/CardColumn" unique_id=678820596]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.341176, 0.294118, 0.243137, 0.95)
@@ -419,34 +420,34 @@ theme_override_font_sizes/font_size = 13
 text = "详情待载入"
 autowrap_mode = 3
 
-[node name="ExpeditionCard" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid"]
+[node name="ExpeditionCard" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid" unique_id=2117840179]
 custom_minimum_size = Vector2(0, 170)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_section")
 
-[node name="CardMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/ExpeditionCard"]
+[node name="CardMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/ExpeditionCard" unique_id=1114079870]
 layout_mode = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 14
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 14
 
-[node name="CardColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/ExpeditionCard/CardMargin"]
+[node name="CardColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/ExpeditionCard/CardMargin" unique_id=670177420]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="TitleLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/ExpeditionCard/CardMargin/CardColumn"]
+[node name="TitleLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/ExpeditionCard/CardMargin/CardColumn" unique_id=1170614739]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "护山外务"
 
-[node name="StatusLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/ExpeditionCard/CardMargin/CardColumn"]
+[node name="StatusLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/ExpeditionCard/CardMargin/CardColumn" unique_id=2140695791]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "状态待载入"
 autowrap_mode = 3
 
-[node name="DetailLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/ExpeditionCard/CardMargin/CardColumn"]
+[node name="DetailLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/ExpeditionCard/CardMargin/CardColumn" unique_id=1686870929]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.341176, 0.294118, 0.243137, 0.95)
@@ -454,34 +455,34 @@ theme_override_font_sizes/font_size = 13
 text = "详情待载入"
 autowrap_mode = 3
 
-[node name="ResearchCard" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid"]
+[node name="ResearchCard" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid" unique_id=1986679948]
 custom_minimum_size = Vector2(0, 170)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_section")
 
-[node name="CardMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/ResearchCard"]
+[node name="CardMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/ResearchCard" unique_id=2025733143]
 layout_mode = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 14
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 14
 
-[node name="CardColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/ResearchCard/CardMargin"]
+[node name="CardColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/ResearchCard/CardMargin" unique_id=1213682071]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="TitleLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/ResearchCard/CardMargin/CardColumn"]
+[node name="TitleLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/ResearchCard/CardMargin/CardColumn" unique_id=571391211]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "传承营造"
 
-[node name="StatusLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/ResearchCard/CardMargin/CardColumn"]
+[node name="StatusLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/ResearchCard/CardMargin/CardColumn" unique_id=1312787161]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "状态待载入"
 autowrap_mode = 3
 
-[node name="DetailLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/ResearchCard/CardMargin/CardColumn"]
+[node name="DetailLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/ResearchCard/CardMargin/CardColumn" unique_id=1188771671]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.341176, 0.294118, 0.243137, 0.95)
@@ -489,34 +490,34 @@ theme_override_font_sizes/font_size = 13
 text = "详情待载入"
 autowrap_mode = 3
 
-[node name="QuarterCard" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid"]
+[node name="QuarterCard" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid" unique_id=695559450]
 custom_minimum_size = Vector2(0, 170)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_section")
 
-[node name="CardMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/QuarterCard"]
+[node name="CardMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/QuarterCard" unique_id=1301753154]
 layout_mode = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 14
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 14
 
-[node name="CardColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/QuarterCard/CardMargin"]
+[node name="CardColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/QuarterCard/CardMargin" unique_id=1472676992]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="TitleLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/QuarterCard/CardMargin/CardColumn"]
+[node name="TitleLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/QuarterCard/CardMargin/CardColumn" unique_id=1882435819]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "季度摘要"
 
-[node name="StatusLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/QuarterCard/CardMargin/CardColumn"]
+[node name="StatusLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/QuarterCard/CardMargin/CardColumn" unique_id=1322931074]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "状态待载入"
 autowrap_mode = 3
 
-[node name="DetailLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/QuarterCard/CardMargin/CardColumn"]
+[node name="DetailLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/QuarterCard/CardMargin/CardColumn" unique_id=1808446208]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.341176, 0.294118, 0.243137, 0.95)
@@ -524,34 +525,34 @@ theme_override_font_sizes/font_size = 13
 text = "详情待载入"
 autowrap_mode = 3
 
-[node name="YearCard" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid"]
+[node name="YearCard" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid" unique_id=250770356]
 custom_minimum_size = Vector2(0, 170)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_section")
 
-[node name="CardMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/YearCard"]
+[node name="CardMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/YearCard" unique_id=1350912214]
 layout_mode = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 14
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 14
 
-[node name="CardColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/YearCard/CardMargin"]
+[node name="CardColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/YearCard/CardMargin" unique_id=1184675246]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="TitleLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/YearCard/CardMargin/CardColumn"]
+[node name="TitleLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/YearCard/CardMargin/CardColumn" unique_id=298229345]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "年度摘要"
 
-[node name="StatusLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/YearCard/CardMargin/CardColumn"]
+[node name="StatusLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/YearCard/CardMargin/CardColumn" unique_id=2113636887]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "状态待载入"
 autowrap_mode = 3
 
-[node name="DetailLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/YearCard/CardMargin/CardColumn"]
+[node name="DetailLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/ReportGrid/YearCard/CardMargin/CardColumn" unique_id=616739237]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.341176, 0.294118, 0.243137, 0.95)
@@ -559,12 +560,12 @@ theme_override_font_sizes/font_size = 13
 text = "详情待载入"
 autowrap_mode = 3
 
-[node name="TrendPanel" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab"]
+[node name="TrendPanel" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab" unique_id=2035411520]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_log")
 
-[node name="TrendMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/TrendPanel"]
+[node name="TrendMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/TrendPanel" unique_id=724779428]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/margin_left = 16
@@ -572,44 +573,43 @@ theme_override_constants/margin_top = 14
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 14
 
-[node name="TrendColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/TrendPanel/TrendMargin"]
+[node name="TrendColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/TrendPanel/TrendMargin" unique_id=2063954583]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 8
 
-[node name="TrendTitleLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/TrendPanel/TrendMargin/TrendColumn"]
+[node name="TrendTitleLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/TrendPanel/TrendMargin/TrendColumn" unique_id=211520994]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
 theme_override_font_sizes/font_size = 16
 text = "近三次时辰结算"
 
-[node name="TrendLabel" type="RichTextLabel" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/TrendPanel/TrendMargin/TrendColumn"]
+[node name="TrendLabel" type="RichTextLabel" parent="Overlay/Center/Frame/RootColumn/BodyMargin/ContentStack/ReportTab/TrendPanel/TrendMargin/TrendColumn" unique_id=517096338]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_colors/default_color = Color(0.298039, 0.247059, 0.2, 0.98)
 theme_override_styles/normal = SubResource("StyleBoxEmpty_rich")
 bbcode_enabled = true
-scroll_active = true
 text = "[color=#5b4d42]尚未记录时辰结算。[/color]"
 
-[node name="FooterDivider" type="ColorRect" parent="Overlay/Center/Frame/RootColumn"]
+[node name="FooterDivider" type="ColorRect" parent="Overlay/Center/Frame/RootColumn" unique_id=1810387363]
 custom_minimum_size = Vector2(0, 1)
 layout_mode = 2
 color = Color(0.494118, 0.423529, 0.341176, 0.78)
 
-[node name="HintPanel" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn"]
+[node name="HintPanel" type="PanelContainer" parent="Overlay/Center/Frame/RootColumn" unique_id=1131870132]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_header")
 
-[node name="HintMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/HintPanel"]
+[node name="HintMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn/HintPanel" unique_id=874521839]
 layout_mode = 2
 theme_override_constants/margin_left = 18
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 18
 theme_override_constants/margin_bottom = 8
 
-[node name="HintLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/HintPanel/HintMargin"]
+[node name="HintLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/HintPanel/HintMargin" unique_id=1917039509]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.286275, 0.239216, 0.196078, 0.92)
 theme_override_font_sizes/font_size = 13

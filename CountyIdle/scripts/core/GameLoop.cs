@@ -30,6 +30,8 @@ public partial class GameLoop : Node
     private readonly SectRuleTreeSystem _sectRuleTreeSystem = new();
     private readonly SectPeakSupportSystem _sectPeakSupportSystem = new();
     private readonly DiscipleDirectiveSystem _discipleDirectiveSystem = new();
+    private readonly DiscipleCultivationSystem _discipleCultivationSystem = new();
+    private readonly DiscipleCultivationSettlementSystem _discipleCultivationSettlementSystem = new();
     private readonly MapOperationalLinkSystem _mapOperationalLinkSystem = new();
     private readonly ResearchSystem _researchSystem = new();
     private readonly BreedingSystem _breedingSystem = new();
@@ -87,6 +89,7 @@ public partial class GameLoop : Node
         _sectRuleTreeSystem.EnsureDefaults(_state);
         _sectPeakSupportSystem.EnsureDefaults(_state);
         _discipleDirectiveSystem.EnsureDefaults(_state);
+        _discipleCultivationSystem.EnsureDefaults(_state);
         ValidateQuarterDecree(false);
         _minuteAccumulator = Math.Max(_state.GameMinutes % MinutesPerSettlement, 0);
         _secondAccumulator = 0;
@@ -110,6 +113,7 @@ public partial class GameLoop : Node
         _sectRuleTreeSystem.EnsureDefaults(_state);
         _sectPeakSupportSystem.EnsureDefaults(_state);
         _discipleDirectiveSystem.EnsureDefaults(_state);
+        _discipleCultivationSystem.EnsureDefaults(_state);
         ValidateQuarterDecree(false);
         _minuteAccumulator = 0;
         _secondAccumulator = 0;
@@ -129,13 +133,43 @@ public partial class GameLoop : Node
     }
 
     /// <summary>
-    /// 建造产业建筑。
+    /// 发起产业营建（进入营建队列）。
     /// </summary>
     public void BuildIndustryBuilding(IndustryBuildingType buildingType)
     {
         if (_industrySystem.TryConstructBuilding(_state, buildingType, out var log))
         {
             SyncTaskOrders();
+            _eventBus.PublishLog(log);
+            _eventBus.PublishState(_state.Clone());
+            return;
+        }
+
+        _eventBus.PublishLog(log);
+    }
+
+    /// <summary>
+    /// 取消当前营建（已开工则停工不退费）。
+    /// </summary>
+    public void CancelCurrentConstruction()
+    {
+        if (_industrySystem.TryCancelCurrentConstruction(_state, out var log))
+        {
+            _eventBus.PublishLog(log);
+            _eventBus.PublishState(_state.Clone());
+            return;
+        }
+
+        _eventBus.PublishLog(log);
+    }
+
+    /// <summary>
+    /// 取消排队中的营建（退回未开工消耗）。
+    /// </summary>
+    public void CancelPendingConstruction()
+    {
+        if (_industrySystem.TryCancelPendingConstruction(_state, out var log))
+        {
             _eventBus.PublishLog(log);
             _eventBus.PublishState(_state.Clone());
             return;
@@ -467,6 +501,21 @@ public partial class GameLoop : Node
     }
 
     /// <summary>
+    /// 设置弟子修炼安排（修炼卷登记）。
+    /// </summary>
+    public void SetDiscipleCultivationAssignment(int discipleId, DiscipleCultivationAssignmentType assignmentType)
+    {
+        if (!_discipleCultivationSystem.SetAssignment(_state, discipleId, assignmentType, out var log))
+        {
+            _eventBus.PublishLog(log);
+            return;
+        }
+
+        _eventBus.PublishLog(log);
+        _eventBus.PublishState(_state.Clone());
+    }
+
+    /// <summary>
     /// 将岗位人数回退指定数量（保护不为负）。
     /// </summary>
     private void RemoveFromJob(JobType jobType, int amount)
@@ -537,7 +586,7 @@ public partial class GameLoop : Node
         _state.HourSettlements += 1;
         SyncTaskOrders();
 
-        // 小时结算顺序：产业 → 资源 → 经济 → 研修 → 人口 → 繁育 → 战斗 → 事件
+        // 小时结算顺序：产业 → 资源 → 经济 → 修炼 → 研修 → 人口 → 繁育 → 战斗 → 事件
         if (_industrySystem.TickHour(_state, out var industryLog) && !string.IsNullOrWhiteSpace(industryLog))
         {
             _eventBus.PublishLog(industryLog);
@@ -549,6 +598,12 @@ public partial class GameLoop : Node
         }
 
         _economySystem.TickHour(_state);
+
+        // 修炼卷收益先于研修系统结算，保证同一时辰内的修炼研修可参与突破判定。
+        if (_discipleCultivationSettlementSystem.TickHour(_state, out var cultivationLog) && !string.IsNullOrWhiteSpace(cultivationLog))
+        {
+            _eventBus.PublishLog(cultivationLog);
+        }
 
         if (_researchSystem.TickHour(_state, out var researchLog) && !string.IsNullOrWhiteSpace(researchLog))
         {
@@ -588,6 +643,7 @@ public partial class GameLoop : Node
         _sectRuleTreeSystem.EnsureDefaults(_state);
         _sectTaskSystem.EnsureDefaults(_state);
         _discipleDirectiveSystem.EnsureDefaults(_state);
+        _discipleCultivationSystem.EnsureDefaults(_state);
     }
 
     /// <summary>

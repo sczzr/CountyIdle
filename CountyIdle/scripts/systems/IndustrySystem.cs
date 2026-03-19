@@ -43,6 +43,13 @@ public class IndustrySystem
     private const double AdminBuildGoldCost = 20;
     private const double AdminBuildContributionCost = 14;
     private const double AdminBuildConstructionCost = 2;
+
+    // 建筑营建时长（按时辰结算推进）
+    private const int AgricultureBuildHours = 1;
+    private const int WorkshopBuildHours = 1;
+    private const int ResearchBuildHours = 2;
+    private const int TradeBuildHours = 1;
+    private const int AdministrationBuildHours = 2;
     private const double ForestryChainWoodCost = 12;
     private const double ForestryChainStoneCost = 10;
     private const double ForestryChainGoldCost = 8;
@@ -107,6 +114,19 @@ public class IndustrySystem
         };
     }
 
+    public static int ResolveConstructionHours(IndustryBuildingType buildingType)
+    {
+        return buildingType switch
+        {
+            IndustryBuildingType.Agriculture => AgricultureBuildHours,
+            IndustryBuildingType.Workshop => WorkshopBuildHours,
+            IndustryBuildingType.Research => ResearchBuildHours,
+            IndustryBuildingType.Trade => TradeBuildHours,
+            IndustryBuildingType.Administration => AdministrationBuildHours,
+            _ => 1
+        };
+    }
+
     public static bool CanAffordBuildCost(GameState state, BuildingCostPreview preview)
     {
         InventoryRules.EndTransaction(state);
@@ -123,6 +143,7 @@ public class IndustrySystem
         IndustryRules.EnsureDefaults(state);
 
         var logs = new List<string>();
+        ResolveConstructionQueue(state, logs);
         EnsureJobCap(state, logs);
         ResolveToolConsumption(state, logs);
 
@@ -137,20 +158,124 @@ public class IndustrySystem
 
     public bool TryConstructBuilding(GameState state, IndustryBuildingType buildingType, out string log)
     {
+        return TryQueueConstruction(state, buildingType, out log);
+    }
+
+    public bool TryQueueConstruction(GameState state, IndustryBuildingType buildingType, out string log)
+    {
         InventoryRules.EndTransaction(state);
         IndustryRules.EnsureDefaults(state);
 
         if (state.Workers <= 0)
         {
-            log = "缺少管理人员，无法组织建造。";
+            log = "缺少管理人员，无法组织营建。";
             return false;
         }
 
-        if (!TryBuildByType(state, buildingType, out log))
+        var preview = GetBuildCostPreview(buildingType);
+        if (!CanAffordBuildCost(state, preview))
         {
+            log =
+                $"{preview.DisplayName}营建失败：木{InventoryRules.QuantizeCost(preview.Wood)}/石{InventoryRules.QuantizeCost(preview.Stone)}/灵石{InventoryRules.QuantizeCost(preview.Gold)}/贡献{InventoryRules.QuantizeCost(preview.Contribution)}/建材{InventoryRules.QuantizeCost(preview.Construction)} 不足。";
             return false;
         }
 
+        var totalHours = Math.Max(ResolveConstructionHours(buildingType), 1);
+        var woodCost = InventoryRules.QuantizeCost(preview.Wood);
+        var stoneCost = InventoryRules.QuantizeCost(preview.Stone);
+        var goldCost = InventoryRules.QuantizeCost(preview.Gold);
+        var contributionCost = InventoryRules.QuantizeCost(preview.Contribution);
+        var constructionCost = InventoryRules.QuantizeCost(preview.Construction);
+
+        // 预先扣除消耗，避免排队过程中资源被重复使用。
+        ConsumeBuildCost(
+            state,
+            preview.Wood,
+            preview.Stone,
+            preview.Gold,
+            preview.Contribution,
+            constructionMaterials: preview.Construction);
+
+        // 写入营建队列，由时辰结算推进。
+        state.ConstructionQueue.Add(new ConstructionQueueItem(
+            buildingType,
+            totalHours,
+            totalHours,
+            woodCost,
+            stoneCost,
+            goldCost,
+            contributionCost,
+            constructionCost));
+
+        var queueIndex = state.ConstructionQueue.Count;
+        var costText = BuildCostLogText(preview);
+        log = queueIndex == 1
+            ? $"营建排队：{preview.DisplayName} 已开工（{costText}），预计 {totalHours} 时辰完工。"
+            : $"营建排队：{preview.DisplayName} 已入队（序位 {queueIndex}，{costText}），预计 {totalHours} 时辰。";
+        return true;
+    }
+
+    public bool TryCancelCurrentConstruction(GameState state, out string log)
+    {
+        return TryCancelConstructionQueueItem(state, 0, out log);
+    }
+
+    public bool TryCancelPendingConstruction(GameState state, out string log)
+    {
+        IndustryRules.EnsureDefaults(state);
+        var queue = state.ConstructionQueue;
+        if (queue.Count <= 1)
+        {
+            log = "营建队列暂无可撤销的排队项目。";
+            return false;
+        }
+
+        var refund = new ConstructionRefund();
+        var canceledNames = new List<string>();
+        for (var index = queue.Count - 1; index >= 1; index--)
+        {
+            var item = queue[index];
+            canceledNames.Add(SectMapSemanticRules.GetBuildingDisplayName(item.BuildingType));
+            if (item.RemainingHours >= item.TotalHours)
+            {
+                refund = refund.WithAdded(item);
+            }
+            queue.RemoveAt(index);
+        }
+
+        ApplyRefund(state, refund);
+        log = refund.HasRefund
+            ? $"已撤销排队：{string.Join("、", canceledNames)}，退回{refund.BuildRefundText()}。"
+            : $"已撤销排队：{string.Join("、", canceledNames)}。";
+        return true;
+    }
+
+    private bool TryCancelConstructionQueueItem(GameState state, int index, out string log)
+    {
+        IndustryRules.EnsureDefaults(state);
+        var queue = state.ConstructionQueue;
+        if (index < 0 || index >= queue.Count)
+        {
+            log = "营建队列暂无可撤销条目。";
+            return false;
+        }
+
+        var item = queue[index];
+        var displayName = SectMapSemanticRules.GetBuildingDisplayName(item.BuildingType);
+        var canRefund = item.RemainingHours >= item.TotalHours;
+        if (canRefund)
+        {
+            var refund = new ConstructionRefund().WithAdded(item);
+            ApplyRefund(state, refund);
+            queue.RemoveAt(index);
+            log = refund.HasRefund
+                ? $"已撤销营建：{displayName}，退回{refund.BuildRefundText()}。"
+                : $"已撤销营建：{displayName}。";
+            return true;
+        }
+
+        queue.RemoveAt(index);
+        log = $"已停工：{displayName}，已消耗资源不予退回。";
         return true;
     }
 
@@ -371,6 +496,102 @@ public class IndustrySystem
         return true;
     }
 
+    private record struct ConstructionRefund(
+        int Wood,
+        int Stone,
+        int Gold,
+        int Contribution,
+        int Construction)
+    {
+        public bool HasRefund => Wood > 0 || Stone > 0 || Gold > 0 || Contribution > 0 || Construction > 0;
+
+        public ConstructionRefund WithAdded(ConstructionQueueItem item)
+        {
+            return new ConstructionRefund(
+                Wood + Math.Max(item.WoodCost, 0),
+                Stone + Math.Max(item.StoneCost, 0),
+                Gold + Math.Max(item.GoldCost, 0),
+                Contribution + Math.Max(item.ContributionCost, 0),
+                Construction + Math.Max(item.ConstructionCost, 0));
+        }
+
+        public string BuildRefundText()
+        {
+            var parts = new List<string>(5);
+            AppendRefund(parts, nameof(GameState.Wood), Wood);
+            AppendRefund(parts, nameof(GameState.Stone), Stone);
+            AppendRefund(parts, nameof(GameState.Gold), Gold);
+            AppendRefund(parts, nameof(GameState.ContributionPoints), Contribution);
+            AppendRefund(parts, nameof(GameState.ConstructionMaterials), Construction);
+            return parts.Count > 0 ? string.Join("/", parts) : "无";
+        }
+
+        private static void AppendRefund(List<string> parts, string fieldName, int amount)
+        {
+            if (amount <= 0)
+            {
+                return;
+            }
+
+            var name = MaterialSemanticRules.GetDisplayName(fieldName);
+            parts.Add($"{name}{amount}");
+        }
+    }
+
+    private static void ApplyRefund(GameState state, ConstructionRefund refund)
+    {
+        if (refund.Wood > 0)
+        {
+            InventoryRules.ApplyDelta(state, nameof(GameState.Wood), refund.Wood);
+        }
+
+        if (refund.Stone > 0)
+        {
+            InventoryRules.ApplyDelta(state, nameof(GameState.Stone), refund.Stone);
+        }
+
+        if (refund.Gold > 0)
+        {
+            InventoryRules.ApplyDelta(state, nameof(GameState.Gold), refund.Gold);
+        }
+
+        if (refund.Contribution > 0)
+        {
+            InventoryRules.ApplyDelta(state, nameof(GameState.ContributionPoints), refund.Contribution);
+        }
+
+        if (refund.Construction > 0)
+        {
+            InventoryRules.ApplyDelta(state, nameof(GameState.ConstructionMaterials), refund.Construction);
+        }
+    }
+
+    private static void ResolveConstructionQueue(GameState state, List<string> logs)
+    {
+        if (state.ConstructionQueue == null || state.ConstructionQueue.Count <= 0)
+        {
+            return;
+        }
+
+        // 每时辰仅推进队首一项，完工后生成待落点记录。
+        var current = state.ConstructionQueue[0];
+        var remaining = Math.Max(current.RemainingHours, 0) - 1;
+        current.RemainingHours = Math.Max(remaining, 0);
+        state.ConstructionQueue[0] = current;
+
+        if (current.RemainingHours > 0)
+        {
+            return;
+        }
+
+        state.ConstructionQueue.RemoveAt(0);
+        ApplyBuildingCompletion(state, current.BuildingType);
+        state.PendingConstructionCompletions ??= new List<IndustryBuildingType>();
+        state.PendingConstructionCompletions.Add(current.BuildingType);
+        var displayName = SectMapSemanticRules.GetBuildingDisplayName(current.BuildingType);
+        logs.Add($"营建完工：{displayName} 已完工，待在山门图落点。");
+    }
+
     private static void EnsureJobCap(GameState state, List<string> logs)
     {
         ClampSkill(state, CraftSkillType.SpiritPlant, IndustryRules.GetSpiritPlantCapacity(state), logs);
@@ -435,6 +656,51 @@ public class IndustrySystem
         log =
             $"产业扩建：新建{preview.DisplayName} 1 座（木{InventoryRules.QuantizeCost(preview.Wood)}/石{InventoryRules.QuantizeCost(preview.Stone)}/灵石{InventoryRules.QuantizeCost(preview.Gold)}/贡献{InventoryRules.QuantizeCost(preview.Contribution)}/建材{InventoryRules.QuantizeCost(preview.Construction)}）。";
         return true;
+    }
+
+    private static string BuildCostLogText(BuildingCostPreview preview)
+    {
+        var parts = new List<string>(5);
+        AppendCostPart(parts, nameof(GameState.Wood), preview.Wood);
+        AppendCostPart(parts, nameof(GameState.Stone), preview.Stone);
+        AppendCostPart(parts, nameof(GameState.Gold), preview.Gold);
+        AppendCostPart(parts, nameof(GameState.ContributionPoints), preview.Contribution);
+        AppendCostPart(parts, nameof(GameState.ConstructionMaterials), preview.Construction);
+        return parts.Count > 0 ? string.Join("/", parts) : "无消耗";
+    }
+
+    private static void AppendCostPart(List<string> parts, string fieldName, double value)
+    {
+        if (value <= 0)
+        {
+            return;
+        }
+
+        var displayName = MaterialSemanticRules.GetDisplayName(fieldName);
+        var amount = InventoryRules.QuantizeCost(value);
+        parts.Add($"{displayName}{amount}");
+    }
+
+    private static void ApplyBuildingCompletion(GameState state, IndustryBuildingType buildingType)
+    {
+        switch (buildingType)
+        {
+            case IndustryBuildingType.Agriculture:
+                state.AgricultureBuildings += 1;
+                break;
+            case IndustryBuildingType.Workshop:
+                state.WorkshopBuildings += 1;
+                break;
+            case IndustryBuildingType.Research:
+                state.ResearchBuildings += 1;
+                break;
+            case IndustryBuildingType.Trade:
+                state.TradeBuildings += 1;
+                break;
+            case IndustryBuildingType.Administration:
+                state.AdministrationBuildings += 1;
+                break;
+        }
     }
 
     private static void ResolveToolConsumption(GameState state, List<string> logs)

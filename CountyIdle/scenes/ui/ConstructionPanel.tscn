@@ -1,8 +1,8 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://b04rnlnj5df8b"]
 
-[ext_resource type="Script" path="res://scripts/ui/ConstructionPanel.cs" id="1_construction"]
+[ext_resource type="Script" uid="uid://cgmtwk77d2ocn" path="res://scripts/ui/ConstructionPanel.cs" id="1_construction"]
 
-[node name="ConstructionPanel" type="Control"]
+[node name="ConstructionPanel" type="Control" unique_id=981739836]
 visible = false
 layout_mode = 3
 anchors_preset = 15
@@ -13,7 +13,7 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_construction")
 
-[node name="Backdrop" type="ColorRect" parent="."]
+[node name="Backdrop" type="ColorRect" parent="." unique_id=622119163]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -22,589 +22,627 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.101961, 0.0862745, 0.0745098, 0.9)
 
-[node name="CenterLayer" type="CenterContainer" parent="."]
+[node name="CenterLayer" type="MarginContainer" parent="." unique_id=584070548]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 20
 
-[node name="Dialog" type="PanelContainer" parent="CenterLayer"]
-custom_minimum_size = Vector2(1120, 680)
+[node name="Dialog" type="PanelContainer" parent="CenterLayer" unique_id=2038144043]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
-[node name="Margin" type="MarginContainer" parent="CenterLayer/Dialog"]
+[node name="Margin" type="MarginContainer" parent="CenterLayer/Dialog" unique_id=875244233]
 layout_mode = 2
 theme_override_constants/margin_left = 24
 theme_override_constants/margin_top = 24
 theme_override_constants/margin_right = 24
 theme_override_constants/margin_bottom = 22
 
-[node name="MainColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin"]
+[node name="MainColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin" unique_id=357153142]
 layout_mode = 2
 theme_override_constants/separation = 14
 
-[node name="HeaderRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn"]
+[node name="HeaderRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn" unique_id=533381583]
 layout_mode = 2
 
-[node name="TitleLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/HeaderRow"]
+[node name="TitleLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/HeaderRow" unique_id=1245212303]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 20
 text = "文明式营建卷"
 
-[node name="CloseButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/HeaderRow"]
+[node name="CloseButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/HeaderRow" unique_id=1422059476]
 custom_minimum_size = Vector2(44, 28)
 layout_mode = 2
 text = "✖"
 
-[node name="HintLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn"]
+[node name="HintLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn" unique_id=1144264705]
 layout_mode = 2
 text = "挑选宗门营建并与院域坊局联动，建造会优先落点到当前选中院域。"
 autowrap_mode = 3
 
-[node name="HeaderDivider" type="ColorRect" parent="CenterLayer/Dialog/Margin/MainColumn"]
+[node name="HeaderDivider" type="ColorRect" parent="CenterLayer/Dialog/Margin/MainColumn" unique_id=338780575]
 custom_minimum_size = Vector2(0, 1)
 layout_mode = 2
 color = Color(0.294118, 0.247059, 0.207843, 1)
 
-[node name="SummaryRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn"]
+[node name="SummaryRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn" unique_id=1778905195]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="TileCard" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow"]
+[node name="TileCard" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow" unique_id=1474227882]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="CardMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/TileCard"]
+[node name="CardMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/TileCard" unique_id=2049067622]
 layout_mode = 2
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 10
 
-[node name="CardColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/TileCard/CardMargin"]
+[node name="CardColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/TileCard/CardMargin" unique_id=1203744417]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="TileTitle" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/TileCard/CardMargin/CardColumn"]
+[node name="TileTitle" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/TileCard/CardMargin/CardColumn" unique_id=434212138]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "未选中地块"
 
-[node name="TileSubtitle" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/TileCard/CardMargin/CardColumn"]
+[node name="TileSubtitle" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/TileCard/CardMargin/CardColumn" unique_id=681389435]
 layout_mode = 2
 text = "点击任意院域检视地块详情"
 
-[node name="TileStatus" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/TileCard/CardMargin/CardColumn"]
+[node name="TileStatus" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/TileCard/CardMargin/CardColumn" unique_id=1293371436]
 layout_mode = 2
 text = "当前态势：未检视"
 
-[node name="TileLocation" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/TileCard/CardMargin/CardColumn"]
+[node name="TileLocation" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/TileCard/CardMargin/CardColumn" unique_id=695877738]
 layout_mode = 2
 text = "地气坐标：Hex 坐标待定"
 
-[node name="TileDescription" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/TileCard/CardMargin/CardColumn"]
+[node name="TileDescription" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/TileCard/CardMargin/CardColumn" unique_id=354943407]
 layout_mode = 2
 text = "山门图现已支持全格检视，左键点选任意六角地块后可查看其院域底盘、灵气和推荐坊局。"
 autowrap_mode = 3
 
-[node name="BuildingCard" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow"]
+[node name="BuildingCard" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow" unique_id=770426048]
 layout_mode = 2
 size_flags_horizontal = 2
 
-[node name="CardMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/BuildingCard"]
+[node name="CardMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/BuildingCard" unique_id=700024091]
 layout_mode = 2
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 10
 
-[node name="CardColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/BuildingCard/CardMargin"]
+[node name="CardColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/BuildingCard/CardMargin" unique_id=385802678]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="BuildingLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/BuildingCard/CardMargin/CardColumn"]
+[node name="BuildingLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/BuildingCard/CardMargin/CardColumn" unique_id=818205274]
 layout_mode = 2
 text = "当前坊局"
 
-[node name="BuildingValue" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/BuildingCard/CardMargin/CardColumn"]
+[node name="BuildingValue" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/BuildingCard/CardMargin/CardColumn" unique_id=1245380084]
 layout_mode = 2
 text = "待选中"
 autowrap_mode = 3
 
-[node name="RecommendationLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/BuildingCard/CardMargin/CardColumn"]
+[node name="RecommendationLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/BuildingCard/CardMargin/CardColumn" unique_id=787535069]
 layout_mode = 2
 text = "推荐：待评估"
 
-[node name="ContentRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn"]
+[node name="ContentRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn" unique_id=1935444745]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 12
 
-[node name="BuildingListCard" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow"]
+[node name="BuildingListCard" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow" unique_id=193536963]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="CardMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard"]
+[node name="CardMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard" unique_id=1004960967]
 layout_mode = 2
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 12
 
-[node name="ListColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin"]
+[node name="ListColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin" unique_id=1226643962]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 8
 
-[node name="BuildingListHeader" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn"]
+[node name="BuildingListHeader" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn" unique_id=1728161749]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="ListTitle" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListHeader"]
+[node name="ListTitle" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListHeader" unique_id=1856883320]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "营建清单"
 
-[node name="ListHint" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListHeader"]
+[node name="ListHint" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListHeader" unique_id=1540838334]
 layout_mode = 2
 text = "可对比收益并快速建造"
 
-[node name="CategoryRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn"]
+[node name="CategoryRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn" unique_id=1124405658]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="CategoryAll" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/CategoryRow"]
+[node name="CategoryAll" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/CategoryRow" unique_id=1093824574]
 custom_minimum_size = Vector2(54, 26)
 layout_mode = 2
 text = "全部"
 
-[node name="CategoryProduction" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/CategoryRow"]
+[node name="CategoryProduction" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/CategoryRow" unique_id=1478635291]
 custom_minimum_size = Vector2(54, 26)
 layout_mode = 2
 text = "产务"
 
-[node name="CategoryResearchTrade" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/CategoryRow"]
+[node name="CategoryResearchTrade" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/CategoryRow" unique_id=24708928]
 custom_minimum_size = Vector2(54, 26)
 layout_mode = 2
 text = "研商"
 
-[node name="CategoryGovernance" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/CategoryRow"]
+[node name="CategoryGovernance" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/CategoryRow" unique_id=1238619167]
 custom_minimum_size = Vector2(54, 26)
 layout_mode = 2
 text = "治务"
 
-[node name="BuildingListScroll" type="ScrollContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn"]
-layout_mode = 2
-size_flags_vertical = 3
-size_flags_horizontal = 3
+[node name="BuildingListScroll" type="ScrollContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn" unique_id=1016192156]
 custom_minimum_size = Vector2(0, 360)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
-[node name="BuildingRows" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll"]
+[node name="BuildingRows" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll" unique_id=650375017]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
-[node name="GroupProduction" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows"]
+[node name="GroupProduction" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows" unique_id=967469290]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.403922, 0.352941, 0.301961, 0.9)
 theme_override_font_sizes/font_size = 12
 text = "产务营建"
 
-[node name="RowAgriculture" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows"]
+[node name="RowAgriculture" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows" unique_id=562757115]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="RowMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture"]
+[node name="RowMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture" unique_id=2136245228]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 8
 
-[node name="RowColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin"]
+[node name="RowColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin" unique_id=870621919]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="HeaderRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin/RowColumn"]
+[node name="HeaderRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin/RowColumn" unique_id=559356380]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="NameLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin/RowColumn/HeaderRow"]
+[node name="NameLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin/RowColumn/HeaderRow" unique_id=1656854190]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "阵材圃"
 
-[node name="CountLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin/RowColumn/HeaderRow"]
+[node name="CountLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin/RowColumn/HeaderRow" unique_id=236613414]
 layout_mode = 2
 text = "×0"
 
-[node name="TagLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin/RowColumn/HeaderRow"]
+[node name="TagLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin/RowColumn/HeaderRow" unique_id=1403500354]
 layout_mode = 2
 text = "推荐"
 
-[node name="EffectLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin/RowColumn"]
+[node name="EffectLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin/RowColumn" unique_id=1233652418]
 layout_mode = 2
 text = "灵植容量 +16"
 autowrap_mode = 3
 
-[node name="RequirementLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin/RowColumn"]
+[node name="RequirementLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin/RowColumn" unique_id=1668007271]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.403922, 0.352941, 0.301961, 0.92)
 theme_override_font_sizes/font_size = 12
 text = "前置：坊位与灵气待判定"
 autowrap_mode = 3
 
-[node name="ActionRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin/RowColumn"]
+[node name="ActionRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin/RowColumn" unique_id=1322158500]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="CostLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin/RowColumn/ActionRow"]
+[node name="CostLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin/RowColumn/ActionRow" unique_id=1133413706]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "木24 / 石12 / 灵石10"
 autowrap_mode = 3
 
-[node name="DetailButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin/RowColumn/ActionRow"]
+[node name="DetailButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin/RowColumn/ActionRow" unique_id=1291101807]
 custom_minimum_size = Vector2(60, 28)
 layout_mode = 2
 text = "详情"
 
-[node name="BuildButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin/RowColumn/ActionRow"]
+[node name="BuildButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAgriculture/RowMargin/RowColumn/ActionRow" unique_id=1735766046]
 custom_minimum_size = Vector2(72, 28)
 layout_mode = 2
 text = "建造"
 
-[node name="RowWorkshop" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows"]
+[node name="RowWorkshop" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows" unique_id=1561471875]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="RowMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop"]
+[node name="RowMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop" unique_id=2003525021]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 8
 
-[node name="RowColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin"]
+[node name="RowColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin" unique_id=1040473365]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="HeaderRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin/RowColumn"]
+[node name="HeaderRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin/RowColumn" unique_id=2131499683]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="NameLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin/RowColumn/HeaderRow"]
+[node name="NameLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin/RowColumn/HeaderRow" unique_id=1575488055]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "工务坊"
 
-[node name="CountLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin/RowColumn/HeaderRow"]
+[node name="CountLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin/RowColumn/HeaderRow" unique_id=1470326479]
 layout_mode = 2
 text = "×0"
 
-[node name="TagLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin/RowColumn/HeaderRow"]
+[node name="TagLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin/RowColumn/HeaderRow" unique_id=901297739]
 layout_mode = 2
 text = "推荐"
 
-[node name="EffectLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin/RowColumn"]
+[node name="EffectLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin/RowColumn" unique_id=771337777]
 layout_mode = 2
-text = "炼器容量 +12\n灵植容量 +6"
+text = "炼器容量 +12
+灵植容量 +6"
 autowrap_mode = 3
 
-[node name="RequirementLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin/RowColumn"]
+[node name="RequirementLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin/RowColumn" unique_id=1837045902]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.403922, 0.352941, 0.301961, 0.92)
 theme_override_font_sizes/font_size = 12
 text = "前置：坊位与灵气待判定"
 autowrap_mode = 3
 
-[node name="ActionRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin/RowColumn"]
+[node name="ActionRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin/RowColumn" unique_id=1048706710]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="CostLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin/RowColumn/ActionRow"]
+[node name="CostLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin/RowColumn/ActionRow" unique_id=1316154013]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "木26 / 石18 / 灵石12"
 autowrap_mode = 3
 
-[node name="DetailButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin/RowColumn/ActionRow"]
+[node name="DetailButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin/RowColumn/ActionRow" unique_id=1604485383]
 custom_minimum_size = Vector2(60, 28)
 layout_mode = 2
 text = "详情"
 
-[node name="BuildButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin/RowColumn/ActionRow"]
+[node name="BuildButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowWorkshop/RowMargin/RowColumn/ActionRow" unique_id=1889199474]
 custom_minimum_size = Vector2(72, 28)
 layout_mode = 2
 text = "建造"
 
-[node name="GroupResearchTrade" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows"]
+[node name="GroupResearchTrade" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows" unique_id=1651990954]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.403922, 0.352941, 0.301961, 0.9)
 theme_override_font_sizes/font_size = 12
 text = "研修与商贸"
 
-[node name="RowResearch" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows"]
+[node name="RowResearch" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows" unique_id=857472508]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="RowMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch"]
+[node name="RowMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch" unique_id=1016208895]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 8
 
-[node name="RowColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin"]
+[node name="RowColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin" unique_id=1080179298]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="HeaderRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin/RowColumn"]
+[node name="HeaderRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin/RowColumn" unique_id=413456904]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="NameLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin/RowColumn/HeaderRow"]
+[node name="NameLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin/RowColumn/HeaderRow" unique_id=201623122]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "传法院"
 
-[node name="CountLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin/RowColumn/HeaderRow"]
+[node name="CountLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin/RowColumn/HeaderRow" unique_id=1174089061]
 layout_mode = 2
 text = "×0"
 
-[node name="TagLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin/RowColumn/HeaderRow"]
+[node name="TagLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin/RowColumn/HeaderRow" unique_id=30893798]
 layout_mode = 2
 text = "推荐"
 
-[node name="EffectLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin/RowColumn"]
+[node name="EffectLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin/RowColumn" unique_id=782916853]
 layout_mode = 2
-text = "符箓容量 +10\n天机容量 +10"
+text = "符箓容量 +10
+天机容量 +10"
 autowrap_mode = 3
 
-[node name="RequirementLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin/RowColumn"]
+[node name="RequirementLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin/RowColumn" unique_id=1927486239]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.403922, 0.352941, 0.301961, 0.92)
 theme_override_font_sizes/font_size = 12
 text = "前置：坊位与灵气待判定"
 autowrap_mode = 3
 
-[node name="ActionRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin/RowColumn"]
+[node name="ActionRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin/RowColumn" unique_id=890983778]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="CostLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin/RowColumn/ActionRow"]
+[node name="CostLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin/RowColumn/ActionRow" unique_id=1566802422]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "木16 / 石22 / 灵石22"
 autowrap_mode = 3
 
-[node name="DetailButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin/RowColumn/ActionRow"]
+[node name="DetailButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin/RowColumn/ActionRow" unique_id=1239242867]
 custom_minimum_size = Vector2(60, 28)
 layout_mode = 2
 text = "详情"
 
-[node name="BuildButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin/RowColumn/ActionRow"]
+[node name="BuildButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowResearch/RowMargin/RowColumn/ActionRow" unique_id=1363783036]
 custom_minimum_size = Vector2(72, 28)
 layout_mode = 2
 text = "建造"
 
-[node name="RowTrade" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows"]
+[node name="RowTrade" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows" unique_id=2140617046]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="RowMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade"]
+[node name="RowMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade" unique_id=1480649677]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 8
 
-[node name="RowColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin"]
+[node name="RowColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin" unique_id=1597913636]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="HeaderRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin/RowColumn"]
+[node name="HeaderRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin/RowColumn" unique_id=619842252]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="NameLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin/RowColumn/HeaderRow"]
+[node name="NameLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin/RowColumn/HeaderRow" unique_id=1528005861]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "总坊"
 
-[node name="CountLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin/RowColumn/HeaderRow"]
+[node name="CountLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin/RowColumn/HeaderRow" unique_id=766431270]
 layout_mode = 2
 text = "×0"
 
-[node name="TagLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin/RowColumn/HeaderRow"]
+[node name="TagLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin/RowColumn/HeaderRow" unique_id=816493538]
 layout_mode = 2
 text = "推荐"
 
-[node name="EffectLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin/RowColumn"]
+[node name="EffectLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin/RowColumn" unique_id=469368303]
 layout_mode = 2
-text = "灵兽容量 +8\n傀儡容量 +14"
+text = "灵兽容量 +8
+傀儡容量 +14"
 autowrap_mode = 3
 
-[node name="RequirementLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin/RowColumn"]
+[node name="RequirementLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin/RowColumn" unique_id=706473576]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.403922, 0.352941, 0.301961, 0.92)
 theme_override_font_sizes/font_size = 12
 text = "前置：坊位与灵气待判定"
 autowrap_mode = 3
 
-[node name="ActionRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin/RowColumn"]
+[node name="ActionRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin/RowColumn" unique_id=1383338735]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="CostLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin/RowColumn/ActionRow"]
+[node name="CostLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin/RowColumn/ActionRow" unique_id=2105020335]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "木18 / 石14 / 灵石24"
 autowrap_mode = 3
 
-[node name="DetailButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin/RowColumn/ActionRow"]
+[node name="DetailButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin/RowColumn/ActionRow" unique_id=1889135423]
 custom_minimum_size = Vector2(60, 28)
 layout_mode = 2
 text = "详情"
 
-[node name="BuildButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin/RowColumn/ActionRow"]
+[node name="BuildButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowTrade/RowMargin/RowColumn/ActionRow" unique_id=1121063545]
 custom_minimum_size = Vector2(72, 28)
 layout_mode = 2
 text = "建造"
 
-[node name="GroupGovernance" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows"]
+[node name="GroupGovernance" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows" unique_id=1801150783]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.403922, 0.352941, 0.301961, 0.9)
 theme_override_font_sizes/font_size = 12
 text = "治务中枢"
 
-[node name="RowAdministration" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows"]
+[node name="RowAdministration" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows" unique_id=428279871]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="RowMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration"]
+[node name="RowMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration" unique_id=1240460759]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 8
 
-[node name="RowColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin"]
+[node name="RowColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin" unique_id=1474969404]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="HeaderRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin/RowColumn"]
+[node name="HeaderRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin/RowColumn" unique_id=214217444]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="NameLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin/RowColumn/HeaderRow"]
+[node name="NameLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin/RowColumn/HeaderRow" unique_id=595103994]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "庶务殿"
 
-[node name="CountLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin/RowColumn/HeaderRow"]
+[node name="CountLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin/RowColumn/HeaderRow" unique_id=1110482897]
 layout_mode = 2
 text = "×0"
 
-[node name="TagLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin/RowColumn/HeaderRow"]
+[node name="TagLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin/RowColumn/HeaderRow" unique_id=995397033]
 layout_mode = 2
 text = "推荐"
 
-[node name="EffectLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin/RowColumn"]
+[node name="EffectLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin/RowColumn" unique_id=712275977]
 layout_mode = 2
-text = "炼丹容量 +8\n阵法容量 +6\n仓储上限 +45"
+text = "炼丹容量 +8
+阵法容量 +6
+仓储上限 +45"
 autowrap_mode = 3
 
-[node name="RequirementLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin/RowColumn"]
+[node name="RequirementLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin/RowColumn" unique_id=1747483438]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.403922, 0.352941, 0.301961, 0.92)
 theme_override_font_sizes/font_size = 12
 text = "前置：坊位与灵气待判定"
 autowrap_mode = 3
 
-[node name="ActionRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin/RowColumn"]
+[node name="ActionRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin/RowColumn" unique_id=1673871072]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="CostLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin/RowColumn/ActionRow"]
+[node name="CostLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin/RowColumn/ActionRow" unique_id=1401307492]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "木20 / 石20 / 灵石20"
 autowrap_mode = 3
 
-[node name="DetailButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin/RowColumn/ActionRow"]
+[node name="DetailButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin/RowColumn/ActionRow" unique_id=1454751604]
 custom_minimum_size = Vector2(60, 28)
 layout_mode = 2
 text = "详情"
 
-[node name="BuildButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin/RowColumn/ActionRow"]
+[node name="BuildButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/BuildingListCard/CardMargin/ListColumn/BuildingListScroll/BuildingRows/RowAdministration/RowMargin/RowColumn/ActionRow" unique_id=2108366052]
 custom_minimum_size = Vector2(72, 28)
 layout_mode = 2
 text = "建造"
 
-[node name="DetailCard" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow"]
+[node name="DetailCard" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow" unique_id=1024646304]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="CardMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailCard"]
+[node name="CardMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailCard" unique_id=616933507]
 layout_mode = 2
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 12
 
-[node name="DetailColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailCard/CardMargin"]
+[node name="DetailColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailCard/CardMargin" unique_id=974218149]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 8
 
-[node name="DetailTitle" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailCard/CardMargin/DetailColumn"]
+[node name="DetailTitle" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailCard/CardMargin/DetailColumn" unique_id=160132048]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "建筑详览"
 
-[node name="DetailEffect" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailCard/CardMargin/DetailColumn"]
+[node name="DetailEffect" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailCard/CardMargin/DetailColumn" unique_id=1678620037]
 layout_mode = 2
 text = "建筑效果将在此展示。"
 autowrap_mode = 3
 
-[node name="DetailCost" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailCard/CardMargin/DetailColumn"]
+[node name="DetailCost" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailCard/CardMargin/DetailColumn" unique_id=917420948]
 layout_mode = 2
 text = "建造消耗：—"
 autowrap_mode = 3
 
-[node name="DetailHint" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailCard/CardMargin/DetailColumn"]
+[node name="DetailHint" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailCard/CardMargin/DetailColumn" unique_id=1557935207]
 layout_mode = 2
 text = "建筑选择影响坊位协同与产出节奏。"
 autowrap_mode = 3
 
-[node name="QueueCard" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow"]
+[node name="QueueCard" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow" unique_id=484602030]
 layout_mode = 2
 size_flags_horizontal = 2
 size_flags_vertical = 3
 
-[node name="CardMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/QueueCard"]
+[node name="CardMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/QueueCard" unique_id=1514837379]
 layout_mode = 2
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 12
 
-[node name="QueueColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/QueueCard/CardMargin"]
+[node name="QueueColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/QueueCard/CardMargin" unique_id=414251892]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="QueueTitle" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/QueueCard/CardMargin/QueueColumn"]
+[node name="QueueTitle" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/QueueCard/CardMargin/QueueColumn" unique_id=1068407100]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "营建队列"
 
-[node name="QueueHint" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/QueueCard/CardMargin/QueueColumn"]
+[node name="QueueHint" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/QueueCard/CardMargin/QueueColumn" unique_id=206854556]
 layout_mode = 2
-text = "队列与时辰进度将在后续接入。当前点击“建造”将立即执行落点。"
+text = "营建会进入队列并在时辰结算推进，完工后自动落点到山门图。"
 autowrap_mode = 3
+
+[node name="QueueStatusLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/QueueCard/CardMargin/QueueColumn" unique_id=1675407813]
+layout_mode = 2
+text = "队列空置"
+autowrap_mode = 3
+
+[node name="QueueProgressBar" type="ProgressBar" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/QueueCard/CardMargin/QueueColumn" unique_id=830167877]
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+
+[node name="QueuePendingLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/QueueCard/CardMargin/QueueColumn" unique_id=1247665509]
+layout_mode = 2
+text = "排队：--"
+autowrap_mode = 3
+
+[node name="QueueActionRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/QueueCard/CardMargin/QueueColumn" unique_id=603481287]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CancelCurrentButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/QueueCard/CardMargin/QueueColumn/QueueActionRow" unique_id=1173891589]
+custom_minimum_size = Vector2(72, 28)
+layout_mode = 2
+text = "停工"
+
+[node name="CancelPendingButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/QueueCard/CardMargin/QueueColumn/QueueActionRow" unique_id=1299290728]
+custom_minimum_size = Vector2(90, 28)
+layout_mode = 2
+text = "撤销排队"

@@ -38,67 +38,76 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.101961, 0.0862745, 0.0745098, 0.9)
 
-[node name="CenterLayer" type="CenterContainer" parent="." unique_id=2019955571]
+[node name="CenterLayer" type="MarginContainer" parent="." unique_id=2019955571]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 20
 
-[node name="DecorLayer" type="Control" parent="CenterLayer" unique_id=842689102]
-custom_minimum_size = Vector2(968, 640)
+[node name="DecorLayer" type="VBoxContainer" parent="CenterLayer" unique_id=842689102]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 0
 
 [node name="TopTrim" type="ColorRect" parent="CenterLayer/DecorLayer" unique_id=1934959294]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 12.0
-offset_right = 958.0
-offset_bottom = 22.0
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.831373, 0.686275, 0.215686, 1)
+
+[node name="RollerRow" type="HBoxContainer" parent="CenterLayer/DecorLayer" unique_id=1256291387]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 0
+
+[node name="LeftRoller" type="PanelContainer" parent="CenterLayer/DecorLayer/RollerRow" unique_id=945657257]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LeftTopCap" type="ColorRect" parent="CenterLayer/DecorLayer/RollerRow/LeftRoller" unique_id=129691109]
+layout_mode = 2
+color = Color(0.831373, 0.686275, 0.215686, 1)
+
+[node name="LeftBottomCap" type="ColorRect" parent="CenterLayer/DecorLayer/RollerRow/LeftRoller" unique_id=127533338]
+layout_mode = 2
+color = Color(0.831373, 0.686275, 0.215686, 1)
+
+[node name="RollerSpacer" type="Control" parent="CenterLayer/DecorLayer/RollerRow" unique_id=650194878]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RightRoller" type="PanelContainer" parent="CenterLayer/DecorLayer/RollerRow" unique_id=1096216985]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="RightTopCap" type="ColorRect" parent="CenterLayer/DecorLayer/RollerRow/RightRoller" unique_id=2092096616]
+layout_mode = 2
+color = Color(0.831373, 0.686275, 0.215686, 1)
+
+[node name="RightBottomCap" type="ColorRect" parent="CenterLayer/DecorLayer/RollerRow/RightRoller" unique_id=1066150745]
+layout_mode = 2
 color = Color(0.831373, 0.686275, 0.215686, 1)
 
 [node name="BottomTrim" type="ColorRect" parent="CenterLayer/DecorLayer" unique_id=1831908954]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 618.0
-offset_right = 958.0
-offset_bottom = 628.0
-color = Color(0.831373, 0.686275, 0.215686, 1)
-
-[node name="LeftRoller" type="PanelContainer" parent="CenterLayer/DecorLayer" unique_id=945657257]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 24.0
-offset_right = 34.0
-offset_bottom = 616.0
-
-[node name="LeftTopCap" type="ColorRect" parent="CenterLayer/DecorLayer/LeftRoller" unique_id=129691109]
+custom_minimum_size = Vector2(0, 8)
 layout_mode = 2
-color = Color(0.831373, 0.686275, 0.215686, 1)
-
-[node name="LeftBottomCap" type="ColorRect" parent="CenterLayer/DecorLayer/LeftRoller" unique_id=127533338]
-layout_mode = 2
-color = Color(0.831373, 0.686275, 0.215686, 1)
-
-[node name="RightRoller" type="PanelContainer" parent="CenterLayer/DecorLayer" unique_id=1096216985]
-layout_mode = 0
-offset_left = 934.0
-offset_top = 24.0
-offset_right = 958.0
-offset_bottom = 616.0
-
-[node name="RightTopCap" type="ColorRect" parent="CenterLayer/DecorLayer/RightRoller" unique_id=2092096616]
-layout_mode = 2
-color = Color(0.831373, 0.686275, 0.215686, 1)
-
-[node name="RightBottomCap" type="ColorRect" parent="CenterLayer/DecorLayer/RightRoller" unique_id=1066150745]
-layout_mode = 2
+size_flags_horizontal = 3
 color = Color(0.831373, 0.686275, 0.215686, 1)
 
 [node name="Dialog" type="PanelContainer" parent="CenterLayer" unique_id=1117033655]
-custom_minimum_size = Vector2(920, 592)
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_dialog")
 
 [node name="Margin" type="MarginContainer" parent="CenterLayer/Dialog" unique_id=1101452923]

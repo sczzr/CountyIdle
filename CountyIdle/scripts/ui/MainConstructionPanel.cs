@@ -23,6 +23,8 @@ public partial class Main
 
         _constructionPanel = panelScene.Instantiate<ConstructionPanel>();
         _constructionPanel.BuildRequested += OnConstructionBuildRequested;
+        _constructionPanel.CancelCurrentRequested += OnConstructionCancelCurrentRequested;
+        _constructionPanel.CancelPendingRequested += OnConstructionCancelPendingRequested;
         _constructionPanel.Opened += OnConstructionPanelOpened;
         _constructionPanel.Closed += OnConstructionPanelClosed;
         AddChild(_constructionPanel);
@@ -99,6 +101,16 @@ public partial class Main
         BuildIndustryBuildingWithPlacement(buildingType);
     }
 
+    private void OnConstructionCancelCurrentRequested()
+    {
+        _gameLoop?.CancelCurrentConstruction();
+    }
+
+    private void OnConstructionCancelPendingRequested()
+    {
+        _gameLoop?.CancelPendingConstruction();
+    }
+
     private void OnConstructionPanelOpened()
     {
         SetConstructionPanelButtonState(true);
@@ -123,6 +135,8 @@ public partial class Main
         }
 
         _constructionPanel.BuildRequested -= OnConstructionBuildRequested;
+        _constructionPanel.CancelCurrentRequested -= OnConstructionCancelCurrentRequested;
+        _constructionPanel.CancelPendingRequested -= OnConstructionCancelPendingRequested;
         _constructionPanel.Opened -= OnConstructionPanelOpened;
         _constructionPanel.Closed -= OnConstructionPanelClosed;
     }

@@ -40,12 +40,17 @@ public sealed class DiscipleDirectiveSystem
         }
 
         DiscipleDirectiveRules.SetDirective(state, discipleId, directiveType);
+        var dutyAffinitySummary = DiscipleCultivationRules.BuildDutyAffinitySummary(state, profile);
+        var specializationEffectSummary = DiscipleCultivationRules.BuildSpecializationEffectLogSummary(state, profile.Id);
+        var specializationEffectSuffix = string.IsNullOrWhiteSpace(specializationEffectSummary)
+            ? string.Empty
+            : $" {specializationEffectSummary}。";
         log = directiveType switch
         {
             DiscipleDirectiveType.OuterMissionCandidate =>
-                $"已将“{profile.Name}”纳入外务候补：后续历练将优先吸纳其战力与执行表现。",
+                $"已将“{profile.Name}”纳入外务候补：后续历练将优先吸纳其战力与执行表现。当前差事相性：{dutyAffinitySummary}。{specializationEffectSuffix}",
             DiscipleDirectiveType.StewardCandidate =>
-                $"已将“{profile.Name}”纳入执事培养：当前内务执行效率约 +{(DiscipleDirectiveRules.GetStewardExecutionModifier(state) - 1.0) * 100.0:0.#}%，贡献回流约 +{(DiscipleDirectiveRules.GetStewardContributionModifier(state) - 1.0) * 100.0:0.#}%。",
+                $"已将“{profile.Name}”纳入执事培养：当前内务执行效率约 +{(DiscipleDirectiveRules.GetStewardExecutionModifier(state) - 1.0) * 100.0:0.#}%，贡献回流约 +{(DiscipleDirectiveRules.GetStewardContributionModifier(state) - 1.0) * 100.0:0.#}%。当前差事相性：{dutyAffinitySummary}。{specializationEffectSuffix}",
             _ =>
                 $"已将“{profile.Name}”恢复为常制观察，不再额外纳入外务/执事重点名册。"
         };

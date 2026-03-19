@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>浮云宗 · 命谱详情 (角色焦点页)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-base: #040605; --panel-bg: rgba(14, 18, 16, 0.7);
+      --gold-bright: #E4C04F; --gold-dim: #6B6244; 
+      --text-main: #E8EBE9; --text-dim: #8E9894; 
+      --yield-cyan: #3FD9A8; --danger-red: #D94838;
+    }
+    body { font-family: 'Noto Serif SC', serif; background-color: var(--bg-base); color: var(--text-main); user-select: none; overflow: hidden; }
+    .font-title { font-family: 'Ma Shan Zheng', cursive; }
+
+    /* 背景与环境光 */
+    .bg-hex-grid {
+      position: absolute; inset: 0; z-index: 0; opacity: 0.05;
+      background-image: url("data:image/svg+xml,%3Csvg width='80' height='138.564' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M40 138.564L0 115.47L0 69.282L40 46.188L80 69.282L80 115.47Z' fill='none' stroke='%233FD9A8' stroke-width='1'/%3E%3C/svg%3E");
+    }
+    .ambient-glow {
+      position: absolute; top: 20%; left: 30%; width: 50vh; height: 50vh;
+      background: radial-gradient(circle, rgba(228,192,79,0.05) 0%, transparent 70%);
+      filter: blur(40px); z-index: 0;
+    }
+
+    /* 玻璃质感大面板 */
+    .panel-glass {
+      background: var(--panel-bg); backdrop-filter: blur(20px);
+      border: 1px solid rgba(107, 98, 68, 0.25);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.03);
+    }
+
+    /* 头像阵眼 */
+    .avatar-core {
+      position: relative; background: radial-gradient(circle, #F4F5F0 0%, #A0A6A3 70%);
+      box-shadow: 0 0 50px rgba(228, 192, 79, 0.1), inset 0 0 40px rgba(0,0,0,0.9); color: #040605; 
+    }
+    .avatar-core::after {
+      content: ''; position: absolute; inset: -14px; border: 1.5px dashed var(--gold-bright);
+      border-radius: 50%; animation: rotateRing 40s linear infinite; opacity: 0.6;
+    }
+    @keyframes rotateRing { 100% { transform: rotate(360deg); } }
+
+    /* 切角标签 Tag */
+    .tag-poly {
+      clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(107, 98, 68, 0.4);
+    }
+
+    /* 九宫格属性块 */
+    .stat-block {
+      background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.03);
+      border-bottom: 2px solid rgba(107, 98, 68, 0.3); transition: all 0.2s;
+    }
+    .stat-block:hover { background: rgba(228, 192, 79, 0.05); border-bottom-color: var(--gold-bright); transform: translateY(-2px); }
+
+    /* 发光灵力条 */
+    .bar-bg { background: rgba(0,0,0,0.8); height: 10px; width: 100%; border-radius: 5px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
+    .bar-fill-realm { background: linear-gradient(90deg, #6B6244, #E4C04F); height: 100%; box-shadow: 0 0 15px rgba(228, 192, 79, 0.6); position: relative; }
+    .bar-fill-realm::after { content:''; position: absolute; top:0; right:0; bottom:0; width: 20px; background: linear-gradient(90deg, transparent, #FFF); opacity: 0.8; }
+    .bar-fill-qi { background: linear-gradient(90deg, #1A4D43, #3FD9A8); height: 100%; box-shadow: 0 0 15px rgba(63, 217, 168, 0.6); position: relative; }
+    .bar-fill-qi::after { content:''; position: absolute; top:0; right:0; bottom:0; width: 20px; background: linear-gradient(90deg, transparent, #FFF); opacity: 0.8; }
+
+    /* 敕令玉简按键 */
+    .btn-action {
+      background: linear-gradient(180deg, rgba(30,35,33,0.8) 0%, rgba(15,18,17,0.9) 100%);
+      border: 1px solid var(--gold-dim); border-radius: 4px; color: var(--text-dim);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.05);
+      transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    .btn-action:hover { border-color: var(--gold-bright); color: var(--gold-bright); box-shadow: 0 10px 20px rgba(0,0,0,0.8), inset 0 0 15px rgba(228,192,79,0.1); transform: translateY(-2px); }
+    .btn-action.active {
+      background: linear-gradient(180deg, rgba(107,98,68,0.3) 0%, rgba(20,24,22,0.9) 100%);
+      border: 1.5px solid var(--gold-bright); color: var(--gold-bright);
+      box-shadow: 0 0 20px rgba(228,192,79,0.2), inset 0 0 10px rgba(228,192,79,0.1);
+    }
+
+    /* 终端打印感 */
+    .log-terminal { background: #020303; border: 1px solid rgba(107, 98, 68, 0.2); box-shadow: inset 0 0 50px rgba(0,0,0,0.9); }
+  </style>
+</head>
+<body class="w-screen h-screen flex flex-col relative">
+  <!-- 说明：弟子谱双页拆分的 HTML 原型，仅用于视觉对齐与结构验证。 -->
+  <div class="bg-hex-grid"></div>
+  <div class="ambient-glow"></div>
+
+  <!-- 悬浮的返回按钮 -->
+  <a href="sect_tree.html" class="absolute top-8 left-10 z-50 flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity cursor-pointer group">
+    <div class="w-10 h-10 border border-[--gold-dim] rounded-full flex items-center justify-center text-[--gold-bright] group-hover:bg-[--gold-bright] group-hover:text-black transition-colors">◀</div>
+    <span class="text-[14px] font-bold tracking-widest text-[--text-main]">宗门大谱</span>
+  </a>
+
+  <!-- 主容器 (居中宽屏设计) -->
+  <main class="w-full h-full max-w-[1600px] mx-auto px-12 pt-28 pb-10 flex flex-col gap-8 relative z-30">
+    
+    <!-- 上半部分：三栏布局 (左30% 中40% 右30%) -->
+    <div class="flex-1 flex gap-8 min-h-0">
+      
+      <!-- 【左栏：角色核心状态】 -->
+      <section class="w-[32%] panel-glass rounded-xl flex flex-col items-center p-10 relative">
+        <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-transparent via-[--gold-dim] to-transparent opacity-50"></div>
+        
+        <!-- 巨大阵眼 -->
+        <div class="w-40 h-40 rounded-full avatar-core flex items-center justify-center font-title text-7xl mt-4">
+          宁
+        </div>
+        
+        <!-- 红色危机印记 -->
+        <div class="mt-8 border border-[--danger-red] bg-[rgba(217,72,56,0.15)] text-[--danger-red] px-5 py-1.5 text-[14px] font-bold tracking-[0.3em] rounded-sm shadow-[0_0_20px_rgba(217,72,56,0.3)] transform rotate-[-2deg]">
+          五行未明 · 四灵根
+        </div>
+
+        <h2 class="text-4xl font-title text-[--text-main] mt-6 tracking-[0.2em] drop-shadow-md">宁照宁</h2>
+        
+        <!-- 基础身份 Tags -->
+        <div class="flex flex-wrap justify-center gap-2.5 mt-6 w-full px-4">
+          <div class="tag-poly px-5 py-1.5 text-[13px] text-[--gold-bright] font-bold bg-[rgba(228,192,79,0.05)] border-[--gold-dim]">骨龄 29 · 盛年期</div>
+          <div class="tag-poly px-5 py-1.5 text-[13px] text-[--text-main]">庶务殿 · 外门轮值司</div>
+          <div class="tag-poly px-5 py-1.5 text-[13px] text-[--text-dim]">差事: 点卯整队</div>
+          <div class="tag-poly px-5 py-1.5 text-[13px] text-[--text-dim]">居所: 外门居舍</div>
+        </div>
+
+        <div class="mt-auto w-full p-4 bg-[rgba(0,0,0,0.6)] border border-[rgba(255,255,255,0.05)] rounded-md text-[13px] text-[--text-dim] leading-relaxed shadow-inner">
+          <span class="text-[--text-main] font-bold">功法路数：</span>待定功法 · 待定技艺<br>
+          <span class="text-[--gold-bright]">专精映照：功法技艺专精尚待映照。</span>
+        </div>
+      </section>
+
+      <!-- 【中栏：雷达图与六维属性】 -->
+      <section class="w-[38%] panel-glass rounded-xl p-8 flex flex-col items-center relative">
+        <h3 class="absolute top-6 left-8 text-[12px] font-bold text-[--gold-bright] tracking-widest uppercase">先天根基评估</h3>
+        
+        <!-- 巨型手绘 SVG 科幻雷达图 -->
+        <div class="w-[280px] h-[280px] relative mt-10 mb-6 flex items-center justify-center">
+          <svg width="260" height="260" viewBox="0 0 200 200">
+            <!-- 底纹罗盘网格 -->
+            <polygon points="100,20 170,60 170,140 100,180 30,140 30,60" fill="rgba(255,255,255,0.01)" stroke="rgba(107,98,68,0.4)" stroke-width="1.5"/>
+            <polygon points="100,45 145,70 145,130 100,155 55,130 55,70" fill="none" stroke="rgba(107,98,68,0.2)" stroke-width="1" stroke-dasharray="3,3"/>
+            <!-- 轴线 -->
+            <line x1="100" y1="100" x2="100" y2="20" stroke="rgba(107,98,68,0.3)" stroke-width="1"/>
+            <line x1="100" y1="100" x2="170" y2="60" stroke="rgba(107,98,68,0.3)" stroke-width="1"/>
+            <line x1="100" y1="100" x2="170" y2="140" stroke="rgba(107,98,68,0.3)" stroke-width="1"/>
+            <line x1="100" y1="100" x2="100" y2="180" stroke="rgba(107,98,68,0.3)" stroke-width="1"/>
+            <line x1="100" y1="100" x2="30" y2="140" stroke="rgba(107,98,68,0.3)" stroke-width="1"/>
+            <line x1="100" y1="100" x2="30" y2="60" stroke="rgba(107,98,68,0.3)" stroke-width="1"/>
+            <!-- 实际数值面 (神魂与根骨极高) -->
+            <polygon points="100,70 140,80 165,125 100,140 30,90 60,70" fill="rgba(63,217,168,0.2)" stroke="#3FD9A8" stroke-width="2"/>
+            <!-- 发光锚点 -->
+            <circle cx="100" cy="70" r="4" fill="#3FD9A8" filter="drop-shadow(0 0 4px #3FD9A8)"/><circle cx="140" cy="80" r="4" fill="#3FD9A8"/>
+            <circle cx="165" cy="125" r="5" fill="#E4C04F" filter="drop-shadow(0 0 6px #E4C04F)"/><circle cx="100" cy="140" r="4" fill="#3FD9A8"/>
+            <circle cx="30" cy="90" r="5" fill="#D94838" filter="drop-shadow(0 0 6px #D94838)"/><circle cx="60" cy="70" r="4" fill="#3FD9A8"/>
+          </svg>
+          <!-- 外围文本 -->
+          <span class="absolute top-0 text-[12px] text-[--text-dim]">悟性</span>
+          <span class="absolute right-0 top-[60px] text-[12px] text-[--text-dim]">潜力</span>
+          <span class="absolute right-0 bottom-[60px] text-[13px] font-bold text-[--gold-bright] drop-shadow-[0_0_5px_rgba(228,192,79,0.8)]">根骨</span>
+          <span class="absolute bottom-0 text-[12px] text-[--text-dim]">心境</span>
+          <span class="absolute left-0 bottom-[60px] text-[13px] font-bold text-[--danger-red] drop-shadow-[0_0_5px_rgba(217,72,56,0.8)]">神魂</span>
+          <span class="absolute left-0 top-[60px] text-[12px] text-[--text-dim]">匠艺</span>
+        </div>
+
+        <!-- 3x3 属性网格区 -->
+        <div class="w-full grid grid-cols-3 gap-3">
+          <div class="stat-block flex flex-col items-center justify-center py-3 rounded-sm">
+            <span class="text-[11px] text-[--text-dim] mb-1">悟性</span><span class="text-[18px] font-bold text-[--text-main]">44</span>
+          </div>
+          <div class="stat-block flex flex-col items-center justify-center py-3 rounded-sm">
+            <span class="text-[11px] text-[--text-dim] mb-1">潜力</span><span class="text-[18px] font-bold text-[--yield-cyan]">54</span>
+          </div>
+          <div class="stat-block flex flex-col items-center justify-center py-3 rounded-sm relative overflow-hidden border-b-[--danger-red]">
+            <div class="absolute inset-0 bg-gradient-to-t from-[rgba(217,72,56,0.15)] to-transparent pointer-events-none"></div>
+            <span class="text-[11px] text-[--text-dim] mb-1 z-10">根骨</span><span class="text-[20px] font-bold text-[--danger-red] drop-shadow-[0_0_5px_rgba(217,72,56,0.8)] z-10">86</span>
+          </div>
+          <div class="stat-block flex flex-col items-center justify-center py-3 rounded-sm">
+            <span class="text-[11px] text-[--text-dim] mb-1">匠艺</span><span class="text-[18px] font-bold text-[--text-main]">40</span>
+          </div>
+          <div class="stat-block flex flex-col items-center justify-center py-3 rounded-sm relative overflow-hidden border-b-[--gold-bright]">
+            <div class="absolute inset-0 bg-gradient-to-t from-[rgba(228,192,79,0.15)] to-transparent pointer-events-none"></div>
+            <span class="text-[11px] text-[--text-dim] mb-1 z-10">神魂</span><span class="text-[20px] font-bold text-[--gold-bright] drop-shadow-[0_0_5px_rgba(228,192,79,0.8)] z-10">100</span>
+          </div>
+          <div class="stat-block flex flex-col items-center justify-center py-3 rounded-sm">
+            <span class="text-[11px] text-[--text-dim] mb-1">心境</span><span class="text-[18px] font-bold text-[--yield-cyan]">79</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 【右栏：修为造化与敕令操作】 -->
+      <section class="w-[30%] panel-glass rounded-xl p-8 flex flex-col relative">
+        <h3 class="absolute top-6 left-8 text-[12px] font-bold text-[--gold-bright] tracking-widest uppercase">造化与敕令</h3>
+        
+        <div class="mt-12 space-y-8 flex-1">
+          <!-- 发光境界条 -->
+          <div>
+            <div class="flex justify-between items-end mb-2">
+              <span class="text-[14px] font-bold text-[--text-main] tracking-widest">炼气六层</span>
+              <span class="text-[11px] text-[--gold-bright]">进度：五成二分</span>
+            </div>
+            <div class="bar-bg"><div class="bar-fill-realm" style="width: 52%;"></div></div>
+          </div>
+
+          <!-- 发光气海条 -->
+          <div>
+            <div class="flex justify-between items-end mb-2">
+              <span class="text-[14px] font-bold text-[--text-main] tracking-widest">灵力储备</span>
+              <span class="text-[11px] text-[--yield-cyan]">气海：七成一分</span>
+            </div>
+            <div class="bar-bg"><div class="bar-fill-qi" style="width: 71%;"></div></div>
+          </div>
+
+          <!-- 战力评级警告 -->
+          <div class="bg-[rgba(217,72,56,0.05)] border border-[--danger-red] p-5 text-center shadow-[inset_0_0_30px_rgba(217,72,56,0.1)] rounded-md relative overflow-hidden">
+            <div class="absolute -right-4 -top-4 text-6xl opacity-10 font-title text-[--danger-red]">危</div>
+            <span class="text-[11px] text-[--danger-red] opacity-80 block mb-1 uppercase tracking-widest">综合战力评定</span>
+            <h3 class="text-2xl font-bold text-[--danger-red] tracking-[0.2em] mb-1">待砺其锋</h3>
+            <p class="text-[11px] text-[--text-dim]">待符种临养中；火候尚浅，个体表现反哺未显。</p>
+          </div>
+
+          <!-- 敕令操作玉简按钮区 -->
+          <div class="mt-auto pt-4 border-t border-[rgba(255,255,255,0.05)]">
+            <span class="text-[11px] text-[--text-dim] block mb-3 font-bold tracking-widest">落子指派 (当前: 常制观察)</span>
+            <div class="grid grid-cols-2 gap-3">
+              <button class="btn-action active py-3 text-[14px] font-bold tracking-widest">常制观察</button>
+              <button class="btn-action py-3 text-[14px] font-bold tracking-widest">纳入外务</button>
+              <button class="btn-action py-3 text-[14px] font-bold tracking-widest">执事培养</button>
+              <button class="btn-action py-3 text-[14px] font-bold tracking-widest text-[--gold-dim] hover:text-[--gold-bright]">送入修炼卷</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- 下半部分：终端推演日志 (横跨全宽) -->
+    <section class="h-[140px] shrink-0 log-terminal rounded-xl p-6 flex flex-col relative">
+      <div class="flex items-center gap-3 mb-3 border-b border-[rgba(255,255,255,0.05)] pb-3">
+        <div class="w-3 h-3 bg-[--yield-cyan] rounded-full animate-pulse shadow-[0_0_10px_rgba(63,217,168,0.8)]"></div>
+        <span class="text-[14px] font-bold text-[--text-main] tracking-widest">衍天推演终端</span>
+        <span class="text-[10px] text-[--text-dim] ml-auto">System.Log.Xianxia // 正在推演命理交织...</span>
+      </div>
+      
+      <div class="text-[13.5px] text-[--text-dim] leading-[1.8] font-serif overflow-y-auto pr-4 flex-1">
+        观其气机，轮值灵活，骨相与心识相济。现下以<span class="text-[--text-main]">“点卯整队”</span>为主线，修炼卷记为<span class="text-[--text-main]">“常制隐修，兼修 执行·贡献”</span>。<br>
+        其长期积累为“根基 未起 · 功法 未起 · 技艺 未起 · 静修 未起”。专精路数尚浅，当前仍以常制行为主。<br>
+        近时又记“近时尚无修炼记载”。当前整体状态平稳，可按既定方略继续历练。若能继续借 庶务殿 外门轮值司 之务磨砺，则在 <span class="text-[--gold-bright] font-bold">炼气六层</span> 上尚可再进一步。
+      </div>
+    </section>
+
+  </main>
+</body>
+</html>

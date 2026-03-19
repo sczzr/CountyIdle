@@ -1,24 +1,74 @@
-[gd_resource type="TileSet" format=3 uid="uid://d4cbccy7t2b2w"]
+[gd_resource type="TileSet" format=3 uid="uid://b6mvkox362r63"]
 
-[ext_resource type="Texture2D" uid="uid://bf6qswacsskuj" path="res://assets/ui/tilemap/L1_tilemap_c.png" id="3_75c0v"]
+[ext_resource type="Texture2D" uid="uid://c3pmwmf55c8y3" path="res://assets/ui/tilemap/hex_tundra.png" id="1_hex_tundra"]
+[ext_resource type="Texture2D" uid="uid://c3wxmjnch2erd" path="res://assets/ui/tilemap/hex_ocean.png" id="2_hex_ocean"]
+[ext_resource type="Texture2D" uid="uid://dcuaf15yk7kwo" path="res://assets/ui/tilemap/hex_forest.png" id="3_hex_forest"]
+[ext_resource type="Texture2D" uid="uid://3l6fujxokqnh" path="res://assets/ui/tilemap/hex_swamp.png" id="4_hex_swamp"]
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_gw6sw"]
-texture = ExtResource("3_75c0v")
-margins = Vector2i(86, 122)
-separation = Vector2i(44, 48)
-texture_region_size = Vector2i(612, 622)
+[sub_resource type="TileSetCustomDataLayer" id="TileSetCustomDataLayer_world_terrain"]
+name = "world_terrain_family"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_tundra"]
+texture = ExtResource("1_hex_tundra")
+margins = Vector2i(50, 40)
+separation = Vector2i(12, 100)
+texture_region_size = Vector2i(660, 660)
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/next_alternative_id = 3
+3:0/0 = 0
 0:1/0 = 0
-0:1/0/probability = 0.0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ocean"]
+texture = ExtResource("2_hex_ocean")
+margins = Vector2i(33, 40)
+separation = Vector2i(20, 120)
+texture_region_size = Vector2i(660, 660)
 0:0/0 = 0
 1:0/0 = 0
 2:0/0 = 0
 3:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_forest"]
+texture = ExtResource("3_hex_forest")
+margins = Vector2i(40, 50)
+separation = Vector2i(20, 120)
+texture_region_size = Vector2i(660, 660)
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_swamp"]
+texture = ExtResource("4_hex_swamp")
+margins = Vector2i(40, 50)
+separation = Vector2i(12, 80)
+texture_region_size = Vector2i(660, 660)
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+0:1/0 = 0
 1:1/0 = 0
 2:1/0 = 0
 3:1/0 = 0
 
 [resource]
 tile_shape = 3
-tile_size = Vector2i(568, 614)
-uv_clipping = true
-sources/0 = SubResource("TileSetAtlasSource_gw6sw")
+tile_size = Vector2i(660, 660)
+sources/0 = SubResource("TileSetAtlasSource_tundra")
+sources/1 = SubResource("TileSetAtlasSource_ocean")
+sources/2 = SubResource("TileSetAtlasSource_forest")
+sources/3 = SubResource("TileSetAtlasSource_swamp")

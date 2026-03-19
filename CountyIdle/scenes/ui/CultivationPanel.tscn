@@ -1,10 +1,10 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://hxm805kegxlq"]
 
-[ext_resource type="Script" path="res://scripts/ui/CultivationPanel.cs" id="1_cultivation"]
-[ext_resource type="Script" path="res://scripts/ui/gd/CultivationPanelVisualFx.gd" id="2_cultivation_fx"]
+[ext_resource type="Script" uid="uid://tt1uf30l78o8" path="res://scripts/ui/CultivationPanel.cs" id="1_cultivation"]
+[ext_resource type="Script" uid="uid://o3luamk7oqln" path="res://scripts/ui/gd/CultivationPanelVisualFx.gd" id="2_cultivation_fx"]
+[ext_resource type="Texture2D" uid="uid://c2bldbnt0q1yo" path="res://assets/ui/background/cultivation_hex_grid.svg" id="3_hex_grid"]
 
-[node name="CultivationPanel" type="Control"]
-visible = false
+[node name="CultivationPanel" type="Control" unique_id=1072524990]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -14,349 +14,1840 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_cultivation")
 
-[node name="VisualFx" type="Node" parent="."]
+[node name="VisualFx" type="Node" parent="." unique_id=425652322]
 script = ExtResource("2_cultivation_fx")
 
-[node name="Backdrop" type="ColorRect" parent="."]
+[node name="Backdrop" type="ColorRect" parent="." unique_id=788030812]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.101961, 0.0862745, 0.0745098, 0.9)
+color = Color(0.0509804, 0.0705882, 0.0666667, 0.96)
 
-[node name="CenterLayer" type="CenterContainer" parent="."]
+[node name="HexGrid" type="TextureRect" parent="." unique_id=1847584810]
+self_modulate = Color(1, 1, 1, 0.12)
+z_index = -90
+texture_repeat = 2
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_hex_grid")
+expand_mode = 1
+stretch_mode = 1
 
-[node name="DecorLayer" type="Control" parent="CenterLayer"]
-custom_minimum_size = Vector2(1000, 640)
+[node name="TopOverlay" type="Control" parent="." unique_id=1236755361]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TopMargin" type="MarginContainer" parent="TopOverlay" unique_id=1368188415]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+theme_override_constants/margin_left = 56
+theme_override_constants/margin_top = 28
+theme_override_constants/margin_right = 56
+
+[node name="TopRow" type="HBoxContainer" parent="TopOverlay/TopMargin" unique_id=1896968679]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="BackRow" type="HBoxContainer" parent="TopOverlay/TopMargin/TopRow" unique_id=1700723245]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="BackIconFrame" type="PanelContainer" parent="TopOverlay/TopMargin/TopRow/BackRow" unique_id=648304980]
+custom_minimum_size = Vector2(34, 34)
 layout_mode = 2
 
-[node name="TopTrim" type="ColorRect" parent="CenterLayer/DecorLayer"]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 12.0
-offset_right = 990.0
-offset_bottom = 22.0
-color = Color(0.831373, 0.686275, 0.215686, 1)
-
-[node name="BottomTrim" type="ColorRect" parent="CenterLayer/DecorLayer"]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 618.0
-offset_right = 990.0
-offset_bottom = 628.0
-color = Color(0.831373, 0.686275, 0.215686, 1)
-
-[node name="LeftRoller" type="PanelContainer" parent="CenterLayer/DecorLayer"]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 24.0
-offset_right = 34.0
-offset_bottom = 616.0
-
-[node name="LeftTopCap" type="ColorRect" parent="CenterLayer/DecorLayer/LeftRoller"]
+[node name="BackIconLabel" type="Label" parent="TopOverlay/TopMargin/TopRow/BackRow/BackIconFrame" unique_id=56930005]
 layout_mode = 2
-color = Color(0.831373, 0.686275, 0.215686, 1)
+text = "◀"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="LeftBottomCap" type="ColorRect" parent="CenterLayer/DecorLayer/LeftRoller"]
+[node name="BackTextLabel" type="Label" parent="TopOverlay/TopMargin/TopRow/BackRow" unique_id=381790906]
 layout_mode = 2
-color = Color(0.831373, 0.686275, 0.215686, 1)
+text = "返回卷外"
+vertical_alignment = 1
 
-[node name="RightRoller" type="PanelContainer" parent="CenterLayer/DecorLayer"]
-layout_mode = 0
-offset_left = 966.0
-offset_top = 24.0
-offset_right = 990.0
-offset_bottom = 616.0
-
-[node name="RightTopCap" type="ColorRect" parent="CenterLayer/DecorLayer/RightRoller"]
+[node name="TopSpacer" type="Control" parent="TopOverlay/TopMargin/TopRow" unique_id=564142791]
 layout_mode = 2
-color = Color(0.831373, 0.686275, 0.215686, 1)
+size_flags_horizontal = 3
 
-[node name="RightBottomCap" type="ColorRect" parent="CenterLayer/DecorLayer/RightRoller"]
+[node name="CloseButton" type="Button" parent="TopOverlay/TopMargin/TopRow" unique_id=541245927]
+custom_minimum_size = Vector2(44, 32)
 layout_mode = 2
-color = Color(0.831373, 0.686275, 0.215686, 1)
+text = "✕"
 
-[node name="Dialog" type="PanelContainer" parent="CenterLayer"]
-custom_minimum_size = Vector2(940, 592)
+[node name="ScreenMargin" type="MarginContainer" parent="." unique_id=148420166]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 56
+theme_override_constants/margin_top = 34
+theme_override_constants/margin_right = 56
+theme_override_constants/margin_bottom = 28
+
+[node name="ScreenRoot" type="ScrollContainer" parent="ScreenMargin" unique_id=1793102440]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 2
+
+[node name="RootColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot" unique_id=596556938]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 18
+
+[node name="TopBar" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn" unique_id=2077874926]
+visible = false
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TitleGroup" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/TopBar" unique_id=2035701833]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 14
+
+[node name="TitleSeal" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/TopBar/TitleGroup" unique_id=2074289964]
+custom_minimum_size = Vector2(52, 52)
 layout_mode = 2
 
-[node name="Margin" type="MarginContainer" parent="CenterLayer/Dialog"]
+[node name="SealLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/TopBar/TitleGroup/TitleSeal" unique_id=725192764]
+layout_mode = 2
+text = "衍"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TitleColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/TopBar/TitleGroup" unique_id=1429552081]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/TopBar/TitleGroup/TitleColumn" unique_id=73640237]
+layout_mode = 2
+text = "天衍峰 · 修炼卷"
+
+[node name="SubtitleLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/TopBar/TitleGroup/TitleColumn" unique_id=1797975897]
+layout_mode = 2
+text = "此卷统御门下弟子修行路数，敕令落下时，火候与职责都将回映于人。"
+autowrap_mode = 3
+
+[node name="SummaryRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/TopBar" unique_id=2118506298]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="PopulationCard" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/TopBar/SummaryRow" unique_id=28206407]
+custom_minimum_size = Vector2(112, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CardMargin" type="MarginContainer" parent="ScreenMargin/ScreenRoot/RootColumn/TopBar/SummaryRow/PopulationCard" unique_id=126384214]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="CardColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/TopBar/SummaryRow/PopulationCard/CardMargin" unique_id=952993395]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/TopBar/SummaryRow/PopulationCard/CardMargin/CardColumn" unique_id=2090393540]
+layout_mode = 2
+text = "门人总数"
+
+[node name="ValueLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/TopBar/SummaryRow/PopulationCard/CardMargin/CardColumn" unique_id=1107129790]
+layout_mode = 2
+text = "0 人"
+
+[node name="TechCard" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/TopBar/SummaryRow" unique_id=2015938714]
+custom_minimum_size = Vector2(112, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CardMargin" type="MarginContainer" parent="ScreenMargin/ScreenRoot/RootColumn/TopBar/SummaryRow/TechCard" unique_id=1515304445]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="CardColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/TopBar/SummaryRow/TechCard/CardMargin" unique_id=756506752]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/TopBar/SummaryRow/TechCard/CardMargin/CardColumn" unique_id=955829665]
+layout_mode = 2
+text = "研修层级"
+
+[node name="ValueLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/TopBar/SummaryRow/TechCard/CardMargin/CardColumn" unique_id=2112229795]
+layout_mode = 2
+text = "壹层  T1"
+
+[node name="ResourceCard" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/TopBar/SummaryRow" unique_id=685161542]
+custom_minimum_size = Vector2(144, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CardMargin" type="MarginContainer" parent="ScreenMargin/ScreenRoot/RootColumn/TopBar/SummaryRow/ResourceCard" unique_id=624629029]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="CardColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/TopBar/SummaryRow/ResourceCard/CardMargin" unique_id=602153493]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/TopBar/SummaryRow/ResourceCard/CardMargin/CardColumn" unique_id=1316529763]
+layout_mode = 2
+text = "当前资源"
+
+[node name="ValueLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/TopBar/SummaryRow/ResourceCard/CardMargin/CardColumn" unique_id=1348545177]
+layout_mode = 2
+text = "灵石 0
+贡献 0"
+
+[node name="RegisterCard" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/TopBar/SummaryRow" unique_id=795605248]
+custom_minimum_size = Vector2(132, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CardMargin" type="MarginContainer" parent="ScreenMargin/ScreenRoot/RootColumn/TopBar/SummaryRow/RegisterCard" unique_id=621256241]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="CardColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/TopBar/SummaryRow/RegisterCard/CardMargin" unique_id=1077367284]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/TopBar/SummaryRow/RegisterCard/CardMargin/CardColumn" unique_id=546542349]
+layout_mode = 2
+text = "当前修炼登记"
+
+[node name="ValueLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/TopBar/SummaryRow/RegisterCard/CardMargin/CardColumn" unique_id=2122372962]
+layout_mode = 2
+text = "技 0 · 法 0
+艺 0 · 坐 0"
+
+[node name="TopSpacer" type="Control" parent="ScreenMargin/ScreenRoot/RootColumn" unique_id=1336475749]
+custom_minimum_size = Vector2(0, 4)
+layout_mode = 2
+
+[node name="BodyRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn" unique_id=2116961599]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="LeftPanel" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow" unique_id=1952697918]
+custom_minimum_size = Vector2(356, 0)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LeftMargin" type="MarginContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel" unique_id=1131985995]
 layout_mode = 2
 theme_override_constants/margin_left = 24
 theme_override_constants/margin_top = 24
 theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 22
+theme_override_constants/margin_bottom = 24
 
-[node name="MainColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin"]
+[node name="LeftColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin" unique_id=332426858]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 14
+
+[node name="FocusBanner" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn" unique_id=851565223]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="FocusBannerLineLeft" type="ColorRect" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/FocusBanner" unique_id=859176395]
+custom_minimum_size = Vector2(32, 1)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FocusBannerLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/FocusBanner" unique_id=380601694]
+layout_mode = 2
+text = "当前阵眼"
+
+[node name="FocusBannerLineRight" type="ColorRect" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/FocusBanner" unique_id=1418067110]
+custom_minimum_size = Vector2(32, 1)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RosterPanel" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn" unique_id=20549769]
+visible = false
+custom_minimum_size = Vector2(0, 164)
+layout_mode = 2
+
+[node name="RosterMargin" type="MarginContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/RosterPanel" unique_id=1366276261]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="RosterColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/RosterPanel/RosterMargin" unique_id=1157386314]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="RosterTitleLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/RosterPanel/RosterMargin/RosterColumn" unique_id=1538527545]
+layout_mode = 2
+text = "门下点名册"
+
+[node name="RosterHintLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/RosterPanel/RosterMargin/RosterColumn" unique_id=938646473]
+layout_mode = 2
+text = "先从名册点名，再于下方查看阵眼详情与火候。"
+autowrap_mode = 3
+
+[node name="RosterScroll" type="ScrollContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/RosterPanel/RosterMargin/RosterColumn" unique_id=1387477217]
+custom_minimum_size = Vector2(0, 98)
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="DiscipleRosterList" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/RosterPanel/RosterMargin/RosterColumn/RosterScroll" unique_id=1412706556]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="DiscipleRosterButtonTemplate" type="Button" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/RosterPanel/RosterMargin/RosterColumn/RosterScroll/DiscipleRosterList" unique_id=1096119880]
+visible = false
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+size_flags_horizontal = 3
+toggle_mode = true
+alignment = 0
+text_overrun_behavior = 3
+clip_text = true
+
+[node name="ButtonMargin" type="MarginContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/RosterPanel/RosterMargin/RosterColumn/RosterScroll/DiscipleRosterList/DiscipleRosterButtonTemplate" unique_id=739667304]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="ButtonRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/RosterPanel/RosterMargin/RosterColumn/RosterScroll/DiscipleRosterList/DiscipleRosterButtonTemplate/ButtonMargin" unique_id=1858132681]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SelectionMarker" type="ColorRect" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/RosterPanel/RosterMargin/RosterColumn/RosterScroll/DiscipleRosterList/DiscipleRosterButtonTemplate/ButtonMargin/ButtonRow" unique_id=307730848]
+custom_minimum_size = Vector2(4, 0)
+layout_mode = 2
+size_flags_vertical = 3
+color = Color(0.83, 0.69, 0.22, 0)
+
+[node name="GlyphBadge" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/RosterPanel/RosterMargin/RosterColumn/RosterScroll/DiscipleRosterList/DiscipleRosterButtonTemplate/ButtonMargin/ButtonRow" unique_id=1231643481]
+custom_minimum_size = Vector2(38, 38)
+layout_mode = 2
+
+[node name="GlyphLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/RosterPanel/RosterMargin/RosterColumn/RosterScroll/DiscipleRosterList/DiscipleRosterButtonTemplate/ButtonMargin/ButtonRow/GlyphBadge" unique_id=1712634546]
+layout_mode = 2
+text = "宁"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BodyColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/RosterPanel/RosterMargin/RosterColumn/RosterScroll/DiscipleRosterList/DiscipleRosterButtonTemplate/ButtonMargin/ButtonRow" unique_id=344701433]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="NameLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/RosterPanel/RosterMargin/RosterColumn/RosterScroll/DiscipleRosterList/DiscipleRosterButtonTemplate/ButtonMargin/ButtonRow/BodyColumn" unique_id=1987862950]
+layout_mode = 2
+text = "宁照宁"
+
+[node name="MetaLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/RosterPanel/RosterMargin/RosterColumn/RosterScroll/DiscipleRosterList/DiscipleRosterButtonTemplate/ButtonMargin/ButtonRow/BodyColumn" unique_id=980300869]
+layout_mode = 2
+text = "炼气六层 · 外门轮值"
+autowrap_mode = 3
+
+[node name="TagColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/RosterPanel/RosterMargin/RosterColumn/RosterScroll/DiscipleRosterList/DiscipleRosterButtonTemplate/ButtonMargin/ButtonRow" unique_id=1896521039]
+custom_minimum_size = Vector2(82, 0)
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="AssignmentTag" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/RosterPanel/RosterMargin/RosterColumn/RosterScroll/DiscipleRosterList/DiscipleRosterButtonTemplate/ButtonMargin/ButtonRow/TagColumn" unique_id=2077035647]
+custom_minimum_size = Vector2(0, 22)
+layout_mode = 2
+
+[node name="AssignmentTagLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/RosterPanel/RosterMargin/RosterColumn/RosterScroll/DiscipleRosterList/DiscipleRosterButtonTemplate/ButtonMargin/ButtonRow/TagColumn/AssignmentTag" unique_id=326149158]
+layout_mode = 2
+text = "常制"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BranchTag" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/RosterPanel/RosterMargin/RosterColumn/RosterScroll/DiscipleRosterList/DiscipleRosterButtonTemplate/ButtonMargin/ButtonRow/TagColumn" unique_id=364077263]
+custom_minimum_size = Vector2(0, 22)
+layout_mode = 2
+
+[node name="BranchTagLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/RosterPanel/RosterMargin/RosterColumn/RosterScroll/DiscipleRosterList/DiscipleRosterButtonTemplate/ButtonMargin/ButtonRow/TagColumn/BranchTag" unique_id=1877851049]
+layout_mode = 2
+text = "未成"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FocusHeader" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn" unique_id=563989647]
 layout_mode = 2
 theme_override_constants/separation = 14
 
-[node name="HeaderRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn"]
-layout_mode = 2
-
-[node name="TitleLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/HeaderRow"]
+[node name="FocusInfoColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/FocusHeader" unique_id=1705099805]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "天衍峰 · 修炼卷"
+theme_override_constants/separation = 4
 
-[node name="CloseButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/HeaderRow"]
-custom_minimum_size = Vector2(44, 28)
+[node name="FocusTitleLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/FocusHeader/FocusInfoColumn" unique_id=2063585369]
 layout_mode = 2
-text = "✖"
+text = "当前阵眼详情"
 
-[node name="HintLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn"]
-layout_mode = 2
-text = "安排弟子修炼与功法打磨，本卷暂作登记，尚未接入结算。"
-autowrap_mode = 3
-
-[node name="HeaderDivider" type="ColorRect" parent="CenterLayer/Dialog/Margin/MainColumn"]
+[node name="FocusDivider" type="ColorRect" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn" unique_id=530597970]
 custom_minimum_size = Vector2(0, 1)
 layout_mode = 2
-color = Color(0.294118, 0.247059, 0.207843, 1)
+color = Color(0.501961, 0.423529, 0.247059, 0.45)
 
-[node name="SummaryRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn"]
+[node name="DiscipleNavRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn" unique_id=455534857]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 8
 
-[node name="PopulationCard" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow"]
+[node name="PreviousDiscipleButton" type="Button" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/DiscipleNavRow" unique_id=612963632]
+custom_minimum_size = Vector2(40, 40)
 layout_mode = 2
-size_flags_horizontal = 3
+text = "◀"
 
-[node name="CardMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/PopulationCard"]
-layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 10
-
-[node name="CardColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/PopulationCard/CardMargin"]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="TitleLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/PopulationCard/CardMargin/CardColumn"]
-layout_mode = 2
-text = "门人总数"
-
-[node name="ValueLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/PopulationCard/CardMargin/CardColumn"]
-layout_mode = 2
-text = "0"
-
-[node name="TechCard" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow"]
+[node name="NavHintLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/DiscipleNavRow" unique_id=1509752559]
 layout_mode = 2
 size_flags_horizontal = 3
+text = "切换阵眼"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="CardMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/TechCard"]
+[node name="NextDiscipleButton" type="Button" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/DiscipleNavRow" unique_id=1214360963]
+custom_minimum_size = Vector2(40, 40)
 layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 10
+text = "▶"
 
-[node name="CardColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/TechCard/CardMargin"]
+[node name="CoreSection" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn" unique_id=51470450]
 layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="TitleLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/TechCard/CardMargin/CardColumn"]
-layout_mode = 2
-text = "研修层级"
-
-[node name="ValueLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/TechCard/CardMargin/CardColumn"]
-layout_mode = 2
-text = "T1"
-
-[node name="ResourceCard" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="CardMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/ResourceCard"]
-layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 10
-
-[node name="CardColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/ResourceCard/CardMargin"]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="TitleLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/ResourceCard/CardMargin/CardColumn"]
-layout_mode = 2
-text = "修炼资源"
-
-[node name="ValueLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/ResourceCard/CardMargin/CardColumn"]
-layout_mode = 2
-text = "灵石 0\n贡献 0"
-
-[node name="ActionSection" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn"]
-layout_mode = 2
-size_flags_vertical = 3
 theme_override_constants/separation = 10
 
-[node name="ActionHeader" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection"]
+[node name="SoulCoreWrap" type="CenterContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/CoreSection" unique_id=1923606739]
+custom_minimum_size = Vector2(0, 170)
 layout_mode = 2
-text = "修炼安排"
 
-[node name="SkillTrainingCard" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection"]
+[node name="SoulCoreStack" type="Control" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/CoreSection/SoulCoreWrap" unique_id=1780388959]
+custom_minimum_size = Vector2(160, 160)
+layout_mode = 2
+
+[node name="CoreGlowOuter" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/CoreSection/SoulCoreWrap/SoulCoreStack" unique_id=1268950334]
+z_index = -2
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -98.0
+offset_top = -98.0
+offset_right = 98.0
+offset_bottom = 98.0
+
+[node name="CoreGlowInner" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/CoreSection/SoulCoreWrap/SoulCoreStack" unique_id=1859276683]
+z_index = -3
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -114.0
+offset_top = -114.0
+offset_right = 114.0
+offset_bottom = 114.0
+
+[node name="SoulRingThin" type="TextureRect" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/CoreSection/SoulCoreWrap/SoulCoreStack" unique_id=149755117]
+z_index = -1
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -112.0
+offset_top = -112.0
+offset_right = 112.0
+offset_bottom = 112.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 1
+
+[node name="SoulRingDashed" type="TextureRect" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/CoreSection/SoulCoreWrap/SoulCoreStack" unique_id=1091510041]
+z_index = 1
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -92.0
+offset_top = -92.0
+offset_right = 92.0
+offset_bottom = 92.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 1
+
+[node name="SoulCoreOuter" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/CoreSection/SoulCoreWrap/SoulCoreStack" unique_id=25574645]
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -80.0
+offset_top = -80.0
+offset_right = 80.0
+offset_bottom = 80.0
+
+[node name="SoulCoreInner" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/CoreSection/SoulCoreWrap/SoulCoreStack" unique_id=1488051898]
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -64.0
+offset_top = -64.0
+offset_right = 64.0
+offset_bottom = 64.0
+
+[node name="CoreLetterLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/CoreSection/SoulCoreWrap/SoulCoreStack" unique_id=1288096751]
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -40.0
+offset_top = -48.0
+offset_right = 40.0
+offset_bottom = 48.0
+text = "宁"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CoreInfoColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn" unique_id=1016298767]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="SelectedDiscipleNameLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/CoreInfoColumn" unique_id=1157848989]
+layout_mode = 2
+text = "宁照宁"
+horizontal_alignment = 1
+
+[node name="TagRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/CoreInfoColumn" unique_id=1924828345]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="RealmBadge" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/CoreInfoColumn/TagRow" unique_id=991513754]
+custom_minimum_size = Vector2(96, 22)
+layout_mode = 2
+
+[node name="RealmLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/CoreInfoColumn/TagRow/RealmBadge" unique_id=1444731315]
+layout_mode = 2
+text = "炼气六层"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AgeTag" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/CoreInfoColumn/TagRow" unique_id=1008733507]
+custom_minimum_size = Vector2(76, 22)
+layout_mode = 2
+
+[node name="AgeTagLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/CoreInfoColumn/TagRow/AgeTag" unique_id=1859180050]
+layout_mode = 2
+text = "骨龄 29"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ResidenceTag" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/CoreInfoColumn/TagRow" unique_id=949672306]
+custom_minimum_size = Vector2(96, 22)
+layout_mode = 2
+
+[node name="ResidenceTagLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/CoreInfoColumn/TagRow/ResidenceTag" unique_id=1625771627]
+layout_mode = 2
+text = "外门居舍"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DutyTag" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/CoreInfoColumn" unique_id=1057359770]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="DutyLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/CoreInfoColumn/DutyTag" unique_id=335624901]
+layout_mode = 2
+text = "◈ 差事：点卯整队"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SelectedDiscipleMetaLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/CoreInfoColumn" unique_id=350637632]
+visible = false
+layout_mode = 2
+text = "骨龄 29 岁 · 盛年期
+当前差事：点卯整队 · 居所：外门居舍"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="TrackSection" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn" unique_id=1744785887]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="SkillTrackBox" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection" unique_id=1693056751]
+layout_mode = 2
+
+[node name="TrackMargin" type="MarginContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/SkillTrackBox" unique_id=475045255]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="TrackColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/SkillTrackBox/TrackMargin" unique_id=1399456970]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="TrackHeaderRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/SkillTrackBox/TrackMargin/TrackColumn" unique_id=167166545]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TrackIconLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/SkillTrackBox/TrackMargin/TrackColumn/TrackHeaderRow" unique_id=278684779]
+layout_mode = 2
+text = "⟡"
+
+[node name="TrackNameLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/SkillTrackBox/TrackMargin/TrackColumn/TrackHeaderRow" unique_id=396739572]
+layout_mode = 2
+text = "根基火候"
+
+[node name="TrackSpacer" type="Control" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/SkillTrackBox/TrackMargin/TrackColumn/TrackHeaderRow" unique_id=1712793205]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="CardMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/SkillTrainingCard"]
+[node name="SkillTrackDiamonds" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/SkillTrackBox/TrackMargin/TrackColumn/TrackHeaderRow" unique_id=1024311968]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Diamond01" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/SkillTrackBox/TrackMargin/TrackColumn/TrackHeaderRow/SkillTrackDiamonds" unique_id=1935582301]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Diamond02" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/SkillTrackBox/TrackMargin/TrackColumn/TrackHeaderRow/SkillTrackDiamonds" unique_id=2105839921]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Diamond03" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/SkillTrackBox/TrackMargin/TrackColumn/TrackHeaderRow/SkillTrackDiamonds" unique_id=637006204]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Diamond04" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/SkillTrackBox/TrackMargin/TrackColumn/TrackHeaderRow/SkillTrackDiamonds" unique_id=1101937819]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Diamond05" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/SkillTrackBox/TrackMargin/TrackColumn/TrackHeaderRow/SkillTrackDiamonds" unique_id=1534593497]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="SkillTrackTag" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/SkillTrackBox/TrackMargin/TrackColumn/TrackHeaderRow" unique_id=361351577]
+visible = false
+custom_minimum_size = Vector2(54, 22)
+layout_mode = 2
+
+[node name="SkillTrackTagLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/SkillTrackBox/TrackMargin/TrackColumn/TrackHeaderRow/SkillTrackTag" unique_id=369720928]
+layout_mode = 2
+text = "未起"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SkillTrackProgress" type="ProgressBar" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/SkillTrackBox/TrackMargin/TrackColumn" unique_id=121524308]
+visible = false
+custom_minimum_size = Vector2(0, 4)
+layout_mode = 2
+show_percentage = false
+
+[node name="TechniqueTrackBox" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection" unique_id=718840067]
+layout_mode = 2
+
+[node name="TrackMargin" type="MarginContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/TechniqueTrackBox" unique_id=909531740]
 layout_mode = 2
 theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 12
+theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 12
+theme_override_constants/margin_bottom = 10
 
-[node name="CardRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/SkillTrainingCard/CardMargin"]
+[node name="TrackColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/TechniqueTrackBox/TrackMargin" unique_id=1052681639]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="TrackHeaderRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/TechniqueTrackBox/TrackMargin/TrackColumn" unique_id=1802122250]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TrackIconLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/TechniqueTrackBox/TrackMargin/TrackColumn/TrackHeaderRow" unique_id=244318491]
+layout_mode = 2
+text = "⟡"
+
+[node name="TrackNameLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/TechniqueTrackBox/TrackMargin/TrackColumn/TrackHeaderRow" unique_id=748253234]
+layout_mode = 2
+text = "功法感悟"
+
+[node name="TrackSpacer" type="Control" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/TechniqueTrackBox/TrackMargin/TrackColumn/TrackHeaderRow" unique_id=1168076253]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TechniqueTrackDiamonds" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/TechniqueTrackBox/TrackMargin/TrackColumn/TrackHeaderRow" unique_id=1154520496]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Diamond01" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/TechniqueTrackBox/TrackMargin/TrackColumn/TrackHeaderRow/TechniqueTrackDiamonds" unique_id=2049042094]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Diamond02" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/TechniqueTrackBox/TrackMargin/TrackColumn/TrackHeaderRow/TechniqueTrackDiamonds" unique_id=858407136]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Diamond03" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/TechniqueTrackBox/TrackMargin/TrackColumn/TrackHeaderRow/TechniqueTrackDiamonds" unique_id=465813218]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Diamond04" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/TechniqueTrackBox/TrackMargin/TrackColumn/TrackHeaderRow/TechniqueTrackDiamonds" unique_id=1855179242]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Diamond05" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/TechniqueTrackBox/TrackMargin/TrackColumn/TrackHeaderRow/TechniqueTrackDiamonds" unique_id=2002495410]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="TechniqueTrackTag" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/TechniqueTrackBox/TrackMargin/TrackColumn/TrackHeaderRow" unique_id=960756227]
+visible = false
+custom_minimum_size = Vector2(54, 22)
+layout_mode = 2
+
+[node name="TechniqueTrackTagLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/TechniqueTrackBox/TrackMargin/TrackColumn/TrackHeaderRow/TechniqueTrackTag" unique_id=893783187]
+layout_mode = 2
+text = "未起"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TechniqueTrackProgress" type="ProgressBar" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/TechniqueTrackBox/TrackMargin/TrackColumn" unique_id=2077370685]
+visible = false
+custom_minimum_size = Vector2(0, 4)
+layout_mode = 2
+show_percentage = false
+
+[node name="CraftTrackBox" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection" unique_id=875574508]
+layout_mode = 2
+
+[node name="TrackMargin" type="MarginContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/CraftTrackBox" unique_id=1628752998]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="TrackColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/CraftTrackBox/TrackMargin" unique_id=1509851026]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="TrackHeaderRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/CraftTrackBox/TrackMargin/TrackColumn" unique_id=1296888836]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TrackIconLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/CraftTrackBox/TrackMargin/TrackColumn/TrackHeaderRow" unique_id=1062845294]
+layout_mode = 2
+text = "⟡"
+
+[node name="TrackNameLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/CraftTrackBox/TrackMargin/TrackColumn/TrackHeaderRow" unique_id=426906694]
+layout_mode = 2
+text = "技艺手感"
+
+[node name="TrackSpacer" type="Control" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/CraftTrackBox/TrackMargin/TrackColumn/TrackHeaderRow" unique_id=1472075317]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CraftTrackDiamonds" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/CraftTrackBox/TrackMargin/TrackColumn/TrackHeaderRow" unique_id=527199907]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Diamond01" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/CraftTrackBox/TrackMargin/TrackColumn/TrackHeaderRow/CraftTrackDiamonds" unique_id=980784603]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Diamond02" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/CraftTrackBox/TrackMargin/TrackColumn/TrackHeaderRow/CraftTrackDiamonds" unique_id=1619783040]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Diamond03" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/CraftTrackBox/TrackMargin/TrackColumn/TrackHeaderRow/CraftTrackDiamonds" unique_id=2052322090]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Diamond04" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/CraftTrackBox/TrackMargin/TrackColumn/TrackHeaderRow/CraftTrackDiamonds" unique_id=837748858]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Diamond05" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/CraftTrackBox/TrackMargin/TrackColumn/TrackHeaderRow/CraftTrackDiamonds" unique_id=1424154884]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="CraftTrackTag" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/CraftTrackBox/TrackMargin/TrackColumn/TrackHeaderRow" unique_id=1989765298]
+visible = false
+custom_minimum_size = Vector2(54, 22)
+layout_mode = 2
+
+[node name="CraftTrackTagLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/CraftTrackBox/TrackMargin/TrackColumn/TrackHeaderRow/CraftTrackTag" unique_id=597891138]
+layout_mode = 2
+text = "未起"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CraftTrackProgress" type="ProgressBar" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/CraftTrackBox/TrackMargin/TrackColumn" unique_id=1085669480]
+visible = false
+custom_minimum_size = Vector2(0, 4)
+layout_mode = 2
+show_percentage = false
+
+[node name="MeditationTrackBox" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection" unique_id=39027145]
+layout_mode = 2
+
+[node name="TrackMargin" type="MarginContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/MeditationTrackBox" unique_id=236006988]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="TrackColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/MeditationTrackBox/TrackMargin" unique_id=954128789]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="TrackHeaderRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/MeditationTrackBox/TrackMargin/TrackColumn" unique_id=1447959379]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TrackIconLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/MeditationTrackBox/TrackMargin/TrackColumn/TrackHeaderRow" unique_id=872246511]
+layout_mode = 2
+text = "⟡"
+
+[node name="TrackNameLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/MeditationTrackBox/TrackMargin/TrackColumn/TrackHeaderRow" unique_id=1056683044]
+layout_mode = 2
+text = "气海静修"
+
+[node name="TrackSpacer" type="Control" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/MeditationTrackBox/TrackMargin/TrackColumn/TrackHeaderRow" unique_id=379211621]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MeditationTrackDiamonds" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/MeditationTrackBox/TrackMargin/TrackColumn/TrackHeaderRow" unique_id=1231806944]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Diamond01" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/MeditationTrackBox/TrackMargin/TrackColumn/TrackHeaderRow/MeditationTrackDiamonds" unique_id=1770346251]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Diamond02" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/MeditationTrackBox/TrackMargin/TrackColumn/TrackHeaderRow/MeditationTrackDiamonds" unique_id=2102048097]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Diamond03" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/MeditationTrackBox/TrackMargin/TrackColumn/TrackHeaderRow/MeditationTrackDiamonds" unique_id=1389766110]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Diamond04" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/MeditationTrackBox/TrackMargin/TrackColumn/TrackHeaderRow/MeditationTrackDiamonds" unique_id=643130808]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Diamond05" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/MeditationTrackBox/TrackMargin/TrackColumn/TrackHeaderRow/MeditationTrackDiamonds" unique_id=1368122377]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="MeditationTrackTag" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/MeditationTrackBox/TrackMargin/TrackColumn/TrackHeaderRow" unique_id=1365815400]
+visible = false
+custom_minimum_size = Vector2(54, 22)
+layout_mode = 2
+
+[node name="MeditationTrackTagLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/MeditationTrackBox/TrackMargin/TrackColumn/TrackHeaderRow/MeditationTrackTag" unique_id=1856329070]
+layout_mode = 2
+text = "未起"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MeditationTrackProgress" type="ProgressBar" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/TrackSection/MeditationTrackBox/TrackMargin/TrackColumn" unique_id=1023295576]
+visible = false
+custom_minimum_size = Vector2(0, 4)
+layout_mode = 2
+show_percentage = false
+
+[node name="FocusFooter" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn" unique_id=1172904160]
+visible = false
+layout_mode = 2
+
+[node name="FooterMargin" type="MarginContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/FocusFooter" unique_id=696104979]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 14
+
+[node name="FooterColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/FocusFooter/FooterMargin" unique_id=860014679]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="FooterHeaderRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/FocusFooter/FooterMargin/FooterColumn" unique_id=1887788518]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="InfoColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/SkillTrainingCard/CardMargin/CardRow"]
+[node name="FooterIcon" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/FocusFooter/FooterMargin/FooterColumn/FooterHeaderRow" unique_id=1873907682]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+
+[node name="FooterIconLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/FocusFooter/FooterMargin/FooterColumn/FooterHeaderRow/FooterIcon" unique_id=585925316]
+layout_mode = 2
+text = "技"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FooterTextColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/FocusFooter/FooterMargin/FooterColumn/FooterHeaderRow" unique_id=1763206142]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="FooterTitleLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/FocusFooter/FooterMargin/FooterColumn/FooterHeaderRow/FooterTextColumn" unique_id=651474796]
+layout_mode = 2
+text = "当前运转周天"
+
+[node name="SelectedDiscipleStatusLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/FocusFooter/FooterMargin/FooterColumn/FooterHeaderRow/FooterTextColumn" unique_id=806264100]
+layout_mode = 2
+text = "技能修炼"
+autowrap_mode = 3
+
+[node name="FooterStatusSpacer" type="Control" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/FocusFooter/FooterMargin/FooterColumn/FooterHeaderRow" unique_id=1777454495]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SelectedDiscipleStatusHighlightLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/FocusFooter/FooterMargin/FooterColumn/FooterHeaderRow" unique_id=1531496704]
+layout_mode = 2
+text = "运转中"
+autowrap_mode = 3
+
+[node name="SelectedDiscipleInsightLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/FocusFooter/FooterMargin/FooterColumn" unique_id=1116340919]
+visible = false
+layout_mode = 2
+text = "最近感悟：近时暂无感悟机缘。"
+autowrap_mode = 3
+
+[node name="BodyDivider" type="ColorRect" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow" unique_id=1315217294]
+custom_minimum_size = Vector2(1, 0)
+layout_mode = 2
+size_flags_vertical = 3
+color = Color(0.501961, 0.423529, 0.247059, 0.35)
+
+[node name="RightLayer" type="Control" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow" unique_id=1660189455]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="RightColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer" unique_id=1018659857]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 18
+
+[node name="ActionHeaderRow" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn" unique_id=37825758]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ActionTextSpacer" type="Control" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow" unique_id=1247077509]
+layout_mode = 2
+
+[node name="ActionTitleRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow" unique_id=531504180]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+
+[node name="ActionMarker" type="ColorRect" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow" unique_id=16781221]
+custom_minimum_size = Vector2(6, 40)
+layout_mode = 2
+color = Color(0.831373, 0.686275, 0.215686, 1)
+
+[node name="ActionTitleLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow" unique_id=1739727454]
+layout_mode = 2
+text = "敕令法门"
+
+[node name="ActionTitleSpacer" type="Control" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow" unique_id=1791579352]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ActionPointBadge" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow" unique_id=218979737]
+custom_minimum_size = Vector2(184, 32)
+layout_mode = 2
+
+[node name="ActionPointRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow/ActionPointBadge" unique_id=1014540332]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 6
+
+[node name="ActionPointTextLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow/ActionPointBadge/ActionPointRow" unique_id=2135425752]
+layout_mode = 2
+text = "施法余力"
+
+[node name="ActionPointSpacer" type="Control" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow/ActionPointBadge/ActionPointRow" unique_id=1364566877]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ActionPointDot1" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow/ActionPointBadge/ActionPointRow" unique_id=424422268]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="ActionPointDot2" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow/ActionPointBadge/ActionPointRow" unique_id=1117024204]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="ActionPointDot3" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow/ActionPointBadge/ActionPointRow" unique_id=613323155]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="HintPanel" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow" unique_id=526137909]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HintMargin" type="MarginContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/HintPanel" unique_id=1801939417]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 0
+
+[node name="HintRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/HintPanel/HintMargin" unique_id=1479268900]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="HintDot" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/HintPanel/HintMargin/HintRow" unique_id=1601496450]
+custom_minimum_size = Vector2(8, 8)
+layout_mode = 2
+
+[node name="HintLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/HintPanel/HintMargin/HintRow" unique_id=469675959]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "结算时将产出对应资源与修为"
+
+[node name="ActionGrid" type="GridContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn" unique_id=474367897]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/h_separation = 18
+theme_override_constants/v_separation = 18
+columns = 2
+
+[node name="SkillTrainingCard" type="Button" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid" unique_id=1399706482]
+custom_minimum_size = Vector2(0, 176)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+toggle_mode = true
+
+[node name="CardMargin" type="MarginContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard" unique_id=2089947131]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 22.0
+offset_top = 18.0
+offset_right = -18.0
+offset_bottom = -18.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CardColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin" unique_id=1562757687]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="CardHeaderRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn" unique_id=1740909723]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="IconBadge" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/CardHeaderRow" unique_id=2087282847]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+
+[node name="IconLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/CardHeaderRow/IconBadge" unique_id=2077583776]
+layout_mode = 2
+text = "技"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HeaderTextColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/CardHeaderRow" unique_id=744390665]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 4
 
-[node name="TitleLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/SkillTrainingCard/CardMargin/CardRow/InfoColumn"]
+[node name="TitleLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/CardHeaderRow/HeaderTextColumn" unique_id=867083268]
 layout_mode = 2
 text = "技能修炼"
 
-[node name="DescLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/SkillTrainingCard/CardMargin/CardRow/InfoColumn"]
+[node name="SealBadge" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/CardHeaderRow/HeaderTextColumn" unique_id=1952428624]
+visible = false
+custom_minimum_size = Vector2(0, 22)
 layout_mode = 2
-text = "安排弟子在技艺堂口修炼基础法门，稳固技艺根基。"
-autowrap_mode = 3
+size_flags_horizontal = 4
 
-[node name="StatusLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/SkillTrainingCard/CardMargin/CardRow/InfoColumn"]
+[node name="SealLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/CardHeaderRow/HeaderTextColumn/SealBadge" unique_id=917603000]
 layout_mode = 2
-text = "当前：未安排"
+text = "正在运转"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="ActionButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/SkillTrainingCard/CardMargin/CardRow"]
-custom_minimum_size = Vector2(130, 36)
+[node name="SubtitleLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/CardHeaderRow/HeaderTextColumn" unique_id=2063555183]
 layout_mode = 2
-text = "安排修炼"
+text = "根基培元"
 
-[node name="TechniquePolishCard" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection"]
+[node name="HeaderSpacer" type="Control" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/CardHeaderRow" unique_id=340644028]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="CardMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/TechniquePolishCard"]
+[node name="TimeBadge" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/CardHeaderRow" unique_id=1081478646]
+custom_minimum_size = Vector2(72, 22)
 layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 12
 
-[node name="CardRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/TechniquePolishCard/CardMargin"]
+[node name="TimeRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/CardHeaderRow/TimeBadge" unique_id=1311377886]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 4
 
-[node name="InfoColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/TechniquePolishCard/CardMargin/CardRow"]
+[node name="TimeIconLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/CardHeaderRow/TimeBadge/TimeRow" unique_id=69049136]
+layout_mode = 2
+text = "⏳"
+
+[node name="TimeTextLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/CardHeaderRow/TimeBadge/TimeRow" unique_id=2056126056]
+layout_mode = 2
+text = "1 时辰"
+
+[node name="Divider" type="ColorRect" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn" unique_id=317034156]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+color = Color(0.501961, 0.423529, 0.247059, 0.3)
+
+[node name="DescLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn" unique_id=121851101]
+layout_mode = 2
+text = "“温养技艺，筑基培元，夯实大道之基。”"
+autowrap_mode = 3
+
+[node name="StatusLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn" unique_id=226564599]
+visible = false
+layout_mode = 2
+text = "待命玉简"
+autowrap_mode = 3
+
+[node name="Spacer" type="Control" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn" unique_id=407272800]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="EffectRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn" unique_id=1223851665]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="PrimaryEffect" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/EffectRow" unique_id=1306546402]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="EffectMargin" type="MarginContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/EffectRow/PrimaryEffect" unique_id=1723160186]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="EffectContentRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/EffectRow/PrimaryEffect/EffectMargin" unique_id=1951193726]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="EffectIcon" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/EffectRow/PrimaryEffect/EffectMargin/EffectContentRow" unique_id=1503822921]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+
+[node name="EffectIconLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/EffectRow/PrimaryEffect/EffectMargin/EffectContentRow/EffectIcon" unique_id=905996903]
+layout_mode = 2
+text = "⟡"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EffectColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/EffectRow/PrimaryEffect/EffectMargin/EffectContentRow" unique_id=2078320171]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 4
 
-[node name="TitleLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/TechniquePolishCard/CardMargin/CardRow/InfoColumn"]
+[node name="TitleLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/EffectRow/PrimaryEffect/EffectMargin/EffectContentRow/EffectColumn" unique_id=2059128065]
+layout_mode = 2
+text = "修为成长"
+
+[node name="ValueLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/EffectRow/PrimaryEffect/EffectMargin/EffectContentRow/EffectColumn" unique_id=1321437628]
+layout_mode = 2
+text = "根基火候 ↑"
+
+[node name="SecondaryEffect" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/EffectRow" unique_id=71060060]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="EffectMargin" type="MarginContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/EffectRow/SecondaryEffect" unique_id=1303496745]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="EffectColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/EffectRow/SecondaryEffect/EffectMargin" unique_id=634623276]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/EffectRow/SecondaryEffect/EffectMargin/EffectColumn" unique_id=731743966]
+layout_mode = 2
+text = "宗门资源"
+
+[node name="ValueLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/EffectRow/SecondaryEffect/EffectMargin/EffectColumn" unique_id=1823612821]
+layout_mode = 2
+text = "◈ 贡献 +15"
+
+[node name="TechniquePolishCard" type="Button" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid" unique_id=1054292357]
+custom_minimum_size = Vector2(0, 176)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+toggle_mode = true
+
+[node name="CardMargin" type="MarginContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard" unique_id=526042645]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 22.0
+offset_top = 18.0
+offset_right = -18.0
+offset_bottom = -18.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CardColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin" unique_id=1030345428]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="CardHeaderRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn" unique_id=315909867]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="IconBadge" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/CardHeaderRow" unique_id=1550594368]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+
+[node name="IconLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/CardHeaderRow/IconBadge" unique_id=956433123]
+layout_mode = 2
+text = "法"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HeaderTextColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/CardHeaderRow" unique_id=587698409]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/CardHeaderRow/HeaderTextColumn" unique_id=1764670940]
 layout_mode = 2
 text = "功法打磨"
 
-[node name="DescLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/TechniquePolishCard/CardMargin/CardRow/InfoColumn"]
+[node name="SealBadge" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/CardHeaderRow/HeaderTextColumn" unique_id=257029032]
+visible = false
+custom_minimum_size = Vector2(0, 22)
 layout_mode = 2
-text = "聚焦传功堂校订功法要诀，提升法门稳定与悟性。"
-autowrap_mode = 3
+size_flags_horizontal = 4
 
-[node name="StatusLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/TechniquePolishCard/CardMargin/CardRow/InfoColumn"]
+[node name="SealLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/CardHeaderRow/HeaderTextColumn/SealBadge" unique_id=2041183426]
 layout_mode = 2
-text = "当前：未安排"
+text = "正在运转"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="ActionButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/TechniquePolishCard/CardMargin/CardRow"]
-custom_minimum_size = Vector2(130, 36)
+[node name="SubtitleLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/CardHeaderRow/HeaderTextColumn" unique_id=1975386822]
 layout_mode = 2
-text = "安排打磨"
+text = "法门校订"
 
-[node name="CraftPracticeCard" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection"]
+[node name="HeaderSpacer" type="Control" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/CardHeaderRow" unique_id=1319342001]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="CardMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/CraftPracticeCard"]
+[node name="TimeBadge" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/CardHeaderRow" unique_id=1007345504]
+custom_minimum_size = Vector2(72, 22)
 layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 12
 
-[node name="CardRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/CraftPracticeCard/CardMargin"]
+[node name="TimeRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/CardHeaderRow/TimeBadge" unique_id=332437161]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 4
 
-[node name="InfoColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/CraftPracticeCard/CardMargin/CardRow"]
+[node name="TimeIconLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/CardHeaderRow/TimeBadge/TimeRow" unique_id=1522937476]
+layout_mode = 2
+text = "⏳"
+
+[node name="TimeTextLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/CardHeaderRow/TimeBadge/TimeRow" unique_id=1432921366]
+layout_mode = 2
+text = "1 时辰"
+
+[node name="Divider" type="ColorRect" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn" unique_id=799683468]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+color = Color(0.501961, 0.423529, 0.247059, 0.3)
+
+[node name="DescLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn" unique_id=1306003141]
+layout_mode = 2
+text = "“聚焦传功堂，研读并校订深奥法门与运气节律。”"
+autowrap_mode = 3
+
+[node name="StatusLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn" unique_id=1130860950]
+visible = false
+layout_mode = 2
+text = "待命玉简"
+autowrap_mode = 3
+
+[node name="Spacer" type="Control" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn" unique_id=823781969]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="EffectRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn" unique_id=1737976440]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="PrimaryEffect" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/EffectRow" unique_id=979332315]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="EffectMargin" type="MarginContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/EffectRow/PrimaryEffect" unique_id=1934286890]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="EffectContentRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/EffectRow/PrimaryEffect/EffectMargin" unique_id=232150439]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="EffectIcon" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/EffectRow/PrimaryEffect/EffectMargin/EffectContentRow" unique_id=1607390490]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+
+[node name="EffectIconLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/EffectRow/PrimaryEffect/EffectMargin/EffectContentRow/EffectIcon" unique_id=47777746]
+layout_mode = 2
+text = "⟡"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EffectColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/EffectRow/PrimaryEffect/EffectMargin/EffectContentRow" unique_id=613437535]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 4
 
-[node name="TitleLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/CraftPracticeCard/CardMargin/CardRow/InfoColumn"]
+[node name="TitleLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/EffectRow/PrimaryEffect/EffectMargin/EffectContentRow/EffectColumn" unique_id=911856127]
+layout_mode = 2
+text = "修为成长（高）"
+
+[node name="ValueLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/EffectRow/PrimaryEffect/EffectMargin/EffectContentRow/EffectColumn" unique_id=1951158391]
+layout_mode = 2
+text = "功法感悟 ↑↑"
+
+[node name="SecondaryEffect" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/EffectRow" unique_id=1675791496]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="EffectMargin" type="MarginContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/EffectRow/SecondaryEffect" unique_id=1049079443]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="EffectColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/EffectRow/SecondaryEffect/EffectMargin" unique_id=191861774]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/EffectRow/SecondaryEffect/EffectMargin/EffectColumn" unique_id=762284453]
+layout_mode = 2
+text = "天赋气质"
+
+[node name="ValueLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/EffectRow/SecondaryEffect/EffectMargin/EffectColumn" unique_id=1387861639]
+layout_mode = 2
+text = "✧ 悟性偏盛"
+
+[node name="CraftPracticeCard" type="Button" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid" unique_id=1458259076]
+custom_minimum_size = Vector2(0, 176)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+toggle_mode = true
+
+[node name="CardMargin" type="MarginContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard" unique_id=321654174]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 22.0
+offset_top = 18.0
+offset_right = -18.0
+offset_bottom = -18.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CardColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin" unique_id=388903927]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="CardHeaderRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn" unique_id=1878854597]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="IconBadge" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/CardHeaderRow" unique_id=654514664]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+
+[node name="IconLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/CardHeaderRow/IconBadge" unique_id=1707021635]
+layout_mode = 2
+text = "艺"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HeaderTextColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/CardHeaderRow" unique_id=1408674805]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/CardHeaderRow/HeaderTextColumn" unique_id=1234014452]
 layout_mode = 2
 text = "技艺练习"
 
-[node name="DescLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/CraftPracticeCard/CardMargin/CardRow/InfoColumn"]
+[node name="SealBadge" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/CardHeaderRow/HeaderTextColumn" unique_id=1603562271]
+visible = false
+custom_minimum_size = Vector2(0, 22)
 layout_mode = 2
-text = "在炼器、炼丹、阵法等技艺堂口轮修，稳固产能。"
-autowrap_mode = 3
+size_flags_horizontal = 4
 
-[node name="StatusLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/CraftPracticeCard/CardMargin/CardRow/InfoColumn"]
+[node name="SealLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/CardHeaderRow/HeaderTextColumn/SealBadge" unique_id=1449385356]
 layout_mode = 2
-text = "当前：未安排"
+text = "正在运转"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="ActionButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/CraftPracticeCard/CardMargin/CardRow"]
-custom_minimum_size = Vector2(130, 36)
+[node name="SubtitleLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/CardHeaderRow/HeaderTextColumn" unique_id=1615057806]
 layout_mode = 2
-text = "安排练习"
+text = "炼丹画符"
 
-[node name="MeditationCard" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection"]
+[node name="HeaderSpacer" type="Control" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/CardHeaderRow" unique_id=956326251]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="CardMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/MeditationCard"]
+[node name="TimeBadge" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/CardHeaderRow" unique_id=949573070]
+custom_minimum_size = Vector2(72, 22)
 layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 12
 
-[node name="CardRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/MeditationCard/CardMargin"]
+[node name="TimeRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/CardHeaderRow/TimeBadge" unique_id=1132765153]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 4
 
-[node name="InfoColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/MeditationCard/CardMargin/CardRow"]
+[node name="TimeIconLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/CardHeaderRow/TimeBadge/TimeRow" unique_id=1979842861]
+layout_mode = 2
+text = "⏳"
+
+[node name="TimeTextLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/CardHeaderRow/TimeBadge/TimeRow" unique_id=844274753]
+layout_mode = 2
+text = "1 时辰"
+
+[node name="Divider" type="ColorRect" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn" unique_id=1099523171]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+color = Color(0.501961, 0.423529, 0.247059, 0.3)
+
+[node name="DescLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn" unique_id=2010564717]
+layout_mode = 2
+text = "“偏向炼器、炼丹、阵法等术门轮修，稳定产出宗门利好。”"
+autowrap_mode = 3
+
+[node name="StatusLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn" unique_id=1816212330]
+visible = false
+layout_mode = 2
+text = "待命玉简"
+autowrap_mode = 3
+
+[node name="Spacer" type="Control" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn" unique_id=1849616100]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="EffectRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn" unique_id=1215086997]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="PrimaryEffect" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/EffectRow" unique_id=683328691]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="EffectMargin" type="MarginContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/EffectRow/PrimaryEffect" unique_id=1999688527]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="EffectContentRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/EffectRow/PrimaryEffect/EffectMargin" unique_id=1072601801]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="EffectIcon" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/EffectRow/PrimaryEffect/EffectMargin/EffectContentRow" unique_id=723359646]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+
+[node name="EffectIconLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/EffectRow/PrimaryEffect/EffectMargin/EffectContentRow/EffectIcon" unique_id=667153713]
+layout_mode = 2
+text = "⚙"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EffectColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/EffectRow/PrimaryEffect/EffectMargin/EffectContentRow" unique_id=474525602]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 4
 
-[node name="TitleLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/MeditationCard/CardMargin/CardRow/InfoColumn"]
+[node name="TitleLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/EffectRow/PrimaryEffect/EffectMargin/EffectContentRow/EffectColumn" unique_id=1799914159]
+layout_mode = 2
+text = "宗门物资"
+
+[node name="ValueLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/EffectRow/PrimaryEffect/EffectMargin/EffectContentRow/EffectColumn" unique_id=26164002]
+layout_mode = 2
+text = "少量工器 +"
+
+[node name="SecondaryEffect" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/EffectRow" unique_id=1129557352]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="EffectMargin" type="MarginContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/EffectRow/SecondaryEffect" unique_id=866685214]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="EffectColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/EffectRow/SecondaryEffect/EffectMargin" unique_id=1952783891]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/EffectRow/SecondaryEffect/EffectMargin/EffectColumn" unique_id=1781693373]
+layout_mode = 2
+text = "宗门资源"
+
+[node name="ValueLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/EffectRow/SecondaryEffect/EffectMargin/EffectColumn" unique_id=1989699787]
+layout_mode = 2
+text = "◈ 贡献 +10"
+
+[node name="MeditationCard" type="Button" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid" unique_id=547599827]
+custom_minimum_size = Vector2(0, 176)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+toggle_mode = true
+
+[node name="CardMargin" type="MarginContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard" unique_id=1874416250]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 22.0
+offset_top = 18.0
+offset_right = -18.0
+offset_bottom = -18.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CardColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin" unique_id=1209240872]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="CardHeaderRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn" unique_id=1784322470]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="IconBadge" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/CardHeaderRow" unique_id=1551666835]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+
+[node name="IconLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/CardHeaderRow/IconBadge" unique_id=1541008212]
+layout_mode = 2
+text = "坐"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HeaderTextColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/CardHeaderRow" unique_id=1284875234]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/CardHeaderRow/HeaderTextColumn" unique_id=1505562910]
 layout_mode = 2
 text = "打坐修炼"
 
-[node name="DescLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/MeditationCard/CardMargin/CardRow/InfoColumn"]
+[node name="SealBadge" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/CardHeaderRow/HeaderTextColumn" unique_id=1257176664]
+visible = false
+custom_minimum_size = Vector2(0, 22)
 layout_mode = 2
-text = "安排静室打坐，温养气海与心境，积蓄长时修为。"
+size_flags_horizontal = 4
+
+[node name="SealLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/CardHeaderRow/HeaderTextColumn/SealBadge" unique_id=1256717543]
+layout_mode = 2
+text = "正在运转"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/CardHeaderRow/HeaderTextColumn" unique_id=231800526]
+layout_mode = 2
+text = "摒除杂念"
+
+[node name="HeaderSpacer" type="Control" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/CardHeaderRow" unique_id=2055482490]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TimeBadge" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/CardHeaderRow" unique_id=1609953522]
+custom_minimum_size = Vector2(72, 22)
+layout_mode = 2
+
+[node name="TimeRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/CardHeaderRow/TimeBadge" unique_id=1203175326]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TimeIconLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/CardHeaderRow/TimeBadge/TimeRow" unique_id=776892261]
+layout_mode = 2
+text = "⏳"
+
+[node name="TimeTextLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/CardHeaderRow/TimeBadge/TimeRow" unique_id=667259377]
+layout_mode = 2
+text = "1 时辰"
+
+[node name="Divider" type="ColorRect" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn" unique_id=819629086]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+color = Color(0.501961, 0.423529, 0.247059, 0.3)
+
+[node name="DescLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn" unique_id=875717080]
+layout_mode = 2
+text = "“安排静室打坐，摒除杂念，平复心魔并稳住道心。”"
 autowrap_mode = 3
 
-[node name="StatusLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/MeditationCard/CardMargin/CardRow/InfoColumn"]
+[node name="StatusLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn" unique_id=1614329657]
+visible = false
 layout_mode = 2
-text = "当前：未安排"
-
-[node name="ActionButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ActionSection/MeditationCard/CardMargin/CardRow"]
-custom_minimum_size = Vector2(130, 36)
-layout_mode = 2
-text = "安排静修"
-
-[node name="FooterHint" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn"]
-layout_mode = 2
-text = "注：本卷为修炼安排记录，实际效果将在后续与时辰结算接入。"
+text = "待命玉简"
 autowrap_mode = 3
+
+[node name="Spacer" type="Control" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn" unique_id=87945329]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="EffectRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn" unique_id=842437405]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="PrimaryEffect" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/EffectRow" unique_id=1792318937]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="EffectMargin" type="MarginContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/EffectRow/PrimaryEffect" unique_id=407748134]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="EffectContentRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/EffectRow/PrimaryEffect/EffectMargin" unique_id=1655113559]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="EffectIcon" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/EffectRow/PrimaryEffect/EffectMargin/EffectContentRow" unique_id=800910159]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+
+[node name="EffectIconLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/EffectRow/PrimaryEffect/EffectMargin/EffectContentRow/EffectIcon" unique_id=776297248]
+layout_mode = 2
+text = "☯"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EffectColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/EffectRow/PrimaryEffect/EffectMargin/EffectContentRow" unique_id=1565317458]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/EffectRow/PrimaryEffect/EffectMargin/EffectContentRow/EffectColumn" unique_id=839988882]
+layout_mode = 2
+text = "宗门气象"
+
+[node name="ValueLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/EffectRow/PrimaryEffect/EffectMargin/EffectContentRow/EffectColumn" unique_id=118595983]
+layout_mode = 2
+text = "提振民心 ↑"
+
+[node name="SecondaryEffect" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/EffectRow" unique_id=696578442]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="EffectMargin" type="MarginContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/EffectRow/SecondaryEffect" unique_id=57112800]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="EffectColumn" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/EffectRow/SecondaryEffect/EffectMargin" unique_id=1295050611]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/EffectRow/SecondaryEffect/EffectMargin/EffectColumn" unique_id=309632143]
+layout_mode = 2
+text = "特殊庇护"
+
+[node name="ValueLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/EffectRow/SecondaryEffect/EffectMargin/EffectColumn" unique_id=777297289]
+layout_mode = 2
+text = "🛡 缓和危兆"
+
+[node name="FrameOuter" type="ColorRect" parent="ScreenMargin/ScreenRoot" unique_id=819120240]
+visible = false
+z_index = -10
+layout_mode = 2
+color = Color(0.854902, 0.721569, 0.298039, 0.08)
+
+[node name="FrameInner" type="ColorRect" parent="ScreenMargin/ScreenRoot" unique_id=696594450]
+visible = false
+z_index = -9
+layout_mode = 2
+color = Color(0.854902, 0.721569, 0.298039, 0.05)
+
+[node name="CornerTL" type="ColorRect" parent="ScreenMargin/ScreenRoot" unique_id=1243339385]
+visible = false
+z_index = -8
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+color = Color(0.854902, 0.721569, 0.298039, 0.14)
+
+[node name="CornerTR" type="ColorRect" parent="ScreenMargin/ScreenRoot" unique_id=1352548089]
+visible = false
+z_index = -8
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+color = Color(0.854902, 0.721569, 0.298039, 0.14)
+
+[node name="CornerBL" type="ColorRect" parent="ScreenMargin/ScreenRoot" unique_id=1010975977]
+visible = false
+z_index = -8
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+color = Color(0.854902, 0.721569, 0.298039, 0.14)
+
+[node name="CornerBR" type="ColorRect" parent="ScreenMargin/ScreenRoot" unique_id=415087522]
+visible = false
+z_index = -8
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+color = Color(0.854902, 0.721569, 0.298039, 0.14)
+
+[node name="WatermarkLabel" type="Label" parent="." unique_id=2086762780]
+visible = false
+z_index = -80
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -605.0
+offset_top = -635.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "法"
+horizontal_alignment = 1
+vertical_alignment = 1

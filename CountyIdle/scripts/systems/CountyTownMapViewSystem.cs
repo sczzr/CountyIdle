@@ -118,7 +118,8 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
     ];
 
     // 资源路径
-    private const string GeographyAtlasPath = "res://assets/ui/tilemap/tileset_geography.png";
+    // 历史旧图集 `tileset_geography.png` 已不在仓库中，备用路径改为现存的 L1 地形图集资源。
+    private const string GeographyAtlasPath = "res://assets/ui/tilemap/L1_tilemap_a.png";
     private const string Layer1TileSetPath = "res://assets/ui/tilemap/L1_hex_tileset.tres";
 
     private const string TerrainAtlasManifestPath = "res://assets/map/manifests/l1_terrain_manifest.json";

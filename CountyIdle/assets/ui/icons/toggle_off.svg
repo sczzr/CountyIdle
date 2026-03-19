@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 24" width="44" height="24">
+  <!-- 修仙控件图标：关闭态开关 -->
+  <path d="M6 5h32l4 7-4 7H6l-4-7 4-7z" fill="#0A0E0C" stroke="#6B6244" stroke-width="1.4"/>
+  <path d="M8.3 8.2h24.4l2.2 3.8-2.2 3.8H8.3L6.1 12l2.2-3.8z" fill="#141816" opacity="0.45"/>
+  <polygon points="12,4 16,8 16,16 12,20 8,16 8,8" fill="#6B6244"/>
+  <polygon points="12,6.1 14.2,8.3 14.2,15.7 12,17.9 9.8,15.7 9.8,8.3" fill="#A6925B" opacity="0.32"/>
+</svg>

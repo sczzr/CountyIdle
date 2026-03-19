@@ -1,6 +1,6 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://ct4rekfy34pn8"]
 
-[ext_resource type="Script" path="res://scripts/ui/SectNamePanel.cs" id="1_panel"]
+[ext_resource type="Script" uid="uid://g7tlwkwylbox" path="res://scripts/ui/SectNamePanel.cs" id="1_panel"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_frame"]
 bg_color = Color(0.941176, 0.917647, 0.854902, 0.98)
@@ -12,13 +12,7 @@ border_color = Color(0.298039, 0.247059, 0.2, 0.92)
 shadow_color = Color(0, 0, 0, 0.22)
 shadow_size = 12
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_header"]
-bg_color = Color(0.905882, 0.870588, 0.796078, 0.96)
-border_width_bottom = 1
-border_color = Color(0.529412, 0.45098, 0.356863, 0.8)
-
-[node name="SectNamePanel" type="Control"]
-visible = false
+[node name="SectNamePanel" type="Control" unique_id=409252604]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -28,7 +22,7 @@ grow_vertical = 2
 mouse_filter = 1
 script = ExtResource("1_panel")
 
-[node name="Overlay" type="ColorRect" parent="."]
+[node name="Overlay" type="ColorRect" parent="." unique_id=495618890]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -38,7 +32,7 @@ grow_vertical = 2
 mouse_filter = 1
 color = Color(0.08, 0.07, 0.06, 0.75)
 
-[node name="Center" type="CenterContainer" parent="Overlay"]
+[node name="Center" type="MarginContainer" parent="Overlay" unique_id=306105556]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -46,38 +40,42 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 30
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 30
 
-[node name="Frame" type="PanelContainer" parent="Overlay/Center"]
-custom_minimum_size = Vector2(760, 620)
+[node name="Frame" type="PanelContainer" parent="Overlay/Center" unique_id=2080598157]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 mouse_filter = 1
 theme_override_styles/panel = SubResource("StyleBoxFlat_frame")
 
-[node name="RootColumn" type="VBoxContainer" parent="Overlay/Center/Frame"]
+[node name="RootColumn" type="VBoxContainer" parent="Overlay/Center/Frame" unique_id=643345470]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 0
 
-[node name="HeaderRow" type="HBoxContainer" parent="Overlay/Center/Frame/RootColumn"]
+[node name="HeaderRow" type="HBoxContainer" parent="Overlay/Center/Frame/RootColumn" unique_id=113351607]
 custom_minimum_size = Vector2(0, 58)
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_header")
 theme_override_constants/separation = 16
 
-[node name="TitleLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/HeaderRow"]
+[node name="TitleLabel" type="Label" parent="Overlay/Center/Frame/RootColumn/HeaderRow" unique_id=345954505]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 20
 text = "宗门档案"
 
-[node name="CloseButton" type="Button" parent="Overlay/Center/Frame/RootColumn/HeaderRow"]
+[node name="CloseButton" type="Button" parent="Overlay/Center/Frame/RootColumn/HeaderRow" unique_id=1583023476]
 custom_minimum_size = Vector2(42, 42)
 layout_mode = 2
 text = "×"
 flat = true
 
-[node name="BodyMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn"]
+[node name="BodyMargin" type="MarginContainer" parent="Overlay/Center/Frame/RootColumn" unique_id=871132103]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/margin_left = 20
@@ -85,40 +83,40 @@ theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 10
 
-[node name="BodyColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin"]
+[node name="BodyColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin" unique_id=45342567]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 12
 
-[node name="EntriesScroll" type="ScrollContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/BodyColumn"]
+[node name="EntriesScroll" type="ScrollContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/BodyColumn" unique_id=473709659]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="EntriesColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/BodyColumn/EntriesScroll"]
+[node name="EntriesColumn" type="VBoxContainer" parent="Overlay/Center/Frame/RootColumn/BodyMargin/BodyColumn/EntriesScroll" unique_id=408144132]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
-[node name="FooterRow" type="HBoxContainer" parent="Overlay/Center/Frame/RootColumn"]
+[node name="FooterRow" type="HBoxContainer" parent="Overlay/Center/Frame/RootColumn" unique_id=1484417643]
 custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="ResetButton" type="Button" parent="Overlay/Center/Frame/RootColumn/FooterRow"]
-layout_mode = 2
+[node name="ResetButton" type="Button" parent="Overlay/Center/Frame/RootColumn/FooterRow" unique_id=793556542]
 custom_minimum_size = Vector2(120, 34)
+layout_mode = 2
 text = "恢复默认"
 
-[node name="ApplyButton" type="Button" parent="Overlay/Center/Frame/RootColumn/FooterRow"]
-layout_mode = 2
+[node name="ApplyButton" type="Button" parent="Overlay/Center/Frame/RootColumn/FooterRow" unique_id=594601727]
 custom_minimum_size = Vector2(120, 34)
+layout_mode = 2
 text = "应用命名"
 
-[node name="HintLabel" type="Label" parent="Overlay/Center/Frame/RootColumn"]
-layout_mode = 2
+[node name="HintLabel" type="Label" parent="Overlay/Center/Frame/RootColumn" unique_id=1166160965]
 custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+text = "按 Esc 可收卷。"
 horizontal_alignment = 1
 autowrap_mode = 3
-text = "按 Esc 可收卷。"

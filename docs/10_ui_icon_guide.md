@@ -173,6 +173,21 @@
 | 排序 | 双箭 | 排序切换 |
 | 搜索 | 放大镜 | 搜索入口 |
 
+### 5.6.1 表单控件主题图标
+
+| 控件 | 建议图形 | 推荐资源名 | 备注 |
+| --- | --- | --- | --- |
+| `CheckBox` 未选中 | 阵法方印 + 四角节点 | `checkbox_unchecked.svg` | 用于普通勾选框 |
+| `CheckBox` 已选中 | 发光符文勾 + 四角节点 | `checkbox_checked.svg` | 兼作 `Tree` 勾选态备用资源 |
+| `CheckBox` 单选态未选中 | 六边阵眼 | `radio_unchecked.svg` | 供 `radio_unchecked` 使用 |
+| `CheckBox` 单选态已选中 | 发光灵石核心 | `radio_checked.svg` | 供 `radio_checked` 使用 |
+| `Slider` 手柄 | 菱形晶体 / 飞剑剑格 | `slider_grabber.svg` | 用于 `HSlider / VSlider` |
+| `Slider` 高亮手柄 | 灵气青高亮晶体 | `slider_grabber_hl.svg` | 用于 hover / focus |
+| `OptionButton` 下拉箭头 | 锋利矛头倒三角 | `arrow_down.svg` | 用于 `OptionButton` 与展开态箭头 |
+| `Tree` 收拢箭头 | 右指矛头 / 剑尖 | `arrow_right.svg` | 用于 `Tree` 的 `arrow_collapsed` |
+| `CheckButton` 关闭 | 八边枢纽滑轨（暗） | `toggle_off.svg` | 用于 toggle / switch 未开启态 |
+| `CheckButton` 开启 | 发光金石枢纽滑轨 | `toggle_on.svg` | 用于 toggle / switch 开启态 |
+
 ### 5.7 状态与提示
 
 | 状态 | 建议图形 | 说明 |
@@ -191,6 +206,7 @@
 - `map_zoom_in` `map_zoom_out` `map_zoom_reset` `map_primary_action` `map_secondary_action` `map_regenerate`
 - `settings` `save` `close` `back` `confirm` `cancel` `filter` `sort` `search`
 - `warning` `info` `success`
+- 表单控件资源可直接放在 `CountyIdle/assets/ui/icons/`，沿用显式语义名（如 `checkbox_checked.svg`、`slider_grabber.svg`），不强制并入按钮图集
 
 ## 7. 图集存储规范（Atlas）
 

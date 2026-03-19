@@ -1,268 +1,524 @@
 extends Node
 
-const PAPER_BG := Color(0.956, 0.945, 0.918, 1.0)
-const INK_BLACK := Color(0.173, 0.173, 0.173, 1.0)
-const INK_GRAY := Color(0.478, 0.478, 0.478, 1.0)
-const CINNABAR := Color(0.651, 0.192, 0.165, 1.0)
-const CELADON := Color(0.439, 0.553, 0.506, 1.0)
+const BG_DARK := Color(0.027, 0.033, 0.030, 0.96)
+const PANEL_DARK := Color(0.075, 0.085, 0.081, 0.90)
+const PANEL_EDGE := Color(0.420, 0.384, 0.267, 0.45)
+const GOLD := Color(0.894, 0.753, 0.310, 1.0)
+const GOLD_DIM := Color(0.420, 0.384, 0.267, 1.0)
+const INK_MAIN := Color(0.910, 0.922, 0.914, 1.0)
+const INK_MUTED := Color(0.557, 0.596, 0.580, 1.0)
+const INK_DIM := Color(0.420, 0.384, 0.267, 0.85)
+const ACCENT := Color(0.247, 0.851, 0.659, 1.0)
+const DANGER := Color(0.851, 0.282, 0.220, 1.0)
 
-var _overlay: ColorRect
-var _wrapper: Control
-var _roster_frame: Control
-var _profile_panel: Control
-var _right_panel: Control
+# 维持国风手札气质的字体与形状素材。
+const FONT_TITLE := preload("res://assets/ui/fonts/MaShanZheng-Regular.ttf")
+const FONT_BODY := preload("res://assets/ui/fonts/NotoSerifSC[wght].ttf")
+const TAG_POLY_TEXTURE := preload("res://assets/ui/shapes/tag_poly.svg")
+
+var _backdrop: ColorRect
+var _tree_page: Control
+var _profile_page: Control
+var _roster_panel: Control
+var _profile_row: Control
+var _back_button: Button
+var _close_button: Button
 var _current_tween: Tween
 
 
 func _ready() -> void:
+	# 视觉层只注入样式与动效，权威数据仍由 C# 面板维护。
 	var root: Node = get_parent()
-	_overlay = root.get_node("Overlay")
-	_wrapper = root.get_node("Overlay/Wrapper")
-	_roster_frame = root.get_node("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/RosterFrame")
-	_profile_panel = root.get_node("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel")
-	_right_panel = root.get_node("Overlay/Wrapper/RootColumn/BodyRow/RightPanel")
+	_backdrop = root.get_node("Backdrop")
+	_tree_page = root.get_node("ScreenMargin/ScreenRoot/TreePage")
+	_profile_page = root.get_node("ScreenMargin/ScreenRoot/ProfilePage")
+	_roster_panel = root.get_node("ScreenMargin/ScreenRoot/TreePage/TreeColumn/RosterPanel")
+	_profile_row = root.get_node("ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow")
+	_back_button = root.get_node("TopOverlay/BackButton")
+	_close_button = root.get_node("TopOverlay/CloseButton")
 	apply_theme_styles()
 	reset_state()
 
 
 func apply_theme_styles() -> void:
 	var root := get_parent()
-	_apply_panel_style("Overlay/Wrapper", _create_paper_style())
-	_apply_panel_style("Overlay/Wrapper/RootColumn/HeaderPanel", _create_inset_paper_style(Color(PAPER_BG.r, PAPER_BG.g, PAPER_BG.b, 0.78), Color(INK_GRAY.r, INK_GRAY.g, INK_GRAY.b, 0.45)))
-	_apply_panel_style("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel", _create_inset_paper_style(Color(PAPER_BG.r, PAPER_BG.g, PAPER_BG.b, 0.32), Color(INK_GRAY.r, INK_GRAY.g, INK_GRAY.b, 0.25)))
-	_apply_panel_style("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/SummaryPanel", _create_inset_paper_style(Color(PAPER_BG.r, PAPER_BG.g, PAPER_BG.b, 0.58), Color(INK_GRAY.r, INK_GRAY.g, INK_GRAY.b, 0.35)))
-	_apply_panel_style("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/FilterPanel", _create_inset_paper_style(Color(PAPER_BG.r, PAPER_BG.g, PAPER_BG.b, 0.46), Color(INK_GRAY.r, INK_GRAY.g, INK_GRAY.b, 0.32)))
-	var debug_panel := root.get_node_or_null("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/DebugPanel")
-	if debug_panel != null:
-		_apply_panel_style("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/DebugPanel", _create_inset_paper_style(Color(PAPER_BG.r, PAPER_BG.g, PAPER_BG.b, 0.42), Color(INK_GRAY.r, INK_GRAY.g, INK_GRAY.b, 0.32)))
-	_apply_panel_style("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/RosterFrame", _create_inset_paper_style(Color(PAPER_BG.r, PAPER_BG.g, PAPER_BG.b, 0.62), Color(INK_GRAY.r, INK_GRAY.g, INK_GRAY.b, 0.30)))
-	_apply_panel_style("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel", _create_inset_paper_style(Color(PAPER_BG.r, PAPER_BG.g, PAPER_BG.b, 0.62), Color(INK_GRAY.r, INK_GRAY.g, INK_GRAY.b, 0.35)))
-	_apply_panel_style("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/DirectivePanel", _create_transparent_style())
-	_apply_panel_style("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/ProfileHeader/RootCircle", _create_circle_style(Color(1, 1, 1, 0), CINNABAR))
-	_apply_panel_style("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel", _create_inset_paper_style(Color(0, 0, 0, 0.03), Color(0.74, 0.68, 0.60, 1.0)))
-	_apply_panel_style("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel", _create_inset_paper_style(Color(0, 0, 0, 0.02), Color(0.78, 0.71, 0.61, 1.0)))
-	_apply_panel_style("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/TraitPanel", _create_inset_paper_style(Color(0, 0, 0, 0.02), Color(0.78, 0.71, 0.61, 1.0)))
-	_apply_panel_style("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/FullInfoPanel/FullInfoMargin/FullInfoColumn/AnnotationPanel", _create_transparent_style())
-	_apply_panel_style("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/CombatTag", _create_combat_tag_style())
-	_apply_panel_style("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/FullInfoPanel", _create_inset_paper_style(Color(0.97, 0.96, 0.94, 1.0), Color(0.56, 0.48, 0.37, 0.80), 2))
+	_backdrop.color = BG_DARK
 
-	for key in ["Insight", "Potential", "Health", "Craft", "Mood", "HeartState", "Combat", "Execution", "Contribution"]:
-		_apply_metric_tile_style(key)
+	var hex_grid := root.get_node_or_null("HexGrid") as TextureRect
+	if hex_grid != null:
+		hex_grid.self_modulate = Color(1, 1, 1, 0.08)
+
+	for path in [
+		"ScreenMargin/ScreenRoot/TreePage/TreeColumn/SummaryPanel",
+		"ScreenMargin/ScreenRoot/TreePage/TreeColumn/FilterPanel",
+		"ScreenMargin/ScreenRoot/TreePage/TreeColumn/DebugPanel",
+		"ScreenMargin/ScreenRoot/TreePage/TreeColumn/RosterPanel",
+		"ScreenMargin/ScreenRoot/TreePage/TreeColumn/HeaderRow/TreeCountBadge",
+		"ScreenMargin/ScreenRoot/TreePage/TreeColumn/RosterPanel/RosterMargin/RosterScroll/ChartRoot/SectRootCenter/SectRootCard",
+		"ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/LeftPanel",
+		"ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/MiddlePanel",
+		"ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel",
+		"ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/RealmBox",
+		"ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/QiSeaBox",
+		"ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/TraitPanel",
+		"ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/DirectiveActions",
+		"ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/LogPanel"
+	]:
+		_apply_stylebox_safe(root, path, "panel", _create_panel_glass_style())
+
+	_apply_stylebox_safe(
+		root,
+		"ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/CombatTag",
+		"panel",
+		_create_combat_tag_style()
+	)
+	_apply_stylebox_safe(
+		root,
+		"ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/LeftPanel/LeftMargin/LeftColumn/RootCircleWrap/RootCircle",
+		"panel",
+		_create_circle_style()
+	)
+	_apply_stylebox_safe(
+		root,
+		"ScreenMargin/ScreenRoot/TreePage/TreeColumn/HeaderRow/TitleGroup/TitleSeal",
+		"panel",
+		_create_seal_style()
+	)
+	_apply_stylebox_safe(
+		root,
+		"ScreenMargin/ScreenRoot/TreePage/TreeColumn/RosterPanel/RosterMargin/RosterScroll/ChartRoot/Templates/PeakColumnTemplate/PeakCard",
+		"panel",
+		_create_peak_card_style()
+	)
+	_apply_stylebox_safe(
+		root,
+		"ScreenMargin/ScreenRoot/TreePage/TreeColumn/RosterPanel/RosterMargin/RosterScroll/ChartRoot/Templates/HallGroupTemplate/HallCard",
+		"panel",
+		_create_hall_card_style()
+	)
+
+	_style_option_button(root, "ScreenMargin/ScreenRoot/TreePage/TreeColumn/FilterPanel/FilterMargin/FilterColumn/FilterOption")
+	_style_option_button(root, "ScreenMargin/ScreenRoot/TreePage/TreeColumn/FilterPanel/FilterMargin/FilterColumn/SortOption")
+
+	for path in [
+		"TopOverlay/BackButton",
+		"TopOverlay/CloseButton",
+		"ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/DirectiveActions/ActionMargin/ActionColumn/ActionGrid/DirectiveNoneButton",
+		"ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/DirectiveActions/ActionMargin/ActionColumn/ActionGrid/DirectiveOuterButton",
+		"ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/DirectiveActions/ActionMargin/ActionColumn/ActionGrid/DirectiveStewardButton",
+		"ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/DirectiveActions/ActionMargin/ActionColumn/ActionGrid/CultivationJumpButton",
+		"ScreenMargin/ScreenRoot/TreePage/TreeColumn/DebugPanel/DebugMargin/DebugRow/RandomRosterButton"
+	]:
+		_style_button(root, path)
+	style_roster_card(root.get_node("ScreenMargin/ScreenRoot/TreePage/TreeColumn/RosterPanel/RosterMargin/RosterScroll/ChartRoot/Templates/DiscipleCardTemplate"), false)
+
+	_style_progress_bar(root, "ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/RealmBox/RealmMargin/RealmColumn/RealmProgress", GOLD)
+	_style_progress_bar(root, "ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/QiSeaBox/QiSeaMargin/QiSeaColumn/QiSeaProgress", ACCENT)
 
 	for entry in [
-		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/ProfileHeader/ProfileTextColumn/ProfileName", 26, INK_BLACK],
-		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/ProfileHeader/ProfileTextColumn/ProfileMeta", 12, INK_GRAY],
-		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/ProfileHeader/ProfileTextColumn/ProfileStatus", 12, INK_BLACK],
-		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveStatus", 12, INK_BLACK],
-		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveEffect", 11, INK_GRAY],
-		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/ProfileHeader/RootCircle/RootCircleLabel", 12, CINNABAR],
-		["Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/SummaryPanel/SummaryMargin/SummaryColumn/SummaryLabel", 12, INK_BLACK],
-		["Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/SummaryPanel/SummaryMargin/SummaryColumn/GovernanceLabel", 11, INK_GRAY],
-		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/RealmBox/RealmStatus", 13, INK_BLACK],
-		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/RealmBox/RealmHint", 11, INK_GRAY],
-		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/QiSeaBox/QiSeaHint", 11, INK_GRAY],
-		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/CombatTag/CombatMargin/CombatColumn/CombatMain", 22, CINNABAR],
-		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/CombatTag/CombatMargin/CombatColumn/CombatHint", 12, INK_GRAY],
-		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/FullInfoPanel/FullInfoMargin/FullInfoColumn/AnnotationPanel/AnnotationMargin/AnnotationColumn/AnnotationText", 13, Color(0.25, 0.25, 0.25, 1.0)],
-		["Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/FullInfoPanel/FullInfoMargin/FullInfoColumn/FullInfoHeader", 13, INK_BLACK],
-		["Overlay/Wrapper/RootColumn/HintLabel", 11, INK_GRAY]
+		["ScreenMargin/ScreenRoot/TreePage/TreeColumn/HeaderRow/TitleGroup/TitleColumn/TitleLabel", 26, GOLD, true],
+		["ScreenMargin/ScreenRoot/TreePage/TreeColumn/HeaderRow/TitleGroup/TitleColumn/SubtitleLabel", 12, INK_MUTED, false],
+		["ScreenMargin/ScreenRoot/TreePage/TreeColumn/HeaderRow/TitleGroup/TitleSeal/SealLabel", 24, GOLD, true],
+		["ScreenMargin/ScreenRoot/TreePage/TreeColumn/HeaderRow/TreeCountBadge/TreeCountLabel", 12, GOLD, false],
+		["ScreenMargin/ScreenRoot/TreePage/TreeColumn/RosterPanel/RosterMargin/RosterScroll/ChartRoot/SectRootCenter/SectRootCard/SectRootMargin/SectRootColumn/SectRoleLabel", 11, GOLD_DIM, false],
+		["ScreenMargin/ScreenRoot/TreePage/TreeColumn/RosterPanel/RosterMargin/RosterScroll/ChartRoot/SectRootCenter/SectRootCard/SectRootMargin/SectRootColumn/SectTitleLabel", 26, GOLD, true],
+		["ScreenMargin/ScreenRoot/TreePage/TreeColumn/RosterPanel/RosterMargin/RosterScroll/ChartRoot/SectRootCenter/SectRootCard/SectRootMargin/SectRootColumn/SectMetaLabel", 11, INK_MUTED, false],
+		["ScreenMargin/ScreenRoot/TreePage/TreeColumn/SummaryPanel/SummaryMargin/SummaryColumn/SummaryTitle", 13, GOLD_DIM, false],
+		["ScreenMargin/ScreenRoot/TreePage/TreeColumn/SummaryPanel/SummaryMargin/SummaryColumn/SummaryLabel", 12, INK_MAIN, false],
+		["ScreenMargin/ScreenRoot/TreePage/TreeColumn/SummaryPanel/SummaryMargin/SummaryColumn/GovernanceLabel", 11, INK_MUTED, false],
+		["ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/LeftPanel/LeftMargin/LeftColumn/ProfileName", 30, INK_MAIN, true],
+		["ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/LeftPanel/LeftMargin/LeftColumn/ProfileMeta", 12, INK_MUTED, false],
+		["ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/LeftPanel/LeftMargin/LeftColumn/ProfileStatus", 12, INK_DIM, false],
+		["ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/LeftPanel/LeftMargin/LeftColumn/RootCircleWrap/RootCircle/RootCircleLabel", 12, GOLD, true],
+		["ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/DirectiveHeader/DirectiveStatus", 12, INK_MAIN, false],
+		["ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/DirectiveHeader/DirectiveEffect", 11, INK_MUTED, false],
+		["ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/RealmBox/RealmMargin/RealmColumn/RealmStatus", 12, INK_MAIN, false],
+		["ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/RealmBox/RealmMargin/RealmColumn/RealmHint", 11, INK_MUTED, false],
+		["ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/QiSeaBox/QiSeaMargin/QiSeaColumn/QiSeaHint", 11, INK_MUTED, false],
+		["ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/CombatTag/CombatMargin/CombatColumn/CombatMain", 20, DANGER, true],
+		["ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/CombatTag/CombatMargin/CombatColumn/CombatHint", 11, INK_MUTED, false],
+		["ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/TraitPanel/TraitMargin/TraitColumn/TraitTitle", 12, GOLD_DIM, false],
+		["ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/RightPanel/RightMargin/RightColumn/DirectiveActions/ActionMargin/ActionColumn/ActionTitle", 12, GOLD_DIM, false],
+		["ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/LogPanel/LogMargin/LogColumn/LogHeaderRow/LogTitle", 12, INK_MAIN, false],
+		["ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/LogPanel/LogMargin/LogColumn/LogSummary", 12, INK_MUTED, false],
+		["ScreenMargin/ScreenRoot/HintLabel", 11, INK_MUTED, false]
 	]:
-		_apply_label_style(entry[0], entry[1], entry[2])
+		_apply_label_style(root, entry[0], entry[1], entry[2], entry[3])
 
-	var full_info_label: RichTextLabel = root.get_node("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/FullInfoPanel/FullInfoMargin/FullInfoColumn/FullInfoScroll/FullInfoLabel")
-	full_info_label.add_theme_color_override("default_color", Color(0.25, 0.25, 0.25, 1.0))
-	full_info_label.add_theme_stylebox_override("normal", _create_transparent_style())
+	for entry in [
+		["ScreenMargin/ScreenRoot/TreePage/TreeColumn/RosterPanel/RosterMargin/RosterScroll/ChartRoot/Templates/PeakColumnTemplate/PeakCard/PeakMargin/PeakColumn/PeakTagLabel", 10, ACCENT, false],
+		["ScreenMargin/ScreenRoot/TreePage/TreeColumn/RosterPanel/RosterMargin/RosterScroll/ChartRoot/Templates/PeakColumnTemplate/PeakCard/PeakMargin/PeakColumn/PeakTitleLabel", 18, INK_MAIN, true],
+		["ScreenMargin/ScreenRoot/TreePage/TreeColumn/RosterPanel/RosterMargin/RosterScroll/ChartRoot/Templates/PeakColumnTemplate/PeakCard/PeakMargin/PeakColumn/PeakCountLabel", 11, INK_MUTED, false],
+		["ScreenMargin/ScreenRoot/TreePage/TreeColumn/RosterPanel/RosterMargin/RosterScroll/ChartRoot/Templates/HallGroupTemplate/HallCard/HallMargin/HallColumn/HallTitleLabel", 13, GOLD, false],
+		["ScreenMargin/ScreenRoot/TreePage/TreeColumn/RosterPanel/RosterMargin/RosterScroll/ChartRoot/Templates/HallGroupTemplate/HallCard/HallMargin/HallColumn/HallMetaLabel", 10, INK_MUTED, false],
+		["ScreenMargin/ScreenRoot/TreePage/TreeColumn/RosterPanel/RosterMargin/RosterScroll/ChartRoot/Templates/DiscipleCardTemplate/CardMargin/CardColumn/DiscipleBadgeLabel", 10, DANGER, false],
+		["ScreenMargin/ScreenRoot/TreePage/TreeColumn/RosterPanel/RosterMargin/RosterScroll/ChartRoot/Templates/DiscipleCardTemplate/CardMargin/CardColumn/DiscipleNameLabel", 16, INK_MAIN, true],
+		["ScreenMargin/ScreenRoot/TreePage/TreeColumn/RosterPanel/RosterMargin/RosterScroll/ChartRoot/Templates/DiscipleCardTemplate/CardMargin/CardColumn/DiscipleRealmLabel", 11, ACCENT, false],
+		["ScreenMargin/ScreenRoot/TreePage/TreeColumn/RosterPanel/RosterMargin/RosterScroll/ChartRoot/Templates/DiscipleCardTemplate/CardMargin/CardColumn/DiscipleDutyLabel", 10, INK_MUTED, false]
+	]:
+		_apply_label_style(root, entry[0], entry[1], entry[2], entry[3])
 
-	var realm_hint: Label = root.get_node("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/RealmBox/RealmHint")
-	realm_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	var qi_hint: Label = root.get_node("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/QiSeaBox/QiSeaHint")
-	qi_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	var combat_main: Label = root.get_node("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/CombatTag/CombatMargin/CombatColumn/CombatMain")
-	combat_main.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	var combat_hint: Label = root.get_node("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/CombatTag/CombatMargin/CombatColumn/CombatHint")
-	combat_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	var branch_line := root.get_node_or_null("ScreenMargin/ScreenRoot/TreePage/TreeColumn/RosterPanel/RosterMargin/RosterScroll/ChartRoot/BranchWrap/BranchLine") as ColorRect
+	if branch_line != null:
+		branch_line.color = Color(GOLD.r, GOLD.g, GOLD.b, 0.22)
+	var root_connector := root.get_node_or_null("ScreenMargin/ScreenRoot/TreePage/TreeColumn/RosterPanel/RosterMargin/RosterScroll/ChartRoot/RootConnectorCenter/RootConnector") as ColorRect
+	if root_connector != null:
+		root_connector.color = Color(GOLD.r, GOLD.g, GOLD.b, 0.35)
 
-	var close_button: Button = root.get_node("Overlay/Wrapper/RootColumn/HeaderPanel/HeaderMargin/HeaderRow/CloseButton")
-	close_button.add_theme_font_size_override("font_size", 22)
-	close_button.add_theme_color_override("font_color", INK_BLACK)
-	close_button.add_theme_color_override("font_hover_color", CINNABAR)
-	close_button.add_theme_color_override("font_pressed_color", CINNABAR)
-	for state in ["normal", "hover", "pressed", "focus"]:
-		close_button.add_theme_stylebox_override(state, _create_transparent_style())
-
-	_style_paper_option_button(root.get_node("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/FilterPanel/FilterMargin/FilterColumn/FilterOption"))
-	_style_paper_option_button(root.get_node("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/FilterPanel/FilterMargin/FilterColumn/SortOption"))
-	var random_roster_button := root.get_node_or_null("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/DebugPanel/DebugMargin/DebugRow/RandomRosterButton")
-	if random_roster_button != null:
-		_style_paper_button(random_roster_button)
-	_style_paper_button(root.get_node("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveButtonRow/DirectiveNoneButton"))
-	_style_paper_button(root.get_node("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveButtonRow/DirectiveOuterButton"))
-	_style_paper_button(root.get_node("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/ProfilePanel/ProfileMargin/ProfileRow/DirectivePanel/DirectiveMargin/DirectiveColumn/DirectiveButtonRow/DirectiveStewardButton"))
-	_style_roster_tree(root.get_node("Overlay/Wrapper/RootColumn/BodyRow/LeftPanel/LeftMargin/RosterColumn/RosterFrame/RosterMargin/RosterTree"))
-	_style_ink_progress_bar(root.get_node("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/RealmBox/RealmProgress"), INK_BLACK, Color(0.91, 0.89, 0.84, 1.0))
-	_style_ink_progress_bar(root.get_node("Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/CultivationPanel/CultivationMargin/CultivationColumn/QiSeaBox/QiSeaProgress"), CELADON, Color(0.91, 0.89, 0.84, 1.0))
+	for metric_key in ["Insight", "Potential", "Health", "Craft", "Mood", "HeartState", "Combat", "Execution", "Contribution"]:
+		_apply_metric_tile_style(root, metric_key)
 
 
 func play_open() -> void:
-	_kill_tween()
-	_overlay.modulate.a = 0.0
-	_wrapper.modulate.a = 0.0
-	_wrapper.scale = Vector2.ONE
-	_current_tween = create_tween()
-	_current_tween.set_parallel(true)
-	_current_tween.tween_property(_overlay, "modulate:a", 1.0, 0.18)
-	_current_tween.tween_property(_wrapper, "modulate:a", 1.0, 0.2)
+	# 开场轻微淡入，让宗门大谱有“翻卷”气质。
+	if _tree_page == null or _profile_page == null:
+		return
+	_fade_in_page(_profile_page if _profile_page.visible else _tree_page)
+
+
+func switch_to_tree() -> void:
+	# 切回宗门大谱时做轻微淡入。
+	if _tree_page == null:
+		return
+	_fade_in_page(_tree_page)
+
+
+func switch_to_profile() -> void:
+	# 进入命谱详情时做轻微淡入。
+	if _profile_page == null:
+		return
+	_fade_in_page(_profile_page)
 
 
 func pulse_roster_refresh() -> void:
+	# 名册刷新时做一次轻微脉冲，避免界面僵硬。
+	if _roster_panel == null:
+		return
 	_kill_tween()
-	_roster_frame.scale = Vector2.ONE
-	_roster_frame.modulate.a = 0.82
+	_roster_panel.scale = Vector2.ONE
 	_current_tween = create_tween()
-	_current_tween.set_parallel(true)
-	_current_tween.tween_property(_roster_frame, "modulate:a", 1.0, 0.1)
+	_current_tween.tween_property(_roster_panel, "scale", Vector2(1.02, 1.02), 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_current_tween.tween_property(_roster_panel, "scale", Vector2.ONE, 0.18).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 
 
 func transition_profile_card() -> void:
+	# 详情卡片更新时做轻微抬升，提示已切换目标。
+	if _profile_row == null:
+		return
 	_kill_tween()
-	_profile_panel.scale = Vector2.ONE
-	_profile_panel.modulate.a = 0.84
-	_right_panel.modulate.a = 0.9
+	_profile_row.scale = Vector2.ONE
 	_current_tween = create_tween()
-	_current_tween.set_parallel(true)
-	_current_tween.tween_property(_profile_panel, "modulate:a", 1.0, 0.12)
-	_current_tween.tween_property(_right_panel, "modulate:a", 1.0, 0.12)
+	_current_tween.tween_property(_profile_row, "scale", Vector2(1.01, 1.01), 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_current_tween.tween_property(_profile_row, "scale", Vector2.ONE, 0.18).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 
 
 func apply_metric_value_tone(value_label: Label, value: int) -> void:
-	var clamped: int = clampi(value, 0, 100)
-	var color := INK_GRAY
-	if clamped >= 85:
-		color = CINNABAR
-	elif clamped >= 65:
-		color = INK_BLACK
-	elif clamped >= 45:
-		color = CELADON
+	# 数值越高越显色，突出天赋差异。
+	var color := INK_MAIN
+	if value >= 85:
+		color = DANGER
+	elif value >= 70:
+		color = GOLD
+	elif value <= 30:
+		color = INK_MUTED
 	value_label.add_theme_color_override("font_color", color)
+	value_label.add_theme_font_override("font", FONT_BODY)
+	value_label.add_theme_font_size_override("font_size", 20)
 
 
 func style_trait_tag(panel: PanelContainer, label: Label) -> void:
-	panel.add_theme_stylebox_override("panel", _create_trait_tag_style())
+	# 性情标签使用金线边框强化玉简感。
+	panel.add_theme_stylebox_override("panel", _create_tag_style())
+	label.add_theme_font_override("font", FONT_BODY)
 	label.add_theme_font_size_override("font_size", 12)
-	label.add_theme_color_override("font_color", CINNABAR)
+	label.add_theme_color_override("font_color", GOLD)
 
 
 func reset_state() -> void:
+	# 恢复默认透明度与缩放，避免上次动效残留。
+	if _tree_page != null:
+		_tree_page.modulate = Color(1, 1, 1, 1)
+	if _profile_page != null:
+		_profile_page.modulate = Color(1, 1, 1, 1)
+	if _roster_panel != null:
+		_roster_panel.scale = Vector2.ONE
+	if _profile_row != null:
+		_profile_row.scale = Vector2.ONE
+
+
+func _fade_in_page(page: Control) -> void:
 	_kill_tween()
-	_overlay.modulate.a = 1.0
-	_wrapper.modulate.a = 1.0
-	_wrapper.scale = Vector2.ONE
-	_roster_frame.scale = Vector2.ONE
-	_roster_frame.modulate.a = 1.0
-	_profile_panel.scale = Vector2.ONE
-	_profile_panel.modulate.a = 1.0
-	_right_panel.modulate.a = 1.0
+	page.modulate.a = 0.0
+	_current_tween = create_tween()
+	_current_tween.tween_property(page, "modulate:a", 1.0, 0.22).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 
 
-func _apply_panel_style(path: String, style: StyleBox) -> void:
-	var panel := get_parent().get_node(path)
-	if panel is Control:
-		panel.add_theme_stylebox_override("panel", style)
+func _apply_stylebox_safe(root: Node, path: String, theme_type: String, style: StyleBox) -> void:
+	var control := root.get_node_or_null(path) as Control
+	if control == null:
+		push_warning("DisciplePanelVisualFx missing node: %s" % path)
+		return
+	control.add_theme_stylebox_override(theme_type, style)
 
 
-func _apply_label_style(path: String, font_size: int, color: Color) -> void:
-	var label: Label = get_parent().get_node(path)
+func _apply_label_style(root: Node, path: String, font_size: int, color: Color, use_title_font: bool) -> void:
+	var label := root.get_node_or_null(path) as Label
+	if label == null:
+		push_warning("DisciplePanelVisualFx missing label: %s" % path)
+		return
+	label.add_theme_font_override("font", FONT_TITLE if use_title_font else FONT_BODY)
 	label.add_theme_font_size_override("font_size", font_size)
 	label.add_theme_color_override("font_color", color)
 
 
-func _apply_metric_tile_style(key: String) -> void:
-	var tile_path := "Overlay/Wrapper/RootColumn/BodyRow/RightPanel/RightMargin/RightColumn/DashboardRow/FoundationPanel/FoundationMargin/FoundationColumn/StatsCenter/MetricGrid/%sTile" % key
-	_apply_panel_style(tile_path, _create_inset_paper_style(Color(0, 0, 0, 0.03), Color(INK_GRAY.r, INK_GRAY.g, INK_GRAY.b, 0.26)))
-	var title_label: Label = get_parent().get_node("%s/%sMargin/%sColumn/%sTitle" % [tile_path, key, key, key])
-	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title_label.add_theme_font_size_override("font_size", 12)
-	title_label.add_theme_color_override("font_color", INK_GRAY)
-	var value_label: Label = get_parent().get_node("%s/%sMargin/%sColumn/%sValue" % [tile_path, key, key, key])
-	value_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	value_label.add_theme_font_size_override("font_size", 20)
-	value_label.add_theme_color_override("font_color", INK_BLACK)
-
-
-func _style_paper_option_button(option_button: OptionButton) -> void:
-	option_button.custom_minimum_size = Vector2(180, 0)
-	option_button.add_theme_font_size_override("font_size", 12)
-	option_button.add_theme_stylebox_override("normal", _create_paper_button_style())
-	option_button.add_theme_stylebox_override("hover", _create_paper_button_style(Color(CINNABAR.r, CINNABAR.g, CINNABAR.b, 0.08)))
-	option_button.add_theme_stylebox_override("pressed", _create_paper_button_style(Color(CINNABAR.r, CINNABAR.g, CINNABAR.b, 0.14)))
-	option_button.add_theme_stylebox_override("focus", _create_paper_button_style(Color(CINNABAR.r, CINNABAR.g, CINNABAR.b, 0.08)))
-	option_button.add_theme_color_override("font_color", INK_BLACK)
-
-
-func _style_paper_button(button: Button) -> void:
+func _style_button(root: Node, path: String) -> void:
+	var button := root.get_node_or_null(path) as Button
+	if button == null:
+		return
+	button.add_theme_font_override("font", FONT_BODY)
 	button.add_theme_font_size_override("font_size", 12)
-	button.add_theme_color_override("font_color", INK_BLACK)
-	button.add_theme_color_override("font_hover_color", INK_BLACK)
-	button.add_theme_color_override("font_pressed_color", CINNABAR)
-	button.add_theme_color_override("font_focus_color", INK_BLACK)
-	button.add_theme_color_override("font_disabled_color", Color(INK_GRAY.r, INK_GRAY.g, INK_GRAY.b, 0.7))
-	button.add_theme_stylebox_override("normal", _create_paper_button_style())
-	button.add_theme_stylebox_override("hover", _create_paper_button_style(Color(CINNABAR.r, CINNABAR.g, CINNABAR.b, 0.08)))
-	button.add_theme_stylebox_override("pressed", _create_paper_button_style(Color(CINNABAR.r, CINNABAR.g, CINNABAR.b, 0.14)))
-	button.add_theme_stylebox_override("focus", _create_paper_button_style(Color(CINNABAR.r, CINNABAR.g, CINNABAR.b, 0.08)))
-	button.add_theme_stylebox_override("disabled", _create_paper_button_style(Color(0, 0, 0, 0.02)))
+	button.add_theme_color_override("font_color", INK_MAIN)
+	button.add_theme_color_override("font_hover_color", GOLD)
+	button.add_theme_color_override("font_pressed_color", GOLD)
+	button.add_theme_color_override("font_disabled_color", INK_MUTED)
+	button.add_theme_stylebox_override("normal", _create_button_style(false))
+	button.add_theme_stylebox_override("hover", _create_button_style(true))
+	button.add_theme_stylebox_override("pressed", _create_button_style(true))
+	button.add_theme_stylebox_override("disabled", _create_button_style(false, true))
+
+
+func style_peak_card(panel: PanelContainer) -> void:
+	if panel == null:
+		return
+	panel.add_theme_stylebox_override("panel", _create_peak_card_style())
+
+
+func style_hall_card(panel: PanelContainer) -> void:
+	if panel == null:
+		return
+	panel.add_theme_stylebox_override("panel", _create_hall_card_style())
+
+
+func style_roster_card(panel: PanelContainer, is_selected: bool) -> void:
+	if panel == null:
+		return
+	panel.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	panel.add_theme_stylebox_override("panel", _create_roster_card_style(is_selected))
+
+
+func _style_option_button(root: Node, path: String) -> void:
+	var option_button := root.get_node_or_null(path) as OptionButton
+	if option_button == null:
+		return
+	option_button.add_theme_font_override("font", FONT_BODY)
+	option_button.add_theme_font_size_override("font_size", 12)
+	option_button.add_theme_color_override("font_color", INK_MAIN)
+	option_button.add_theme_stylebox_override("normal", _create_button_style(false))
+	option_button.add_theme_stylebox_override("hover", _create_button_style(true))
+	option_button.add_theme_stylebox_override("pressed", _create_button_style(true))
+	option_button.add_theme_stylebox_override("focus", _create_button_style(true))
 
 
 func _style_roster_tree(tree: Tree) -> void:
-	tree.add_theme_color_override("font_color", INK_BLACK)
-	tree.add_theme_color_override("font_selected_color", CINNABAR)
-	tree.add_theme_color_override("guide_color", Color(INK_GRAY.r, INK_GRAY.g, INK_GRAY.b, 0.45))
-	tree.add_theme_color_override("relationship_line_color", Color(INK_GRAY.r, INK_GRAY.g, INK_GRAY.b, 0.35))
-	tree.add_theme_stylebox_override("selected", _create_inset_paper_style(Color(CINNABAR.r, CINNABAR.g, CINNABAR.b, 0.08), Color(CINNABAR.r, CINNABAR.g, CINNABAR.b, 0.45)))
-	tree.add_theme_stylebox_override("selected_focus", _create_inset_paper_style(Color(CINNABAR.r, CINNABAR.g, CINNABAR.b, 0.12), Color(CINNABAR.r, CINNABAR.g, CINNABAR.b, 0.65)))
-	tree.add_theme_stylebox_override("cursor", _create_inset_paper_style(Color(CINNABAR.r, CINNABAR.g, CINNABAR.b, 0.08), Color(CINNABAR.r, CINNABAR.g, CINNABAR.b, 0.45)))
-	tree.add_theme_stylebox_override("cursor_unfocused", _create_inset_paper_style(Color(CINNABAR.r, CINNABAR.g, CINNABAR.b, 0.05), Color(CINNABAR.r, CINNABAR.g, CINNABAR.b, 0.25)))
-	tree.add_theme_stylebox_override("panel", _create_inset_paper_style(Color(PAPER_BG.r, PAPER_BG.g, PAPER_BG.b, 0.08), Color(INK_GRAY.r, INK_GRAY.g, INK_GRAY.b, 0.18)))
+	tree.add_theme_color_override("font_color", INK_MAIN)
+	tree.add_theme_color_override("font_selected_color", GOLD)
+	tree.add_theme_color_override("guide_color", Color(GOLD_DIM.r, GOLD_DIM.g, GOLD_DIM.b, 0.55))
+	tree.add_theme_color_override("relationship_line_color", Color(GOLD_DIM.r, GOLD_DIM.g, GOLD_DIM.b, 0.45))
+	tree.add_theme_stylebox_override("selected", _create_selection_style())
+	tree.add_theme_stylebox_override("selected_focus", _create_selection_style(true))
+	tree.add_theme_stylebox_override("cursor", _create_selection_style())
+	tree.add_theme_stylebox_override("cursor_unfocused", _create_selection_style())
+	tree.add_theme_stylebox_override("panel", _create_panel_glass_style(0.35))
 
 
-func _style_ink_progress_bar(progress_bar: ProgressBar, fill_color: Color, background_color: Color) -> void:
-	progress_bar.add_theme_stylebox_override("fill", _create_progress_fill_style(fill_color))
-	progress_bar.add_theme_stylebox_override("background", _create_progress_bar_style(background_color))
-	progress_bar.custom_minimum_size = Vector2(0, 14)
+func _style_progress_bar(root: Node, path: String, fill_color: Color) -> void:
+	var progress := root.get_node_or_null(path) as ProgressBar
+	if progress == null:
+		return
+	progress.add_theme_stylebox_override("background", _create_progress_bg())
+	progress.add_theme_stylebox_override("fill", _create_progress_fill(fill_color))
+	progress.custom_minimum_size = Vector2(0, 12)
 
 
-func _create_inset_paper_style(color: Color, border_color: Color, border_width: int = 1) -> StyleBoxFlat:
+func _apply_metric_tile_style(root: Node, key: String) -> void:
+	var tile_path := "ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/MiddlePanel/MiddleMargin/MiddleColumn/MetricGrid/%sTile" % key
+	_apply_stylebox_safe(root, tile_path, "panel", _create_metric_tile_style())
+	var title_label := root.get_node_or_null("%s/%sMargin/%sColumn/%sTitle" % [tile_path, key, key, key]) as Label
+	var value_label := root.get_node_or_null("%s/%sMargin/%sColumn/%sValue" % [tile_path, key, key, key]) as Label
+	if title_label != null:
+		title_label.add_theme_font_override("font", FONT_BODY)
+		title_label.add_theme_font_size_override("font_size", 11)
+		title_label.add_theme_color_override("font_color", INK_MUTED)
+		title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	if value_label != null:
+		value_label.add_theme_font_override("font", FONT_BODY)
+		value_label.add_theme_font_size_override("font_size", 20)
+		value_label.add_theme_color_override("font_color", INK_MAIN)
+		value_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
+
+func _create_panel_glass_style(alpha: float = 0.82) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = color
-	style.border_width_left = border_width
-	style.border_width_top = border_width
-	style.border_width_right = border_width
-	style.border_width_bottom = border_width
-	style.border_color = border_color
-	return style
-
-
-func _create_paper_style() -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = PAPER_BG
+	style.bg_color = Color(PANEL_DARK.r, PANEL_DARK.g, PANEL_DARK.b, alpha)
 	style.border_width_left = 1
 	style.border_width_top = 1
 	style.border_width_right = 1
 	style.border_width_bottom = 1
-	style.border_color = Color(0.48, 0.42, 0.35, 0.45)
-	style.shadow_color = Color(0, 0, 0, 0.35)
-	style.shadow_size = 10
+	style.border_color = PANEL_EDGE
+	style.corner_radius_top_left = 6
+	style.corner_radius_top_right = 6
+	style.corner_radius_bottom_right = 6
+	style.corner_radius_bottom_left = 6
+	style.shadow_color = Color(0, 0, 0, 0.45)
+	style.shadow_size = 12
 	return style
 
 
-func _create_circle_style(background: Color, border_color: Color) -> StyleBoxFlat:
+func _create_metric_tile_style() -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = background
+	style.bg_color = Color(PANEL_DARK.r, PANEL_DARK.g, PANEL_DARK.b, 0.65)
+	style.border_width_left = 1
+	style.border_width_top = 1
+	style.border_width_right = 1
+	style.border_width_bottom = 1
+	style.border_color = Color(GOLD_DIM.r, GOLD_DIM.g, GOLD_DIM.b, 0.35)
+	style.corner_radius_top_left = 4
+	style.corner_radius_top_right = 4
+	style.corner_radius_bottom_right = 4
+	style.corner_radius_bottom_left = 4
+	return style
+
+
+func _create_peak_card_style() -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.09, 0.12, 0.11, 0.92)
+	style.border_width_left = 1
+	style.border_width_top = 1
+	style.border_width_right = 1
+	style.border_width_bottom = 1
+	style.border_color = Color(ACCENT.r, ACCENT.g, ACCENT.b, 0.55)
+	style.corner_radius_top_left = 5
+	style.corner_radius_top_right = 5
+	style.corner_radius_bottom_right = 5
+	style.corner_radius_bottom_left = 5
+	style.shadow_color = Color(0, 0, 0, 0.25)
+	style.shadow_size = 8
+	return style
+
+
+func _create_hall_card_style() -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(PANEL_DARK.r, PANEL_DARK.g, PANEL_DARK.b, 0.76)
+	style.border_width_left = 1
+	style.border_width_top = 1
+	style.border_width_right = 1
+	style.border_width_bottom = 1
+	style.border_color = Color(GOLD_DIM.r, GOLD_DIM.g, GOLD_DIM.b, 0.42)
+	style.corner_radius_top_left = 5
+	style.corner_radius_top_right = 5
+	style.corner_radius_bottom_right = 5
+	style.corner_radius_bottom_left = 5
+	return style
+
+
+func _create_roster_card_style(is_selected: bool) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	var bg_alpha := 0.08
+	var border_alpha := 0.24
+	var shadow_alpha := 0.10
+	if is_selected:
+		bg_alpha = 0.18
+		border_alpha = 0.72
+		shadow_alpha = 0.26
+	style.bg_color = Color(0.10, 0.12, 0.11, bg_alpha)
+	style.border_width_left = 1
+	style.border_width_top = 1
+	style.border_width_right = 1
+	style.border_width_bottom = 1
+	if is_selected:
+		style.border_width_left = 2
+		style.border_width_top = 2
+		style.border_width_right = 2
+		style.border_width_bottom = 2
+	style.border_color = Color(GOLD.r, GOLD.g, GOLD.b, border_alpha)
+	style.corner_radius_top_left = 5
+	style.corner_radius_top_right = 5
+	style.corner_radius_bottom_right = 5
+	style.corner_radius_bottom_left = 5
+	style.content_margin_left = 0
+	style.content_margin_top = 0
+	style.content_margin_right = 0
+	style.content_margin_bottom = 0
+	style.shadow_color = Color(GOLD.r, GOLD.g, GOLD.b, shadow_alpha)
+	style.shadow_size = 8 if is_selected else 4
+	return style
+
+
+func _create_button_style(is_hovered: bool, is_disabled: bool = false) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	var bg_alpha := 0.08 if is_hovered else 0.04
+	var border_alpha := 0.45 if is_hovered else 0.25
+	if is_disabled:
+		bg_alpha = 0.02
+		border_alpha = 0.12
+	style.bg_color = Color(0.10, 0.12, 0.11, bg_alpha)
+	style.border_width_left = 1
+	style.border_width_top = 1
+	style.border_width_right = 1
+	style.border_width_bottom = 1
+	style.border_color = Color(GOLD_DIM.r, GOLD_DIM.g, GOLD_DIM.b, border_alpha)
+	style.corner_radius_top_left = 4
+	style.corner_radius_top_right = 4
+	style.corner_radius_bottom_right = 4
+	style.corner_radius_bottom_left = 4
+	style.content_margin_left = 8
+	style.content_margin_top = 4
+	style.content_margin_right = 8
+	style.content_margin_bottom = 4
+	return style
+
+
+func _create_selection_style(is_focus: bool = false) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(GOLD.r, GOLD.g, GOLD.b, 0.12 if is_focus else 0.08)
+	style.border_width_left = 1
+	style.border_width_top = 1
+	style.border_width_right = 1
+	style.border_width_bottom = 1
+	style.border_color = Color(GOLD.r, GOLD.g, GOLD.b, 0.55 if is_focus else 0.35)
+	return style
+
+
+func _create_progress_bg() -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0, 0, 0, 0.35)
+	style.corner_radius_top_left = 4
+	style.corner_radius_top_right = 4
+	style.corner_radius_bottom_right = 4
+	style.corner_radius_bottom_left = 4
+	return style
+
+
+func _create_progress_fill(color: Color) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = color
+	style.corner_radius_top_left = 4
+	style.corner_radius_top_right = 4
+	style.corner_radius_bottom_right = 4
+	style.corner_radius_bottom_left = 4
+	style.shadow_color = Color(color.r, color.g, color.b, 0.4)
+	style.shadow_size = 6
+	return style
+
+
+func _create_circle_style() -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.10, 0.12, 0.11, 0.75)
 	style.border_width_left = 2
 	style.border_width_top = 2
 	style.border_width_right = 2
 	style.border_width_bottom = 2
-	style.border_color = border_color
+	style.border_color = GOLD
 	style.corner_radius_top_left = 999
 	style.corner_radius_top_right = 999
 	style.corner_radius_bottom_right = 999
@@ -270,63 +526,48 @@ func _create_circle_style(background: Color, border_color: Color) -> StyleBoxFla
 	return style
 
 
-func _create_paper_button_style(color: Color = Color(1, 1, 1, 0.03)) -> StyleBoxFlat:
+func _create_seal_style() -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = color
+	style.bg_color = Color(GOLD.r, GOLD.g, GOLD.b, 0.18)
 	style.border_width_left = 1
 	style.border_width_top = 1
 	style.border_width_right = 1
 	style.border_width_bottom = 1
-	style.border_color = Color(INK_GRAY.r, INK_GRAY.g, INK_GRAY.b, 0.45)
-	style.content_margin_left = 12
-	style.content_margin_top = 6
-	style.content_margin_right = 12
-	style.content_margin_bottom = 6
+	style.border_color = GOLD
+	style.corner_radius_top_left = 4
+	style.corner_radius_top_right = 4
+	style.corner_radius_bottom_right = 4
+	style.corner_radius_bottom_left = 4
 	return style
 
 
 func _create_combat_tag_style() -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(CINNABAR.r, CINNABAR.g, CINNABAR.b, 0.03)
-	style.border_width_left = 2
-	style.border_width_top = 2
-	style.border_width_right = 2
-	style.border_width_bottom = 2
-	style.border_color = CINNABAR
-	return style
-
-
-func _create_trait_tag_style() -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(CINNABAR.r, CINNABAR.g, CINNABAR.b, 0.03)
+	style.bg_color = Color(DANGER.r, DANGER.g, DANGER.b, 0.08)
 	style.border_width_left = 1
 	style.border_width_top = 1
 	style.border_width_right = 1
 	style.border_width_bottom = 1
-	style.border_color = Color(CINNABAR.r, CINNABAR.g, CINNABAR.b, 0.75)
+	style.border_color = DANGER
+	style.corner_radius_top_left = 4
+	style.corner_radius_top_right = 4
+	style.corner_radius_bottom_right = 4
+	style.corner_radius_bottom_left = 4
 	return style
 
 
-func _create_transparent_style() -> StyleBoxFlat:
+func _create_tag_style() -> StyleBox:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(1, 1, 1, 0)
-	return style
-
-
-func _create_progress_bar_style(background_color: Color) -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = background_color
+	style.bg_color = Color(GOLD.r, GOLD.g, GOLD.b, 0.06)
 	style.border_width_left = 1
 	style.border_width_top = 1
 	style.border_width_right = 1
 	style.border_width_bottom = 1
-	style.border_color = INK_GRAY
-	return style
-
-
-func _create_progress_fill_style(fill_color: Color) -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = fill_color
+	style.border_color = Color(GOLD_DIM.r, GOLD_DIM.g, GOLD_DIM.b, 0.7)
+	style.corner_radius_top_left = 4
+	style.corner_radius_top_right = 4
+	style.corner_radius_bottom_right = 4
+	style.corner_radius_bottom_left = 4
 	return style
 
 

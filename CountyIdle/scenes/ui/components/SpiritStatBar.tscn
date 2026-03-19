@@ -1,0 +1,111 @@
+[gd_scene format=3 uid="uid://d1pn1edii270d"]
+
+[ext_resource type="Script" uid="uid://bm6pflewntit0" path="res://scripts/ui/gd/components/SpiritStatBar.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://jhuacodlaayl" path="res://assets/ui/shapes/spirit_gem.svg" id="2_gem"]
+
+[node name="SpiritStatBar" type="PanelContainer" unique_id=616116489]
+size_flags_horizontal = 3
+script = ExtResource("1_script")
+
+[node name="TrackMargin" type="MarginContainer" parent="." unique_id=1755097439]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="TrackColumn" type="VBoxContainer" parent="TrackMargin" unique_id=1276870163]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TrackHeaderRow" type="HBoxContainer" parent="TrackMargin/TrackColumn" unique_id=135741460]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TrackIconTexture" type="TextureRect" parent="TrackMargin/TrackColumn/TrackHeaderRow" unique_id=1485544240]
+custom_minimum_size = Vector2(18, 18)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 1
+
+[node name="TrackIconLabel" type="Label" parent="TrackMargin/TrackColumn/TrackHeaderRow" unique_id=5841362]
+visible = false
+layout_mode = 2
+text = "技"
+
+[node name="TrackNameLabel" type="Label" parent="TrackMargin/TrackColumn/TrackHeaderRow" unique_id=1309590740]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "技能修炼"
+
+[node name="TrackSpacer" type="Control" parent="TrackMargin/TrackColumn/TrackHeaderRow" unique_id=787561639]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TrackDiamonds" type="HBoxContainer" parent="TrackMargin/TrackColumn/TrackHeaderRow" unique_id=937336989]
+layout_mode = 2
+theme_type_variation = &"HBoxContainerSpiritbar"
+
+[node name="Diamond01" type="PanelContainer" parent="TrackMargin/TrackColumn/TrackHeaderRow/TrackDiamonds" unique_id=2133498664]
+layout_mode = 2
+
+[node name="GemTexture" type="TextureRect" parent="TrackMargin/TrackColumn/TrackHeaderRow/TrackDiamonds/Diamond01" unique_id=805112146]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+texture = ExtResource("2_gem")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="Diamond02" type="PanelContainer" parent="TrackMargin/TrackColumn/TrackHeaderRow/TrackDiamonds" unique_id=1799507680]
+layout_mode = 2
+
+[node name="GemTexture" type="TextureRect" parent="TrackMargin/TrackColumn/TrackHeaderRow/TrackDiamonds/Diamond02" unique_id=1157798909]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+texture = ExtResource("2_gem")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="Diamond03" type="PanelContainer" parent="TrackMargin/TrackColumn/TrackHeaderRow/TrackDiamonds" unique_id=1269793770]
+layout_mode = 2
+
+[node name="GemTexture" type="TextureRect" parent="TrackMargin/TrackColumn/TrackHeaderRow/TrackDiamonds/Diamond03" unique_id=966885674]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+texture = ExtResource("2_gem")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="Diamond04" type="PanelContainer" parent="TrackMargin/TrackColumn/TrackHeaderRow/TrackDiamonds" unique_id=966012071]
+layout_mode = 2
+
+[node name="GemTexture" type="TextureRect" parent="TrackMargin/TrackColumn/TrackHeaderRow/TrackDiamonds/Diamond04" unique_id=2053026966]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+texture = ExtResource("2_gem")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="Diamond05" type="PanelContainer" parent="TrackMargin/TrackColumn/TrackHeaderRow/TrackDiamonds" unique_id=285850755]
+layout_mode = 2
+
+[node name="GemTexture" type="TextureRect" parent="TrackMargin/TrackColumn/TrackHeaderRow/TrackDiamonds/Diamond05" unique_id=768534041]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+texture = ExtResource("2_gem")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="TrackTag" type="PanelContainer" parent="TrackMargin/TrackColumn/TrackHeaderRow" unique_id=51442083]
+layout_mode = 2
+theme_type_variation = &"PanelContainerTracktag"
+
+[node name="TrackTagLabel" type="Label" parent="TrackMargin/TrackColumn/TrackHeaderRow/TrackTag" unique_id=1568369174]
+layout_mode = 2
+text = "未起"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TrackProgress" type="ProgressBar" parent="TrackMargin/TrackColumn" unique_id=2015035164]
+layout_mode = 2
+show_percentage = false

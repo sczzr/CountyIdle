@@ -97,10 +97,11 @@ public static class DiscipleRosterSystem
         var roster = new List<DiscipleProfile>(population);
         for (var index = 0; index < population; index++)
         {
+            var discipleId = index + 1;
             var jobType = jobAssignments[index];
             var ageBand = ageBands[index];
             var isElite = eliteSet.Contains(index);
-            var directiveType = DiscipleDirectiveRules.GetDirective(state, index + 1);
+            var directiveType = DiscipleDirectiveRules.GetDirective(state, discipleId);
             var age = ResolveAge(index, ageBand);
             var health = ResolveHealth(index, state, ageBand, isElite);
             var mood = ResolveMood(index, state, law);
@@ -109,7 +110,16 @@ public static class DiscipleRosterSystem
             var craft = ResolveCraft(index, state, jobType, isElite, direction);
             var insight = ResolveInsight(index, state, jobType, isElite, talentPlan, direction);
             var execution = ResolveExecution(index, state, jobType, law, mood);
+            // 修炼卷长期火候会对个体表现形成温和反哺，作为真实培养反馈的一部分。
+            var cultivationFeedback = DiscipleCultivationRules.ResolvePerformanceFeedback(state, discipleId);
+            health = Math.Clamp(health + cultivationFeedback.HealthBonus, 10, 100);
+            mood = Math.Clamp(mood + cultivationFeedback.MoodBonus, 10, 100);
+            combat = Math.Clamp(combat + cultivationFeedback.CombatBonus, 10, 100);
+            craft = Math.Clamp(craft + cultivationFeedback.CraftBonus, 10, 100);
+            insight = Math.Clamp(insight + cultivationFeedback.InsightBonus, 10, 100);
+            execution = Math.Clamp(execution + cultivationFeedback.ExecutionBonus, 10, 100);
             var contribution = ResolveContribution(index, isElite, execution, law);
+            contribution = Math.Clamp(contribution + cultivationFeedback.ContributionBonus, 8, 100);
             var realmTier = ResolveRealmTier(index, state, jobType, isElite, talentPlan, direction, ageBand);
             var currentAssignment = ResolveCurrentAssignment(state, jobType, ageBand, minuteOfDay, isElite, directiveType);
             var residenceName = ResolveResidenceName(state, jobType, ageBand, isElite);
@@ -118,7 +128,7 @@ public static class DiscipleRosterSystem
             var note = ResolveNote(jobType, isElite, health, mood, potential, insight, currentAssignment, directiveType);
             var equipmentProfile = DiscipleEquipmentRules.GetOrCreateEquipmentProfile(
                 sourceState,
-                index + 1,
+                discipleId,
                 jobType,
                 ageBand,
                 realmTier,
@@ -126,7 +136,7 @@ public static class DiscipleRosterSystem
                 directiveType);
 
             roster.Add(new DiscipleProfile(
-                index + 1,
+                discipleId,
                 BuildName(index),
                 ResolveRankName(jobType, ageBand, isElite, potential),
                 directiveType,

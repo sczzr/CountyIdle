@@ -1,0 +1,183 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/gd/components/JadeSlipCard.gd" id="1_script"]
+
+[node name="JadeSlipCard" type="Button"]
+custom_minimum_size = Vector2(0, 240)
+layout_mode = 3
+size_flags_horizontal = 3
+toggle_mode = true
+theme_type_variation = &"ButtonJadecard"
+script = ExtResource("1_script")
+
+[node name="CardMargin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 28.0
+offset_top = 22.0
+offset_right = -22.0
+offset_bottom = -22.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CardColumn" type="VBoxContainer" parent="CardMargin"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="CardHeaderRow" type="HBoxContainer" parent="CardMargin/CardColumn"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="IconBadge" type="PanelContainer" parent="CardMargin/CardColumn/CardHeaderRow"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+
+[node name="IconTexture" type="TextureRect" parent="CardMargin/CardColumn/CardHeaderRow/IconBadge"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -16.0
+offset_top = -16.0
+offset_right = 16.0
+offset_bottom = 16.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 1
+
+[node name="IconLabel" type="Label" parent="CardMargin/CardColumn/CardHeaderRow/IconBadge"]
+visible = false
+layout_mode = 2
+text = "技"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HeaderTextColumn" type="VBoxContainer" parent="CardMargin/CardColumn/CardHeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="CardMargin/CardColumn/CardHeaderRow/HeaderTextColumn"]
+layout_mode = 2
+text = "技能修炼"
+
+[node name="SealBadge" type="PanelContainer" parent="CardMargin/CardColumn/CardHeaderRow/HeaderTextColumn"]
+visible = false
+custom_minimum_size = Vector2(0, 22)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="SealLabel" type="Label" parent="CardMargin/CardColumn/CardHeaderRow/HeaderTextColumn/SealBadge"]
+layout_mode = 2
+text = "正在运转"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="CardMargin/CardColumn/CardHeaderRow/HeaderTextColumn"]
+layout_mode = 2
+text = "演武参玄"
+
+[node name="HeaderSpacer" type="Control" parent="CardMargin/CardColumn/CardHeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TimeBadge" type="PanelContainer" parent="CardMargin/CardColumn/CardHeaderRow"]
+custom_minimum_size = Vector2(76, 22)
+layout_mode = 2
+
+[node name="TimeRow" type="HBoxContainer" parent="CardMargin/CardColumn/CardHeaderRow/TimeBadge"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TimeIconLabel" type="Label" parent="CardMargin/CardColumn/CardHeaderRow/TimeBadge/TimeRow"]
+layout_mode = 2
+text = "⏳"
+
+[node name="TimeTextLabel" type="Label" parent="CardMargin/CardColumn/CardHeaderRow/TimeBadge/TimeRow"]
+layout_mode = 2
+text = "1 时辰"
+
+[node name="Divider" type="ColorRect" parent="CardMargin/CardColumn"]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+color = Color(0.501961, 0.423529, 0.247059, 0.3)
+
+[node name="DescLabel" type="Label" parent="CardMargin/CardColumn"]
+layout_mode = 2
+text = "“以演武与拆招为主，稳步抬升弟子临阵手感与执行。”"
+autowrap_mode = 3
+
+[node name="StatusLabel" type="Label" parent="CardMargin/CardColumn"]
+visible = false
+layout_mode = 2
+text = "待命玉简"
+autowrap_mode = 3
+
+[node name="Spacer" type="Control" parent="CardMargin/CardColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="EffectRow" type="HBoxContainer" parent="CardMargin/CardColumn"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="PrimaryEffect" type="PanelContainer" parent="CardMargin/CardColumn/EffectRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="EffectMargin" type="MarginContainer" parent="CardMargin/CardColumn/EffectRow/PrimaryEffect"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="EffectContentRow" type="HBoxContainer" parent="CardMargin/CardColumn/EffectRow/PrimaryEffect/EffectMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="EffectIcon" type="PanelContainer" parent="CardMargin/CardColumn/EffectRow/PrimaryEffect/EffectMargin/EffectContentRow"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+
+[node name="EffectColumn" type="VBoxContainer" parent="CardMargin/CardColumn/EffectRow/PrimaryEffect/EffectMargin/EffectContentRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="CardMargin/CardColumn/EffectRow/PrimaryEffect/EffectMargin/EffectContentRow/EffectColumn"]
+layout_mode = 2
+text = "主收益"
+
+[node name="ValueLabel" type="Label" parent="CardMargin/CardColumn/EffectRow/PrimaryEffect/EffectMargin/EffectContentRow/EffectColumn"]
+layout_mode = 2
+text = "少量修为 +"
+
+[node name="SecondaryEffect" type="PanelContainer" parent="CardMargin/CardColumn/EffectRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="EffectMargin" type="MarginContainer" parent="CardMargin/CardColumn/EffectRow/SecondaryEffect"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="EffectColumn" type="VBoxContainer" parent="CardMargin/CardColumn/EffectRow/SecondaryEffect/EffectMargin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="CardMargin/CardColumn/EffectRow/SecondaryEffect/EffectMargin/EffectColumn"]
+layout_mode = 2
+text = "附带偏向"
+
+[node name="ValueLabel" type="Label" parent="CardMargin/CardColumn/EffectRow/SecondaryEffect/EffectMargin/EffectColumn"]
+layout_mode = 2
+text = "悟性偏盛"

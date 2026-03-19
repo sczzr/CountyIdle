@@ -215,6 +215,10 @@ func _resolve_view(tab_name: String) -> Control:
 
 
 func _apply_world_site_button_style(button: Button, emphasized: bool) -> void:
+	# 响应式布局调整期间按钮节点可能暂时缺席，视觉层应降级而非直接报错。
+	if button == null:
+		push_warning("WorldPanelVisualFx missing button while applying world-site style.")
+		return
 	button.flat = true
 	button.add_theme_font_size_override("font_size", 14)
 	button.add_theme_color_override("font_color", INK_MAIN)
@@ -227,6 +231,10 @@ func _apply_world_site_button_style(button: Button, emphasized: bool) -> void:
 
 
 func _apply_map_directive_button_tone(button: Button, accent: Color, enabled: bool) -> void:
+	# 地图指令条在部分布局/调试模式下可能尚未挂载，对空按钮直接跳过即可。
+	if button == null:
+		push_warning("WorldPanelVisualFx missing map directive button while applying tone.")
+		return
 	button.flat = true
 	button.add_theme_color_override("font_color", accent if enabled else Color(INK_MUTED.r, INK_MUTED.g, INK_MUTED.b, 0.72))
 	button.add_theme_color_override("font_hover_color", PAPER_MAIN)

@@ -1,0 +1,14 @@
+[remap]
+
+importer="Godot CSS Importer"
+type="Theme"
+uid="uid://3dtfufungbqq"
+path="res://.godot/imported/xianxia.css-dccd10819fe5dd997c198cebd3c7eb8a.tres"
+
+[deps]
+
+source_file="res://ui/xianxia.css"
+dest_files=["res://.godot/imported/xianxia.css-dccd10819fe5dd997c198cebd3c7eb8a.tres"]
+
+[params]
+
