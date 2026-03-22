@@ -27,6 +27,10 @@ public class ClientSettingsSystem
         new Vector2I(1920, 1080),
         new Vector2I(2560, 1440)
     };
+    // 自动存档可选间隔（按时辰结算次数）
+    private static readonly int[] AutoSaveIntervalOptions = { 3, 6, 12, 24 };
+    // 画质档位白名单
+    private static readonly string[] GraphicsQualityOptions = { "low", "medium", "high" };
     // 快捷键冲突时的候补池（确保最终可用）
     private static readonly string[] ShortcutFallbackPool =
     {
@@ -84,7 +88,7 @@ public class ClientSettingsSystem
             var json = JsonSerializer.Serialize(sanitized, JsonOptions);
             using var file = FileAccess.Open(SavePath, FileAccess.ModeFlags.Write);
             file.StoreString(json);
-            message = "基础设置已保存（含快捷键）。";
+            message = "基础设置已保存（含音画、符令与游戏性偏好）。";
             return true;
         }
         catch (Exception ex)
@@ -115,6 +119,10 @@ public class ClientSettingsSystem
 
         normalized.FontScale = Mathf.Clamp(normalized.FontScale, MinContentZoom, MaxContentZoom);
         normalized.MasterVolume = Mathf.Clamp(normalized.MasterVolume, 0.0f, 1.0f);
+        normalized.BgmVolume = Mathf.Clamp(normalized.BgmVolume, 0.0f, 1.0f);
+        normalized.SfxVolume = Mathf.Clamp(normalized.SfxVolume, 0.0f, 1.0f);
+        normalized.GraphicsQualityPreset = NormalizeGraphicsQualityPreset(normalized.GraphicsQualityPreset);
+        normalized.AutoSaveInterval = NormalizeAutoSaveInterval(normalized.AutoSaveInterval);
         NormalizeShortcuts(normalized);
         return normalized;
     }
@@ -181,6 +189,14 @@ public class ClientSettingsSystem
     }
 
     /// <summary>
+    /// 对外暴露可选自动存档间隔列表，供 UI 下拉框复用。
+    /// </summary>
+    public static IReadOnlyList<int> GetAutoSaveIntervalOptions()
+    {
+        return AutoSaveIntervalOptions;
+    }
+
+    /// <summary>
     /// 当前仅支持中文/英文两种语言码。
     /// </summary>
     private static bool IsSupportedLanguage(string languageCode)
@@ -203,6 +219,38 @@ public class ClientSettingsSystem
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// 规范化画质档位，避免旧档或手改 JSON 写入未知值。
+    /// </summary>
+    private static string NormalizeGraphicsQualityPreset(string? rawPreset)
+    {
+        foreach (var option in GraphicsQualityOptions)
+        {
+            if (string.Equals(option, rawPreset, StringComparison.OrdinalIgnoreCase))
+            {
+                return option;
+            }
+        }
+
+        return ClientSettings.DefaultGraphicsQualityPreset;
+    }
+
+    /// <summary>
+    /// 规范化自动存档间隔；非法值回退默认档。
+    /// </summary>
+    private static int NormalizeAutoSaveInterval(int rawInterval)
+    {
+        foreach (var option in AutoSaveIntervalOptions)
+        {
+            if (option == rawInterval)
+            {
+                return option;
+            }
+        }
+
+        return ClientSettings.DefaultAutoSaveInterval;
     }
 
     /// <summary>

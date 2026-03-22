@@ -154,16 +154,15 @@ public partial class Main
         _taskPanel.Closed -= OnTaskPanelClosed;
     }
 
-    private Button? GetTaskPanelButton()
+    private BaseButton? GetTaskPanelButton()
     {
-
-        var bottomQuickButton = GetNodeOrNull<Button>($"{BottomBarPath}/BarPadding/MainRow/QuickActionRow/TaskQuickButton");
+        var bottomQuickButton = GetNodeOrNull<BaseButton>($"{BottomBarPath}/BarPadding/MainRow/QuickActionRow/TaskQuickButton");
         if (bottomQuickButton != null)
         {
             return bottomQuickButton;
         }
 
-        return GetNodeOrNull<Button>($"{CenterTopTabRowPath}/TaskPanelButton");
+        return GetNodeOrNull<BaseButton>($"{CenterTopTabRowPath}/TaskPanelButton");
     }
 
     private void SetTaskQuickButtonState(bool pressed)

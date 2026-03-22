@@ -121,6 +121,9 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
     // 历史旧图集 `tileset_geography.png` 已不在仓库中，备用路径改为现存的 L1 地形图集资源。
     private const string GeographyAtlasPath = "res://assets/ui/tilemap/L1_tilemap_a.png";
     private const string Layer1TileSetPath = "res://assets/ui/tilemap/L1_hex_tileset.tres";
+    private static readonly StringName TerrainFamilyCustomDataLayer = new("terrain_family");
+    private static readonly StringName WorldTerrainFamilyCustomDataLayer = new("world_terrain_family");
+    private static readonly StringName SeasonCustomDataLayer = new("season");
 
     private const string TerrainAtlasManifestPath = "res://assets/map/manifests/l1_terrain_manifest.json";
     private const string TerrainGroundTexturePath = "";
@@ -137,6 +140,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
     // 命名映射与生成器
     private IReadOnlyDictionary<string, string>? _nameMap;
     private readonly TownMapGeneratorSystem _generator = new();
+    private readonly GameCalendarSystem _calendarSystem = new();
     // 地形贴图缓存
     private readonly Dictionary<TownTerrainType, Texture2D?> _terrainTextures = new();
     // 图集缓存与索引
@@ -146,10 +150,13 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
     private readonly Dictionary<string, List<string>> _terrainAtlasFamilyVariants = new(StringComparer.Ordinal);
     private readonly Dictionary<TownTerrainType, List<Layer1TileVariant>> _layer1TileVariants = new();
     private readonly Dictionary<TownTerrainVisualFamily, List<Layer1TileVariant>> _layer1VisualVariants = new();
+    private readonly Dictionary<(TownTerrainType TerrainType, int SeasonIndex), List<Layer1TileVariant>> _layer1SeasonalTileVariants = new();
+    private readonly Dictionary<(TownTerrainVisualFamily VisualFamily, int SeasonIndex), List<Layer1TileVariant>> _layer1SeasonalVisualVariants = new();
     private readonly Color[] _hexTintColors = new Color[6];
 
     // 运行时地图数据与节点引用
     private TownMapData? _mapData;
+    private int _currentSeasonIndex;
     private Button _regenerateButton = null!;
     private Label _mapHintLabel = null!;
     private Node2D? _hoverFx;
@@ -1037,6 +1044,12 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         variant = default;
         var preferredVisualFamily = ResolvePreferredVisualFamily(terrainType, visualFamily);
         if (preferredVisualFamily != TownTerrainVisualFamily.Auto &&
+            TryGetSeasonalLayer1VisualVariant(cell, preferredVisualFamily, out variant))
+        {
+            return true;
+        }
+
+        if (preferredVisualFamily != TownTerrainVisualFamily.Auto &&
             TryGetLayer1VisualVariant(cell, preferredVisualFamily, out variant))
         {
             return true;
@@ -1049,12 +1062,34 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
     private bool TryGetSemanticLayer1Variant(Vector2I cell, TownTerrainType terrainType, out Layer1TileVariant variant)
     {
         variant = default;
+        if (TryGetSeasonalLayer1SemanticVariant(cell, terrainType, out variant))
+        {
+            return true;
+        }
+
         if (!_layer1TileVariants.TryGetValue(terrainType, out var variants) || variants.Count == 0)
         {
             return false;
         }
 
         variant = variants[GetCellHash(cell, 509 + ((int)terrainType * 97)) % variants.Count];
+        return true;
+    }
+
+    // 优先选择当前季节的语义地块；缺季时再回退到历史非季节候选。
+    private bool TryGetSeasonalLayer1SemanticVariant(
+        Vector2I cell,
+        TownTerrainType terrainType,
+        out Layer1TileVariant variant)
+    {
+        variant = default;
+        if (!_layer1SeasonalTileVariants.TryGetValue((terrainType, _currentSeasonIndex), out var variants) ||
+            variants.Count == 0)
+        {
+            return false;
+        }
+
+        variant = variants[GetCellHash(cell, 433 + ((int)terrainType * 89)) % variants.Count];
         return true;
     }
 
@@ -1071,6 +1106,23 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         }
 
         variant = variants[GetCellHash(cell, 701 + ((int)visualFamily * 53)) % variants.Count];
+        return true;
+    }
+
+    // 优先选择当前季节的视觉族系地块；缺季时再回退到历史非季节候选。
+    private bool TryGetSeasonalLayer1VisualVariant(
+        Vector2I cell,
+        TownTerrainVisualFamily visualFamily,
+        out Layer1TileVariant variant)
+    {
+        variant = default;
+        if (!_layer1SeasonalVisualVariants.TryGetValue((visualFamily, _currentSeasonIndex), out var variants) ||
+            variants.Count == 0)
+        {
+            return false;
+        }
+
+        variant = variants[GetCellHash(cell, 647 + ((int)visualFamily * 47)) % variants.Count];
         return true;
     }
 
@@ -1464,6 +1516,8 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         _terrainAtlasFamilyVariants.Clear();
         _layer1TileVariants.Clear();
         _layer1VisualVariants.Clear();
+        _layer1SeasonalTileVariants.Clear();
+        _layer1SeasonalVisualVariants.Clear();
         _geographyAtlas = HexAtlas5x4.TryLoad(GeographyAtlasPath);
         LoadAtlasManifest();
         LoadLayer1TileSet();
@@ -1674,6 +1728,8 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
                 continue;
             }
 
+            RegisterMetadataDrivenLayer1Variants(atlasSource, sourceId);
+
             var resourcePath = atlasSource.Texture?.ResourcePath ?? string.Empty;
             var normalizedPath = resourcePath.Replace('\\', '/');
             if (normalizedPath.EndsWith("/L1_tilemap_a.png", StringComparison.OrdinalIgnoreCase))
@@ -1712,6 +1768,36 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         }
     }
 
+    // 若 tileset 已补 metadata，则把多 source 的四季图块直接登记进季节索引。
+    private void RegisterMetadataDrivenLayer1Variants(TileSetAtlasSource atlasSource, int sourceId)
+    {
+        var tilesCount = atlasSource.GetTilesCount();
+        for (var index = 0; index < tilesCount; index++)
+        {
+            var coords = atlasSource.GetTileId(index);
+            var tileData = atlasSource.GetTileData(coords, 0);
+            if (tileData == null)
+            {
+                continue;
+            }
+
+            var familyText = ReadLayer1CustomText(tileData, TerrainFamilyCustomDataLayer, WorldTerrainFamilyCustomDataLayer);
+            if (!TryMapLayer1FamilyToVisualFamily(familyText, out var visualFamily))
+            {
+                continue;
+            }
+
+            var variant = new Layer1TileVariant(sourceId, coords, 0);
+            var seasonIndex = ResolveLayer1SeasonIndex(tileData, coords);
+            AddSeasonalLayer1VisualVariant(visualFamily, seasonIndex, variant);
+
+            if (TryMapLayer1FamilyToTerrainType(familyText, out var terrainType))
+            {
+                AddSeasonalLayer1TileVariant(terrainType, seasonIndex, variant);
+            }
+        }
+    }
+
     // 按地形类型注册 tile 变体
     private void AddLayer1TileVariants(TownTerrainType terrainType, int sourceId, Vector2I[] atlasCoords)
     {
@@ -1727,6 +1813,19 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         }
     }
 
+    // 按季节注册地形类型 tile 变体
+    private void AddSeasonalLayer1TileVariant(TownTerrainType terrainType, int seasonIndex, Layer1TileVariant variant)
+    {
+        var key = (terrainType, Math.Clamp(seasonIndex, 0, 3));
+        if (!_layer1SeasonalTileVariants.TryGetValue(key, out var variants))
+        {
+            variants = new List<Layer1TileVariant>();
+            _layer1SeasonalTileVariants[key] = variants;
+        }
+
+        variants.Add(variant);
+    }
+
     // 按视觉族系注册 tile 变体
     private void AddLayer1VisualVariants(TownTerrainVisualFamily visualFamily, int sourceId, Vector2I[] atlasCoords)
     {
@@ -1739,6 +1838,183 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         foreach (var atlasCoord in atlasCoords)
         {
             variants.Add(new Layer1TileVariant(sourceId, atlasCoord, 0));
+        }
+    }
+
+    // 按季节注册视觉族系 tile 变体
+    private void AddSeasonalLayer1VisualVariant(TownTerrainVisualFamily visualFamily, int seasonIndex, Layer1TileVariant variant)
+    {
+        var key = (visualFamily, Math.Clamp(seasonIndex, 0, 3));
+        if (!_layer1SeasonalVisualVariants.TryGetValue(key, out var variants))
+        {
+            variants = new List<Layer1TileVariant>();
+            _layer1SeasonalVisualVariants[key] = variants;
+        }
+
+        variants.Add(variant);
+    }
+
+    // 根据游戏分钟同步当前季节列，四季 atlas 的列选择统一走这里。
+    private void UpdateSeasonIndex(int gameMinutes)
+    {
+        var nextSeasonIndex = Math.Clamp(_calendarSystem.GetQuarterIndex(Math.Max(gameMinutes, 0)), 0, 3);
+        if (nextSeasonIndex == _currentSeasonIndex)
+        {
+            return;
+        }
+
+        _currentSeasonIndex = nextSeasonIndex;
+        QueueRedraw();
+    }
+
+    // 读取 tileset custom data 文本；若首选层缺失，则尝试下一个层名。
+    private static string ReadLayer1CustomText(TileData tileData, params StringName[] layerNames)
+    {
+        foreach (var layerName in layerNames)
+        {
+            var value = tileData.GetCustomData(layerName);
+            if (value.VariantType == Variant.Type.Nil)
+            {
+                continue;
+            }
+
+            var text = value.AsString();
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                return text;
+            }
+        }
+
+        return string.Empty;
+    }
+
+    // 若未显式写 season，则按 4x2 约定用列号推导四季。
+    private static int ResolveLayer1SeasonIndex(TileData tileData, Vector2I atlasCoords)
+    {
+        var seasonText = ReadLayer1CustomText(tileData, SeasonCustomDataLayer);
+        switch (seasonText.Trim().ToLowerInvariant())
+        {
+            case "spring":
+            case "0":
+                return 0;
+            case "summer":
+            case "1":
+                return 1;
+            case "autumn":
+            case "fall":
+            case "2":
+                return 2;
+            case "winter":
+            case "3":
+                return 3;
+            default:
+                return Math.Clamp(atlasCoords.X & 3, 0, 3);
+        }
+    }
+
+    // 将 metadata 中的地貌家族映射到局部地图视觉族系。
+    private static bool TryMapLayer1FamilyToVisualFamily(string familyText, out TownTerrainVisualFamily visualFamily)
+    {
+        visualFamily = TownTerrainVisualFamily.Auto;
+        if (string.IsNullOrWhiteSpace(familyText))
+        {
+            return false;
+        }
+
+        switch (familyText.Trim().ToLowerInvariant())
+        {
+            case "plain":
+            case "grass":
+            case "grassland":
+            case "field":
+            case "meadow":
+            case "forest":
+                visualFamily = TownTerrainVisualFamily.Plain;
+                return true;
+            case "spirit":
+            case "spirit_vein":
+            case "spiritvein":
+            case "spirit_land":
+            case "swamp":
+                visualFamily = TownTerrainVisualFamily.Spirit;
+                return true;
+            case "rugged":
+            case "foothill":
+            case "mountain":
+            case "rock":
+                visualFamily = TownTerrainVisualFamily.Rugged;
+                return true;
+            case "snow":
+            case "snowfield":
+            case "ice":
+            case "tundra":
+                visualFamily = TownTerrainVisualFamily.Snow;
+                return true;
+            case "deep_water":
+            case "deepwater":
+            case "water_deep":
+            case "ocean":
+            case "sea":
+                visualFamily = TownTerrainVisualFamily.DeepWater;
+                return true;
+            case "shallow_water":
+            case "shallowwater":
+            case "water_shallow":
+            case "shore":
+            case "lake":
+                visualFamily = TownTerrainVisualFamily.ShallowWater;
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    // 将 metadata 中的地貌家族粗分回当前语义地块类型，供通用地貌底盘使用。
+    private static bool TryMapLayer1FamilyToTerrainType(string familyText, out TownTerrainType terrainType)
+    {
+        terrainType = TownTerrainType.Ground;
+        if (string.IsNullOrWhiteSpace(familyText))
+        {
+            return false;
+        }
+
+        switch (familyText.Trim().ToLowerInvariant())
+        {
+            case "deep_water":
+            case "deepwater":
+            case "water_deep":
+            case "ocean":
+            case "sea":
+            case "shallow_water":
+            case "shallowwater":
+            case "water_shallow":
+            case "shore":
+            case "lake":
+                terrainType = TownTerrainType.Water;
+                return true;
+            case "plain":
+            case "grass":
+            case "grassland":
+            case "field":
+            case "meadow":
+            case "forest":
+            case "spirit":
+            case "spirit_vein":
+            case "spiritvein":
+            case "spirit_land":
+            case "swamp":
+            case "rugged":
+            case "foothill":
+            case "mountain":
+            case "rock":
+            case "snow":
+            case "snowfield":
+            case "ice":
+            case "tundra":
+                terrainType = TownTerrainType.Ground;
+                return true;
+            default:
+                return false;
         }
     }
     // 绘制地形贴花

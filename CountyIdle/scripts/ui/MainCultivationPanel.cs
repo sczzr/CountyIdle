@@ -87,9 +87,9 @@ public partial class Main
         _cultivationPanel.Closed -= OnCultivationPanelClosed;
     }
 
-    private Button? GetCultivationPanelButton()
+    private BaseButton? GetCultivationPanelButton()
     {
-        return GetNodeOrNull<Button>($"{BottomBarPath}/BarPadding/MainRow/QuickActionRow/CultivationQuickButton");
+        return GetNodeOrNull<BaseButton>($"{BottomBarPath}/BarPadding/MainRow/QuickActionRow/CultivationQuickButton");
     }
 
     private void SetCultivationQuickButtonState(bool pressed)

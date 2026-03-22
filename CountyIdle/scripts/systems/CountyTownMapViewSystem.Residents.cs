@@ -143,6 +143,8 @@ public partial class CountyTownMapViewSystem
     // 设置居民时钟（外部驱动）
     public void SetResidentClock(int gameMinutes, float timeScale)
     {
+        UpdateSeasonIndex(gameMinutes);
+
         if (_residentWalkers.Count == 0)
         {
             return;
@@ -163,6 +165,7 @@ public partial class CountyTownMapViewSystem
     // 刷新居民数据（通常在状态变化后调用）
     public void RefreshResidents(GameState state)
     {
+        UpdateSeasonIndex(state.GameMinutes);
         _residentSourceState = state.Clone();
         _residentWalkers.Clear();
         _selectedResidentDiscipleId = null;

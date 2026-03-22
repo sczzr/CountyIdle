@@ -149,16 +149,15 @@ public partial class Main
         _warehousePanel.Closed -= OnWarehousePanelClosed;
     }
 
-    private Button? GetWarehousePanelButton()
+    private BaseButton? GetWarehousePanelButton()
     {
-
-        var bottomQuickButton = GetNodeOrNull<Button>($"{BottomBarPath}/BarPadding/MainRow/QuickActionRow/WarehouseQuickButton");
+        var bottomQuickButton = GetNodeOrNull<BaseButton>($"{BottomBarPath}/BarPadding/MainRow/QuickActionRow/WarehouseQuickButton");
         if (bottomQuickButton != null)
         {
             return bottomQuickButton;
         }
 
-        return GetNodeOrNull<Button>($"{CenterTopTabRowPath}/WarehousePanelButton");
+        return GetNodeOrNull<BaseButton>($"{CenterTopTabRowPath}/WarehousePanelButton");
     }
 
     private void SetWarehouseQuickButtonState(bool pressed)

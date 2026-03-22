@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@300;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --paper: #f2ede4;
+            --ink: #2c2c2c;
+            --cord: #b22222;
+            --gold: #8c734b;
+        }
+
+        body {
+            background-color: var(--paper);
+            background-image: url('https://www.transparenttextures.com/patterns/handmade-paper.png');
+            font-family: 'Noto Serif SC', serif;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .font-calligraphy { font-family: 'Ma Shan Zheng', cursive; }
+
+        /* --- 动态水墨背景装饰 --- */
+        .ink-blur {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0,0,0,0.05) 0%, transparent 70%);
+            filter: blur(50px);
+            z-index: -1;
+            animation: drift 20s infinite alternate;
+        }
+        @keyframes drift {
+            from { transform: translate(-10%, -10%) scale(1); }
+            to { transform: translate(10%, 10%) scale(1.1); }
+        }
+
+        /* --- 标题区域 --- */
+        .game-title-wrap {
+            text-align: center;
+            margin-bottom: 5rem;
+            position: relative;
+        }
+        .main-title {
+            font-size: 8rem;
+            color: var(--ink);
+            line-height: 1;
+            letter-spacing: 0.2em;
+            text-shadow: 4px 4px 0px rgba(0,0,0,0.05);
+            position: relative;
+        }
+        .sub-title {
+            font-size: 1rem;
+            letter-spacing: 1.2em;
+            color: var(--gold);
+            margin-top: 1rem;
+            margin-left: 1.2em; /* 修正间距 */
+        }
+
+        /* --- 卷轴式菜单 --- */
+        .menu-container {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+        }
+
+        .scroll-item {
+            position: relative;
+            width: 60px;
+            height: 240px;
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        /* 卷轴画心 */
+        .scroll-body {
+            position: absolute;
+            top: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 45px;
+            height: 100%;
+            background: #fffdf9;
+            border: 1px solid rgba(140, 115, 75, 0.3);
+            box-shadow: 2px 5px 15px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            writing-mode: vertical-rl;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--ink);
+            letter-spacing: 0.5em;
+            transition: all 0.4s;
+            z-index: 2;
+        }
+
+        /* 卷轴轴柄 */
+        .scroll-axis {
+            position: absolute;
+            width: 54px;
+            height: 12px;
+            background: linear-gradient(to right, #1a1a1a, #444, #1a1a1a);
+            border-radius: 3px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+        }
+        .axis-top { top: -6px; }
+        .axis-bottom { bottom: -6px; }
+
+        /* 悬停效果：卷轴拉长并变亮 */
+        .scroll-item:hover {
+            transform: translateY(-10px);
+        }
+        .scroll-item:hover .scroll-body {
+            height: 260px;
+            background: #ffffff;
+            color: var(--cord);
+            box-shadow: 5px 15px 30px rgba(0,0,0,0.15);
+        }
+
+        /* --- 底部印章主按钮 --- */
+        .start-seal-wrap {
+            position: absolute;
+            bottom: 10%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .seal-btn {
+            width: 100px;
+            height: 100px;
+            background: var(--cord);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--paper);
+            font-family: 'Ma Shan Zheng';
+            font-size: 2.5rem;
+            cursor: pointer;
+            box-shadow: 0 0 0 5px var(--paper), 0 0 0 8px var(--cord), 5px 10px 20px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+            clip-path: polygon(2% 5%, 98% 3%, 95% 95%, 5% 98%);
+            user-select: none;
+        }
+
+        .seal-btn:hover {
+            transform: scale(1.05) rotate(2deg);
+            background: #c22d2d;
+        }
+
+        .seal-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--cord);
+        }
+
+        .hint-text {
+            margin-top: 1.5rem;
+            font-size: 0.75rem;
+            color: var(--gold);
+            letter-spacing: 0.4em;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        /* 装饰用红绳 */
+        .decoration-cord {
+            position: absolute;
+            top: 0;
+            width: 2px;
+            height: 100px;
+            background: var(--cord);
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 背景装饰 -->
+    <div class="ink-blur" style="top: 10%; left: 15%;"></div>
+    <div class="ink-blur" style="bottom: 10%; right: 15%;"></div>
+
+    <!-- 装饰红绳 -->
+    <div class="decoration-cord" style="left: 10%;"></div>
+    <div class="decoration-cord" style="left: calc(10% + 4px);"></div>
+
+    <div class="flex flex-col items-center">
+        <!-- 游戏标题 -->
+        <div class="game-title-wrap">
+            <h1 class="main-title font-calligraphy">山海機局</h1>
+            <p class="sub-title uppercase">Shanhai Strategy Chronicles</p>
+        </div>
+
+        <!-- 菜单选项 -->
+        <nav class="menu-container">
+            <!-- 每一个 scroll-item 都是一个菜单项 -->
+            <div class="scroll-item" onclick="navigate('new')">
+                <div class="scroll-axis axis-top"></div>
+                <div class="scroll-body font-calligraphy">初入仙途</div>
+                <div class="scroll-axis axis-bottom"></div>
+            </div>
+
+            <div class="scroll-item" onclick="navigate('load')">
+                <div class="scroll-axis axis-top"></div>
+                <div class="scroll-body font-calligraphy">舊夢重溫</div>
+                <div class="scroll-axis axis-bottom"></div>
+            </div>
+
+            <div class="scroll-item" onclick="navigate('settings')">
+                <div class="scroll-axis axis-top"></div>
+                <div class="scroll-body font-calligraphy">修法配置</div>
+                <div class="scroll-axis axis-bottom"></div>
+            </div>
+
+            <div class="scroll-item" onclick="window.close()">
+                <div class="scroll-axis axis-top"></div>
+                <div class="scroll-body font-calligraphy">切斷因果</div>
+                <div class="scroll-axis axis-bottom"></div>
+            </div>
+        </nav>
+
+        <!-- 主入口：盖章开始 -->
+        <div class="start-seal-wrap">
+            <div class="seal-btn" onclick="startGame()">入世</div>
+            <p class="hint-text">—— 击印以开启画卷 ——</p>
+        </div>
+    </div>
+
+    <!-- 底部版本信息 -->
+    <footer class="absolute bottom-6 w-full text-center">
+        <p class="text-[10px] text-stone-400 tracking-widest font-light">
+            天機閣出品 &copy; 庚子年三月 | VERSION 0.9.2 BETA
+        </p>
+    </footer>
+
+    <script>
+        function startGame() {
+            // 播放一个简单的点击反馈
+            console.log("游戏开始，进入过场动画...");
+            document.body.style.transition = "all 1.5s";
+            document.body.style.backgroundColor = "#2c2c2c";
+            document.body.style.opacity = "0";
+            
+            setTimeout(() => {
+                alert("乾坤倒转，正在进入山海世界...");
+                // 此处跳转到你的主游戏页面
+                // window.location.href = "主页.html";
+            }, 1000);
+        }
+
+        function navigate(type) {
+            console.log("导航至: " + type);
+            // 这里可以添加对应的逻辑
+        }
+    </script>
+</body>
+</html>

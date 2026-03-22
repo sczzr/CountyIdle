@@ -1,0 +1,63 @@
+[gd_scene format=3 uid="uid://8whd262m0caj"]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/TopBar.tscn" id="1_topbar"]
+[ext_resource type="PackedScene" uid="uid://d0yegsystt6dx" path="res://scenes/ui/JobsPanel.tscn" id="2_jobs"]
+[ext_resource type="PackedScene" uid="uid://dluw3nntcv37i" path="res://scenes/ui/WorldPanel.tscn" id="3_world_panel"]
+[ext_resource type="PackedScene" uid="uid://b41bsu0i675xo" path="res://scenes/ui/EventLogPanel.tscn" id="4_eventlog"]
+[ext_resource type="PackedScene" uid="uid://uy3k5axcp60" path="res://scenes/ui/BottomBar.tscn" id="5_bottombar"]
+
+[node name="MainOperation" type="MarginContainer" unique_id=441056789]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 8
+
+[node name="MainLayout" type="Control" parent="." unique_id=1249936846]
+layout_mode = 2
+
+[node name="LayoutVBox" type="VBoxContainer" parent="MainLayout" unique_id=175330991]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="TopBar" parent="MainLayout/LayoutVBox" unique_id=114258763 instance=ExtResource("1_topbar")]
+z_index = 30
+layout_mode = 2
+
+[node name="BodyRow" type="HBoxContainer" parent="MainLayout/LayoutVBox" unique_id=1045294665]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="LeftPanel" parent="MainLayout/LayoutVBox/BodyRow" unique_id=1844678190 instance=ExtResource("2_jobs")]
+visible = false
+top_level = true
+z_index = 20
+custom_minimum_size = Vector2(294, 0)
+layout_mode = 2
+
+[node name="CenterPanel" parent="MainLayout/LayoutVBox/BodyRow" unique_id=1690050995 instance=ExtResource("3_world_panel")]
+z_index = 10
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="RightPanel" parent="MainLayout/LayoutVBox/BodyRow" unique_id=1323381172 instance=ExtResource("4_eventlog")]
+visible = false
+z_index = 20
+custom_minimum_size = Vector2(294, 0)
+layout_mode = 2
+
+[node name="BottomBar" parent="MainLayout/LayoutVBox" unique_id=1152257841 instance=ExtResource("5_bottombar")]
+z_index = 30
+layout_mode = 2

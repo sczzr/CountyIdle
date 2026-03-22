@@ -1,0 +1,168 @@
+[gd_scene format=3 uid="uid://cxphvd5ythuc8"]
+
+[ext_resource type="Script" uid="uid://jogdeypkxd0p" path="res://scripts/ui/title/JadeMenuItem.cs" id="1_script"]
+[ext_resource type="Shader" uid="uid://cwk8t3eig5205" path="res://assets/ui/title/jade_leaf.gdshader" id="2_leaf_shader"]
+[ext_resource type="Texture2D" uid="uid://dfhhmsgr766h" path="res://assets/ui/title/jade_leaf.svg" id="3_leaf_texture"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_leaf"]
+shader = ExtResource("2_leaf_shader")
+shader_parameter/top_color = Color(0.9922, 0.9922, 0.9922, 1)
+shader_parameter/bottom_color = Color(0.7961, 0.8627, 0.8157, 1)
+shader_parameter/border_color = Color(0, 0, 0, 0.08)
+shader_parameter/corner_radius = 0.115
+shader_parameter/border_width = 0.018
+shader_parameter/highlight_strength = 0.08
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_leaf_frame"]
+bg_color = Color(1, 1, 1, 0)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0, 0, 0, 0.08)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_color = Color(0, 0, 0, 0.12)
+shadow_size = 8
+shadow_offset = Vector2(2, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hole"]
+bg_color = Color(0.239216, 0.168627, 0.121569, 1)
+corner_radius_top_left = 64
+corner_radius_top_right = 64
+corner_radius_bottom_right = 64
+corner_radius_bottom_left = 64
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hit"]
+
+[node name="JadeMenuItem" type="Control" unique_id=448529660]
+custom_minimum_size = Vector2(188, 280)
+layout_mode = 3
+anchors_preset = 0
+mouse_filter = 1
+script = ExtResource("1_script")
+
+[node name="LeftLeaf" type="Control" parent="." unique_id=862504985]
+anchors_preset = 0
+mouse_filter = 2
+
+[node name="Body" type="ColorRect" parent="LeftLeaf" unique_id=126681972]
+material = SubResource("ShaderMaterial_leaf")
+layout_mode = 0
+mouse_filter = 2
+
+[node name="LeafFrame" type="Panel" parent="LeftLeaf" unique_id=1586956306]
+visible = false
+layout_mode = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_leaf_frame")
+
+[node name="LeafTexture" type="TextureRect" parent="LeftLeaf" unique_id=370846301]
+visible = false
+layout_mode = 0
+mouse_filter = 2
+texture = ExtResource("3_leaf_texture")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="TopHole" type="Panel" parent="LeftLeaf" unique_id=79004573]
+layout_mode = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hole")
+
+[node name="BottomHole" type="Panel" parent="LeftLeaf" unique_id=1316630390]
+layout_mode = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hole")
+
+[node name="TextLabel" type="Label" parent="LeftLeaf" unique_id=1887399811]
+layout_mode = 0
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RightLeaf" type="Control" parent="." unique_id=1894804024]
+anchors_preset = 0
+mouse_filter = 2
+
+[node name="Body" type="ColorRect" parent="RightLeaf" unique_id=1405573002]
+material = SubResource("ShaderMaterial_leaf")
+layout_mode = 0
+mouse_filter = 2
+
+[node name="LeafFrame" type="Panel" parent="RightLeaf" unique_id=292916377]
+visible = false
+layout_mode = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_leaf_frame")
+
+[node name="LeafTexture" type="TextureRect" parent="RightLeaf" unique_id=521896175]
+visible = false
+layout_mode = 0
+mouse_filter = 2
+texture = ExtResource("3_leaf_texture")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="TopHole" type="Panel" parent="RightLeaf" unique_id=27764822]
+layout_mode = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hole")
+
+[node name="BottomHole" type="Panel" parent="RightLeaf" unique_id=492153071]
+layout_mode = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hole")
+
+[node name="TextLabel" type="Label" parent="RightLeaf" unique_id=218281024]
+layout_mode = 0
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MainLeaf" type="Control" parent="." unique_id=1156214298]
+anchors_preset = 0
+mouse_filter = 2
+
+[node name="Body" type="ColorRect" parent="MainLeaf" unique_id=1282611585]
+material = SubResource("ShaderMaterial_leaf")
+layout_mode = 0
+mouse_filter = 2
+
+[node name="LeafFrame" type="Panel" parent="MainLeaf" unique_id=817878043]
+visible = false
+layout_mode = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_leaf_frame")
+
+[node name="LeafTexture" type="TextureRect" parent="MainLeaf" unique_id=309476978]
+visible = false
+layout_mode = 0
+mouse_filter = 2
+texture = ExtResource("3_leaf_texture")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="TopHole" type="Panel" parent="MainLeaf" unique_id=1998523761]
+layout_mode = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hole")
+
+[node name="BottomHole" type="Panel" parent="MainLeaf" unique_id=292403857]
+layout_mode = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hole")
+
+[node name="TextLabel" type="Label" parent="MainLeaf" unique_id=1272368281]
+layout_mode = 0
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HitButton" type="Button" parent="." unique_id=1743126828]
+layout_mode = 0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_hit")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_hit")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_hit")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_hit")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_hit")
+flat = true

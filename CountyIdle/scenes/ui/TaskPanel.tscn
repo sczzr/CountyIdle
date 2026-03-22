@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://d24s551njtx85" path="res://scripts/ui/TaskPanel.cs" id="1_task_panel"]
 [ext_resource type="Script" uid="uid://d0bqyf87mwhkh" path="res://scripts/ui/gd/TaskPanelVisualFx.gd" id="2_task_fx"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/SealConfirmButton.tscn" id="3_seal_confirm_button"]
 
 [node name="TaskPanel" type="Control" unique_id=1414837021]
 visible = false
@@ -101,11 +102,10 @@ text = "灵石结余:"
 layout_mode = 2
 text = "0"
 
-[node name="CloseButton" type="Button" parent="Overlay/Center/Frame/RootColumn/HeaderPanel/HeaderMargin/HeaderRow" unique_id=842947311]
-custom_minimum_size = Vector2(40, 40)
+[node name="CloseButton" parent="Overlay/Center/Frame/RootColumn/HeaderPanel/HeaderMargin/HeaderRow" instance=ExtResource("3_seal_confirm_button") unique_id=842947311]
+custom_minimum_size = Vector2(96, 56)
 layout_mode = 2
-text = "×"
-flat = true
+text = "收卷"
 
 [node name="HeaderDivider" type="ColorRect" parent="Overlay/Center/Frame/RootColumn" unique_id=835851480]
 custom_minimum_size = Vector2(0, 1)

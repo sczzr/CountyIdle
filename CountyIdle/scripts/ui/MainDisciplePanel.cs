@@ -113,16 +113,15 @@ public partial class Main
         _disciplePanel.Closed -= OnDisciplePanelClosed;
     }
 
-    private Button? GetDisciplePanelButton()
+    private BaseButton? GetDisciplePanelButton()
     {
-
-        var bottomQuickButton = GetNodeOrNull<Button>($"{BottomBarPath}/BarPadding/MainRow/QuickActionRow/DiscipleQuickButton");
+        var bottomQuickButton = GetNodeOrNull<BaseButton>($"{BottomBarPath}/BarPadding/MainRow/QuickActionRow/DiscipleQuickButton");
         if (bottomQuickButton != null)
         {
             return bottomQuickButton;
         }
 
-        return GetNodeOrNull<Button>($"{CenterTopTabRowPath}/DisciplePanelButton");
+        return GetNodeOrNull<BaseButton>($"{CenterTopTabRowPath}/DisciplePanelButton");
     }
 
     private void SetDiscipleQuickButtonState(bool pressed)

@@ -1,0 +1,126 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/TopBar.tscn" id="1_topbar"]
+[ext_resource type="PackedScene" path="res://scenes/ui/BottomBar.tscn" id="2_bottombar"]
+[ext_resource type="PackedScene" uid="uid://d0yegsystt6dx" path="res://scenes/ui/JobsPanel.tscn" id="3_jobs"]
+[ext_resource type="PackedScene" uid="uid://b41bsu0i675xo" path="res://scenes/ui/EventLogPanel.tscn" id="4_eventlog"]
+[ext_resource type="Texture2D" path="res://assets/ui/settings/paper_grain.svg" id="5_paper"]
+[ext_resource type="FontFile" path="res://assets/ui/fonts/MaShanZheng-Regular.ttf" id="6_calligraphy"]
+[ext_resource type="FontFile" path="res://assets/ui/fonts/NotoSerifSC[wght].ttf" id="7_serif"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_aura"]
+bg_color = Color(0.98, 0.97, 0.93, 0.56)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.552941, 0.45098, 0.294118, 0.35)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[node name="MainHUD" type="CanvasLayer"]
+layer = 100
+
+[node name="PaperOverlay" type="TextureRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+modulate = Color(1, 1, 1, 0.16)
+texture = ExtResource("5_paper")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="HUDControl" type="Control" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TopBar" parent="HUDControl" instance=ExtResource("1_topbar")]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 92.0
+grow_horizontal = 2
+
+[node name="FloatingLayer" type="Control" parent="HUDControl"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="AuraRow" type="HBoxContainer" parent="HUDControl/FloatingLayer"]
+layout_mode = 1
+offset_left = 26.0
+offset_top = 106.0
+offset_right = 166.0
+offset_bottom = 146.0
+theme_override_constants/separation = 10
+
+[node name="GoodAura" type="PanelContainer" parent="HUDControl/FloatingLayer/AuraRow"]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_aura")
+
+[node name="Label" type="Label" parent="HUDControl/FloatingLayer/AuraRow/GoodAura"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.447059, 0.572549, 0.505882, 1)
+theme_override_fonts/font = ExtResource("6_calligraphy")
+theme_override_font_sizes/font_size = 22
+text = "丰"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BadAura" type="PanelContainer" parent="HUDControl/FloatingLayer/AuraRow"]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_aura")
+
+[node name="Label" type="Label" parent="HUDControl/FloatingLayer/AuraRow/BadAura"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.705882, 0.133333, 0.133333, 1)
+theme_override_fonts/font = ExtResource("6_calligraphy")
+theme_override_font_sizes/font_size = 22
+text = "煞"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LeftPanel" parent="HUDControl/FloatingLayer" instance=ExtResource("3_jobs")]
+layout_mode = 1
+offset_left = 24.0
+offset_top = 154.0
+offset_right = 344.0
+offset_bottom = 706.0
+mouse_filter = 0
+
+[node name="RightPanel" parent="HUDControl/FloatingLayer" instance=ExtResource("4_eventlog")]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -338.0
+offset_top = 154.0
+offset_right = -24.0
+offset_bottom = 706.0
+grow_horizontal = 0
+mouse_filter = 0
+
+[node name="BottomBar" parent="HUDControl" instance=ExtResource("2_bottombar")]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -188.0
+grow_horizontal = 2
+grow_vertical = 0

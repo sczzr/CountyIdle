@@ -34,10 +34,13 @@ public partial class Main
         }
 
         _settingsPanel = panelScene.Instantiate<SettingsPanel>();
+        // 设置卷在主场景启动时就会预先挂入树中，先显式隐藏，避免欢迎页阶段出现首帧透出。
+        _settingsPanel.Hide();
         _settingsPanel.PreviewRequested += OnClientSettingsPreviewRequested;
         _settingsPanel.ApplyRequested += OnClientSettingsApplyRequested;
         AddChild(_settingsPanel);
         MoveChild(_settingsPanel, GetChildCount() - 1);
+        _settingsPanel.Hide();
     }
 
     private void BindSettingsButtonEvent()
@@ -70,7 +73,9 @@ public partial class Main
         TranslationServer.SetLocale(settings.Language);
         ApplyDisplayMode(settings.IsFullscreen, settings.ResolutionWidth, settings.ResolutionHeight);
         ApplyContentZoom(settings.FontScale);
-        ApplyMasterVolume(settings.MasterVolume);
+        ApplyAudioBusVolume(MasterAudioBusName, settings.MasterVolume);
+        ApplyNamedBusVolume(settings.BgmVolume, "Music", "BGM", "Bgm");
+        ApplyNamedBusVolume(settings.SfxVolume, "SFX", "Sfx", "UI", "Ui");
     }
 
     private static void ApplyDisplayMode(bool isFullscreen, int width, int height)
@@ -107,9 +112,34 @@ public partial class Main
         window.ContentScaleFactor = contentZoom;
     }
 
-    private static void ApplyMasterVolume(float volumeLinear)
+    private static void ApplyNamedBusVolume(float volumeLinear, params string[] busNames)
     {
-        var busIndex = AudioServer.GetBusIndex(MasterAudioBusName);
+        foreach (var busName in busNames)
+        {
+            var busIndex = AudioServer.GetBusIndex(busName);
+            if (busIndex < 0)
+            {
+                continue;
+            }
+
+            ApplyAudioBusVolume(busIndex, volumeLinear);
+            return;
+        }
+    }
+
+    private static void ApplyAudioBusVolume(string busName, float volumeLinear)
+    {
+        var busIndex = AudioServer.GetBusIndex(busName);
+        if (busIndex < 0)
+        {
+            return;
+        }
+
+        ApplyAudioBusVolume(busIndex, volumeLinear);
+    }
+
+    private static void ApplyAudioBusVolume(int busIndex, float volumeLinear)
+    {
         if (busIndex < 0)
         {
             return;

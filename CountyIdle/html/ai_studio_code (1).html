@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@300;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --paper: #f4f1ea;
+            --ink: #2c2c2c;
+            --jade: #cbdcd0;
+            --cord: #3d2b1f;
+            --seal: #b22222;
+            /* 基础比例因子，随窗口高度变化 */
+            --unit: 1vh;
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            background-color: var(--paper);
+            font-family: 'Noto Serif SC', serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            /* 禁止缩放导致的布局崩溃，使用等比缩放思路 */
+        }
+
+        /* --- 背景纸张滤镜 --- */
+        .paper-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paperGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='5' result='noise'/%3E%3CfeDiffuseLighting in='noise' lighting-color='%23f4f1ea' surfaceScale='2'%3E%3CfeDistantLight azimuth='45' elevation='60'/%3E%3C/feDiffuseLighting%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paperGrain)' opacity='0.5'/%3E%3C/svg%3E");
+        }
+
+        /* --- 全屏流光粒子效果 --- */
+        .aura-particle {
+            position: absolute;
+            background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.4), transparent);
+            width: 1px;
+            height: 20vh;
+            top: -20vh;
+            animation: flowDown 8s infinite linear;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes flowDown {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+
+            20% {
+                opacity: 0.5;
+            }
+
+            80% {
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: translateY(120vh) translateX(20vw);
+                opacity: 0;
+            }
+        }
+
+        /* --- 标题区域 (响应式) --- */
+        .header {
+            text-align: center;
+            margin-bottom: calc(8 * var(--unit));
+            z-index: 10;
+        }
+
+        .title {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: calc(12 * var(--unit));
+            color: var(--ink);
+            letter-spacing: 0.2em;
+            text-shadow: 0.3vh 0.3vh 1vh rgba(0, 0, 0, 0.05);
+        }
+
+        /* --- 菜单布局 --- */
+        .menu-container {
+            display: flex;
+            gap: calc(8 * var(--unit));
+            perspective: 1000px;
+            z-index: 10;
+        }
+
+        /* --- 玉简组 (高度占比 45vh) --- */
+        .jade-group {
+            position: relative;
+            width: calc(10 * var(--unit));
+            height: calc(45 * var(--unit));
+            cursor: pointer;
+        }
+
+        .jade-leaf {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: calc(10 * var(--unit));
+            height: calc(45 * var(--unit));
+            background-image: url("data:image/svg+xml,%3Csvg width='44' height='190' viewBox='0 0 44 190' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='jadeGrad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23fdfdfd' /%3E%3Cstop offset='100%25' style='stop-color:%23cbdcd0' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='2' y='2' width='40' height='186' rx='4' fill='url(%23jadeGrad)' stroke='rgba(0,0,0,0.1)' stroke-width='1'/%3E%3Ccircle cx='22' cy='18' r='3' fill='%233d2b1f' /%3E%3Ccircle cx='22' cy='172' r='3' fill='%233d2b1f' /%3E%3Cpath d='M10 40 Q 22 80 15 150' stroke='rgba(255,255,255,0.5)' fill='none' stroke-width='0.5' /%3E%3C/svg%3E");
+            background-size: 100% 100%;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            writing-mode: vertical-rl;
+            font-family: 'Ma Shan Zheng', cursive;
+            overflow: hidden;
+        }
+
+        /* 玉简表面扫过的流光 */
+        .jade-leaf::after {
+            content: "";
+            position: absolute;
+            top: -100%;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: skewY(-30deg);
+            animation: jadeGlow 4s infinite;
+        }
+
+        @keyframes jadeGlow {
+            0% {
+                top: -100%;
+            }
+
+            30% {
+                top: 150%;
+            }
+
+            100% {
+                top: 150%;
+            }
+        }
+
+        .main-leaf {
+            z-index: 10;
+            font-size: calc(3.5 * var(--unit));
+            color: var(--ink);
+            filter: drop-shadow(0.5vh 1vh 1vh rgba(0, 0, 0, 0.1));
+        }
+
+        .side-leaf {
+            z-index: 5;
+            font-size: calc(1.8 * var(--unit));
+            color: rgba(44, 44, 44, 0.5);
+            opacity: 0;
+            transform: scaleY(0.92);
+        }
+
+        /* 悬停交互 */
+        .jade-group:hover .main-leaf {
+            color: var(--seal);
+            transform: translateY(calc(-2 * var(--unit)));
+        }
+
+        .jade-group:hover .leaf-left {
+            opacity: 1;
+            transform: translateX(calc(-10.5 * var(--unit))) scaleY(0.92) rotate(-2deg);
+        }
+
+        .jade-group:hover .leaf-right {
+            opacity: 1;
+            transform: translateX(calc(10.5 * var(--unit))) scaleY(0.92) rotate(2deg);
+        }
+
+        .jade-leaf span {
+            letter-spacing: 0.3em;
+            padding: calc(2 * var(--unit)) 0;
+        }
+
+        /* --- 右下角落款印章 --- */
+        .seal-box {
+            position: fixed;
+            bottom: calc(5 * var(--unit));
+            right: calc(5 * var(--unit));
+            width: calc(10 * var(--unit));
+            height: calc(10 * var(--unit));
+            border: calc(0.4 * var(--unit)) solid var(--seal);
+            padding: calc(0.5 * var(--unit));
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            color: var(--seal);
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: calc(3.5 * var(--unit));
+            line-height: 1.1;
+            text-align: center;
+            opacity: 0.8;
+            background: rgba(178, 34, 34, 0.02);
+            box-shadow: inset 0 0 1vh rgba(178, 34, 34, 0.1);
+            transform: rotate(-2deg);
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .seal-box div {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            writing-mode: vertical-rl;
+        }
+
+        /* 装饰绳索 */
+        .connector-line {
+            position: absolute;
+            top: calc(4.5 * var(--unit));
+            left: -50vw;
+            right: -50vw;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--cord), transparent);
+            opacity: 0.1;
+            z-index: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="paper-overlay"></div>
+
+    <!-- 动态生成流光粒子 -->
+    <div id="aura-container"></div>
+
+    <header class="header">
+        <h1 class="title">山海棋局</h1>
+        <p class="text-stone-400 tracking-[1em] text-[1vh] uppercase mt-2">Shanhai Chronicles Strategy</p>
+    </header>
+
+    <div class="menu-container relative">
+        <div class="connector-line"></div>
+        <div class="connector-line" style="top: calc(40.5 * var(--unit));"></div>
+
+        <!-- 选项 -->
+        <div class="jade-group" onclick="handleMenu('start')">
+            <div class="jade-leaf side-leaf leaf-left"><span>云深不知处</span></div>
+            <div class="jade-leaf main-leaf"><span>踏入仙途</span></div>
+            <div class="jade-leaf side-leaf leaf-right"><span>山海觅长生</span></div>
+        </div>
+
+        <div class="jade-group" onclick="handleMenu('load')">
+            <div class="jade-leaf side-leaf leaf-left"><span>梦回旧山河</span></div>
+            <div class="jade-leaf main-leaf"><span>往昔因果</span></div>
+            <div class="jade-leaf side-leaf leaf-right"><span>缘起落花时</span></div>
+        </div>
+
+        <div class="jade-group" onclick="handleMenu('settings')">
+            <div class="jade-leaf side-leaf leaf-left"><span>乾坤归造化</span></div>
+            <div class="jade-leaf main-leaf"><span>万象方寸</span></div>
+            <div class="jade-leaf side-leaf leaf-right"><span>静思理玄机</span></div>
+        </div>
+
+        <div class="jade-group" onclick="handleMenu('mods')">
+            <div class="jade-leaf side-leaf leaf-left"><span>旁门参造化</span></div>
+            <div class="jade-leaf main-leaf"><span>奇门遁甲</span></div>
+            <div class="jade-leaf side-leaf leaf-right"><span>幻影变乾坤</span></div>
+        </div>
+
+        <div class="jade-group" onclick="handleMenu('exit')">
+            <div class="jade-leaf side-leaf leaf-left"><span>挥袖远红尘</span></div>
+            <div class="jade-leaf main-leaf"><span>离线归真</span></div>
+            <div class="jade-leaf side-leaf leaf-right"><span>拂衣入大荒</span></div>
+        </div>
+    </div>
+
+    <!-- 右下角落款 -->
+    <div class="seal-box">
+        <div>谨</div>
+        <div>山</div>
+        <div>制</div>
+        <div>海</div>
+    </div>
+
+    <script>
+        // 动态生成粒子
+        const container = document.getElementById('aura-container');
+        for (let i = 0; i < 15; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'aura-particle';
+            particle.style.left = Math.random() * 100 + 'vw';
+            particle.style.animationDelay = Math.random() * 8 + 's';
+            particle.style.opacity = Math.random() * 0.5;
+            container.appendChild(particle);
+        }
+
+        function handleMenu(action) {
+            console.log("执行: " + action);
+            if (action === 'exit') {
+                document.body.style.opacity = '0';
+                document.body.style.transition = 'opacity 1.5s ease';
+                setTimeout(() => alert('因果已断'), 1000);
+            }
+        }
+    </script>
+</body>
+
+</html>

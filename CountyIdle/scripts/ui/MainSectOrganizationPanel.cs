@@ -110,10 +110,9 @@ public partial class Main
         _sectOrganizationPanel.Closed -= OnSectOrganizationPanelClosed;
     }
 
-    private Button? GetSectOrganizationPanelButton()
+    private BaseButton? GetSectOrganizationPanelButton()
     {
-
-        return GetNodeOrNull<Button>($"{BottomBarPath}/BarPadding/MainRow/QuickActionRow/OrganizationQuickButton");
+        return GetNodeOrNull<BaseButton>($"{BottomBarPath}/BarPadding/MainRow/QuickActionRow/OrganizationQuickButton");
     }
 
     private void SetSectOrganizationQuickButtonState(bool pressed)

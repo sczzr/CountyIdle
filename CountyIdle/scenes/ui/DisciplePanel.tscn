@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://cln78okxidums" path="res://scripts/ui/gd/DiscipleRadarChart.gd" id="3_disciple_radar_fx"]
 [ext_resource type="Texture2D" uid="uid://c2bldbnt0q1yo" path="res://assets/ui/background/cultivation_hex_grid.svg" id="4_hex_grid"]
 [ext_resource type="Theme" uid="uid://3dtfufungbqq" path="res://ui/xianxia.css" id="5_xianxia_css"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/SealConfirmButton.tscn" id="6_seal_confirm_button"]
 
 [node name="DisciplePanel" type="Control" unique_id=770421136]
 visible = false
@@ -65,17 +66,16 @@ offset_bottom = 72.0
 theme_type_variation = &"ButtonGhost"
 text = "◀ 宗门大谱"
 
-[node name="CloseButton" type="Button" parent="TopOverlay" unique_id=674525088]
-custom_minimum_size = Vector2(40, 40)
+[node name="CloseButton" parent="TopOverlay" instance=ExtResource("6_seal_confirm_button") unique_id=674525088]
+custom_minimum_size = Vector2(88, 54)
 layout_mode = 0
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -80.0
+offset_left = -132.0
 offset_top = 32.0
 offset_right = -40.0
-offset_bottom = 72.0
-theme_type_variation = &"ButtonGhost"
-text = "×"
+offset_bottom = 86.0
+text = "收卷"
 
 [node name="ScreenMargin" type="MarginContainer" parent="." unique_id=873349689]
 layout_mode = 1

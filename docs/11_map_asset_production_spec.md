@@ -153,6 +153,43 @@
 | 浅滩（近岸） | 碧绿近岸水土交界 | `2` |
 | 山麓 / 岩地 | 过渡到山体与坡地的基础底盘 | `3` |
 
+### 6.1.1 `L1_hex_tileset.tres` 多图源四季图集规范（强制）
+
+- `L1_hex_tileset.tres` 统一按“`N` 组 `TileSetAtlasSource` + 每组一张 `4x2` 图”组织；当前已落地 `4` 组，后续允许继续追加。
+- 每个 source 对应一张 `4x2` PNG，固定语义如下：
+  - 列 `0 ~ 3`：`春 / 夏 / 秋 / 冬`
+  - 行 `0 ~ 1`：该图内的两类地块槽位
+- 因此单张图的承载单位固定为“`2` 类地块 × `4` 季节”；后续扩容方式是一张一张加新图，不允许改动既有季节列顺序。
+- `sourceId`、资源文件名、导入先后顺序只承担“资源包编号”职责，不承担玩法语义；运行时不得再依赖“第几组图”或文件名去推断它是什么地貌。
+- 同一行的 `4` 个 tile 必须共享同一 `terrain_family / terrain_group / row_slot`，只允许 `season` 不同。
+- 若某一行暂未投产，可保留为空的预留槽；宁可留空，也不要把两种笔触完全不兼容的地貌强塞进同一张图。
+
+推荐按下表理解该图集：
+
+| 维度 | 固定含义 | 备注 |
+| --- | --- | --- |
+| `source / group` | 一张 `4x2` PNG | 当前 `4` 组，后续可继续增加 |
+| `row` | 一类地块 | 每张图固定 `2` 行 |
+| `column` | 一季表现 | 固定为 `春 / 夏 / 秋 / 冬` |
+| `tile` | 某类地块在某季节的单张样本 | 作为运行时候选变体 |
+
+新增 source 时，建议统一补齐以下 tileset custom data：
+
+| 字段 | 是否必填 | 用途 |
+| --- | --- | --- |
+| `terrain_family` | 是 | 地貌家族主键，如 `plain / spirit / rugged / snow / shallow_water / deep_water / forest / swamp` |
+| `world_terrain_family` | 是（兼容层） | 世界图沿用的地貌家族键；若与 `terrain_family` 一致则直接复用 |
+| `terrain_group` | 是 | 资源包 / 变体组编号，如 `plain_spirit_pack_a` |
+| `row_slot` | 是 | 标记该 tile 属于本图第 `0` 行还是第 `1` 行 |
+| `season` | 是 | `spring / summer / autumn / winter` |
+| `variant_weight` | 否 | 同家族同季节出现多组素材时的抽选权重，默认可视为 `1` |
+
+成组建议：
+
+- 优先把笔触、明度和纸面质感接近的两类地块放在同一张图里，例如 `plain + spirit`、`rugged + snow`、`shallow_water + deep_water`、`forest + swamp`。
+- 若后续加入 `desert / volcanic / ruin / corruption` 等强主题地貌，优先与同题材或同色温的地貌同组，不与常规耕地 / 水乡混排。
+- 历史文件名允许暂时保留，但新增资源建议逐步统一到 `l1_hex_<group_slug>.png`，便于美术、程序和后续批量替换协同。
+
 二期储备：
 
 - 荒漠（黄风漠）

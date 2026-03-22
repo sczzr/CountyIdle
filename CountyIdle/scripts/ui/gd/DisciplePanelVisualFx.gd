@@ -275,6 +275,20 @@ func _style_button(root: Node, path: String) -> void:
 	var button := root.get_node_or_null(path) as Button
 	if button == null:
 		return
+	if path == "TopOverlay/CloseButton":
+		# 弟子谱卷首收卷动作复用统一印章组件，保持卷册家族一致。
+		button.add_theme_font_override("font", FONT_BODY)
+		button.add_theme_font_size_override("font_size", 22)
+		button.add_theme_color_override("font_color", ACCENT)
+		button.add_theme_color_override("font_hover_color", ACCENT)
+		button.add_theme_color_override("font_pressed_color", ACCENT)
+		button.add_theme_color_override("font_disabled_color", INK_MUTED)
+		for state in ["normal", "hover", "pressed", "focus", "disabled"]:
+			button.add_theme_stylebox_override(state, _create_button_style(false, false))
+		var seal_shape: TextureRect = button.get_node_or_null("SealShape")
+		if seal_shape != null:
+			seal_shape.modulate = Color(0.66, 0.19, 0.14, 0.92)
+		return
 	button.add_theme_font_override("font", FONT_BODY)
 	button.add_theme_font_size_override("font_size", 12)
 	button.add_theme_color_override("font_color", INK_MAIN)

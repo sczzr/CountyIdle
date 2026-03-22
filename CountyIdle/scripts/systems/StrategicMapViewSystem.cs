@@ -36,9 +36,18 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     private const float WorldHexUnderlayPaddingFactor = 0.012f;
     private const float WorldHexUnderlayPaddingMin = 0.20f;
     private const float WorldHexUnderlayPaddingMax = 1.60f;
+    private const float WorldHexTextureAreaScale = 0.80f;
+    private const float WorldHexOutlineWidthFactor = 0.026f;
+    private const float WorldHexOutlineWidthMin = 0.42f;
+    private const float WorldHexInnerOutlineWidthFactor = 0.42f;
+    private const float WorldHexInnerOutlineWidthMin = 0.22f;
+    private static readonly Color WorldHexInkOutlineOuterColor = new(0.46f, 0.43f, 0.39f, 0.48f);
+    private static readonly Color WorldHexInkOutlineInnerColor = new(0.19f, 0.18f, 0.16f, 0.82f);
     private const string Layer1TileSetPath = "res://assets/ui/tilemap/L1_hex_tileset.tres";
     private const string WorldHexTileClipShaderPath = "res://assets/ui/tilemap/world_hex_tile_clip.gdshader";
+    private static readonly StringName TerrainFamilyCustomDataLayer = new("terrain_family");
     private static readonly StringName WorldTerrainFamilyCustomDataLayer = new("world_terrain_family");
+    private static readonly StringName SeasonCustomDataLayer = new("season");
     private static readonly Vector2I[] WorldPlainTileCoords =
     [
         new Vector2I(0, 1),
@@ -73,6 +82,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     private Vector2I[] _worldDeepWaterTileCoords = WorldWaterTileCoords;
     private Vector2I[] _worldShallowWaterTileCoords = WorldWaterTileCoords;
     private static readonly Color MapBackdropColor = new(0.09f, 0.11f, 0.16f, 0.92f);
+    private static readonly Color WorldMapBackdropOverlayColor = new(1f, 1f, 1f, 0.0f);
     private static readonly Color GridColor = new(0.16f, 0.20f, 0.28f, 0.55f);
     private static readonly Color DefaultOutlineColor = new(0.82f, 0.86f, 0.96f, 0.35f);
     private static readonly Color DefaultRouteColor = new(0.95f, 0.79f, 0.42f, 0.82f);
@@ -96,9 +106,11 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     private bool _useConfigDefinition;
 
     private readonly StrategicMapConfigSystem _configSystem = new();
+    private readonly GameCalendarSystem _calendarSystem = new();
     private readonly PrefectureMapGeneratorSystem _prefectureGenerator = new();
     private readonly XianxiaWorldGeneratorSystem _xianxiaWorldGenerator = new();
     private readonly Color[] _hexTintColors = new Color[6];
+    private readonly Dictionary<TownTerrainVisualFamily, SeasonalLayer1VariantSet> _worldLayer1SeasonalVariants = new();
     private StrategicMapDefinition _mapDefinition = new();
     private XianxiaWorldMapData? _xianxiaWorldMap;
     private Dictionary<(int Q, int R), XianxiaHexCellData> _xianxiaWorldCellLookup = [];
@@ -125,6 +137,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     private int _lastHousingHint = 180;
     private double _lastThreatHint = 10d;
     private int _lastSettlementHint;
+    private int _currentSeasonIndex;
     private MapViewStyle _operationalStyle = new();
     private XianxiaSiteData? _selectedWorldSite;
 
@@ -154,8 +167,8 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         ClipContents = true;
         _titleLabel = GetNodeOrNull<Label>("Label");
         _toneFx = GetNodeOrNull<Node>("ToneFx");
-        LoadAtlases();
         EnsureWorldTerrainLayerInfrastructure();
+        LoadAtlases();
         ReloadMapDefinition();
 
                 ConfigureTitleLabel();
@@ -316,6 +329,19 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         QueueRedraw();
     }
 
+    // 根据历法刷新当前季节列，供四季地块 atlas 选图使用。
+    public void SetCalendarMinute(int gameMinutes)
+    {
+        var nextSeasonIndex = Math.Clamp(_calendarSystem.GetQuarterIndex(Math.Max(gameMinutes, 0)), 0, 3);
+        if (nextSeasonIndex == _currentSeasonIndex)
+        {
+            return;
+        }
+
+        _currentSeasonIndex = nextSeasonIndex;
+        QueueRedraw();
+    }
+
     private Rect2 GetMapRect()
     {
         return new Rect2(12f, 44f, Math.Max(Size.X - 24f, 8f), Math.Max(Size.Y - 56f, 8f));
@@ -329,11 +355,20 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
 
     private void DrawMapBackdrop(Rect2 mapRect)
     {
-        DrawRect(mapRect, _operationalStyle.BackdropColor, true);
+        // 世界图底下已经铺了 `background_map.png`，这里不要再盖一层重色块；
+        // 仅保留极轻的纸面覆色，让底图能透出来。
+        var backdropColor = _mode == StrategicMapMode.World
+            ? WorldMapBackdropOverlayColor
+            : _operationalStyle.BackdropColor;
+        DrawRect(mapRect, backdropColor, true);
     }
 
     private void LoadAtlases()
     {
+        // 世界图正式主链走 `_Draw()` 的 hex polygon 投影，但纹理来源必须独立加载
+        // `L1_hex_tileset.tres`，不能把正式底盘绑定到备用 `TileMapLayer` 节点是否存在。
+        LoadWorldLayer1TileSet();
+        LoadWorldTerrainTileBindings();
     }
 
     public void SetZoom(float zoom)
@@ -732,9 +767,12 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         }
 
         var hexRadius = Math.Max(_xianxiaWorldHexRadius * unit, 2f);
-        var renderRadius = (hexRadius + ResolveWorldSeamPadding(hexRadius)) * WorldHexSeamOverdrawScale;
-        var underlayRadius = renderRadius + ResolveWorldUnderlayPadding(hexRadius);
+        // 用户要求当前世界图底盘素材缩到单元格面积的 0.8 倍，因此半径按面积开平方缩放。
+        var textureRadius = hexRadius * Mathf.Sqrt(WorldHexTextureAreaScale);
         var tint = _operationalStyle.TerrainTint;
+        // 世界图 hex 外轮廓改为“外浅灰、内深墨”的双层描边，更接近中国风地图墨线。
+        var outlineOuterWidth = Math.Max(WorldHexOutlineWidthMin, hexRadius * WorldHexOutlineWidthFactor);
+        var outlineInnerWidth = Math.Max(WorldHexInnerOutlineWidthMin, outlineOuterWidth * WorldHexInnerOutlineWidthFactor);
         foreach (var cell in _xianxiaWorldMap.Cells)
         {
             if (!_xianxiaWorldCenters.TryGetValue((cell.Coord.Q, cell.Coord.R), out var normalizedCenter))
@@ -743,13 +781,16 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
             }
 
             var canvasCenter = ToCanvas(center, unit, normalizedCenter.X, normalizedCenter.Y);
-            var underlayHex = BuildHexPolygon(canvasCenter, underlayRadius);
-            DrawFilledPolygon(underlayHex, tint);
-            var hex = BuildHexPolygon(canvasCenter, renderRadius);
-            if (!TryDrawWorldLayer1TileSetHex(hex, cell, tint))
+            // 世界图底图应直接透出 `background_map.png`，这里不再额外铺任何单元格底色。
+            var cellHex = BuildHexPolygon(canvasCenter, hexRadius);
+            var textureHex = BuildHexPolygon(canvasCenter, textureRadius);
+            if (!TryDrawWorldLayer1TileSetHex(textureHex, cell, tint))
             {
-                DrawFilledPolygon(hex, tint);
+                DrawFilledPolygon(textureHex, tint);
             }
+
+            DrawPath(cellHex, WorldHexInkOutlineOuterColor, outlineOuterWidth, true);
+            DrawPath(cellHex, WorldHexInkOutlineInnerColor, outlineInnerWidth, true);
         }
     }
 
@@ -1850,13 +1891,11 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
             return;
         }
 
+        // `WorldTerrainTileLayer` 当前只保留为实验 / 备用基础设施，正式世界图底盘仍由脚本绘制。
         _worldTerrainTileLayer.ShowBehindParent = true;
         _worldTerrainTileLayer.ZIndex = -10;
         _worldTerrainTileLayer.Visible = false;
         _worldTerrainTileLayer.Material = LoadWorldTerrainClipMaterial();
-
-        LoadWorldLayer1TileSet();
-        LoadWorldTerrainTileBindings();
     }
 
     private void LoadWorldLayer1TileSet()
@@ -1886,6 +1925,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
 
     private void LoadWorldTerrainTileBindings()
     {
+        _worldLayer1SeasonalVariants.Clear();
         if (TryLoadWorldTerrainTilesFromTileSet())
         {
             return;
@@ -1907,97 +1947,224 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
 
     private bool TryLoadWorldTerrainTilesFromTileSet()
     {
-        if (_worldLayer1TileSet == null || _worldLayer1SourceId < 0)
+        if (_worldLayer1TileSet == null)
         {
             return false;
         }
 
         // 当前 L1 图块资源尚未补齐自定义数据层时，直接回退到代码内置坐标，避免运行期刷屏报错。
-        if (!HasCustomDataLayer(_worldLayer1TileSet, WorldTerrainFamilyCustomDataLayer))
+        if (!HasCustomDataLayer(_worldLayer1TileSet, WorldTerrainFamilyCustomDataLayer) &&
+            !HasCustomDataLayer(_worldLayer1TileSet, TerrainFamilyCustomDataLayer))
         {
             return false;
         }
 
-        if (_worldLayer1TileSet.GetSource(_worldLayer1SourceId) is not TileSetAtlasSource atlasSource)
+        var foundAny = false;
+        for (var sourceIndex = 0; sourceIndex < _worldLayer1TileSet.GetSourceCount(); sourceIndex++)
+        {
+            var sourceId = _worldLayer1TileSet.GetSourceId(sourceIndex);
+            if (_worldLayer1TileSet.GetSource(sourceId) is not TileSetAtlasSource atlasSource)
+            {
+                continue;
+            }
+
+            var tilesCount = atlasSource.GetTilesCount();
+            for (var tileIndex = 0; tileIndex < tilesCount; tileIndex++)
+            {
+                var coords = atlasSource.GetTileId(tileIndex);
+                var tileData = atlasSource.GetTileData(coords, 0);
+                if (tileData == null)
+                {
+                    continue;
+                }
+
+                var familyText = ReadLayer1CustomText(tileData, WorldTerrainFamilyCustomDataLayer, TerrainFamilyCustomDataLayer);
+                if (!TryMapLayer1FamilyToWorldVisualFamily(familyText, out var visualFamily))
+                {
+                    continue;
+                }
+
+                var seasonIndex = ResolveLayer1SeasonIndex(tileData, coords);
+                RegisterWorldSeasonalVariant(
+                    visualFamily,
+                    seasonIndex,
+                    new Layer1TileVariant(sourceId, coords, 0));
+                foundAny = true;
+            }
+        }
+
+        return foundAny;
+    }
+
+    // 将世界图自定义 family 文本映射到当前可识别的视觉族系。
+    private static bool TryMapLayer1FamilyToWorldVisualFamily(string familyText, out TownTerrainVisualFamily visualFamily)
+    {
+        visualFamily = TownTerrainVisualFamily.Auto;
+        if (string.IsNullOrWhiteSpace(familyText))
         {
             return false;
         }
 
-        var plain = new HashSet<Vector2I>();
-        var spirit = new HashSet<Vector2I>();
-        var rugged = new HashSet<Vector2I>();
-        var snow = new HashSet<Vector2I>();
-        var deepWater = new HashSet<Vector2I>();
-        var shallowWater = new HashSet<Vector2I>();
-
-        var tilesCount = atlasSource.GetTilesCount();
-        for (var index = 0; index < tilesCount; index++)
+        switch (familyText.Trim().ToLowerInvariant())
         {
-            var coords = atlasSource.GetTileId(index);
-            var tileData = atlasSource.GetTileData(coords, 0);
-            if (tileData == null)
+            case "plain":
+            case "grass":
+            case "grassland":
+            case "field":
+            case "meadow":
+                visualFamily = TownTerrainVisualFamily.Plain;
+                return true;
+            case "spirit":
+            case "spirit_vein":
+            case "spiritvein":
+            case "spirit_land":
+                visualFamily = TownTerrainVisualFamily.Spirit;
+                return true;
+            case "rugged":
+            case "foothill":
+            case "mountain":
+            case "rock":
+                visualFamily = TownTerrainVisualFamily.Rugged;
+                return true;
+            case "snow":
+            case "snowfield":
+            case "ice":
+            case "tundra":
+                visualFamily = TownTerrainVisualFamily.Snow;
+                return true;
+            case "deep_water":
+            case "deepwater":
+            case "water_deep":
+            case "ocean":
+            case "sea":
+                visualFamily = TownTerrainVisualFamily.DeepWater;
+                return true;
+            case "shallow_water":
+            case "shallowwater":
+            case "water_shallow":
+            case "shore":
+            case "lake":
+                visualFamily = TownTerrainVisualFamily.ShallowWater;
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    // 读取 tileset custom data 的字符串值；若首选层缺失，则按顺序回退到下一个层名。
+    private static string ReadLayer1CustomText(TileData tileData, params StringName[] layerNames)
+    {
+        foreach (var layerName in layerNames)
+        {
+            var value = tileData.GetCustomData(layerName);
+            if (value.VariantType == Variant.Type.Nil)
             {
                 continue;
             }
 
-            var familyVariant = tileData.GetCustomData(WorldTerrainFamilyCustomDataLayer);
-            if (familyVariant.VariantType == Variant.Type.Nil)
+            var text = value.AsString();
+            if (!string.IsNullOrWhiteSpace(text))
             {
-                continue;
-            }
-
-            var familyText = familyVariant.AsString();
-            if (string.IsNullOrWhiteSpace(familyText))
-            {
-                continue;
-            }
-
-            var normalized = familyText.Trim().ToLowerInvariant();
-            switch (normalized)
-            {
-                case "plain":
-                    plain.Add(coords);
-                    break;
-                case "spirit":
-                case "spirit_vein":
-                case "spiritvein":
-                    spirit.Add(coords);
-                    break;
-                case "rugged":
-                case "foothill":
-                case "mountain":
-                    rugged.Add(coords);
-                    break;
-                case "snow":
-                    snow.Add(coords);
-                    break;
-                case "deep_water":
-                case "deepwater":
-                case "water_deep":
-                    deepWater.Add(coords);
-                    break;
-                case "shallow_water":
-                case "shallowwater":
-                case "water_shallow":
-                    shallowWater.Add(coords);
-                    break;
+                return text;
             }
         }
 
-        var foundAny = plain.Count > 0 || spirit.Count > 0 || rugged.Count > 0 || snow.Count > 0 ||
-                       deepWater.Count > 0 || shallowWater.Count > 0;
-        if (!foundAny)
+        return string.Empty;
+    }
+
+    // 若 tileset 未显式写 season，则按 4x2 图集约定，用列号推导四季。
+    private static int ResolveLayer1SeasonIndex(TileData tileData, Vector2I atlasCoords)
+    {
+        var seasonText = ReadLayer1CustomText(tileData, SeasonCustomDataLayer);
+        switch (seasonText.Trim().ToLowerInvariant())
+        {
+            case "spring":
+            case "0":
+                return 0;
+            case "summer":
+            case "1":
+                return 1;
+            case "autumn":
+            case "fall":
+            case "2":
+                return 2;
+            case "winter":
+            case "3":
+                return 3;
+            default:
+                return Math.Clamp(atlasCoords.X & 3, 0, 3);
+        }
+    }
+
+    // 注册世界图季节性 L1 变体，同步保留“任意季可用”的总表，方便缺季时回退。
+    private void RegisterWorldSeasonalVariant(TownTerrainVisualFamily visualFamily, int seasonIndex, Layer1TileVariant variant)
+    {
+        if (!_worldLayer1SeasonalVariants.TryGetValue(visualFamily, out var bucket))
+        {
+            bucket = new SeasonalLayer1VariantSet();
+            _worldLayer1SeasonalVariants[visualFamily] = bucket;
+        }
+
+        bucket.AnySeason.Add(variant);
+        bucket.BySeason[Math.Clamp(seasonIndex, 0, 3)].Add(variant);
+    }
+
+    // 优先按“当前地貌家族 + 当前季节”拿候选；若该季未补图，再回退到同家族任意季候选。
+    private bool TryResolveWorldSeasonalVariant(XianxiaHexCellData cell, out Layer1TileVariant variant)
+    {
+        variant = default;
+        if (_worldLayer1SeasonalVariants.Count == 0)
         {
             return false;
         }
 
-        _worldPlainTileCoords = plain.Count > 0 ? new List<Vector2I>(plain).ToArray() : WorldPlainTileCoords;
-        _worldSpiritTileCoords = spirit.Count > 0 ? new List<Vector2I>(spirit).ToArray() : WorldSpiritTileCoords;
-        _worldRuggedTileCoords = rugged.Count > 0 ? new List<Vector2I>(rugged).ToArray() : WorldRuggedTileCoords;
-        _worldSnowTileCoords = snow.Count > 0 ? new List<Vector2I>(snow).ToArray() : WorldSnowTileCoords;
-        _worldDeepWaterTileCoords = deepWater.Count > 0 ? new List<Vector2I>(deepWater).ToArray() : WorldWaterTileCoords;
-        _worldShallowWaterTileCoords = shallowWater.Count > 0 ? new List<Vector2I>(shallowWater).ToArray() : WorldWaterTileCoords;
+        var visualFamily = WorldTerrainVisualRules.ResolveWorldVisualFamily(cell);
+        if (TryGetWorldSeasonalVariant(cell, visualFamily, out variant))
+        {
+            return true;
+        }
+
+        return visualFamily != TownTerrainVisualFamily.Plain &&
+               TryGetWorldSeasonalVariant(cell, TownTerrainVisualFamily.Plain, out variant);
+    }
+
+    private bool TryGetWorldSeasonalVariant(
+        XianxiaHexCellData cell,
+        TownTerrainVisualFamily visualFamily,
+        out Layer1TileVariant variant)
+    {
+        variant = default;
+        if (!_worldLayer1SeasonalVariants.TryGetValue(visualFamily, out var bucket))
+        {
+            return false;
+        }
+
+        var seasonal = bucket.BySeason[_currentSeasonIndex];
+        if (seasonal.Count > 0)
+        {
+            variant = seasonal[ResolveVariantColumn(cell, 521) % seasonal.Count];
+            return true;
+        }
+
+        if (bucket.AnySeason.Count == 0)
+        {
+            return false;
+        }
+
+        variant = bucket.AnySeason[ResolveVariantColumn(cell, 613) % bucket.AnySeason.Count];
         return true;
+    }
+
+    private sealed class SeasonalLayer1VariantSet
+    {
+        public List<Layer1TileVariant> AnySeason { get; } = [];
+        public List<Layer1TileVariant>[] BySeason { get; } =
+        [
+            [],
+            [],
+            [],
+            []
+        ];
     }
 
     private static bool HasCustomDataLayer(TileSet tileSet, StringName layerName)
@@ -2017,6 +2184,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
 
     private void ResetWorldTerrainTileBindings()
     {
+        _worldLayer1SeasonalVariants.Clear();
         _worldPlainTileCoords = WorldPlainTileCoords;
         _worldSpiritTileCoords = WorldSpiritTileCoords;
         _worldRuggedTileCoords = WorldRuggedTileCoords;
@@ -2215,6 +2383,11 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
 
     private Layer1TileVariant ResolveWorldLayer1TileVariant(XianxiaHexCellData cell)
     {
+        if (TryResolveWorldSeasonalVariant(cell, out var seasonalVariant))
+        {
+            return seasonalVariant;
+        }
+
         var coords = ResolveWorldTileCoords(cell);
         if (coords.Length == 0)
         {

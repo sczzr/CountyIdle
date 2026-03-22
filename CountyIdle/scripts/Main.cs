@@ -101,6 +101,7 @@ public partial class Main : Control
     private RichTextLabel? _peakCurrentDetailLabel;
     private Control _legacyLayoutRoot = null!;
     private TextureRect? _backgroundTextureRect;
+    private CanvasLayer? _mainHudLayer;
     private SectMapViewSystem? _sectMapRenderer;
 
 
@@ -130,6 +131,7 @@ public partial class Main : Control
         BindLanternHoverEffects();
         SetupGameLoop();
         LoadInitialState();
+        InitializeTitleMenuOverlay();
     }
 
     public override void _Process(double delta)
@@ -158,6 +160,7 @@ public partial class Main : Control
         UnbindBuildingListPanelEvents();
         UnbindSectTileInspectorEvents();
         UnbindSidePanelVisibilityNodes();
+        UnbindTitleMenuOverlayEvents();
     }
 
     private void SetupGameLoop()
@@ -229,6 +232,8 @@ public partial class Main : Control
             state.TownBuildingPlacements);
         _sectMapRenderer?.RefreshResidents(state);
         _sectMapRenderer?.SetResidentClock(state.GameMinutes, GetCurrentTimeScaleFloat());
+        _worldMapRenderer?.SetCalendarMinute(state.GameMinutes);
+        _prefectureMapRenderer?.SetCalendarMinute(state.GameMinutes);
         RefreshWarehousePanelPopup(state);
         RefreshTaskPanelPopup(state);
         RefreshDisciplePanelPopup(state);
@@ -365,6 +370,7 @@ public partial class Main : Control
     {
         _backgroundTextureRect = GetNodeOrNull<TextureRect>(BackgroundPath);
         ConfigureLegacyBackground();
+        _mainHudLayer = GetNodeOrNull<CanvasLayer>("MainHUD");
         _legacyLayoutRoot = GetNode<Control>(LegacyLayoutPath);
         BindLegacyUiNodes();
 

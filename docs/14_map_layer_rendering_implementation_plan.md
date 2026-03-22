@@ -33,7 +33,7 @@
 截至当前版本：
 
 - `L1`：已由主界面卷轴背景承担，属于 `Main.tscn` / 根 UI 表现层。
-- `L2`：已改为由 `CountyTownMapViewSystem` 直接读取 `L1_hex_tileset.tres` 的 atlas source / region，并继续按现有 hex polygon 几何绘制；世界图当前也继续复用同一套 tileset 资源，但正式主链已回收到 `StrategicMapViewSystem._Draw()` 按 hex polygon 逐格投 atlas 区域，因为此前直接走 `WorldTerrainTileLayer` 的方片排布会在六边形裁切后留下连续白缝；旧 atlas manifest/自绘 atlas 仍保留为过渡 fallback，但不再是主链；旧版蜂窝背景网格也不再叠加。
+- `L2`：已改为由 `CountyTownMapViewSystem` 直接读取 `L1_hex_tileset.tres` 的 atlas source / region，并继续按现有 hex polygon 几何绘制；世界图当前也继续复用同一套 tileset 资源，但正式主链已回收到 `StrategicMapViewSystem._Draw()` 按 hex polygon 逐格投 atlas 区域，因为此前直接走 `WorldTerrainTileLayer` 的方片排布会在六边形裁切后留下连续白缝；世界图底盘后方直接使用 `background_map.png`，不再额外铺浅绿色底色；L1 纹理投影面积当前收口到约 `0.8x` 六边形单元，并叠加黑灰双墨线轮廓；旧 atlas manifest/自绘 atlas 仍保留为过渡 fallback，但不再是主链；旧版蜂窝背景网格也不再叠加。
 - `L3`：已接入 `Road / Courtyard / Water` 的 decal 与连接纹理，但道路 / 河流的生产方向已切到“独立笔触装饰层”，旧连接纹理仅保留为过渡兼容。
 - `L4`：已接入最小运行时闭环，`TownMapGeneratorSystem` 可生成基础 `Building / ActivityAnchor`，`CountyTownMapViewSystem.DrawStructures()` 已进入主绘制顺序。
 - `L5`：尚未正式接入，仍缺专门的数据源、绘制入口与低缩放降噪策略。
@@ -74,7 +74,7 @@
 
 - `DrawTerrain()` 当前直接承担 L2 底盘绘制，但纹理来源必须优先读取 `L1_hex_tileset.tres`；
 - L2 底盘继续沿用现有 hex polygon 几何，保持与点击、建筑、选中高亮共用同一格心；
-- 基础地块默认不画边沿线，视觉目标以“无缝贴近”优先。
+- 宗门图 / 二级局部沙盘仍以“无缝贴近”优先；世界图则允许在六边形外缘叠加黑灰双墨线轮廓，但底盘后方必须直接透出 `background_map.png`，不再额外盖浅绿色底色。
 
 约束：
 
@@ -158,6 +158,63 @@
 - `CorruptionBand`
 
 当前已用于让世界图与宗门图共享同一套地块变体规则；后续只需继续细化世界图专属变体、专用 tileset 和 overlay 分层。
+
+### 6.5 `L1_hex_tileset.tres` 多图源四季 atlas 接入方案
+
+#### 6.5.1 资源组织口径
+
+- `L1_hex_tileset.tres` 当前已存在多组 source，后续默认继续扩容；每个 source 都是一张 `4x2` 图。
+- 每张图的固定语义：
+  - 列 `0 ~ 3`：`春 / 夏 / 秋 / 冬`
+  - 行 `0 ~ 1`：该图内两类地块
+- 因此运行时的稳定索引维度应为“`terrain_family + season`”，而不是“第几个 source、第几张图文件名是什么”。
+
+#### 6.5.2 运行时索引方案
+
+建议下阶段把宗门图 / 世界图 / 二级地图统一收口到以下流程：
+
+1. 启动或 tileset 热重载时，扫描 `L1_hex_tileset.tres` 的全部 `TileSetAtlasSource`，而不是只读第一个 source。
+2. 对每个 tile 读取 custom data，至少建立以下索引字段：
+   - `terrain_family`
+   - `world_terrain_family`
+   - `terrain_group`
+   - `row_slot`
+   - `season`
+   - `variant_weight`
+3. 运行时构建候选表：
+   - `family -> season -> List<Layer1TileVariant>`
+   - 若世界图与局部图口径不同，可先读 `terrain_family`，再按需回退 `world_terrain_family`
+4. 真正选图时，按“目标地貌家族 + 当前季节”筛出候选，再以 `cell hash + variant_weight` 做稳定抽选。
+5. 只要 metadata 完整，后续往 tileset 继续加 source 时不应再需要改 `C#` 的文件名判断或 source 下标判断。
+
+当前已完成的运行时收口：
+
+- `StrategicMapViewSystem` 已可跨全部 source 扫描 tileset custom data，并优先按 `world_terrain_family / terrain_family + season` 构建世界图的四季候选；
+- `CountyTownMapViewSystem` 已补入同口径的四季候选索引脚手架，局部地图会优先按 `terrain_family + season` 选图，再回退到历史文件名分支；
+- 两张地图当前都会根据 `GameCalendarSystem` 的季度索引同步四季列，其中 `season` metadata 若缺失，则先按 `4x2` 约定用列号推导。
+- 当前 `L1_hex_tileset.tres` 已先为现有 `4` 组 source 补入第一版 `terrain_family / world_terrain_family / season` metadata；由于现有美术内容尚未完全按“四季一致主题”量产，现阶段这些 family 标记仍属于过渡映射，后续可继续精修。
+
+#### 6.5.3 回退链路
+
+建议固定为：
+
+1. 精确命中：`terrain_family + season`
+2. 同家族默认季：`terrain_family + spring`
+3. 兼容层：`world_terrain_family + season`
+4. 历史兼容：旧文件名 / 旧 atlas 坐标表
+5. 最终保底：纯色或当前调试底盘
+
+这样可以保证：
+
+- 美术在逐步补齐四季图时，旧地图不会瞬间失去可用底盘；
+- 新旧 source 可以在同一段过渡期并存；
+- 世界图、宗门图、二级地图的选图逻辑最终可以统一。
+
+#### 6.5.4 当前技术债说明
+
+- `StrategicMapViewSystem` 当前 world tileset metadata 仍以“先取第一个 source”的实现为主，若后续继续往 `L1_hex_tileset.tres` 增加 source，仅靠现状无法完整消费全部新图。
+- `CountyTownMapViewSystem` 当前仍保留按历史文件名（如 `L1_tilemap_a/b/c.png`）分支注册坐标的兼容逻辑，这条链路可以继续留作 fallback，但不应再作为长期主口径。
+- 因此，本轮文档裁定的正式方向是：`L1_hex_tileset.tres` 继续沿用 script-driven hex polygon 主绘制，但 tile 选择逻辑要逐步迁到“跨全部 source 的 metadata 驱动索引”。
 
 ## 7) L3 地表装饰层实施方案
 

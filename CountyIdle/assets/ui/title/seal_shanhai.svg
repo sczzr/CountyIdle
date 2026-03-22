@@ -1,0 +1,9 @@
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <rect x="5" y="5" width="90" height="90" fill="none" stroke="#b22222" stroke-width="4" stroke-linejoin="round" />
+  <g font-family="Ma Shan Zheng, cursive" fill="#b22222" text-anchor="middle">
+    <text x="72" y="42" font-size="28">山</text>
+    <text x="72" y="82" font-size="28">海</text>
+    <text x="28" y="42" font-size="28">谨</text>
+    <text x="28" y="82" font-size="28">制</text>
+  </g>
+</svg>

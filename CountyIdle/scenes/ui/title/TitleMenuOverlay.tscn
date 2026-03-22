@@ -1,0 +1,177 @@
+[gd_scene format=3 uid="uid://cesyf728oh4jo"]
+
+[ext_resource type="Script" uid="uid://btfxq3lk3fkqc" path="res://scripts/ui/title/TitleMenuOverlay.cs" id="1_overlay_script"]
+[ext_resource type="PackedScene" uid="uid://cxphvd5ythuc8" path="res://scenes/ui/title/JadeMenuItem.tscn" id="2_jade_item"]
+[ext_resource type="Script" uid="uid://2k4sp7qqknlm" path="res://scripts/ui/title/PoemWaterfallManager.cs" id="3_poem_script"]
+[ext_resource type="Shader" uid="uid://bp4rtoxr5s7n4" path="res://assets/ui/background/background_frosted_glass.gdshader" id="4_bg_shader"]
+[ext_resource type="Texture2D" uid="uid://cjigefh0yq432" path="res://assets/ui/title/seal_shanhai_runtime.png" id="5_seal_texture"]
+[ext_resource type="Texture2D" uid="uid://cgwoo8me6hejx" path="res://assets/ui/background/background_2.png" id="6_landscape_texture"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_landscape"]
+shader = ExtResource("4_bg_shader")
+shader_parameter/distortion_strength = 2.3830001131925
+shader_parameter/diffusion_strength = 0.2230000105925
+shader_parameter/tint_strength = 0.2010000095475
+shader_parameter/saturation_strength = 0.7910000375725
+shader_parameter/contrast_strength = 1.1810000323474998
+shader_parameter/grain_strength = 0.02400000114
+shader_parameter/glass_tint = Color(0.956863, 0.945098, 0.917647, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_seal"]
+bg_color = Color(1, 1, 1, 0.04)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.698039, 0.133333, 0.133333, 0.82)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[node name="TitleMenuOverlay" type="Control" unique_id=1143948188]
+z_index = 150
+z_as_relative = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+script = ExtResource("1_overlay_script")
+
+[node name="PaperBackground" type="ColorRect" parent="." unique_id=33877779]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.956863, 0.945098, 0.917647, 1)
+
+[node name="LandscapeBackground" type="TextureRect" parent="." unique_id=508642184]
+material = SubResource("ShaderMaterial_landscape")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("6_landscape_texture")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="PoemWaterfall" type="Control" parent="." unique_id=1798471755]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("3_poem_script")
+
+[node name="CenterWrap" type="CenterContainer" parent="." unique_id=761647387]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ContentVBox" type="VBoxContainer" parent="CenterWrap" unique_id=291903549]
+layout_mode = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="HeaderBox" type="VBoxContainer" parent="CenterWrap/ContentVBox" unique_id=72513957]
+layout_mode = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="CenterWrap/ContentVBox/HeaderBox" unique_id=939016227]
+layout_mode = 2
+text = "山海棋局"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="CenterWrap/ContentVBox/HeaderBox" unique_id=1792151409]
+layout_mode = 2
+text = "S H A N H A I   S T R A T E G Y"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MenuRow" type="HBoxContainer" parent="CenterWrap/ContentVBox" unique_id=1239048378]
+layout_mode = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="StartItem" parent="CenterWrap/ContentVBox/MenuRow" unique_id=621450952 instance=ExtResource("2_jade_item")]
+layout_mode = 2
+
+[node name="LoadItem" parent="CenterWrap/ContentVBox/MenuRow" unique_id=142763379 instance=ExtResource("2_jade_item")]
+layout_mode = 2
+
+[node name="SettingsItem" parent="CenterWrap/ContentVBox/MenuRow" unique_id=1246256922 instance=ExtResource("2_jade_item")]
+layout_mode = 2
+
+[node name="ModsItem" parent="CenterWrap/ContentVBox/MenuRow" unique_id=69687087 instance=ExtResource("2_jade_item")]
+layout_mode = 2
+
+[node name="ExitItem" parent="CenterWrap/ContentVBox/MenuRow" unique_id=1746987345 instance=ExtResource("2_jade_item")]
+layout_mode = 2
+
+[node name="StatusLabel" type="Label" parent="CenterWrap/ContentVBox" unique_id=1838636804]
+visible = false
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SealBox" type="PanelContainer" parent="." unique_id=2045259533]
+layout_mode = 0
+rotation = -0.0349066
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_seal")
+
+[node name="SealGrid" type="GridContainer" parent="SealBox" unique_id=89874512]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+columns = 2
+
+[node name="SealJin" type="Label" parent="SealBox/SealGrid" unique_id=488960027]
+layout_mode = 2
+text = "谨"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SealShan" type="Label" parent="SealBox/SealGrid" unique_id=202992773]
+layout_mode = 2
+text = "山"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SealZhi" type="Label" parent="SealBox/SealGrid" unique_id=2073193858]
+layout_mode = 2
+text = "制"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SealHai" type="Label" parent="SealBox/SealGrid" unique_id=1071221372]
+layout_mode = 2
+text = "海"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SealTexture" type="TextureRect" parent="." unique_id=1833470242]
+visible = false
+layout_mode = 0
+rotation = -0.0349066
+mouse_filter = 2
+texture = ExtResource("5_seal_texture")
+expand_mode = 1
+stretch_mode = 6

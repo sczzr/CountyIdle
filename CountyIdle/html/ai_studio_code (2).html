@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@300;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --paper: #f4f1ea;
+            --ink: #2c2c2c;
+            --jade: #cbdcd0;
+            --cord: #3d2b1f;
+            --seal: #b22222;
+            --unit: 1vh; 
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            background-color: var(--paper);
+            font-family: 'Noto Serif SC', serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .paper-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paperGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='5' result='noise'/%3E%3CfeDiffuseLighting in='noise' lighting-color='%23f4f1ea' surfaceScale='2'%3E%3CfeDistantLight azimuth='45' elevation='60'/%3E%3C/feDiffuseLighting%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paperGrain)' opacity='0.5'/%3E%3C/svg%3E");
+        }
+
+        /* 灵气流光粒子 */
+        .aura-particle {
+            position: absolute;
+            background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.3), transparent);
+            width: 1px;
+            height: 15vh;
+            top: -20vh;
+            animation: flowDown 10s infinite linear;
+            pointer-events: none;
+            z-index: 1;
+        }
+        @keyframes flowDown {
+            0% { transform: translateY(0); opacity: 0; }
+            50% { opacity: 0.4; }
+            100% { transform: translateY(120vh); opacity: 0; }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: calc(10 * var(--unit));
+            z-index: 10;
+        }
+        .title {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: calc(10 * var(--unit)); /* 缩小标题 */
+            color: var(--ink);
+            letter-spacing: 0.2em;
+        }
+
+        /* 菜单容器：关键优化，限制最大宽度并居中 */
+        .menu-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: calc(6 * var(--unit)); /* 调整选项间距 */
+            width: 90vw;
+            max-width: 1200px;
+            z-index: 10;
+        }
+
+        .jade-group {
+            position: relative;
+            width: calc(8 * var(--unit)); /* 缩小容器宽度 */
+            height: calc(38 * var(--unit)); /* 缩小整体高度 */
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .jade-leaf {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='44' height='190' viewBox='0 0 44 190' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='jadeGrad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23fdfdfd' /%3E%3Cstop offset='100%25' style='stop-color:%23cbdcd0' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='2' y='2' width='40' height='186' rx='4' fill='url(%23jadeGrad)' stroke='rgba(0,0,0,0.1)' stroke-width='1'/%3E%3Ccircle cx='22' cy='18' r='3' fill='%233d2b1f' /%3E%3Ccircle cx='22' cy='172' r='3' fill='%233d2b1f' /%3E%3Cpath d='M10 40 Q 22 80 15 150' stroke='rgba(255,255,255,0.5)' fill='none' stroke-width='0.5' /%3E%3C/svg%3E");
+            background-size: 100% 100%;
+            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            writing-mode: vertical-rl;
+            font-family: 'Ma Shan Zheng', cursive;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        /* 内部扫过光效 */
+        .jade-leaf::after {
+            content: "";
+            position: absolute;
+            top: -100%; left: 0; width: 100%; height: 40%;
+            background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.4), transparent);
+            animation: jadeGlow 5s infinite;
+        }
+        @keyframes jadeGlow {
+            0% { top: -100%; }
+            20% { top: 120%; }
+            100% { top: 120%; }
+        }
+
+        .main-leaf {
+            z-index: 10;
+            font-size: calc(3 * var(--unit));
+            color: var(--ink);
+        }
+
+        .side-leaf {
+            z-index: 5;
+            font-size: calc(1.5 * var(--unit));
+            color: rgba(44, 44, 44, 0.4);
+            opacity: 0;
+            transform: scaleY(0.94);
+        }
+
+        /* 悬停展开逻辑 - 缩减位移避免遮挡 */
+        .jade-group:hover .main-leaf {
+            color: var(--seal);
+            transform: translateY(calc(-1.5 * var(--unit)));
+        }
+
+        .jade-group:hover .leaf-left {
+            opacity: 1;
+            transform: translateX(calc(-8.5 * var(--unit))) scaleY(0.94) rotate(-1.5deg);
+        }
+
+        .jade-group:hover .leaf-right {
+            opacity: 1;
+            transform: translateX(calc(8.5 * var(--unit))) scaleY(0.94) rotate(1.5deg);
+        }
+
+        .jade-leaf span {
+            letter-spacing: 0.2em;
+            padding: calc(2 * var(--unit)) 0;
+        }
+
+        /* 红色印章落款 */
+        .seal-box {
+            position: fixed;
+            bottom: 5vh;
+            right: 5vw;
+            width: calc(8 * var(--unit));
+            height: calc(8 * var(--unit));
+            border: calc(0.3 * var(--unit)) solid var(--seal);
+            padding: calc(0.4 * var(--unit));
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            color: var(--seal);
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: calc(2.8 * var(--unit));
+            line-height: 1.1;
+            text-align: center;
+            opacity: 0.8;
+            transform: rotate(-3deg);
+            background: rgba(178, 34, 34, 0.03);
+            pointer-events: none;
+        }
+        .seal-box div { display: flex; align-items: center; justify-content: center; writing-mode: vertical-rl; }
+
+        /* 背景连接线 */
+        .connector-line {
+            position: absolute;
+            top: calc(4 * var(--unit));
+            left: -10vw; right: -10vw;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(61, 43, 31, 0.1), transparent);
+            z-index: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="paper-overlay"></div>
+    <div id="aura-container"></div>
+
+    <header class="header">
+        <h1 class="title">山海機局</h1>
+        <p class="text-stone-400 tracking-[0.8em] text-[0.8vh] uppercase mt-1">Shanhai Chronicles Strategy</p>
+    </header>
+
+    <div class="menu-container relative">
+        <div class="connector-line"></div>
+        <div class="connector-line" style="top: calc(34 * var(--unit));"></div>
+
+        <!-- 选项 -->
+        <div class="jade-group">
+            <div class="jade-leaf side-leaf leaf-left"><span>云深不知处</span></div>
+            <div class="jade-leaf main-leaf"><span>踏入仙途</span></div>
+            <div class="jade-leaf side-leaf leaf-right"><span>山海觅长生</span></div>
+        </div>
+
+        <div class="jade-group">
+            <div class="jade-leaf side-leaf leaf-left"><span>梦回旧山河</span></div>
+            <div class="jade-leaf main-leaf"><span>往昔因果</span></div>
+            <div class="jade-leaf side-leaf leaf-right"><span>缘起落花时</span></div>
+        </div>
+
+        <div class="jade-group">
+            <div class="jade-leaf side-leaf leaf-left"><span>乾坤归造化</span></div>
+            <div class="jade-leaf main-leaf"><span>万象方寸</span></div>
+            <div class="jade-leaf side-leaf leaf-right"><span>静思理玄机</span></div>
+        </div>
+
+        <div class="jade-group">
+            <div class="jade-leaf side-leaf leaf-left"><span>旁門参造化</span></div>
+            <div class="jade-leaf main-leaf"><span>奇門遁甲</span></div>
+            <div class="jade-leaf side-leaf leaf-right"><span>幻影变乾坤</span></div>
+        </div>
+
+        <div class="jade-group">
+            <div class="jade-leaf side-leaf leaf-left"><span>挥袖远红尘</span></div>
+            <div class="jade-leaf main-leaf"><span>离线归真</span></div>
+            <div class="jade-leaf side-leaf leaf-right"><span>拂衣入大荒</span></div>
+        </div>
+    </div>
+
+    <div class="seal-box">
+        <div>谨</div><div>山</div>
+        <div>制</div><div>海</div>
+    </div>
+
+    <script>
+        // 自动生成粒子
+        const container = document.getElementById('aura-container');
+        for (let i = 0; i < 10; i++) {
+            const p = document.createElement('div');
+            p.className = 'aura-particle';
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.animationDelay = Math.random() * 5 + 's';
+            container.appendChild(p);
+        }
+    </script>
+</body>
+</html>

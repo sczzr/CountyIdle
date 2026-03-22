@@ -1,0 +1,23 @@
+<svg width="60" height="280" viewBox="0 0 60 280" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="jadeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#fdfdfd; stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#cbdcd0; stop-opacity:1" />
+        </linearGradient>
+        <filter id="dropShadow">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+          <feOffset dx="2" dy="4"/>
+          <feMerge>
+            <feMergeNode/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+    </defs>
+    <rect x="5" y="5" width="50" height="270" rx="25" 
+          fill="url(#jadeGradient)" 
+          stroke="rgba(140, 115, 75, 0.2)" 
+          stroke-width="1"
+          style="filter:url(#dropShadow)"/>
+    <circle cx="30" cy="30" r="5" fill="#3d2b1f" opacity="0.8"/>
+    <circle cx="30" cy="250" r="5" fill="#3d2b1f" opacity="0.8"/>
+</svg>

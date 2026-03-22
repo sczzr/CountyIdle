@@ -1,3 +1,4 @@
+using System;
 using Godot;
 using CountyIdle.Models;
 using CountyIdle.UI;
@@ -7,7 +8,6 @@ namespace CountyIdle;
 public partial class Main
 {
     private const string SaveSlotsPanelScenePath = "res://scenes/ui/SaveSlotsPanel.tscn";
-    private const int AutoSaveSettlementInterval = 6;
 
     private SaveSlotsPanel? _saveSlotsPanel;
 
@@ -90,6 +90,7 @@ public partial class Main
         if (success)
         {
             _gameLoop.LoadState(state);
+            EnterGameplayFromTitleMenu();
             _saveSlotsPanel?.ClosePanel();
         }
 
@@ -145,6 +146,10 @@ public partial class Main
 
     private void HandleAutoSaveFromState(GameState state)
     {
+        var autoSaveInterval = _clientSettings.AutoSaveEnabled
+            ? Math.Max(1, _clientSettings.AutoSaveInterval)
+            : 0;
+
         if (_lastObservedHourSettlements < 0 || state.HourSettlements < _lastObservedHourSettlements)
         {
             _lastObservedHourSettlements = state.HourSettlements;
@@ -156,8 +161,14 @@ public partial class Main
             return;
         }
 
-        var previousBucket = _lastObservedHourSettlements / AutoSaveSettlementInterval;
-        var currentBucket = state.HourSettlements / AutoSaveSettlementInterval;
+        if (autoSaveInterval <= 0)
+        {
+            _lastObservedHourSettlements = state.HourSettlements;
+            return;
+        }
+
+        var previousBucket = _lastObservedHourSettlements / autoSaveInterval;
+        var currentBucket = state.HourSettlements / autoSaveInterval;
         _lastObservedHourSettlements = state.HourSettlements;
 
         if (state.HourSettlements <= 0 || currentBucket <= previousBucket)

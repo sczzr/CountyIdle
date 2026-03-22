@@ -6,9 +6,17 @@ namespace CountyIdle;
 
 public partial class Main
 {
+    private const ulong QuickResetConfirmWindowMilliseconds = 1600;
+    private ulong _quickResetConfirmExpiresAtMs;
+
     public override void _UnhandledKeyInput(InputEvent @event)
     {
         if (@event is not InputEventKey keyEvent || !keyEvent.Pressed || keyEvent.Echo)
+        {
+            return;
+        }
+
+        if (IsTitleMenuVisible())
         {
             return;
         }
@@ -28,6 +36,11 @@ public partial class Main
     public override void _UnhandledInput(InputEvent @event)
     {
         if (_gameLoop == null)
+        {
+            return;
+        }
+
+        if (IsTitleMenuVisible())
         {
             return;
         }
@@ -143,6 +156,19 @@ public partial class Main
 
     private void ExecuteQuickReset()
     {
+        if (_clientSettings.RequireQuickResetConfirm)
+        {
+            var now = Time.GetTicksMsec();
+            if (now > _quickResetConfirmExpiresAtMs)
+            {
+                _quickResetConfirmExpiresAtMs = now + QuickResetConfirmWindowMilliseconds;
+                AppendLog("速归初局需二次敕令：请在短时内再按一次当前快捷键，以免误毁当前棋局。");
+                return;
+            }
+        }
+
+        _quickResetConfirmExpiresAtMs = 0;
         _gameLoop.ResetState();
+        AppendLog("已按机宜卷裁定，速归初局。");
     }
 }

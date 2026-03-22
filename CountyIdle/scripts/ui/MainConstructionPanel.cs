@@ -141,9 +141,15 @@ public partial class Main
         _constructionPanel.Closed -= OnConstructionPanelClosed;
     }
 
-    private Button? GetConstructionPanelButton()
+    private BaseButton? GetConstructionPanelButton()
     {
-        return GetNodeOrNull<Button>(ConstructionPanelButtonPath);
+        var bottomButton = GetNodeOrNull<BaseButton>($"{BottomBarPath}/BarPadding/MainRow/QuickActionRow/ConstructionQuickButton");
+        if (bottomButton != null)
+        {
+            return bottomButton;
+        }
+
+        return GetNodeOrNull<BaseButton>(ConstructionPanelButtonPath);
     }
 
     private void SetConstructionPanelButtonState(bool pressed)

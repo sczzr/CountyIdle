@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://btqpny854xu3t"]
+
+[ext_resource type="Texture2D" uid="uid://fklblwg4m65q" path="res://assets/ui/hud/seal_mini.svg" id="1_cv03n"]
+
+[node name="SealButton" type="Button" unique_id=1222361754]
+custom_minimum_size = Vector2(60, 60)
+offset_right = 60.0
+offset_bottom = 60.0
+text = "收录"
+flat = true
+
+[node name="SealShape" type="TextureRect" parent="." unique_id=1250108703]
+z_index = -1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("1_cv03n")
+expand_mode = 1
+stretch_mode = 5

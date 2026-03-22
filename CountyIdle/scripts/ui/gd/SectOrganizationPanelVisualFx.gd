@@ -169,12 +169,16 @@ func _apply_label_style(path: String, font_size: int, color: Color) -> void:
 
 
 func _apply_close_button_style(button: Button) -> void:
+	# 峰令谱卷首收卷改复用统一印章组件，与机宜卷/治宗册/留影录同族。
 	button.add_theme_font_size_override("font_size", 22)
-	for state in ["normal", "hover", "pressed", "focus"]:
+	for state in ["normal", "hover", "pressed", "focus", "disabled"]:
 		button.add_theme_stylebox_override(state, _create_transparent_style())
-	button.add_theme_color_override("font_color", INK_BLACK)
+	button.add_theme_color_override("font_color", CINNABAR)
 	button.add_theme_color_override("font_hover_color", CINNABAR)
 	button.add_theme_color_override("font_pressed_color", CINNABAR)
+	var seal_shape: TextureRect = button.get_node_or_null("SealShape")
+	if seal_shape != null:
+		seal_shape.modulate = Color(0.66, 0.19, 0.14, 0.92)
 
 
 func _apply_action_button_style(button: Button, accent_color: Color, emphasize: bool) -> void:

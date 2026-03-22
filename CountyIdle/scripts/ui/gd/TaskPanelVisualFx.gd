@@ -123,12 +123,16 @@ func apply_theme_styles() -> void:
 	hint_label.add_theme_constant_override("line_spacing", 1)
 
 	var close_button: Button = get_parent().get_node("Overlay/Center/Frame/RootColumn/HeaderPanel/HeaderMargin/HeaderRow/CloseButton")
-	close_button.add_theme_font_size_override("font_size", 24)
-	close_button.add_theme_color_override("font_color", INK_MUTED)
+	# 治宗册卷首收口改复用印章组件，形成与机宜卷、留影录一致的卷册家族动作。
+	close_button.add_theme_font_size_override("font_size", 22)
+	close_button.add_theme_color_override("font_color", SEAL_RED)
 	close_button.add_theme_color_override("font_hover_color", SEAL_RED)
 	close_button.add_theme_color_override("font_pressed_color", SEAL_RED)
-	for state in ["normal", "hover", "pressed", "focus"]:
+	for state in ["normal", "hover", "pressed", "focus", "disabled"]:
 		close_button.add_theme_stylebox_override(state, _create_transparent_style())
+	var close_seal_shape: TextureRect = close_button.get_node_or_null("SealShape")
+	if close_seal_shape != null:
+		close_seal_shape.modulate = Color(0.66, 0.19, 0.14, 0.92)
 
 	for path in [
 		"Overlay/Center/Frame/RootColumn/BodyRow/SidebarPanel/SidebarColumn/PolicyTabButton",

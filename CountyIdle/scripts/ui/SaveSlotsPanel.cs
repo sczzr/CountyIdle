@@ -8,8 +8,13 @@ using CountyIdle.Systems;
 
 namespace CountyIdle.UI;
 
+/// <summary>
+/// 留影录主面板：负责卷册筛选、玉简列表选择、卷轴详情展示与存读档动作转发。
+/// </summary>
 public partial class SaveSlotsPanel : PopupPanelBase
 {
+    private const string SlipItemScenePath = "res://scenes/ui/components/SaveJadeSlipItem.tscn";
+
     public enum PanelIntent
     {
         Save,
@@ -34,12 +39,19 @@ public partial class SaveSlotsPanel : PopupPanelBase
         TechDesc
     }
 
+    private PackedScene? _slipItemScene;
     private PanelContainer _dialog = null!;
     private PanelContainer _previewFrame = null!;
-    private ItemList _slotList = null!;
+    private VBoxContainer _slipShelf = null!;
     private Label _slotListTitle = null!;
     private Label _modeLabel = null!;
+    private Label _slotTitleLabel = null!;
+    private Label _slotUpdatedLabel = null!;
     private Label _slotDetailLabel = null!;
+    private Label _slotUpdatedDetailLabel = null!;
+    private Label _populationStatValueLabel = null!;
+    private Label _goldStatValueLabel = null!;
+    private Label _explorationStatValueLabel = null!;
     private TextureRect _previewTexture = null!;
     private Label _previewHintLabel = null!;
     private LineEdit _slotNameEdit = null!;
@@ -58,6 +70,7 @@ public partial class SaveSlotsPanel : PopupPanelBase
 
     private readonly List<SaveSlotSummary> _allSlots = new();
     private readonly List<SaveSlotSummary> _visibleSlots = new();
+    private readonly List<SaveJadeSlipItem> _slipCards = new();
     private readonly GameCalendarSystem _calendarSystem = new();
     private string? _selectedSlotKey;
     private PanelIntent _currentIntent;
@@ -72,24 +85,31 @@ public partial class SaveSlotsPanel : PopupPanelBase
 
     public override void _Ready()
     {
+        _slipItemScene = GD.Load<PackedScene>(SlipItemScenePath);
         _dialog = GetNode<PanelContainer>("CenterLayer/Dialog");
-        _slotList = GetNode<ItemList>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/SlotColumn/SlotList");
+        _slipShelf = GetNode<VBoxContainer>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/SlotColumn/SlipShelfFrame/SlipShelfMargin/SlipShelfScroll/SlipShelf");
         _slotListTitle = GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/SlotColumn/SlotListTitle");
         _modeLabel = GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/ModeLabel");
-        _slotDetailLabel = GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/SlotDetailLabel");
-        _previewFrame = GetNode<PanelContainer>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/PreviewFrame");
-        _previewTexture = GetNode<TextureRect>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/PreviewFrame/PreviewMargin/PreviewColumn/PreviewTexture");
-        _previewHintLabel = GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/PreviewFrame/PreviewMargin/PreviewColumn/PreviewHintLabel");
-        _slotNameEdit = GetNode<LineEdit>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/NameRow/SlotNameEdit");
+        _slotTitleLabel = GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/ScrollTitleRow/ScrollTitleStack/SlotTitleLabel");
+        _slotUpdatedLabel = GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/ScrollTitleRow/ScrollTitleStack/SlotUpdatedLabel");
+        _slotDetailLabel = GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/DetailBody/SlotDetailLabel");
+        _slotUpdatedDetailLabel = GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/DetailBody/SlotUpdatedDetailLabel");
+        _populationStatValueLabel = GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/StatRow/PopulationStatCard/PopulationStatValueLabel");
+        _goldStatValueLabel = GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/StatRow/GoldStatCard/GoldStatValueLabel");
+        _explorationStatValueLabel = GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/StatRow/ExplorationStatCard/ExplorationStatValueLabel");
+        _previewFrame = GetNode<PanelContainer>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/PreviewFrame");
+        _previewTexture = GetNode<TextureRect>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/PreviewFrame/PreviewMargin/PreviewColumn/PreviewTexture");
+        _previewHintLabel = GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/PreviewFrame/PreviewMargin/PreviewColumn/PreviewHintLabel");
+        _slotNameEdit = GetNode<LineEdit>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/NameRow/SlotNameEdit");
         _filterOptionButton = GetNode<OptionButton>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/SlotColumn/FilterRow/FilterOptionButton");
         _sortOptionButton = GetNode<OptionButton>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/SlotColumn/FilterRow/SortOptionButton");
-        _saveSelectedButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ActionRowPrimary/SaveSelectedButton");
-        _loadSelectedButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ActionRowPrimary/LoadSelectedButton");
-        _createSlotButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ActionRowSecondary/CreateSlotButton");
-        _renameSlotButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ActionRowSecondary/RenameSlotButton");
-        _copySlotButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ActionRowSecondary/CopySlotButton");
-        _deleteSlotButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ActionRowTertiary/DeleteSlotButton");
-        _refreshButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ActionRowTertiary/RefreshButton");
+        _saveSelectedButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/ActionRowPrimary/SaveSelectedButton");
+        _loadSelectedButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/ActionRowPrimary/LoadSelectedButton");
+        _createSlotButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/ActionRowSecondary/CreateSlotButton");
+        _renameSlotButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/NameRow/RenameSlotButton");
+        _copySlotButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/ActionRowPrimary/CopySlotButton");
+        _deleteSlotButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/ActionRowPrimary/DeleteSlotButton");
+        _refreshButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/ActionRowSecondary/RefreshButton");
         _closeButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/HeaderRow/CloseButton");
         _footerCloseButton = GetNode<Button>("CenterLayer/Dialog/Margin/MainColumn/FooterRow/CloseFooterButton");
         _previewVisualFx = GetNodeOrNull<Node>("PreviewVisualFx");
@@ -97,6 +117,7 @@ public partial class SaveSlotsPanel : PopupPanelBase
         InitializeFilterControls();
         InitializePopupHint("CenterLayer/Dialog/Margin/MainColumn/HintLabel");
         BindEvents();
+        ApplyStaticButtonText();
         Hide();
     }
 
@@ -151,13 +172,12 @@ public partial class SaveSlotsPanel : PopupPanelBase
         }
 
         return _currentIntent == PanelIntent.Save
-            ? "可择旧卷覆写，或题新卷名另录分卷；快速存档仍直入主卷。按 Esc 可合卷。"
-            : "可择卷启读，也可顺手誊录副卷或整修卷题；快速读档仍优先读取主卷。按 Esc 可合卷。";
+            ? "检阅玉简，可择旧卷旧梦重写，或另拓副卷以分岔前缘。按 Esc 可合卷。"
+            : "检阅玉简，可开启前尘，也可顺手另拓副卷与重题卷名。按 Esc 可合卷。";
     }
 
     private void BindEvents()
     {
-        _slotList.ItemSelected += OnSlotSelected;
         _filterOptionButton.ItemSelected += OnFilterOptionSelected;
         _sortOptionButton.ItemSelected += OnSortOptionSelected;
         _slotNameEdit.TextChanged += _ => RefreshActionState();
@@ -172,11 +192,23 @@ public partial class SaveSlotsPanel : PopupPanelBase
         _footerCloseButton.Pressed += ClosePopup;
     }
 
+    private void ApplyStaticButtonText()
+    {
+        _saveSelectedButton.Text = "覆写";
+        _loadSelectedButton.Text = "启读";
+        _createSlotButton.Text = "新卷";
+        _renameSlotButton.Text = "修改卷名";
+        _copySlotButton.Text = "另拓";
+        _deleteSlotButton.Text = "焚毁";
+        _refreshButton.Text = "重整";
+        _footerCloseButton.Text = "合卷";
+    }
+
     private void ApplyIntentText()
     {
         _modeLabel.Text = _currentIntent == PanelIntent.Save
-            ? "当前案由：存档。可择旧卷覆写，或题新卷名另录分卷。"
-            : "当前案由：读档。请选择欲启读之卷，也可誊录副卷或改题旧卷。";
+            ? "当前案由：旧梦重写。可择旧卷覆写，亦可题新卷名另拓分卷。"
+            : "当前案由：开启前尘。请选择欲启读之卷，也可誊录副卷或整修卷题。";
     }
 
     private void ApplySlots(IReadOnlyList<SaveSlotSummary> slots, string? preferredSlotKey)
@@ -204,47 +236,46 @@ public partial class SaveSlotsPanel : PopupPanelBase
     private void SelectSlotByKey(string? slotKey)
     {
         _selectedSlotKey = slotKey;
+        UpdateSlipSelectionVisuals();
 
-        _slotList.DeselectAll();
         if (string.IsNullOrWhiteSpace(slotKey))
         {
-            _slotDetailLabel.Text = BuildEmptyDetailText();
-            ClearPreviewDisplay();
+            ApplyEmptyDetailState();
             _slotNameEdit.Text = string.Empty;
+            RefreshActionState();
             return;
         }
 
-        for (var index = 0; index < _visibleSlots.Count; index++)
+        var selectedSlot = _visibleSlots.FirstOrDefault(slot => slot.SlotKey == slotKey);
+        if (selectedSlot != null)
         {
-            if (_visibleSlots[index].SlotKey != slotKey)
-            {
-                continue;
-            }
-
-            _slotList.Select(index);
-            UpdateSelectedSlotDisplay(_visibleSlots[index]);
+            UpdateSelectedSlotDisplay(selectedSlot);
+            RefreshActionState();
             return;
         }
 
-        _slotDetailLabel.Text = BuildEmptyDetailText();
-        ClearPreviewDisplay();
+        ApplyEmptyDetailState();
         _slotNameEdit.Text = string.Empty;
+        RefreshActionState();
     }
 
     private void UpdateSelectedSlotDisplay(SaveSlotSummary slot)
     {
         var calendarInfo = _calendarSystem.Describe(slot.GameMinutes);
-        var saveTypeText = slot.IsAutosave ? "自动卷" : "手卷";
         var warehouseRate = slot.WarehouseCapacity <= 0
             ? 0.0
             : Math.Clamp(slot.WarehouseUsed / slot.WarehouseCapacity * 100.0, 0.0, 999.0);
+        var displayName = BuildDisplaySlotName(slot);
+
+        _slotTitleLabel.Text = $"卷名：{displayName}";
+        _slotUpdatedLabel.Text = $"最近落卷：{slot.UpdatedAtUtc.ToLocalTime():yyyy-MM-dd HH:mm:ss}";
         _slotDetailLabel.Text =
-            $"{slot.SlotName}\n" +
             $"{calendarInfo.DateText} · {calendarInfo.DetailText}\n" +
-            $"人口 {slot.Population} · 灵石 {slot.Gold:0} · 科技 T{Math.Max(slot.TechLevel + 1, 1)} · {saveTypeText}\n" +
-            $"民心 {slot.Happiness:0.#} · 威胁 {slot.Threat:0.#} · 历练层数 {slot.ExplorationDepth}\n" +
-            $"库藏 {slot.WarehouseUsed:0}/{Math.Max(slot.WarehouseCapacity, 1):0} ({warehouseRate:0}%)\n" +
-            $"最近落卷：{slot.UpdatedAtUtc.ToLocalTime():yyyy-MM-dd HH:mm:ss}";
+            $"{BuildSlotBadge(slot)}｜科技 T{Math.Max(slot.TechLevel + 1, 1)}｜民心 {slot.Happiness:0.#}｜威胁 {slot.Threat:0.#}";
+        _slotUpdatedDetailLabel.Text = BuildNarrativeSummary(slot, warehouseRate);
+        _populationStatValueLabel.Text = $"{slot.Population} · 灵";
+        _goldStatValueLabel.Text = $"{slot.Gold:0} · 錠";
+        _explorationStatValueLabel.Text = FormatExplorationDepth(slot.ExplorationDepth);
 
         _slotNameEdit.Text = slot.SlotName;
         _slotNameEdit.CaretColumn = _slotNameEdit.Text.Length;
@@ -252,29 +283,48 @@ public partial class SaveSlotsPanel : PopupPanelBase
         CallPreviewVisualFx("pulse_on_select");
     }
 
-    private string BuildSlotListText(SaveSlotSummary slot)
+    private string BuildNarrativeSummary(SaveSlotSummary slot, double warehouseRate)
     {
-        var calendarInfo = _calendarSystem.Describe(slot.GameMinutes);
-        var tag = slot.SlotKey switch
-        {
-            "default" => "主卷",
-            _ when slot.IsAutosave => "自录",
-            _ => "手卷"
-        };
-        return $"【{tag}】{slot.SlotName} · {calendarInfo.DateText} · T{Math.Max(slot.TechLevel + 1, 1)} · 民{slot.Happiness:0}/威{slot.Threat:0}";
+        var protectionText = IsProtectedSlot(slot)
+            ? "此卷受宗门戒律与天道刻印庇护，不可焚毁亦不可覆写题名。"
+            : "此卷可重题卷名、另拓副卷，也可在必要时因果火解。";
+        return $"灵石 {slot.Gold:0}、人口 {slot.Population}、库藏负载 {warehouseRate:0}% 共同勾勒此卷气象。{protectionText}";
     }
 
-    private void OnSlotSelected(long index)
+    private static string BuildDisplaySlotName(SaveSlotSummary slot)
     {
-        var safeIndex = (int)index;
-        if (safeIndex < 0 || safeIndex >= _visibleSlots.Count)
+        if (slot.IsAutosave)
         {
-            return;
+            return slot.SlotName.Replace("自动存档", "天道刻印", StringComparison.Ordinal);
         }
 
-        _selectedSlotKey = _visibleSlots[safeIndex].SlotKey;
-        UpdateSelectedSlotDisplay(_visibleSlots[safeIndex]);
-        RefreshActionState();
+        if (string.Equals(slot.SlotKey, "default", StringComparison.Ordinal))
+        {
+            return $"主卷 · {slot.SlotName}";
+        }
+
+        return slot.SlotName;
+    }
+
+    private static string BuildSlotBadge(SaveSlotSummary slot)
+    {
+        if (string.Equals(slot.SlotKey, "default", StringComparison.Ordinal))
+        {
+            return "本命主卷";
+        }
+
+        return slot.IsAutosave ? "天道刻印" : "手录分卷";
+    }
+
+    private static string FormatExplorationDepth(int depth)
+    {
+        return depth <= 0 ? "未入层" : $"{depth}层";
+    }
+
+    private void OnSlipCardActivated(string slotKey)
+    {
+        _selectedSlotKey = slotKey;
+        SelectSlotByKey(slotKey);
     }
 
     private void RefreshActionState()
@@ -307,7 +357,7 @@ public partial class SaveSlotsPanel : PopupPanelBase
         var selectedSlot = GetSelectedSlot();
         if (selectedSlot == null)
         {
-            ShowPopupStatusMessage("请先择定欲覆写之卷。");
+            ShowPopupStatusMessage("请先择定欲旧梦重写之卷。");
             return;
         }
 
@@ -319,7 +369,7 @@ public partial class SaveSlotsPanel : PopupPanelBase
         var selectedSlot = GetSelectedSlot();
         if (selectedSlot == null)
         {
-            ShowPopupStatusMessage("请先择定欲启读之卷。");
+            ShowPopupStatusMessage("请先择定欲开启前尘之卷。");
             return;
         }
 
@@ -343,7 +393,7 @@ public partial class SaveSlotsPanel : PopupPanelBase
         var selectedSlot = GetSelectedSlot();
         if (selectedSlot == null)
         {
-            ShowPopupStatusMessage("请先择定欲更题之卷。");
+            ShowPopupStatusMessage("请先择定欲重题之卷。");
             return;
         }
 
@@ -362,7 +412,7 @@ public partial class SaveSlotsPanel : PopupPanelBase
         var selectedSlot = GetSelectedSlot();
         if (selectedSlot == null)
         {
-            ShowPopupStatusMessage("请先择定欲焚毁之卷。");
+            ShowPopupStatusMessage("请先择定欲因果火解之卷。");
             return;
         }
 
@@ -374,7 +424,7 @@ public partial class SaveSlotsPanel : PopupPanelBase
         var selectedSlot = GetSelectedSlot();
         if (selectedSlot == null)
         {
-            ShowPopupStatusMessage("请先择定欲誊录之卷。");
+            ShowPopupStatusMessage("请先择定欲另拓之卷。");
             return;
         }
 
@@ -389,7 +439,7 @@ public partial class SaveSlotsPanel : PopupPanelBase
             _filterOptionButton.AddItem("全部卷册");
             _filterOptionButton.AddItem("主卷");
             _filterOptionButton.AddItem("手卷");
-            _filterOptionButton.AddItem("自动卷");
+            _filterOptionButton.AddItem("天道刻印");
         }
 
         if (_sortOptionButton.ItemCount == 0)
@@ -425,16 +475,60 @@ public partial class SaveSlotsPanel : PopupPanelBase
         var filteredSlots = _allSlots.Where(MatchesActiveFilter);
         _visibleSlots.AddRange(ApplyActiveSort(filteredSlots));
 
-        _slotList.Clear();
-        foreach (var slot in _visibleSlots)
-        {
-            _slotList.AddItem(BuildSlotListText(slot));
-        }
-
+        RebuildSlipShelf();
         UpdateListTitle();
         var nextSelectedKey = DetermineSelectedSlotKey(preferredSlotKey);
         SelectSlotByKey(nextSelectedKey);
         RefreshActionState();
+    }
+
+    private void RebuildSlipShelf()
+    {
+        foreach (var child in _slipShelf.GetChildren())
+        {
+            child.QueueFree();
+        }
+
+        _slipCards.Clear();
+
+        foreach (var slot in _visibleSlots)
+        {
+            var slipItem = _slipItemScene?.Instantiate<SaveJadeSlipItem>();
+            if (slipItem == null)
+            {
+                continue;
+            }
+
+            slipItem.SetDisplay(
+                slot.SlotKey,
+                BuildDisplaySlotName(slot),
+                BuildSlipSubtitle(slot),
+                BuildSlotBadge(slot),
+                BuildSlipState(slot),
+                string.Equals(slot.SlotKey, _selectedSlotKey, StringComparison.Ordinal));
+            slipItem.Activated += OnSlipCardActivated;
+            _slipShelf.AddChild(slipItem);
+            _slipCards.Add(slipItem);
+        }
+    }
+
+    private string BuildSlipSubtitle(SaveSlotSummary slot)
+    {
+        var calendarInfo = _calendarSystem.Describe(slot.GameMinutes);
+        return $"{calendarInfo.DateText}｜{slot.UpdatedAtUtc.ToLocalTime():MM-dd HH:mm}";
+    }
+
+    private static string BuildSlipState(SaveSlotSummary slot)
+    {
+        return string.IsNullOrWhiteSpace(slot.PreviewImagePath) ? "暂无留影" : "有留影";
+    }
+
+    private void UpdateSlipSelectionVisuals()
+    {
+        foreach (var slipCard in _slipCards)
+        {
+            slipCard.SetSelectedState(string.Equals(slipCard.SlotKey, _selectedSlotKey, StringComparison.Ordinal));
+        }
     }
 
     private bool MatchesActiveFilter(SaveSlotSummary slot)
@@ -477,7 +571,21 @@ public partial class SaveSlotsPanel : PopupPanelBase
 
     private void UpdateListTitle()
     {
-        _slotListTitle.Text = $"卷册目录（{_visibleSlots.Count}/{_allSlots.Count}）";
+        _slotListTitle.Text = $"玉简档案架（{_visibleSlots.Count}/{_allSlots.Count}）";
+    }
+
+    private void ApplyEmptyDetailState()
+    {
+        _slotTitleLabel.Text = "卷名：暂无卷册";
+        _slotUpdatedLabel.Text = _allSlots.Count == 0 ? "因果未曾成卷" : "当前筛选下暂无可阅卷册";
+        _slotDetailLabel.Text = BuildEmptyDetailText();
+        _slotUpdatedDetailLabel.Text = _allSlots.Count == 0
+            ? "待你第一次落卷后，右侧画屏会记住当时景象与宗门气象。"
+            : "可切换筛选、排序，或直接题名另拓新卷。";
+        _populationStatValueLabel.Text = "—";
+        _goldStatValueLabel.Text = "—";
+        _explorationStatValueLabel.Text = "—";
+        ClearPreviewDisplay();
     }
 
     private string BuildEmptyDetailText()
@@ -495,13 +603,15 @@ public partial class SaveSlotsPanel : PopupPanelBase
         if (TryLoadPreviewTexture(slot, out var previewTexture))
         {
             _previewTexture.Texture = previewTexture;
+            _previewTexture.Visible = true;
             _previewHintLabel.Visible = false;
             CallPreviewVisualFx("transition_to_preview");
             return;
         }
 
         _previewTexture.Texture = null;
-        _previewHintLabel.Text = "暂无线索留影。待卷册写成后，会在此显出当时景象。";
+        _previewTexture.Visible = false;
+        _previewHintLabel.Text = "此卷尚未留下可阅画屏，待下次落卷后会在此映出旧景。";
         _previewHintLabel.Visible = true;
         CallPreviewVisualFx("transition_to_empty");
     }
@@ -509,6 +619,7 @@ public partial class SaveSlotsPanel : PopupPanelBase
     private void ClearPreviewDisplay()
     {
         _previewTexture.Texture = null;
+        _previewTexture.Visible = false;
         _previewHintLabel.Text = _allSlots.Count == 0
             ? "暂无线索留影。待任意卷册写成后，会在此显出当时景象。"
             : "当前所筛卷册暂无可阅留影。";
@@ -560,5 +671,4 @@ public partial class SaveSlotsPanel : PopupPanelBase
 
         return string.Equals(slot.SlotKey, "default", StringComparison.Ordinal) || slot.IsAutosave;
     }
-
 }

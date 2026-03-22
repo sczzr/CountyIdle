@@ -1,85 +1,124 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/ui/hud/jade_pendant.svg" id="1_jade"]
+[ext_resource type="FontFile" path="res://assets/ui/fonts/NotoSerifSC[wght].ttf" id="2_serif"]
+[ext_resource type="FontFile" path="res://assets/ui/fonts/MaShanZheng-Regular.ttf" id="3_calligraphy"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_topbar"]
-bg_color = Color(0.94902, 0.929412, 0.882353, 0.72)
+bg_color = Color(0.956863, 0.945098, 0.905882, 0.82)
 border_width_bottom = 1
-border_color = Color(0.701961, 0.65098, 0.560784, 0.75)
+border_color = Color(0.552941, 0.45098, 0.294118, 0.38)
+shadow_color = Color(0, 0, 0, 0.08)
+shadow_size = 8
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_progress_bg"]
-bg_color = Color(0.811765, 0.764706, 0.678431, 0.45)
-corner_radius_top_left = 1
-corner_radius_top_right = 1
-corner_radius_bottom_right = 1
-corner_radius_bottom_left = 1
+bg_color = Color(0.811765, 0.764706, 0.678431, 0.35)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_progress_fill"]
 bg_color = Color(0.270588, 0.231373, 0.192157, 0.95)
-corner_radius_top_left = 1
-corner_radius_top_right = 1
-corner_radius_bottom_right = 1
-corner_radius_bottom_left = 1
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_progress_fill_day"]
 bg_color = Color(0.619608, 0.164706, 0.133333, 0.88)
-corner_radius_top_left = 1
-corner_radius_top_right = 1
-corner_radius_bottom_right = 1
-corner_radius_bottom_left = 1
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="Animation" id="Animation_swing"]
+resource_name = "swing"
+length = 6.0
+loop_mode = 2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:rotation")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 6),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [-0.0261799, 0.0261799]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_qw4tc"]
+_data = {
+"swing": SubResource("Animation_swing")
+}
 
 [node name="TopBar" type="PanelContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 30)
+custom_minimum_size = Vector2(0, 92)
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 92.0
+grow_horizontal = 2
+mouse_filter = 1
 theme_override_styles/panel = SubResource("StyleBoxFlat_topbar")
 
 [node name="BarContent" type="MarginContainer" parent="."]
 layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 2
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 6
 
 [node name="MainRow" type="HBoxContainer" parent="BarContent"]
 layout_mode = 2
-theme_override_constants/separation = 14
+theme_override_constants/separation = 18
+alignment = 1
 
 [node name="StatsRow" type="HBoxContainer" parent="BarContent/MainRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 12
+theme_override_constants/separation = 10
+alignment = 0
 
 [node name="PopulationLabel" type="Label" parent="BarContent/MainRow/StatsRow"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.215686, 0.180392, 0.14902, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_fonts/font = ExtResource("2_serif")
+theme_override_font_sizes/font_size = 22
 text = "人丁 120"
 vertical_alignment = 1
 
 [node name="HappinessLabel" type="Label" parent="BarContent/MainRow/StatsRow"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.215686, 0.180392, 0.14902, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_fonts/font = ExtResource("2_serif")
+theme_override_font_sizes/font_size = 22
 text = "民心 72"
 vertical_alignment = 1
 
 [node name="FoodLabel" type="Label" parent="BarContent/MainRow/StatsRow"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.215686, 0.180392, 0.14902, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_fonts/font = ExtResource("2_serif")
+theme_override_font_sizes/font_size = 22
 text = "灵谷 680"
 vertical_alignment = 1
 
 [node name="WoodLabel" type="Label" parent="BarContent/MainRow/StatsRow"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.215686, 0.180392, 0.14902, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_fonts/font = ExtResource("2_serif")
+theme_override_font_sizes/font_size = 22
 text = "木石 220"
 vertical_alignment = 1
 
 [node name="GoldLabel" type="Label" parent="BarContent/MainRow/StatsRow"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.215686, 0.180392, 0.14902, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.447059, 0.572549, 0.505882, 1)
+theme_override_fonts/font = ExtResource("2_serif")
+theme_override_font_sizes/font_size = 22
 text = "灵石 90"
 vertical_alignment = 1
 
@@ -88,39 +127,42 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="CycleBox" type="VBoxContainer" parent="BarContent/MainRow"]
-custom_minimum_size = Vector2(340, 0)
+custom_minimum_size = Vector2(420, 0)
 layout_mode = 2
-theme_override_constants/separation = 2
+theme_override_constants/separation = 4
 
 [node name="InfoRow" type="HBoxContainer" parent="BarContent/MainRow/CycleBox"]
 layout_mode = 2
 alignment = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 16
 
 [node name="ThreatLabel" type="Label" parent="BarContent/MainRow/CycleBox/InfoRow"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.619608, 0.164706, 0.133333, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.705882, 0.133333, 0.133333, 1)
+theme_override_fonts/font = ExtResource("3_calligraphy")
+theme_override_font_sizes/font_size = 22
 text = "危兆 42%"
 vertical_alignment = 1
 
 [node name="TechLabel" type="Label" parent="BarContent/MainRow/CycleBox/InfoRow"]
+visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(0.368627, 0.313725, 0.258824, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_fonts/font = ExtResource("2_serif")
+theme_override_font_sizes/font_size = 14
 text = "研修 T1"
 vertical_alignment = 1
 
 [node name="CycleLabel" type="Label" parent="BarContent/MainRow/CycleBox/InfoRow"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.215686, 0.180392, 0.14902, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_fonts/font = ExtResource("3_calligraphy")
+theme_override_font_sizes/font_size = 22
 text = "景禾元年 正月 初一"
 horizontal_alignment = 2
 vertical_alignment = 1
 
 [node name="QuarterProgressRow" type="HBoxContainer" parent="BarContent/MainRow/CycleBox"]
-visible = false
 layout_mode = 2
 theme_override_constants/separation = 6
 
@@ -128,12 +170,13 @@ theme_override_constants/separation = 6
 custom_minimum_size = Vector2(24, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.368627, 0.313725, 0.258824, 0.92)
-theme_override_font_sizes/font_size = 10
+theme_override_fonts/font = ExtResource("2_serif")
+theme_override_font_sizes/font_size = 11
 text = "季"
 horizontal_alignment = 1
 
 [node name="QuarterProgress" type="ProgressBar" parent="BarContent/MainRow/CycleBox/QuarterProgressRow"]
-custom_minimum_size = Vector2(0, 5)
+custom_minimum_size = Vector2(0, 6)
 layout_mode = 2
 size_flags_horizontal = 3
 max_value = 100.0
@@ -143,7 +186,6 @@ theme_override_styles/background = SubResource("StyleBoxFlat_progress_bg")
 theme_override_styles/fill = SubResource("StyleBoxFlat_progress_fill")
 
 [node name="DayProgressRow" type="HBoxContainer" parent="BarContent/MainRow/CycleBox"]
-visible = false
 layout_mode = 2
 theme_override_constants/separation = 6
 
@@ -151,12 +193,13 @@ theme_override_constants/separation = 6
 custom_minimum_size = Vector2(24, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.619608, 0.164706, 0.133333, 0.9)
-theme_override_font_sizes/font_size = 10
+theme_override_fonts/font = ExtResource("2_serif")
+theme_override_font_sizes/font_size = 11
 text = "日"
 horizontal_alignment = 1
 
 [node name="DayProgress" type="ProgressBar" parent="BarContent/MainRow/CycleBox/DayProgressRow"]
-custom_minimum_size = Vector2(0, 5)
+custom_minimum_size = Vector2(0, 6)
 layout_mode = 2
 size_flags_horizontal = 3
 max_value = 100.0
@@ -166,9 +209,79 @@ theme_override_styles/background = SubResource("StyleBoxFlat_progress_bg")
 theme_override_styles/fill = SubResource("StyleBoxFlat_progress_fill_day")
 
 [node name="CountdownLabel" type="Label" parent="BarContent/MainRow/CycleBox"]
-visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(0.403922, 0.352941, 0.301961, 0.9)
-theme_override_font_sizes/font_size = 11
+theme_override_fonts/font = ExtResource("2_serif")
+theme_override_font_sizes/font_size = 12
 text = "春季 · 立春 · 子时 · 00:00"
 horizontal_alignment = 2
+
+[node name="AstrologyPendant" type="Control" parent="."]
+custom_minimum_size = Vector2(220, 96)
+layout_mode = 1
+anchors_preset = 2
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -110.0
+offset_right = 110.0
+offset_bottom = 104.0
+grow_horizontal = 2
+pivot_offset = Vector2(110, 0)
+mouse_filter = 1
+
+[node name="PendantTexture" type="TextureRect" parent="AstrologyPendant"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.0
+anchor_right = 0.5
+anchor_bottom = 0.0
+offset_left = -98.0
+offset_right = 98.0
+offset_bottom = 84.0
+grow_horizontal = 2
+texture = ExtResource("1_jade")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SeasonLabel" type="Label" parent="AstrologyPendant/PendantTexture"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.0
+anchor_right = 0.5
+anchor_bottom = 0.0
+offset_left = -34.0
+offset_top = 8.0
+offset_right = 34.0
+offset_bottom = 42.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.176471, 0.145098, 0.12549, 1)
+theme_override_fonts/font = ExtResource("3_calligraphy")
+theme_override_font_sizes/font_size = 28
+text = "惊蛰"
+horizontal_alignment = 1
+
+[node name="WeatherLabel" type="Label" parent="AstrologyPendant/PendantTexture"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.0
+anchor_right = 0.5
+anchor_bottom = 0.0
+offset_left = -78.0
+offset_top = 46.0
+offset_right = 78.0
+offset_bottom = 66.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.552941, 0.45098, 0.294118, 0.92)
+theme_override_fonts/font = ExtResource("2_serif")
+theme_override_font_sizes/font_size = 11
+text = "紫气东来 · 灵气涌动"
+horizontal_alignment = 1
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="AstrologyPendant"]
+autoplay = "swing"
+libraries = {
+"": SubResource("AnimationLibrary_qw4tc")
+}

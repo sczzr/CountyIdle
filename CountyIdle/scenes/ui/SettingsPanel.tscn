@@ -1,362 +1,1054 @@
 [gd_scene format=3 uid="uid://mauxggfyykyf"]
 
-[ext_resource type="Script" uid="uid://b4wfyy6kthib2" path="res://scripts/ui/SettingsPanel.cs" id="1_4af7x"]
+[ext_resource type="Script" uid="uid://b4wfyy6kthib2" path="res://scripts/ui/SettingsPanel.cs" id="1_settings_script"]
 [ext_resource type="Script" uid="uid://wtdw80cloq8l" path="res://scripts/ui/gd/SettingsPanelVisualFx.gd" id="2_settings_fx"]
+[ext_resource type="Texture2D" path="res://assets/ui/settings/paper_grain.svg" id="3_paper_grain"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/JadeTab.tscn" id="10_jade_tab_scene"]
+[ext_resource type="PackedScene" uid="uid://c8vlaettgpxc6" path="res://scenes/ui/components/SealToggle.tscn" id="11_seal_toggle_scene"]
+[ext_resource type="PackedScene" uid="uid://btqpny854xu3t" path="res://scenes/ui/components/SealButton.tscn" id="12_seal_button_scene"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/SealConfirmButton.tscn" id="13_seal_confirm_button_scene"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dialog"]
-bg_color = Color(0.0823529, 0.0862745, 0.101961, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.243137, 0.258824, 0.301961, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[node name="SettingsPanel" type="Control" unique_id=2074523316]
+[node name="SettingsPanel" type="Control" unique_id=820397885]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 mouse_filter = 2
-script = ExtResource("1_4af7x")
+script = ExtResource("1_settings_script")
 
-[node name="VisualFx" type="Node" parent="." unique_id=98061906]
+[node name="VisualFx" type="Node" parent="." unique_id=1584300717]
 script = ExtResource("2_settings_fx")
 
-[node name="Backdrop" type="ColorRect" parent="." unique_id=426550606]
+[node name="Backdrop" type="Control" parent="." unique_id=1413348597]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.101961, 0.0862745, 0.0745098, 0.9)
+mouse_filter = 2
+z_index = -10
 
-[node name="CenterLayer" type="MarginContainer" parent="." unique_id=507445027]
+[node name="BackdropTint" type="ColorRect" parent="Backdrop" unique_id=1754703420]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 24
-theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 20
+mouse_filter = 2
+color = Color(0.9569, 0.9451, 0.9176, 1)
 
-[node name="DecorLayer" type="VBoxContainer" parent="CenterLayer" unique_id=1673268974]
+[node name="BackdropGrain" type="TextureRect" parent="Backdrop" unique_id=116989630]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+modulate = Color(1, 1, 1, 0.24)
+texture = ExtResource("3_paper_grain")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="PaperRoot" type="Control" parent="." unique_id=304393742]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+z_index = 0
+
+[node name="RootRow" type="HBoxContainer" parent="PaperRoot" unique_id=914903678]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 148.0
+offset_top = 22.0
+offset_right = -148.0
+offset_bottom = -18.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 2
+theme_override_constants/separation = 44
+
+[node name="NavColumn" type="VBoxContainer" parent="PaperRoot/RootRow" unique_id=351218416]
+custom_minimum_size = Vector2(96, 0)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/separation = 28
+alignment = 1
+
+[node name="TabAudioVisual" parent="PaperRoot/RootRow/NavColumn" unique_id=1566877379 instance=ExtResource("10_jade_tab_scene")]
+custom_minimum_size = Vector2(80, 200)
+layout_mode = 2
+text = "万
+象
+声
+色"
+
+[node name="TabShortcuts" parent="PaperRoot/RootRow/NavColumn" unique_id=2036580913 instance=ExtResource("10_jade_tab_scene")]
+custom_minimum_size = Vector2(80, 200)
+layout_mode = 2
+text = "敕
+令
+符
+节"
+
+[node name="TabLanguage" parent="PaperRoot/RootRow/NavColumn" unique_id=1982478533 instance=ExtResource("10_jade_tab_scene")]
+custom_minimum_size = Vector2(80, 200)
+layout_mode = 2
+text = "言
+辞
+教
+化"
+
+[node name="ContentColumn" type="VBoxContainer" parent="PaperRoot/RootRow" unique_id=1248810529]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/separation = 0
+mouse_filter = 2
+theme_override_constants/separation = 18
 
-[node name="TopTrim" type="ColorRect" parent="CenterLayer/DecorLayer" unique_id=619824403]
-custom_minimum_size = Vector2(0, 8)
+[node name="HeaderRow" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn" unique_id=1829111766]
 layout_mode = 2
 size_flags_horizontal = 3
-color = Color(0.831373, 0.686275, 0.215686, 1)
+mouse_filter = 2
+theme_override_constants/separation = 16
 
-[node name="RollerRow" type="HBoxContainer" parent="CenterLayer/DecorLayer" unique_id=1801484372]
+[node name="HeadingColumn" type="VBoxContainer" parent="PaperRoot/RootRow/ContentColumn/HeaderRow" unique_id=568249799]
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 3
-theme_override_constants/separation = 0
+mouse_filter = 2
+theme_override_constants/separation = 8
 
-[node name="LeftRoller" type="PanelContainer" parent="CenterLayer/DecorLayer/RollerRow" unique_id=1911820242]
-custom_minimum_size = Vector2(24, 0)
+[node name="TitleLabel" type="Label" parent="PaperRoot/RootRow/ContentColumn/HeaderRow/HeadingColumn" unique_id=1917975298]
 layout_mode = 2
-size_flags_vertical = 3
+text = "天衍機宜"
 
-[node name="LeftTopCap" type="ColorRect" parent="CenterLayer/DecorLayer/RollerRow/LeftRoller" unique_id=197813865]
+[node name="SubtitleLabel" type="Label" parent="PaperRoot/RootRow/ContentColumn/HeaderRow/HeadingColumn" unique_id=1454679108]
 layout_mode = 2
-color = Color(0.831373, 0.686275, 0.215686, 1)
+text = "SECRETS AND STRATEGIES OF TIANYAN"
 
-[node name="LeftBottomCap" type="ColorRect" parent="CenterLayer/DecorLayer/RollerRow/LeftRoller" unique_id=1938062936]
+[node name="CloseButton" type="Button" parent="PaperRoot/RootRow/ContentColumn/HeaderRow" unique_id=1714394764]
+visible = false
+custom_minimum_size = Vector2(42, 42)
 layout_mode = 2
-color = Color(0.831373, 0.686275, 0.215686, 1)
+text = "✕"
+flat = true
 
-[node name="RollerSpacer" type="Control" parent="CenterLayer/DecorLayer/RollerRow" unique_id=1712367236]
+[node name="HintLabel" type="Label" parent="PaperRoot/RootRow/ContentColumn" unique_id=1416138415]
+visible = false
 layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="RightRoller" type="PanelContainer" parent="CenterLayer/DecorLayer/RollerRow" unique_id=882607346]
-custom_minimum_size = Vector2(24, 0)
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="RightTopCap" type="ColorRect" parent="CenterLayer/DecorLayer/RollerRow/RightRoller" unique_id=1956975515]
-layout_mode = 2
-color = Color(0.831373, 0.686275, 0.215686, 1)
-
-[node name="RightBottomCap" type="ColorRect" parent="CenterLayer/DecorLayer/RollerRow/RightRoller" unique_id=988155726]
-layout_mode = 2
-color = Color(0.831373, 0.686275, 0.215686, 1)
-
-[node name="BottomTrim" type="ColorRect" parent="CenterLayer/DecorLayer" unique_id=1710738169]
-custom_minimum_size = Vector2(0, 8)
-layout_mode = 2
-size_flags_horizontal = 3
-color = Color(0.831373, 0.686275, 0.215686, 1)
-
-[node name="Dialog" type="PanelContainer" parent="CenterLayer" unique_id=1783547574]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_dialog")
-
-[node name="Margin" type="MarginContainer" parent="CenterLayer/Dialog" unique_id=127046386]
-layout_mode = 2
-theme_override_constants/margin_left = 24
-theme_override_constants/margin_top = 24
-theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 22
-
-[node name="MainColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin" unique_id=229407272]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 3
-theme_override_constants/separation = 14
-
-[node name="HeaderRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn" unique_id=679785741]
-layout_mode = 2
-
-[node name="TitleLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/HeaderRow" unique_id=189672663]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 18
-text = "天衍峰机宜卷"
-
-[node name="CloseButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/HeaderRow" unique_id=1639502561]
-custom_minimum_size = Vector2(44, 28)
-layout_mode = 2
-text = "✖"
-
-[node name="HintLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn" unique_id=2068979100]
-modulate = Color(0.760784, 0.780392, 0.831373, 1)
-layout_mode = 2
-text = "窗格与音律即时生效；其余条目需批复后收录。符令录入后会在批复时落卷。"
+text = "万象声色页的条目多为即时生效；更高分辨率会显示更多内容而不是把画面放大。"
 autowrap_mode = 3
 
-[node name="HeaderDivider" type="ColorRect" parent="CenterLayer/Dialog/Margin/MainColumn" unique_id=1936167359]
-custom_minimum_size = Vector2(0, 1)
-layout_mode = 2
-color = Color(0.294118, 0.247059, 0.207843, 1)
-
-[node name="SettingsScroll" type="ScrollContainer" parent="CenterLayer/Dialog/Margin/MainColumn" unique_id=752530552]
+[node name="ContentScroll" type="ScrollContainer" parent="PaperRoot/RootRow/ContentColumn" unique_id=1250107993]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-horizontal_scroll_mode = 0
-vertical_scroll_mode = 2
+scroll_hint_mode = 2
 
-[node name="SettingsRows" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll" unique_id=274644095]
+[node name="ContentPages" type="VBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll" unique_id=900237257]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 10
+mouse_filter = 2
+theme_override_constants/separation = 18
 
-[node name="InstantHeader" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows" unique_id=1840756788]
-layout_mode = 2
-text = "即时生效"
-
-[node name="ResolutionRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows" unique_id=752429266]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="ResolutionLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows/ResolutionRow" unique_id=184450504]
-custom_minimum_size = Vector2(118, 0)
-layout_mode = 2
-text = "分辨率"
-
-[node name="ResolutionOption" type="OptionButton" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows/ResolutionRow" unique_id=577053610]
+[node name="AudioPage" type="VBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages" unique_id=1761203471]
 layout_mode = 2
 size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 22
 
-[node name="FullscreenRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows" unique_id=131045221]
+[node name="AudioSettings" type="VBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage" unique_id=91305750]
 layout_mode = 2
-theme_override_constants/separation = 12
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 18
 
-[node name="FullscreenLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows/FullscreenRow" unique_id=966042812]
-custom_minimum_size = Vector2(118, 0)
+[node name="VolumeRow" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings" unique_id=1909977581]
 layout_mode = 2
-text = "全屏"
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 18
 
-[node name="FullscreenCheckBox" type="CheckBox" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows/FullscreenRow" unique_id=1676540829]
+[node name="LabelBox" type="VBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/VolumeRow" unique_id=1258212546]
+custom_minimum_size = Vector2(260, 0)
 layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
 
-[node name="ZoomRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows" unique_id=864239151]
+[node name="VolumeCn" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/VolumeRow/LabelBox" unique_id=27323789]
 layout_mode = 2
-theme_override_constants/separation = 12
+text = "金石交鸣"
 
-[node name="ZoomLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows/ZoomRow" unique_id=1812664821]
-custom_minimum_size = Vector2(118, 0)
+[node name="VolumeEn" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/VolumeRow/LabelBox" unique_id=926902922]
 layout_mode = 2
-text = "画面缩放"
+text = "SFX VOLUME"
 
-[node name="ZoomSlider" type="HSlider" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows/ZoomRow" unique_id=1624794870]
+[node name="VolumeSlider" type="HSlider" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/VolumeRow" unique_id=1751254979]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ZoomValue" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows/ZoomRow" unique_id=1186455976]
-custom_minimum_size = Vector2(56, 0)
+[node name="VolumeValue" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/VolumeRow" unique_id=1991114843]
+custom_minimum_size = Vector2(86, 0)
+layout_mode = 2
+text = "八〇"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="BgmRow" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings" unique_id=1527938035]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 18
+
+[node name="LabelBox" type="VBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/BgmRow" unique_id=155378029]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="BgmCn" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/BgmRow/LabelBox" unique_id=1920755870]
+layout_mode = 2
+text = "仙乐玄音"
+
+[node name="BgmEn" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/BgmRow/LabelBox" unique_id=1786043405]
+layout_mode = 2
+text = "BGM VOLUME"
+
+[node name="BgmSlider" type="HSlider" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/BgmRow" unique_id=424705652]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="BgmValue" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/BgmRow" unique_id=747404292]
+custom_minimum_size = Vector2(86, 0)
+layout_mode = 2
+text = "七二"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="SfxRow" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings" unique_id=1354636678]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 18
+
+[node name="LabelBox" type="VBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/SfxRow" unique_id=753252783]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="SfxCn" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/SfxRow/LabelBox" unique_id=1669195697]
+layout_mode = 2
+text = "金石交鸣"
+
+[node name="SfxEn" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/SfxRow/LabelBox" unique_id=1103789563]
+layout_mode = 2
+text = "SFX VOLUME"
+
+[node name="SfxSlider" type="HSlider" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/SfxRow" unique_id=414335501]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SfxValue" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/SfxRow" unique_id=1101888664]
+custom_minimum_size = Vector2(86, 0)
+layout_mode = 2
+text = "八八"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="FullscreenRow" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings" unique_id=47551626]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 18
+
+[node name="LabelBox" type="VBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/FullscreenRow" unique_id=124063874]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="FullscreenCn" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/FullscreenRow/LabelBox" unique_id=1135215887]
+layout_mode = 2
+text = "须弥幻境"
+
+[node name="FullscreenEn" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/FullscreenRow/LabelBox" unique_id=2033122745]
+layout_mode = 2
+text = "FULLSCREEN MODE"
+
+[node name="Spacer" type="Control" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/FullscreenRow" unique_id=1253967238]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="FullscreenSealButton" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/FullscreenRow" unique_id=241460801 instance=ExtResource("11_seal_toggle_scene")]
+custom_minimum_size = Vector2(46, 46)
+layout_mode = 2
+
+[node name="ResolutionRow" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings" unique_id=1579481007]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 18
+
+[node name="LabelBox" type="VBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/ResolutionRow" unique_id=1240806612]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="ResolutionCn" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/ResolutionRow/LabelBox" unique_id=1772221111]
+layout_mode = 2
+text = "乾坤视野"
+
+[node name="ResolutionEn" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/ResolutionRow/LabelBox" unique_id=456366815]
+layout_mode = 2
+text = "RESOLUTION"
+
+[node name="ResolutionOption" type="OptionButton" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/ResolutionRow" unique_id=1427977222]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ResolutionChoices" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/ResolutionRow" unique_id=287045085]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 28
+alignment = 2
+
+[node name="Resolution1080Button" type="Button" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/ResolutionRow/ResolutionChoices" unique_id=1481887844]
+layout_mode = 2
+text = "入微 (1080p)"
+flat = true
+
+[node name="Resolution2KButton" type="Button" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/ResolutionRow/ResolutionChoices" unique_id=51574285]
+layout_mode = 2
+text = "清明 (2K)"
+flat = true
+
+[node name="Resolution4KButton" type="Button" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/ResolutionRow/ResolutionChoices" unique_id=1614496662]
+layout_mode = 2
+text = "通神 (4K)"
+flat = true
+
+[node name="QualityRow" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings" unique_id=1253622387]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 18
+
+[node name="LabelBox" type="VBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/QualityRow" unique_id=2090009380]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="QualityCn" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/QualityRow/LabelBox" unique_id=2117911897]
+layout_mode = 2
+text = "灵光显像"
+
+[node name="QualityEn" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/QualityRow/LabelBox" unique_id=79729847]
+layout_mode = 2
+text = "GRAPHICS QUALITY"
+
+[node name="QualityOption" type="OptionButton" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/QualityRow" unique_id=1604829673]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="QualityChoices" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/QualityRow" unique_id=896789926]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 28
+alignment = 2
+
+[node name="QualityLowButton" type="Button" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/QualityRow/QualityChoices" unique_id=819433555]
+layout_mode = 2
+text = "凡胎"
+flat = true
+
+[node name="QualityMediumButton" type="Button" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/QualityRow/QualityChoices" unique_id=1723922816]
+layout_mode = 2
+text = "结丹"
+flat = true
+
+[node name="QualityHighButton" type="Button" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/QualityRow/QualityChoices" unique_id=1113854237]
+layout_mode = 2
+text = "大乘"
+flat = true
+
+[node name="ZoomRow" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings" unique_id=1395929908]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 18
+
+[node name="LabelBox" type="VBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/ZoomRow" unique_id=1341960262]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="ZoomCn" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/ZoomRow/LabelBox" unique_id=30865608]
+layout_mode = 2
+text = "流光幅度"
+
+[node name="ZoomEn" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/ZoomRow/LabelBox" unique_id=2010611154]
+layout_mode = 2
+text = "LUMEN SCALE"
+
+[node name="ZoomSlider" type="HSlider" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/ZoomRow" unique_id=1314231519]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ZoomValue" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/AudioSettings/ZoomRow" unique_id=1563413777]
+custom_minimum_size = Vector2(86, 0)
 layout_mode = 2
 text = "100%"
 horizontal_alignment = 2
+vertical_alignment = 1
 
-[node name="VolumeRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows" unique_id=1623347768]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="VolumeLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows/VolumeRow" unique_id=33628181]
-custom_minimum_size = Vector2(118, 0)
-layout_mode = 2
-text = "音律"
-
-[node name="VolumeSlider" type="HSlider" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows/VolumeRow" unique_id=316247948]
+[node name="ShortcutPreviewGrid" type="GridContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage" unique_id=374196714]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/h_separation = 18
+theme_override_constants/v_separation = 18
+columns = 3
 
-[node name="VolumeValue" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows/VolumeRow" unique_id=779645976]
-custom_minimum_size = Vector2(56, 0)
-layout_mode = 2
-text = "80%"
-horizontal_alignment = 2
-
-[node name="SavedHeader" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows" unique_id=1245554780]
-layout_mode = 2
-text = "批复生效"
-
-[node name="LanguageRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows" unique_id=430058772]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="LanguageLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows/LanguageRow" unique_id=686323106]
-custom_minimum_size = Vector2(118, 0)
-layout_mode = 2
-text = "言辞"
-
-[node name="LanguageOption" type="OptionButton" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows/LanguageRow" unique_id=1114681811]
+[node name="SummarySettingsCard" type="PanelContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/ShortcutPreviewGrid" unique_id=1095800850]
 layout_mode = 2
 size_flags_horizontal = 3
+mouse_filter = 2
 
-[node name="ShortcutHeader" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows" unique_id=660895169]
+[node name="CardMargin" type="MarginContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/ShortcutPreviewGrid/SummarySettingsCard" unique_id=779453755]
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "符令配置"
+mouse_filter = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
 
-[node name="OpenSettingsKeyRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows" unique_id=1705477224]
+[node name="CardColumn" type="VBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/ShortcutPreviewGrid/SummarySettingsCard/CardMargin" unique_id=904570237]
 layout_mode = 2
-theme_override_constants/separation = 12
+mouse_filter = 2
+theme_override_constants/separation = 8
 
-[node name="OpenSettingsKeyLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows/OpenSettingsKeyRow" unique_id=1760348943]
-custom_minimum_size = Vector2(118, 0)
+[node name="SummarySettingsLabel" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/ShortcutPreviewGrid/SummarySettingsCard/CardMargin/CardColumn" unique_id=900717761]
 layout_mode = 2
 text = "启机宜卷"
 
-[node name="OpenSettingsKeyOption" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows/OpenSettingsKeyRow" unique_id=1578468966]
+[node name="SummarySettingsValue" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/ShortcutPreviewGrid/SummarySettingsCard/CardMargin/CardColumn" unique_id=42198323]
+layout_mode = 2
+text = "F1"
+horizontal_alignment = 2
+
+[node name="SummaryWarehouseCard" type="PanelContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/ShortcutPreviewGrid" unique_id=1688913544]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "F1"
+mouse_filter = 2
 
-[node name="OpenWarehouseKeyRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows" unique_id=609841197]
+[node name="CardMargin" type="MarginContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/ShortcutPreviewGrid/SummaryWarehouseCard" unique_id=1586285131]
 layout_mode = 2
-theme_override_constants/separation = 12
+mouse_filter = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
 
-[node name="OpenWarehouseKeyLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows/OpenWarehouseKeyRow" unique_id=1055516007]
-custom_minimum_size = Vector2(118, 0)
+[node name="CardColumn" type="VBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/ShortcutPreviewGrid/SummaryWarehouseCard/CardMargin" unique_id=1489664108]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="SummaryWarehouseLabel" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/ShortcutPreviewGrid/SummaryWarehouseCard/CardMargin/CardColumn" unique_id=1657123373]
 layout_mode = 2
 text = "启库藏卷"
 
-[node name="OpenWarehouseKeyOption" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows/OpenWarehouseKeyRow" unique_id=918867287]
+[node name="SummaryWarehouseValue" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/ShortcutPreviewGrid/SummaryWarehouseCard/CardMargin/CardColumn" unique_id=1404532335]
 layout_mode = 2
-size_flags_horizontal = 3
 text = "B"
+horizontal_alignment = 2
 
-[node name="ToggleExplorationKeyRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows" unique_id=1942059167]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="ToggleExplorationKeyLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows/ToggleExplorationKeyRow" unique_id=245622829]
-custom_minimum_size = Vector2(118, 0)
-layout_mode = 2
-text = "历练开关"
-
-[node name="ToggleExplorationKeyOption" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows/ToggleExplorationKeyRow" unique_id=278834597]
+[node name="SummarySpeedCard" type="PanelContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/ShortcutPreviewGrid" unique_id=204722863]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "E"
+mouse_filter = 2
 
-[node name="ToggleSpeedKeyRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows" unique_id=232828564]
+[node name="CardMargin" type="MarginContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/ShortcutPreviewGrid/SummarySpeedCard" unique_id=907966624]
 layout_mode = 2
-theme_override_constants/separation = 12
+mouse_filter = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
 
-[node name="ToggleSpeedKeyLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows/ToggleSpeedKeyRow" unique_id=423366587]
-custom_minimum_size = Vector2(118, 0)
+[node name="CardColumn" type="VBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/ShortcutPreviewGrid/SummarySpeedCard/CardMargin" unique_id=2096660424]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="SummarySpeedLabel" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/ShortcutPreviewGrid/SummarySpeedCard/CardMargin/CardColumn" unique_id=101799666]
 layout_mode = 2
 text = "流光切换"
 
-[node name="ToggleSpeedKeyOption" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows/ToggleSpeedKeyRow" unique_id=280989353]
+[node name="SummarySpeedValue" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/AudioPage/ShortcutPreviewGrid/SummarySpeedCard/CardMargin/CardColumn" unique_id=316462895]
+layout_mode = 2
+text = "Tab"
+horizontal_alignment = 2
+
+[node name="ShortcutPage" type="VBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages" unique_id=1319638467]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 22
+
+[node name="ShortcutIntro" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage" unique_id=842591798]
+visible = false
+layout_mode = 2
+text = "按下任一符节即可重录；若与旧符相冲，卷内会自动换置。"
+autowrap_mode = 3
+
+[node name="ShortcutSettings" type="VBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage" unique_id=1162209447]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 16
+
+[node name="OpenSettingsKeyRow" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutSettings" unique_id=2084611519]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 18
+
+[node name="OpenSettingsKeyLabel" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutSettings/OpenSettingsKeyRow" unique_id=374036865]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+text = "启机宜卷"
+
+[node name="OpenSettingsKeyOption" type="Button" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutSettings/OpenSettingsKeyRow" unique_id=357004228]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "F1"
+flat = true
+
+[node name="OpenWarehouseKeyRow" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutSettings" unique_id=995496430]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 18
+
+[node name="OpenWarehouseKeyLabel" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutSettings/OpenWarehouseKeyRow" unique_id=1050791360]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+text = "启库藏卷"
+
+[node name="OpenWarehouseKeyOption" type="Button" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutSettings/OpenWarehouseKeyRow" unique_id=133239782]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "B"
+flat = true
+
+[node name="ToggleExplorationKeyRow" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutSettings" unique_id=1798085480]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 18
+
+[node name="ToggleExplorationKeyLabel" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutSettings/ToggleExplorationKeyRow" unique_id=1383162020]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+text = "历练开关"
+
+[node name="ToggleExplorationKeyOption" type="Button" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutSettings/ToggleExplorationKeyRow" unique_id=1423054849]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "E"
+flat = true
+
+[node name="ToggleSpeedKeyRow" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutSettings" unique_id=1109814185]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 18
+
+[node name="ToggleSpeedKeyLabel" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutSettings/ToggleSpeedKeyRow" unique_id=340826115]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+text = "流光切换"
+
+[node name="ToggleSpeedKeyOption" type="Button" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutSettings/ToggleSpeedKeyRow" unique_id=2014910872]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Tab"
+flat = true
 
-[node name="QuickSaveKeyRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows" unique_id=1635890437]
+[node name="QuickSaveKeyRow" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutSettings" unique_id=221340810]
 layout_mode = 2
-theme_override_constants/separation = 12
+mouse_filter = 2
+theme_override_constants/separation = 18
 
-[node name="QuickSaveKeyLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows/QuickSaveKeyRow" unique_id=1693745839]
-custom_minimum_size = Vector2(118, 0)
+[node name="QuickSaveKeyLabel" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutSettings/QuickSaveKeyRow" unique_id=1077814967]
+custom_minimum_size = Vector2(260, 0)
 layout_mode = 2
 text = "速录主卷"
 
-[node name="QuickSaveKeyOption" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows/QuickSaveKeyRow" unique_id=504985379]
+[node name="QuickSaveKeyOption" type="Button" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutSettings/QuickSaveKeyRow" unique_id=1320837479]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "F5"
+flat = true
 
-[node name="QuickLoadKeyRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows" unique_id=1753021499]
+[node name="QuickLoadKeyRow" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutSettings" unique_id=1029883862]
 layout_mode = 2
-theme_override_constants/separation = 12
+mouse_filter = 2
+theme_override_constants/separation = 18
 
-[node name="QuickLoadKeyLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows/QuickLoadKeyRow" unique_id=1017319563]
-custom_minimum_size = Vector2(118, 0)
+[node name="QuickLoadKeyLabel" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutSettings/QuickLoadKeyRow" unique_id=916592651]
+custom_minimum_size = Vector2(260, 0)
 layout_mode = 2
 text = "速启主卷"
 
-[node name="QuickLoadKeyOption" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows/QuickLoadKeyRow" unique_id=1017784165]
+[node name="QuickLoadKeyOption" type="Button" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutSettings/QuickLoadKeyRow" unique_id=1871013500]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "F9"
+flat = true
 
-[node name="QuickResetKeyRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows" unique_id=901257452]
+[node name="QuickResetKeyRow" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutSettings" unique_id=298566018]
 layout_mode = 2
-theme_override_constants/separation = 12
+mouse_filter = 2
+theme_override_constants/separation = 18
 
-[node name="QuickResetKeyLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows/QuickResetKeyRow" unique_id=251567980]
-custom_minimum_size = Vector2(118, 0)
+[node name="QuickResetKeyLabel" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutSettings/QuickResetKeyRow" unique_id=1877323973]
+custom_minimum_size = Vector2(260, 0)
 layout_mode = 2
 text = "速归初局"
 
-[node name="QuickResetKeyOption" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/SettingsScroll/SettingsRows/QuickResetKeyRow" unique_id=960532651]
+[node name="QuickResetKeyOption" type="Button" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutSettings/QuickResetKeyRow" unique_id=1872565450]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "R"
+flat = true
 
-[node name="FooterRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn" unique_id=1198995349]
+[node name="ShortcutVisualGrid" type="VBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage" unique_id=189017044]
 layout_mode = 2
-theme_override_constants/separation = 8
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 22
+
+[node name="MovementSection" type="VBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid" unique_id=983663595]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="MovementTitle" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/MovementSection" unique_id=811015444]
+layout_mode = 2
+text = "｜步法与神通（Movement & Spells）"
+
+[node name="MovementGrid" type="GridContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/MovementSection" unique_id=742398076]
+layout_mode = 2
+theme_override_constants/h_separation = 22
+theme_override_constants/v_separation = 18
+columns = 3
+
+[node name="MoveUpCard" type="PanelContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/MovementSection/MovementGrid" unique_id=608584366]
+layout_mode = 2
+
+[node name="Row" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/MovementSection/MovementGrid/MoveUpCard" unique_id=258384800]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="MoveUpLabel" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/MovementSection/MovementGrid/MoveUpCard/Row" unique_id=633764299]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "纵云向上"
+
+[node name="MoveUpKeyText" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/MovementSection/MovementGrid/MoveUpCard/Row" unique_id=785744510]
+layout_mode = 2
+text = "W"
+
+[node name="MoveDownCard" type="PanelContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/MovementSection/MovementGrid" unique_id=706630240]
+layout_mode = 2
+
+[node name="Row" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/MovementSection/MovementGrid/MoveDownCard" unique_id=695685730]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="MoveDownLabel" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/MovementSection/MovementGrid/MoveDownCard/Row" unique_id=1008876293]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "坠凡向下"
+
+[node name="MoveDownKeyText" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/MovementSection/MovementGrid/MoveDownCard/Row" unique_id=263036292]
+layout_mode = 2
+text = "S"
+
+[node name="MoveLeftCard" type="PanelContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/MovementSection/MovementGrid" unique_id=344528632]
+layout_mode = 2
+
+[node name="Row" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/MovementSection/MovementGrid/MoveLeftCard" unique_id=1581664631]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="MoveLeftLabel" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/MovementSection/MovementGrid/MoveLeftCard/Row" unique_id=1923390140]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "乘风向左"
+
+[node name="MoveLeftKeyText" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/MovementSection/MovementGrid/MoveLeftCard/Row" unique_id=2123257008]
+layout_mode = 2
+text = "A"
+
+[node name="ToggleSpeedCard" type="PanelContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/MovementSection/MovementGrid" unique_id=1507666746]
+layout_mode = 2
+
+[node name="Row" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/MovementSection/MovementGrid/ToggleSpeedCard" unique_id=914933580]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ToggleSpeedLabelVisual" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/MovementSection/MovementGrid/ToggleSpeedCard/Row" unique_id=1527057725]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "踏雷向右"
+
+[node name="ToggleSpeedKeyOption" type="Button" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/MovementSection/MovementGrid/ToggleSpeedCard/Row" unique_id=1060686036]
+layout_mode = 2
+text = "D"
+flat = true
+
+[node name="ToggleExplorationCard" type="PanelContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/MovementSection/MovementGrid" unique_id=1463371284]
+layout_mode = 2
+
+[node name="Row" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/MovementSection/MovementGrid/ToggleExplorationCard" unique_id=699403110]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ToggleExplorationLabelVisual" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/MovementSection/MovementGrid/ToggleExplorationCard/Row" unique_id=1215149722]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "探囊取物"
+
+[node name="ToggleExplorationKeyOption" type="Button" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/MovementSection/MovementGrid/ToggleExplorationCard/Row" unique_id=268404035]
+layout_mode = 2
+text = "E"
+flat = true
+
+[node name="CastSpellCard" type="PanelContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/MovementSection/MovementGrid" unique_id=1128134704]
+layout_mode = 2
+
+[node name="Row" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/MovementSection/MovementGrid/CastSpellCard" unique_id=756210258]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="CastSpellLabel" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/MovementSection/MovementGrid/CastSpellCard/Row" unique_id=1954679891]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "施展神通"
+
+[node name="CastSpellKeyText" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/MovementSection/MovementGrid/CastSpellCard/Row" unique_id=2112633059]
+layout_mode = 2
+text = "SPACE"
+
+[node name="UiSection" type="VBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid" unique_id=664040107]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="UiTitle" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/UiSection" unique_id=2060566105]
+layout_mode = 2
+text = "｜法器与内视（UI & Inventory）"
+
+[node name="UiGrid" type="GridContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/UiSection" unique_id=382260090]
+layout_mode = 2
+theme_override_constants/h_separation = 22
+theme_override_constants/v_separation = 18
+columns = 3
+
+[node name="OpenWarehouseCard" type="PanelContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/UiSection/UiGrid" unique_id=1376941456]
+layout_mode = 2
+
+[node name="Row" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/UiSection/UiGrid/OpenWarehouseCard" unique_id=940941366]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="OpenWarehouseVisualLabel" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/UiSection/UiGrid/OpenWarehouseCard/Row" unique_id=111205789]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "纳戒乾坤（背包）"
+
+[node name="OpenWarehouseKeyOption" type="Button" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/UiSection/UiGrid/OpenWarehouseCard/Row" unique_id=943187560]
+layout_mode = 2
+text = "B"
+flat = true
+
+[node name="QuestCard" type="PanelContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/UiSection/UiGrid" unique_id=1188442135]
+layout_mode = 2
+
+[node name="Row" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/UiSection/UiGrid/QuestCard" unique_id=125351760]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="QuestLabel" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/UiSection/UiGrid/QuestCard/Row" unique_id=1760528798]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "命途推演（任务）"
+
+[node name="QuestKeyText" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/UiSection/UiGrid/QuestCard/Row" unique_id=295371183]
+layout_mode = 2
+text = "J"
+
+[node name="OpenSettingsCard" type="PanelContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/UiSection/UiGrid" unique_id=220474623]
+layout_mode = 2
+
+[node name="Row" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/UiSection/UiGrid/OpenSettingsCard" unique_id=996240524]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="OpenSettingsVisualLabel" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/UiSection/UiGrid/OpenSettingsCard/Row" unique_id=1540973526]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "机宜卷宗（菜单）"
+
+[node name="OpenSettingsKeyOption" type="Button" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/UiSection/UiGrid/OpenSettingsCard/Row" unique_id=624450306]
+layout_mode = 2
+text = "ESC"
+flat = true
+
+[node name="QuickResetCard" type="PanelContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/UiSection/UiGrid" unique_id=170341912]
+visible = false
+layout_mode = 2
+
+[node name="Row" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/UiSection/UiGrid/QuickResetCard" unique_id=2089298136]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="QuickResetVisualLabel" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/UiSection/UiGrid/QuickResetCard/Row" unique_id=1565497003]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "速归初局"
+
+[node name="QuickResetKeyOption" type="Button" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/ShortcutPage/ShortcutVisualGrid/UiSection/UiGrid/QuickResetCard/Row" unique_id=1242073654]
+layout_mode = 2
+text = "R"
+flat = true
+
+[node name="LanguagePage" type="VBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages" unique_id=1947855264]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 22
+
+[node name="LanguageLead" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage" unique_id=1151617304]
+layout_mode = 2
+text = "世间法则页收录语言与游玩门禁。后续若扩展自动存档、速归确认与提示详略，也统一归于此页。"
+autowrap_mode = 3
+
+[node name="LanguageSettings" type="VBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage" unique_id=1182227455]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 16
+
+[node name="LanguageRow" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings" unique_id=278222761]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 18
+
+[node name="LanguageLabel" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings/LanguageRow" unique_id=1062221532]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+text = "言辞教化"
+
+[node name="LanguageOption" type="OptionButton" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings/LanguageRow" unique_id=1356746320]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LanguageChoices" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings/LanguageRow" unique_id=1023029575]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 28
 alignment = 2
 
-[node name="CancelButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/FooterRow" unique_id=1277941175]
-custom_minimum_size = Vector2(96, 34)
+[node name="LanguageZhButton" type="Button" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings/LanguageRow/LanguageChoices" unique_id=1082682101]
+layout_mode = 2
+text = "华夏正音"
+flat = true
+
+[node name="LanguageEnButton" type="Button" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings/LanguageRow/LanguageChoices" unique_id=1383853196]
+layout_mode = 2
+text = "异邦番语"
+flat = true
+
+[node name="AutoSaveRow" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings" unique_id=148653247]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 18
+
+[node name="LabelBox" type="VBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings/AutoSaveRow" unique_id=1506824230]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="AutoSaveCn" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings/AutoSaveRow/LabelBox" unique_id=1381592077]
+layout_mode = 2
+text = "铭刻天机"
+
+[node name="AutoSaveEn" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings/AutoSaveRow/LabelBox" unique_id=716860206]
+layout_mode = 2
+text = "AUTO SAVE"
+
+[node name="Spacer" type="Control" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings/AutoSaveRow" unique_id=2071263179]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="AutoSaveSealButton" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings/AutoSaveRow" unique_id=605921746 instance=ExtResource("11_seal_toggle_scene")]
+custom_minimum_size = Vector2(66, 66)
+layout_mode = 2
+
+[node name="AutoSaveIntervalRow" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings" unique_id=1838033525]
+visible = false
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 18
+
+[node name="LabelBox" type="VBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings/AutoSaveIntervalRow" unique_id=362837466]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="AutoSaveIntervalCn" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings/AutoSaveIntervalRow/LabelBox" unique_id=901155318]
+layout_mode = 2
+text = "天机轮转"
+
+[node name="AutoSaveIntervalEn" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings/AutoSaveIntervalRow/LabelBox" unique_id=2126513030]
+layout_mode = 2
+text = "SAVE INTERVAL"
+
+[node name="AutoSaveIntervalOption" type="OptionButton" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings/AutoSaveIntervalRow" unique_id=786844221]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="QuickResetConfirmRow" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings" unique_id=83756442]
+visible = false
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 18
+
+[node name="LabelBox" type="VBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings/QuickResetConfirmRow" unique_id=1180146715]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="QuickResetConfirmCn" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings/QuickResetConfirmRow/LabelBox" unique_id=1918981953]
+layout_mode = 2
+text = "速归护印"
+
+[node name="QuickResetConfirmEn" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings/QuickResetConfirmRow/LabelBox" unique_id=2061155720]
+layout_mode = 2
+text = "RESET CONFIRM"
+
+[node name="Spacer" type="Control" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings/QuickResetConfirmRow" unique_id=1452948885]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="QuickResetConfirmSealButton" type="Button" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings/QuickResetConfirmRow" unique_id=1297491412]
+custom_minimum_size = Vector2(62, 62)
+layout_mode = 2
+toggle_mode = true
+flat = true
+
+[node name="DamageTextRow" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings" unique_id=1189414544]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 18
+
+[node name="LabelBox" type="VBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings/DamageTextRow" unique_id=902973909]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="DamageTextCn" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings/DamageTextRow/LabelBox" unique_id=764883194]
+layout_mode = 2
+text = "气血浮沉"
+
+[node name="DamageTextEn" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings/DamageTextRow/LabelBox" unique_id=472714822]
+layout_mode = 2
+text = "DAMAGE TEXT"
+
+[node name="Spacer" type="Control" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings/DamageTextRow" unique_id=1554841120]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="DamageTextSealButton" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings/DamageTextRow" unique_id=510575780 instance=ExtResource("11_seal_toggle_scene")]
+custom_minimum_size = Vector2(66, 66)
+layout_mode = 2
+
+[node name="BloodGoreRow" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings" unique_id=1090101246]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 18
+
+[node name="LabelBox" type="VBoxContainer" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings/BloodGoreRow" unique_id=2132356000]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="BloodGoreCn" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings/BloodGoreRow/LabelBox" unique_id=355077309]
+layout_mode = 2
+text = "煞气留痕"
+
+[node name="BloodGoreEn" type="Label" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings/BloodGoreRow/LabelBox" unique_id=221941281]
+layout_mode = 2
+text = "BLOOD & GORE"
+
+[node name="Spacer" type="Control" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings/BloodGoreRow" unique_id=1666100613]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="BloodGoreSealButton" parent="PaperRoot/RootRow/ContentColumn/ContentScroll/ContentPages/LanguagePage/LanguageSettings/BloodGoreRow" unique_id=893047467 instance=ExtResource("11_seal_toggle_scene")]
+custom_minimum_size = Vector2(66, 66)
+layout_mode = 2
+
+[node name="FooterRow" type="HBoxContainer" parent="PaperRoot/RootRow/ContentColumn" unique_id=649201728]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 18
+alignment = 2
+
+[node name="CancelButton" parent="PaperRoot/RootRow/ContentColumn/FooterRow" unique_id=1410304208 instance=ExtResource("13_seal_confirm_button_scene")]
+custom_minimum_size = Vector2(108, 74)
 layout_mode = 2
 text = "作罢"
 
-[node name="ApplyButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/FooterRow" unique_id=914229376]
-custom_minimum_size = Vector2(110, 34)
+[node name="ApplyButton" parent="PaperRoot/RootRow/ContentColumn/FooterRow" unique_id=398450444 instance=ExtResource("13_seal_confirm_button_scene")]
+custom_minimum_size = Vector2(128, 92)
 layout_mode = 2
-text = "批复并收录"

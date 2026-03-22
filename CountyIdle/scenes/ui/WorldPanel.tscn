@@ -328,7 +328,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-self_modulate = Color(0.823529, 0.764706, 0.647059, 0.32)
+self_modulate = Color(0.956863, 0.92549, 0.862745, 0.72)
 texture = ExtResource("3_map_background")
 expand_mode = 1
 stretch_mode = 6
@@ -341,7 +341,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.168627, 0.137255, 0.109804, 0.2)
+color = Color(0.921569, 0.886275, 0.803922, 0.08)
 
 [node name="WorldMapView" type="PanelContainer" parent="PanelContent/MapViewport/MapPages" unique_id=984430974]
 visible = false

@@ -1,7 +1,8 @@
 [gd_scene format=3 uid="uid://cqkhjnclmdi24"]
 
-[ext_resource type="Script" uid="uid://chx6vtko8luwr" path="res://scripts/ui/SaveSlotsPanel.cs" id="1_save"]
-[ext_resource type="Script" uid="uid://d0f3p13a75uvb" path="res://scripts/ui/gd/SavePreviewCrossfade.gd" id="2_preview_fx"]
+[ext_resource type="Script" path="res://scripts/ui/SaveSlotsPanel.cs" id="1_save"]
+[ext_resource type="Script" path="res://scripts/ui/gd/SavePreviewCrossfade.gd" id="2_preview_fx"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/SealConfirmButton.tscn" id="3_seal_confirm_button"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dialog"]
 bg_color = Color(0.0823529, 0.0862745, 0.101961, 1)
@@ -36,7 +37,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.101961, 0.0862745, 0.0745098, 0.9)
+color = Color(0.101961, 0.0862745, 0.0745098, 0.88)
 
 [node name="CenterLayer" type="MarginContainer" parent="." unique_id=2019955571]
 layout_mode = 1
@@ -45,9 +46,9 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 24
+theme_override_constants/margin_left = 28
 theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 24
+theme_override_constants/margin_right = 28
 theme_override_constants/margin_bottom = 20
 
 [node name="DecorLayer" type="VBoxContainer" parent="CenterLayer" unique_id=842689102]
@@ -73,14 +74,6 @@ custom_minimum_size = Vector2(24, 0)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="LeftTopCap" type="ColorRect" parent="CenterLayer/DecorLayer/RollerRow/LeftRoller" unique_id=129691109]
-layout_mode = 2
-color = Color(0.831373, 0.686275, 0.215686, 1)
-
-[node name="LeftBottomCap" type="ColorRect" parent="CenterLayer/DecorLayer/RollerRow/LeftRoller" unique_id=127533338]
-layout_mode = 2
-color = Color(0.831373, 0.686275, 0.215686, 1)
-
 [node name="RollerSpacer" type="Control" parent="CenterLayer/DecorLayer/RollerRow" unique_id=650194878]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -89,14 +82,6 @@ size_flags_horizontal = 3
 custom_minimum_size = Vector2(24, 0)
 layout_mode = 2
 size_flags_vertical = 3
-
-[node name="RightTopCap" type="ColorRect" parent="CenterLayer/DecorLayer/RollerRow/RightRoller" unique_id=2092096616]
-layout_mode = 2
-color = Color(0.831373, 0.686275, 0.215686, 1)
-
-[node name="RightBottomCap" type="ColorRect" parent="CenterLayer/DecorLayer/RollerRow/RightRoller" unique_id=1066150745]
-layout_mode = 2
-color = Color(0.831373, 0.686275, 0.215686, 1)
 
 [node name="BottomTrim" type="ColorRect" parent="CenterLayer/DecorLayer" unique_id=1831908954]
 custom_minimum_size = Vector2(0, 8)
@@ -113,7 +98,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_dialog")
 [node name="Margin" type="MarginContainer" parent="CenterLayer/Dialog" unique_id=1101452923]
 layout_mode = 2
 theme_override_constants/margin_left = 26
-theme_override_constants/margin_top = 26
+theme_override_constants/margin_top = 24
 theme_override_constants/margin_right = 26
 theme_override_constants/margin_bottom = 24
 
@@ -123,12 +108,26 @@ theme_override_constants/separation = 12
 
 [node name="HeaderRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn" unique_id=437189588]
 layout_mode = 2
+alignment = 1
 
-[node name="TitleLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/HeaderRow" unique_id=1256586280]
+[node name="TitleStack" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/HeaderRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 18
+theme_override_constants/separation = 2
+
+[node name="TitleLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/HeaderRow/TitleStack" unique_id=1256586280]
+layout_mode = 2
 text = "天衍峰留影录"
+
+[node name="SubtitleLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/HeaderRow/TitleStack"]
+layout_mode = 2
+text = "画屏归档 · 玉简藏卷"
+
+[node name="QuoteLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/HeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+text = "“因果丝连，旧事历历在目”"
 
 [node name="CloseButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/HeaderRow" unique_id=445859819]
 custom_minimum_size = Vector2(44, 28)
@@ -136,15 +135,13 @@ layout_mode = 2
 text = "✖"
 
 [node name="HintLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn" unique_id=2025911460]
-modulate = Color(0.760784, 0.780392, 0.831373, 1)
 layout_mode = 2
-text = "翻检卷册，可择旧档覆写、启读，亦可别录新卷。"
+text = "左侧玉简归架，右侧画屏摊卷，可于此开启前尘、旧梦重写。"
 autowrap_mode = 3
 
 [node name="ModeLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn" unique_id=1065877480]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.94902, 0.909804, 0.788235, 1)
-text = "当前案由：存档。"
+text = "当前案由：旧梦重写。"
 
 [node name="HeaderDivider" type="ColorRect" parent="CenterLayer/Dialog/Margin/MainColumn" unique_id=730888166]
 custom_minimum_size = Vector2(0, 1)
@@ -153,18 +150,24 @@ color = Color(0.294118, 0.247059, 0.207843, 1)
 
 [node name="ContentRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn" unique_id=404713497]
 layout_mode = 2
-theme_override_constants/separation = 16
+size_flags_vertical = 3
+theme_override_constants/separation = 18
 
 [node name="SlotColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow" unique_id=170155776]
-custom_minimum_size = Vector2(380, 0)
+custom_minimum_size = Vector2(390, 0)
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_constants/separation = 8
 
 [node name="SlotListTitle" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/SlotColumn" unique_id=1163204405]
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "卷册目录"
+text = "玉简档案架"
+
+[node name="ShelfCaptionLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/SlotColumn"]
+layout_mode = 2
+text = "左列诸简按落卷先后陈列，点选其一可启右卷。"
+autowrap_mode = 3
 
 [node name="FilterRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/SlotColumn" unique_id=2016445342]
 layout_mode = 2
@@ -180,123 +183,297 @@ custom_minimum_size = Vector2(170, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="SlotList" type="ItemList" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/SlotColumn" unique_id=175180514]
-custom_minimum_size = Vector2(0, 260)
+[node name="SlipShelfFrame" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/SlotColumn"]
 layout_mode = 2
+size_flags_horizontal = 3
 size_flags_vertical = 3
-allow_reselect = true
 
-[node name="DetailColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow" unique_id=1894382052]
-custom_minimum_size = Vector2(420, 0)
+[node name="ShelfSealLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/SlotColumn/SlipShelfFrame"]
+layout_mode = 0
+offset_left = 262.0
+offset_top = 8.0
+offset_right = 364.0
+offset_bottom = 28.0
+text = "藏经乙架"
+horizontal_alignment = 2
+
+[node name="SlipShelfMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/SlotColumn/SlipShelfFrame"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="SlipShelfScroll" type="ScrollContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/SlotColumn/SlipShelfFrame/SlipShelfMargin"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="SlipShelf" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/SlotColumn/SlipShelfFrame/SlipShelfMargin/SlipShelfScroll"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
+[node name="DetailColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow" unique_id=1894382052]
+custom_minimum_size = Vector2(620, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
 [node name="DetailTitle" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn" unique_id=1985830470]
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "卷页详录"
+text = "展开画卷"
 
-[node name="PreviewFrame" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn" unique_id=1921048635]
-custom_minimum_size = Vector2(0, 176)
+[node name="ScrollFrame" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn"]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
-[node name="PreviewMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/PreviewFrame" unique_id=1139084367]
+[node name="ScrollMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame"]
 layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 18
 
-[node name="PreviewColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/PreviewFrame/PreviewMargin" unique_id=587269930]
+[node name="ScrollColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 14
+
+[node name="PreviewFrame" type="PanelContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn" unique_id=1921048635]
+custom_minimum_size = Vector2(0, 244)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="InkWashTop" type="ColorRect" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/PreviewFrame"]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 26.0
+offset_top = 10.0
+offset_right = -108.0
+offset_bottom = 54.0
+mouse_filter = 2
+color = Color(0.35, 0.32, 0.28, 0.08)
+
+[node name="InkWashBottom" type="ColorRect" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/PreviewFrame"]
+layout_mode = 0
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -188.0
+offset_top = -62.0
+offset_right = -26.0
+offset_bottom = -18.0
+mouse_filter = 2
+color = Color(0.42, 0.28, 0.24, 0.08)
+
+[node name="PreviewSealLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/PreviewFrame"]
+layout_mode = 0
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -114.0
+offset_top = -48.0
+offset_right = -24.0
+offset_bottom = -18.0
+mouse_filter = 2
+text = "画屏留影"
+horizontal_alignment = 2
+
+[node name="PreviewMargin" type="MarginContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/PreviewFrame" unique_id=1139084367]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="PreviewColumn" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/PreviewFrame/PreviewMargin" unique_id=587269930]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="PreviewTexture" type="TextureRect" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/PreviewFrame/PreviewMargin/PreviewColumn" unique_id=1164401830]
-custom_minimum_size = Vector2(0, 132)
+[node name="PreviewTexture" type="TextureRect" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/PreviewFrame/PreviewMargin/PreviewColumn" unique_id=1164401830]
+custom_minimum_size = Vector2(0, 188)
 layout_mode = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="PreviewHintLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/PreviewFrame/PreviewMargin/PreviewColumn" unique_id=1220090200]
-modulate = Color(0.760784, 0.780392, 0.831373, 1)
+[node name="PreviewHintLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/PreviewFrame/PreviewMargin/PreviewColumn" unique_id=1220090200]
 layout_mode = 2
 text = "暂无线索留影。待卷册写成后，会在此显出当时景象。"
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="SlotDetailLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn" unique_id=1713019869]
-custom_minimum_size = Vector2(0, 92)
+[node name="ScrollTitleRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ScrollTitleStack" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/ScrollTitleRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 3
+
+[node name="SlotTitleLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/ScrollTitleRow/ScrollTitleStack"]
+layout_mode = 2
+text = "卷名：暂无卷册"
+
+[node name="SlotUpdatedLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/ScrollTitleRow/ScrollTitleStack"]
+layout_mode = 2
+text = "因果未曾成卷"
+
+[node name="ScrollTagLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/ScrollTitleRow"]
+layout_mode = 2
+text = "画屏详录"
+
+[node name="DetailBody" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="SlotDetailLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/DetailBody"]
+custom_minimum_size = Vector2(0, 28)
 layout_mode = 2
 text = "暂未立卷。可先题写卷名，再将当前宗门进度收录成卷。"
 autowrap_mode = 3
 
-[node name="NameRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn" unique_id=1523265607]
+[node name="SlotUpdatedDetailLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/DetailBody"]
+custom_minimum_size = Vector2(0, 22)
+layout_mode = 2
+text = "待你第一次落卷后，右侧画屏会记住当时景象与宗门气象。"
+autowrap_mode = 3
+
+[node name="StatsDivider" type="ColorRect" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn"]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+color = Color(0.87, 0.84, 0.78, 1)
+
+[node name="StatRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="PopulationStatCard" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/StatRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="PopulationStatCaption" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/StatRow/PopulationStatCard"]
+layout_mode = 2
+text = "宗门人口"
+
+[node name="PopulationStatValueLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/StatRow/PopulationStatCard"]
+layout_mode = 2
+text = "—"
+
+[node name="GoldDivider" type="ColorRect" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/StatRow"]
+custom_minimum_size = Vector2(1, 36)
+layout_mode = 2
+color = Color(0.83, 0.89, 0.84, 1)
+
+[node name="GoldStatCard" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/StatRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="GoldStatCaption" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/StatRow/GoldStatCard"]
+layout_mode = 2
+text = "灵石储备"
+
+[node name="GoldStatValueLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/StatRow/GoldStatCard"]
+layout_mode = 2
+text = "—"
+
+[node name="ExplorationDivider" type="ColorRect" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/StatRow"]
+custom_minimum_size = Vector2(1, 36)
+layout_mode = 2
+color = Color(0.83, 0.89, 0.84, 1)
+
+[node name="ExplorationStatCard" type="VBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/StatRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="ExplorationStatCaption" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/StatRow/ExplorationStatCard"]
+layout_mode = 2
+text = "历练层数"
+
+[node name="ExplorationStatValueLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/StatRow/ExplorationStatCard"]
+layout_mode = 2
+text = "—"
+
+[node name="BottomSpacer" type="Control" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn"]
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="NameRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn"]
 layout_mode = 2
 theme_override_constants/separation = 10
+alignment = 2
 
-[node name="SlotNameLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/NameRow" unique_id=665078606]
-custom_minimum_size = Vector2(72, 0)
+[node name="SlotNameLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/NameRow"]
+custom_minimum_size = Vector2(0, 0)
 layout_mode = 2
-text = "卷名"
+text = "卷题"
 
-[node name="SlotNameEdit" type="LineEdit" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/NameRow" unique_id=839347349]
+[node name="SlotNameEdit" type="LineEdit" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/NameRow"]
+custom_minimum_size = Vector2(180, 28)
 layout_mode = 2
-size_flags_horizontal = 3
 placeholder_text = "题写新卷名，或改写所选卷题"
 
-[node name="ActionRowPrimary" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn" unique_id=1185043418]
+[node name="RenameSlotButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/NameRow"]
+custom_minimum_size = Vector2(86, 28)
 layout_mode = 2
-theme_override_constants/separation = 8
+text = "修改卷名"
 
-[node name="SaveSelectedButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ActionRowPrimary" unique_id=1609760687]
+[node name="ActionRowPrimary" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn"]
 layout_mode = 2
-size_flags_horizontal = 3
-text = "覆写所选卷"
+theme_override_constants/separation = 10
+alignment = 2
 
-[node name="LoadSelectedButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ActionRowPrimary" unique_id=1590696203]
+[node name="DeleteSlotButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/ActionRowPrimary"]
+custom_minimum_size = Vector2(74, 54)
 layout_mode = 2
-size_flags_horizontal = 3
-text = "启读所选卷"
+text = "焚毁"
 
-[node name="ActionRowSecondary" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn" unique_id=36599509]
+[node name="CopySlotButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/ActionRowPrimary"]
+custom_minimum_size = Vector2(74, 54)
 layout_mode = 2
-theme_override_constants/separation = 8
+text = "另拓"
 
-[node name="CreateSlotButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ActionRowSecondary" unique_id=1883844798]
+[node name="SaveSelectedButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/ActionRowPrimary"]
+custom_minimum_size = Vector2(74, 54)
 layout_mode = 2
-size_flags_horizontal = 3
-text = "另录新卷"
+text = "覆写"
 
-[node name="RenameSlotButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ActionRowSecondary" unique_id=30180528]
+[node name="LoadSelectedButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/ActionRowPrimary"]
+custom_minimum_size = Vector2(74, 54)
 layout_mode = 2
-size_flags_horizontal = 3
-text = "更题卷名"
+text = "启读"
 
-[node name="CopySlotButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ActionRowSecondary" unique_id=233536397]
+[node name="ActionRowSecondary" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn"]
 layout_mode = 2
-size_flags_horizontal = 3
-text = "誊录副卷"
+theme_override_constants/separation = 10
+alignment = 2
 
-[node name="ActionRowTertiary" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn" unique_id=1406673880]
+[node name="CreateSlotButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/ActionRowSecondary"]
+custom_minimum_size = Vector2(86, 26)
 layout_mode = 2
-theme_override_constants/separation = 8
+text = "新卷"
 
-[node name="DeleteSlotButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ActionRowTertiary" unique_id=178203323]
+[node name="RefreshButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ScrollFrame/ScrollMargin/ScrollColumn/ActionRowSecondary"]
+custom_minimum_size = Vector2(86, 26)
 layout_mode = 2
-size_flags_horizontal = 3
-text = "焚毁所选卷"
-
-[node name="RefreshButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailColumn/ActionRowTertiary" unique_id=1366828023]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "重整卷录"
+text = "重整"
 
 [node name="FooterRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn" unique_id=307189814]
 layout_mode = 2
 alignment = 2
 
-[node name="CloseFooterButton" type="Button" parent="CenterLayer/Dialog/Margin/MainColumn/FooterRow" unique_id=1823106809]
-custom_minimum_size = Vector2(110, 34)
+[node name="CloseFooterButton" parent="CenterLayer/Dialog/Margin/MainColumn/FooterRow" instance=ExtResource("3_seal_confirm_button") unique_id=1823106809]
+custom_minimum_size = Vector2(116, 70)
 layout_mode = 2
 text = "合卷"
