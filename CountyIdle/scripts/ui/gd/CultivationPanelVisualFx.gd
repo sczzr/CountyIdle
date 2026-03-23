@@ -1,19 +1,19 @@
 extends Node
 
-const BG_DARK := Color(0.027, 0.035, 0.031, 0.98)
-const PANEL_DARK := Color(0.078, 0.094, 0.086, 0.82)
-const CARD_DARK := Color(0.094, 0.110, 0.102, 0.92)
-const CARD_DARK_ACTIVE := Color(0.125, 0.140, 0.130, 0.98)
-const PAPER_SOFT := Color(1, 1, 1, 0.06)
-const GOLD := Color(0.894, 0.753, 0.310, 1.0)
-const GOLD_DIM := Color(0.420, 0.384, 0.267, 1.0)
-const INK_MAIN := Color(0.910, 0.922, 0.914, 1.0)
-const INK_MUTED := Color(0.557, 0.596, 0.580, 1.0)
+const BG_DARK := Color(0.956, 0.945, 0.918, 0.98)
+const PANEL_DARK := Color(0.973, 0.965, 0.941, 0.96)
+const CARD_DARK := Color(0.988, 0.982, 0.965, 0.98)
+const CARD_DARK_ACTIVE := Color(0.995, 0.989, 0.973, 1.0)
+const PAPER_SOFT := Color(0.925, 0.902, 0.839, 0.12)
+const GOLD := Color(0.549, 0.451, 0.294, 1.0)
+const GOLD_DIM := Color(0.420, 0.353, 0.255, 0.95)
+const INK_MAIN := Color(0.173, 0.173, 0.173, 1.0)
+const INK_MUTED := Color(0.412, 0.384, 0.329, 1.0)
 const INK_DIM := Color(0.420, 0.384, 0.267, 0.85)
-const SEAL_RED := Color(0.639, 0.176, 0.176, 1.0)
-const POSITIVE := Color(0.247, 0.851, 0.659, 1.0)
+const SEAL_RED := Color(0.698, 0.133, 0.133, 1.0)
+const POSITIVE := Color(0.639, 0.780, 0.702, 1.0)
 const WARNING := Color(0.839, 0.698, 0.290, 1.0)
-const CALM := Color(0.839, 0.698, 0.290, 1.0)
+const CALM := Color(0.796, 0.863, 0.816, 1.0)
 # 修炼卷字体与标签纹理资源，保持与设计稿一致的书法气质。
 const FONT_TITLE := preload("res://assets/ui/fonts/MaShanZheng-Regular.ttf")
 const FONT_BODY := preload("res://assets/ui/fonts/NotoSerifSC[wght].ttf")
@@ -82,10 +82,13 @@ func _process(delta: float) -> void:
 func apply_theme_styles() -> void:
 	var root := get_parent()
 	_backdrop.color = BG_DARK
+	var hex_grid := root.get_node_or_null("HexGrid") as TextureRect
+	if hex_grid != null:
+		hex_grid.self_modulate = Color(0.55, 0.49, 0.36, 0.05)
 	_ring_dashed.texture = RING_DASHED_TEXTURE
 	_ring_thin.texture = RING_THIN_TEXTURE
-	_ring_dashed.self_modulate = Color(1, 1, 1, 0.85)
-	_ring_thin.self_modulate = Color(1, 1, 1, 0.55)
+	_ring_dashed.self_modulate = Color(0.52, 0.44, 0.29, 0.42)
+	_ring_thin.self_modulate = Color(0.52, 0.44, 0.29, 0.26)
 
 	for path in [
 		"ScreenMargin/ScreenRoot/FrameOuter",
@@ -130,6 +133,7 @@ func apply_theme_styles() -> void:
 		"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow/ActionPointBadge/ActionPointRow/ActionPointDot3"
 	]:
 		var dot: PanelContainer = root.get_node(path)
+		dot.rotation_degrees = 45.0
 		dot.add_theme_stylebox_override("panel", _create_action_point_dot_style(path.ends_with("Dot1")))
 
 	# 提示行左侧的绿色指示点。
@@ -721,30 +725,30 @@ func _create_panel_glass_style() -> StyleBoxFlat:
 	style.border_width_top = 1
 	style.border_width_right = 1
 	style.border_width_bottom = 1
-	style.border_color = Color(GOLD_DIM.r, GOLD_DIM.g, GOLD_DIM.b, 0.35)
-	style.corner_radius_top_left = 8
-	style.corner_radius_top_right = 8
-	style.corner_radius_bottom_right = 8
-	style.corner_radius_bottom_left = 8
-	style.shadow_color = Color(0, 0, 0, 0.65)
-	style.shadow_size = 28
-	style.shadow_offset = Vector2(0, 12)
+	style.border_color = Color(GOLD_DIM.r, GOLD_DIM.g, GOLD_DIM.b, 0.24)
+	style.corner_radius_top_left = 12
+	style.corner_radius_top_right = 12
+	style.corner_radius_bottom_right = 12
+	style.corner_radius_bottom_left = 12
+	style.shadow_color = Color(0.44, 0.35, 0.19, 0.10)
+	style.shadow_size = 22
+	style.shadow_offset = Vector2(0, 10)
 	return style
 
 
 func _create_footer_style() -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.035, 0.047, 0.043, 0.9)
+	style.bg_color = Color(0.975, 0.965, 0.941, 0.98)
 	style.border_width_left = 1
 	style.border_width_top = 1
 	style.border_width_right = 1
 	style.border_width_bottom = 1
-	style.border_color = Color(GOLD_DIM.r, GOLD_DIM.g, GOLD_DIM.b, 0.65)
+	style.border_color = Color(GOLD_DIM.r, GOLD_DIM.g, GOLD_DIM.b, 0.26)
 	style.corner_radius_top_left = 6
 	style.corner_radius_top_right = 6
 	style.corner_radius_bottom_right = 6
 	style.corner_radius_bottom_left = 6
-	style.shadow_color = Color(0, 0, 0, 0.55)
+	style.shadow_color = Color(0.44, 0.35, 0.19, 0.08)
 	style.shadow_size = 10
 	style.shadow_offset = Vector2(0, 6)
 	return style
@@ -772,16 +776,16 @@ func _create_track_box_style() -> StyleBoxFlat:
 
 func _create_action_point_badge_style() -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0, 0, 0, 0.55)
+	style.bg_color = Color(0.964, 0.975, 0.969, 0.82)
 	style.border_width_left = 1
 	style.border_width_top = 1
 	style.border_width_right = 1
 	style.border_width_bottom = 1
-	style.border_color = Color(1, 1, 1, 0.16)
-	style.corner_radius_top_left = 14
-	style.corner_radius_top_right = 14
-	style.corner_radius_bottom_right = 14
-	style.corner_radius_bottom_left = 14
+	style.border_color = Color(POSITIVE.r, POSITIVE.g, POSITIVE.b, 0.75)
+	style.corner_radius_top_left = 18
+	style.corner_radius_top_right = 18
+	style.corner_radius_bottom_right = 18
+	style.corner_radius_bottom_left = 18
 	style.content_margin_left = 12
 	style.content_margin_right = 12
 	style.content_margin_top = 6
@@ -797,6 +801,8 @@ func _create_effect_icon_style(bg_color: Color) -> StyleBoxFlat:
 	style.corner_radius_top_right = 4
 	style.corner_radius_bottom_right = 4
 	style.corner_radius_bottom_left = 4
+	style.shadow_color = Color(bg_color.r, bg_color.g, bg_color.b, 0.22)
+	style.shadow_size = 6
 	return style
 
 
@@ -813,12 +819,12 @@ func _create_tag_poly_style() -> StyleBoxTexture:
 
 func _create_core_glow_style() -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(GOLD.r, GOLD.g, GOLD.b, 0.02)
+	style.bg_color = Color(SEAL_RED.r, SEAL_RED.g, SEAL_RED.b, 0.02)
 	style.border_width_left = 1
 	style.border_width_top = 1
 	style.border_width_right = 1
 	style.border_width_bottom = 1
-	style.border_color = Color(GOLD.r, GOLD.g, GOLD.b, 0.15)
+	style.border_color = Color(SEAL_RED.r, SEAL_RED.g, SEAL_RED.b, 0.10)
 	style.corner_radius_top_left = 999
 	style.corner_radius_top_right = 999
 	style.corner_radius_bottom_right = 999
@@ -857,19 +863,19 @@ func _create_circle_style(is_outer: bool) -> StyleBoxFlat:
 	style.corner_radius_top_right = 120
 	style.corner_radius_bottom_right = 120
 	style.corner_radius_bottom_left = 120
-	style.shadow_color = Color(0, 0, 0, 0.45)
-	style.shadow_size = 12
+	style.shadow_color = Color(0.44, 0.35, 0.19, 0.12)
+	style.shadow_size = 10
 	return style
 
 
 func _create_badge_style() -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(GOLD.r, GOLD.g, GOLD.b, 0.03)
+	style.bg_color = Color(POSITIVE.r, POSITIVE.g, POSITIVE.b, 0.12)
 	style.border_width_left = 1
 	style.border_width_top = 1
 	style.border_width_right = 1
 	style.border_width_bottom = 1
-	style.border_color = Color(GOLD_DIM.r, GOLD_DIM.g, GOLD_DIM.b, 0.9)
+	style.border_color = Color(POSITIVE.r, POSITIVE.g, POSITIVE.b, 0.72)
 	style.corner_radius_top_left = 4
 	style.corner_radius_top_right = 4
 	style.corner_radius_bottom_right = 4
@@ -880,12 +886,12 @@ func _create_badge_style() -> StyleBoxFlat:
 # 圆角胶囊标签，用于“差事”类状态提示。
 func _create_tag_pill_style() -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0, 0, 0, 0.35)
+	style.bg_color = Color(POSITIVE.r, POSITIVE.g, POSITIVE.b, 0.12)
 	style.border_width_left = 2
 	style.border_width_top = 1
 	style.border_width_right = 1
 	style.border_width_bottom = 1
-	style.border_color = Color(GOLD_DIM.r, GOLD_DIM.g, GOLD_DIM.b, 0.8)
+	style.border_color = Color(POSITIVE.r, POSITIVE.g, POSITIVE.b, 0.72)
 	style.corner_radius_top_left = 999
 	style.corner_radius_top_right = 999
 	style.corner_radius_bottom_right = 999
@@ -896,12 +902,12 @@ func _create_tag_pill_style() -> StyleBoxFlat:
 # 返回圆钮（名册入口）的玉牌描边样式。
 func _create_back_icon_style() -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0, 0, 0, 0.3)
+	style.bg_color = Color(POSITIVE.r, POSITIVE.g, POSITIVE.b, 0.08)
 	style.border_width_left = 1
 	style.border_width_top = 1
 	style.border_width_right = 1
 	style.border_width_bottom = 1
-	style.border_color = Color(GOLD_DIM.r, GOLD_DIM.g, GOLD_DIM.b, 0.8)
+	style.border_color = Color(POSITIVE.r, POSITIVE.g, POSITIVE.b, 0.68)
 	style.corner_radius_top_left = 999
 	style.corner_radius_top_right = 999
 	style.corner_radius_bottom_right = 999
@@ -912,12 +918,12 @@ func _create_back_icon_style() -> StyleBoxFlat:
 # 当前运转周天状态槽的图标底板。
 func _create_footer_icon_style() -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(GOLD.r, GOLD.g, GOLD.b, 0.15)
+	style.bg_color = Color(SEAL_RED.r, SEAL_RED.g, SEAL_RED.b, 0.10)
 	style.border_width_left = 1
 	style.border_width_top = 1
 	style.border_width_right = 1
 	style.border_width_bottom = 1
-	style.border_color = Color(GOLD_DIM.r, GOLD_DIM.g, GOLD_DIM.b, 0.9)
+	style.border_color = Color(SEAL_RED.r, SEAL_RED.g, SEAL_RED.b, 0.62)
 	style.corner_radius_top_left = 6
 	style.corner_radius_top_right = 6
 	style.corner_radius_bottom_right = 6
@@ -929,18 +935,18 @@ func _create_footer_icon_style() -> StyleBoxFlat:
 func _create_action_point_dot_style(is_active: bool) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
 	if is_active:
-		style.bg_color = GOLD
+		style.bg_color = SEAL_RED
 		style.border_width_left = 0
 		style.border_width_top = 0
 		style.border_width_right = 0
 		style.border_width_bottom = 0
 	else:
-		style.bg_color = Color(0, 0, 0, 0.0)
+		style.bg_color = Color(POSITIVE.r, POSITIVE.g, POSITIVE.b, 0.10)
 		style.border_width_left = 1
 		style.border_width_top = 1
 		style.border_width_right = 1
 		style.border_width_bottom = 1
-		style.border_color = Color(GOLD_DIM.r, GOLD_DIM.g, GOLD_DIM.b, 0.6)
+		style.border_color = Color(POSITIVE.r, POSITIVE.g, POSITIVE.b, 0.88)
 	style.corner_radius_top_left = 999
 	style.corner_radius_top_right = 999
 	style.corner_radius_bottom_right = 999
@@ -962,26 +968,26 @@ func _create_hint_dot_style() -> StyleBoxFlat:
 # 卡片右上时辰徽记底板。
 func _create_time_badge_style() -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0, 0, 0, 0.35)
+	style.bg_color = Color(0.969, 0.957, 0.922, 0.92)
 	style.border_width_left = 1
 	style.border_width_top = 1
 	style.border_width_right = 1
 	style.border_width_bottom = 1
-	style.border_color = Color(1, 1, 1, 0.15)
-	style.corner_radius_top_left = 6
-	style.corner_radius_top_right = 6
-	style.corner_radius_bottom_right = 6
-	style.corner_radius_bottom_left = 6
-	style.content_margin_left = 6
-	style.content_margin_right = 6
-	style.content_margin_top = 2
-	style.content_margin_bottom = 2
+	style.border_color = Color(GOLD_DIM.r, GOLD_DIM.g, GOLD_DIM.b, 0.32)
+	style.corner_radius_top_left = 12
+	style.corner_radius_top_right = 12
+	style.corner_radius_bottom_right = 12
+	style.corner_radius_bottom_left = 12
+	style.content_margin_left = 4
+	style.content_margin_right = 4
+	style.content_margin_top = 8
+	style.content_margin_bottom = 8
 	return style
 
 
 func _create_seal_style() -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = GOLD
+	style.bg_color = SEAL_RED
 	style.border_width_left = 0
 	style.border_width_top = 0
 	style.border_width_right = 0
@@ -990,25 +996,25 @@ func _create_seal_style() -> StyleBoxFlat:
 	style.corner_radius_top_right = 2
 	style.corner_radius_bottom_right = 2
 	style.corner_radius_bottom_left = 2
-	style.shadow_color = Color(GOLD.r, GOLD.g, GOLD.b, 0.3)
+	style.shadow_color = Color(SEAL_RED.r, SEAL_RED.g, SEAL_RED.b, 0.22)
 	style.shadow_size = 6
 	return style
 
 
 func _create_effect_box_style() -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(GOLD.r, GOLD.g, GOLD.b, 0.06)
+	style.bg_color = Color(0.964, 0.959, 0.941, 0.88)
 	style.border_width_left = 1
 	style.border_width_top = 1
 	style.border_width_right = 1
 	style.border_width_bottom = 1
-	style.border_color = Color(GOLD.r, GOLD.g, GOLD.b, 0.38)
+	style.border_color = Color(GOLD_DIM.r, GOLD_DIM.g, GOLD_DIM.b, 0.22)
 	style.corner_radius_top_left = 4
 	style.corner_radius_top_right = 4
 	style.corner_radius_bottom_right = 4
 	style.corner_radius_bottom_left = 4
-	style.shadow_color = Color(0, 0, 0, 0.25)
-	style.shadow_size = 6
+	style.shadow_color = Color(0.44, 0.35, 0.19, 0.06)
+	style.shadow_size = 4
 	style.shadow_offset = Vector2(0, 4)
 	return style
 
@@ -1016,28 +1022,28 @@ func _create_effect_box_style() -> StyleBoxFlat:
 func _create_action_card_box(is_hovered: bool, is_active: bool, is_disabled: bool = false) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
 	var background := CARD_DARK
-	var border := Color(GOLD_DIM.r, GOLD_DIM.g, GOLD_DIM.b, 0.45)
-	var shadow_color := Color(0, 0, 0, 0.6)
+	var border := Color(GOLD_DIM.r, GOLD_DIM.g, GOLD_DIM.b, 0.22)
+	var shadow_color := Color(0.44, 0.35, 0.19, 0.07)
 	var shadow_offset := Vector2(0, 10)
-	var shadow_size := 18
+	var shadow_size := 12
 	if is_hovered and not is_disabled:
 		background = Color(CARD_DARK_ACTIVE.r, CARD_DARK_ACTIVE.g, CARD_DARK_ACTIVE.b, 0.95)
-		border = GOLD
-		shadow_color = Color(GOLD.r, GOLD.g, GOLD.b, 0.24)
+		border = Color(GOLD.r, GOLD.g, GOLD.b, 0.55)
+		shadow_color = Color(GOLD.r, GOLD.g, GOLD.b, 0.12)
 		shadow_offset = Vector2.ZERO
-		shadow_size = 26
+		shadow_size = 16
 	if is_active and not is_disabled:
 		background = CARD_DARK_ACTIVE
-		border = GOLD
-		shadow_color = Color(GOLD.r, GOLD.g, GOLD.b, 0.32)
+		border = SEAL_RED
+		shadow_color = Color(SEAL_RED.r, SEAL_RED.g, SEAL_RED.b, 0.14)
 		shadow_offset = Vector2.ZERO
-		shadow_size = 28
+		shadow_size = 18
 	if is_disabled:
-		background = Color(CARD_DARK.r, CARD_DARK.g, CARD_DARK.b, 0.35)
-		border = Color(GOLD_DIM.r, GOLD_DIM.g, GOLD_DIM.b, 0.25)
-		shadow_color = Color(0, 0, 0, 0.2)
+		background = Color(CARD_DARK.r, CARD_DARK.g, CARD_DARK.b, 0.55)
+		border = Color(GOLD_DIM.r, GOLD_DIM.g, GOLD_DIM.b, 0.12)
+		shadow_color = Color(0.44, 0.35, 0.19, 0.04)
 		shadow_offset = Vector2(0, 6)
-		shadow_size = 10
+		shadow_size = 6
 	style.bg_color = background
 	style.border_width_left = 1
 	style.border_width_top = 1
@@ -1046,10 +1052,10 @@ func _create_action_card_box(is_hovered: bool, is_active: bool, is_disabled: boo
 	if is_active:
 		style.border_width_top = 2
 	style.border_color = border
-	style.corner_radius_top_left = 8
-	style.corner_radius_top_right = 8
-	style.corner_radius_bottom_right = 8
-	style.corner_radius_bottom_left = 8
+	style.corner_radius_top_left = 12
+	style.corner_radius_top_right = 12
+	style.corner_radius_bottom_right = 12
+	style.corner_radius_bottom_left = 12
 	style.shadow_color = shadow_color
 	style.shadow_size = shadow_size
 	style.shadow_offset = shadow_offset
@@ -1059,8 +1065,8 @@ func _create_action_card_box(is_hovered: bool, is_active: bool, is_disabled: boo
 func _create_nav_box(is_hovered: bool, is_left: bool, is_disabled: bool = false) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
 	var bg_alpha := 0.18 if is_hovered else 0.10
-	var border_alpha := 0.65 if is_hovered else 0.45
-	style.bg_color = Color(0.06, 0.08, 0.07, bg_alpha)
+	var border_alpha := 0.72 if is_hovered else 0.48
+	style.bg_color = Color(POSITIVE.r, POSITIVE.g, POSITIVE.b, bg_alpha)
 	style.border_width_left = 1
 	style.border_width_right = 1
 	style.border_width_top = 1
@@ -1075,16 +1081,16 @@ func _create_nav_box(is_hovered: bool, is_left: bool, is_disabled: bool = false)
 
 func _create_roster_button_box(is_hovered: bool, is_active: bool = false, is_disabled: bool = false) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	var bg_alpha := 0.05
-	var border_alpha := 0.18
-	var shadow_alpha := 0.08
+	var bg_alpha := 0.10
+	var border_alpha := 0.10
+	var shadow_alpha := 0.04
 	if is_hovered:
-		bg_alpha = 0.10
-		border_alpha = 0.28
-	if is_active:
 		bg_alpha = 0.16
-		border_alpha = 0.58
-		shadow_alpha = 0.18
+		border_alpha = 0.22
+	if is_active:
+		bg_alpha = 0.22
+		border_alpha = 0.38
+		shadow_alpha = 0.08
 	if is_disabled:
 		bg_alpha = 0.03
 		border_alpha = 0.10
@@ -1099,24 +1105,24 @@ func _create_roster_button_box(is_hovered: bool, is_active: bool = false, is_dis
 		style.border_width_right = 2
 		style.border_width_bottom = 2
 	style.border_color = Color(GOLD.r, GOLD.g, GOLD.b, border_alpha)
-	style.corner_radius_top_left = 8
-	style.corner_radius_top_right = 8
-	style.corner_radius_bottom_right = 8
-	style.corner_radius_bottom_left = 8
+	style.corner_radius_top_left = 10
+	style.corner_radius_top_right = 10
+	style.corner_radius_bottom_right = 10
+	style.corner_radius_bottom_left = 10
 	style.content_margin_left = 10
 	style.content_margin_top = 8
 	style.content_margin_right = 10
 	style.content_margin_bottom = 8
 	style.shadow_color = Color(GOLD.r, GOLD.g, GOLD.b, shadow_alpha)
-	style.shadow_size = 6 if not is_active else 10
+	style.shadow_size = 4 if not is_active else 8
 	return style
 
 
 func _create_close_box(is_hovered: bool) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	var bg_alpha := 0.5
-	var border_alpha := 0.6
-	style.bg_color = Color(0, 0, 0, bg_alpha)
+	var bg_alpha := 0.06
+	var border_alpha := 0.32
+	style.bg_color = Color(POSITIVE.r, POSITIVE.g, POSITIVE.b, bg_alpha)
 	style.border_width_left = 1
 	style.border_width_top = 1
 	style.border_width_right = 1
@@ -1131,7 +1137,7 @@ func _create_close_box(is_hovered: bool) -> StyleBoxFlat:
 
 func _create_progress_background() -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(1, 1, 1, 0.06)
+	style.bg_color = Color(POSITIVE.r, POSITIVE.g, POSITIVE.b, 0.18)
 	style.corner_radius_top_left = 2
 	style.corner_radius_top_right = 2
 	style.corner_radius_bottom_right = 2
@@ -1146,7 +1152,7 @@ func _create_progress_fill(fill_color: Color) -> StyleBoxFlat:
 	style.corner_radius_top_right = 2
 	style.corner_radius_bottom_right = 2
 	style.corner_radius_bottom_left = 2
-	style.shadow_color = Color(GOLD.r, GOLD.g, GOLD.b, 0.35)
+	style.shadow_color = Color(fill_color.r, fill_color.g, fill_color.b, 0.22)
 	style.shadow_size = 6
 	return style
 

@@ -6,261 +6,234 @@
     <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@300;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --paper: #f2ede4;
+            --paper: #f4f1ea;
             --ink: #2c2c2c;
-            --cord: #b22222;
-            --gold: #8c734b;
+            --cord: #3d2b1f;
+            --seal: #b22222;
+            --unit: 0.85vh;
         }
 
         body {
+            margin: 0;
+            height: 100vh;
             background-color: var(--paper);
-            background-image: url('https://www.transparenttextures.com/patterns/handmade-paper.png');
             font-family: 'Noto Serif SC', serif;
             overflow: hidden;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .font-calligraphy { font-family: 'Ma Shan Zheng', cursive; }
-
-        /* --- 动态水墨背景装饰 --- */
-        .ink-blur {
-            position: absolute;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(0,0,0,0.05) 0%, transparent 70%);
-            filter: blur(50px);
-            z-index: -1;
-            animation: drift 20s infinite alternate;
-        }
-        @keyframes drift {
-            from { transform: translate(-10%, -10%) scale(1); }
-            to { transform: translate(10%, 10%) scale(1.1); }
-        }
-
-        /* --- 标题区域 --- */
-        .game-title-wrap {
-            text-align: center;
-            margin-bottom: 5rem;
-            position: relative;
-        }
-        .main-title {
-            font-size: 8rem;
-            color: var(--ink);
-            line-height: 1;
-            letter-spacing: 0.2em;
-            text-shadow: 4px 4px 0px rgba(0,0,0,0.05);
-            position: relative;
-        }
-        .sub-title {
-            font-size: 1rem;
-            letter-spacing: 1.2em;
-            color: var(--gold);
-            margin-top: 1rem;
-            margin-left: 1.2em; /* 修正间距 */
-        }
-
-        /* --- 卷轴式菜单 --- */
-        .menu-container {
-            display: flex;
-            gap: 2rem;
-            justify-content: center;
-        }
-
-        .scroll-item {
-            position: relative;
-            width: 60px;
-            height: 240px;
-            cursor: pointer;
-            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-        }
-
-        /* 卷轴画心 */
-        .scroll-body {
-            position: absolute;
-            top: 0; left: 50%;
-            transform: translateX(-50%);
-            width: 45px;
-            height: 100%;
-            background: #fffdf9;
-            border: 1px solid rgba(140, 115, 75, 0.3);
-            box-shadow: 2px 5px 15px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            writing-mode: vertical-rl;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--ink);
-            letter-spacing: 0.5em;
-            transition: all 0.4s;
-            z-index: 2;
-        }
-
-        /* 卷轴轴柄 */
-        .scroll-axis {
-            position: absolute;
-            width: 54px;
-            height: 12px;
-            background: linear-gradient(to right, #1a1a1a, #444, #1a1a1a);
-            border-radius: 3px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 3;
-        }
-        .axis-top { top: -6px; }
-        .axis-bottom { bottom: -6px; }
-
-        /* 悬停效果：卷轴拉长并变亮 */
-        .scroll-item:hover {
-            transform: translateY(-10px);
-        }
-        .scroll-item:hover .scroll-body {
-            height: 260px;
-            background: #ffffff;
-            color: var(--cord);
-            box-shadow: 5px 15px 30px rgba(0,0,0,0.15);
-        }
-
-        /* --- 底部印章主按钮 --- */
-        .start-seal-wrap {
-            position: absolute;
-            bottom: 10%;
             display: flex;
             flex-direction: column;
             align-items: center;
-        }
-
-        .seal-btn {
-            width: 100px;
-            height: 100px;
-            background: var(--cord);
-            display: flex;
-            align-items: center;
             justify-content: center;
-            color: var(--paper);
-            font-family: 'Ma Shan Zheng';
-            font-size: 2.5rem;
-            cursor: pointer;
-            box-shadow: 0 0 0 5px var(--paper), 0 0 0 8px var(--cord), 5px 10px 20px rgba(0,0,0,0.2);
-            transition: all 0.3s;
-            clip-path: polygon(2% 5%, 98% 3%, 95% 95%, 5% 98%);
+        }
+
+        /* --- 背景纸纹 --- */
+        .paper-overlay {
+            position: fixed; inset: 0; z-index: -1; pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paperGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='5' result='noise'/%3E%3CfeDiffuseLighting in='noise' lighting-color='%23f4f1ea' surfaceScale='2'%3E%3CfeDistantLight azimuth='45' elevation='60'/%3E%3C/feDiffuseLighting%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paperGrain)' opacity='0.5'/%3E%3C/svg%3E");
+        }
+
+        /* --- 诗文瀑布 --- */
+        .poem-waterfall {
+            position: fixed;
+            top: -100%;
+            writing-mode: vertical-rl;
+            color: var(--ink);
+            opacity: 0;
+            white-space: nowrap;
             user-select: none;
+            pointer-events: none;
+            z-index: 1;
+            font-family: 'Noto Serif SC', serif;
+            letter-spacing: 0.6em;
+            animation: waterfall linear infinite;
         }
 
-        .seal-btn:hover {
-            transform: scale(1.05) rotate(2deg);
-            background: #c22d2d;
+        @keyframes waterfall {
+            0% { transform: translateY(-20%); opacity: 0; }
+            10% { opacity: 0.06; }
+            90% { opacity: 0.06; }
+            100% { transform: translateY(150vh); opacity: 0; }
         }
 
-        .seal-btn:active {
-            transform: scale(0.95);
-            box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--cord);
+        /* --- 标题 --- */
+        .title-wrap {
+            text-align: center;
+            margin-bottom: calc(10 * var(--unit));
+            z-index: 10;
+        }
+        .main-title {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: calc(12 * var(--unit));
+            color: var(--ink);
+            letter-spacing: 0.25em;
         }
 
-        .hint-text {
-            margin-top: 1.5rem;
-            font-size: 0.75rem;
-            color: var(--gold);
-            letter-spacing: 0.4em;
-            animation: blink 2s infinite;
+        /* --- 菜单容器 --- */
+        .menu-container {
+            display: flex;
+            gap: calc(24 * var(--unit));
+            perspective: 2000px;
+            z-index: 10;
         }
 
-        @keyframes blink {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.8; }
+        .jade-group {
+            position: relative;
+            width: calc(9 * var(--unit));
+            height: calc(42 * var(--unit));
+            cursor: pointer;
         }
 
-        /* 装饰用红绳 */
-        .decoration-cord {
-            position: absolute;
-            top: 0;
-            width: 2px;
-            height: 100px;
-            background: var(--cord);
-            opacity: 0.6;
+        /* --- 纯净玉简 (去除了内部白线路径) --- */
+        .jade-leaf {
+            position: absolute; top: 0; left: 0;
+            width: calc(9 * var(--unit));
+            height: calc(42 * var(--unit));
+            /* 重新设计的 SVG：移除了 path 线条，保留了温润渐变和孔洞 */
+            background-image: url("data:image/svg+xml,%3Csvg width='44' height='190' viewBox='0 0 44 190' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='j' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23fdfdfd' /%3E%3Cstop offset='100%25' style='stop-color:%23cbdcd0' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='2' y='2' width='40' height='186' rx='5' fill='url(%23j)' stroke='rgba(0,0,0,0.08)' stroke-width='1'/%3E%3Ccircle cx='22' cy='18' r='3' fill='%233d2b1f' /%3E%3Ccircle cx='22' cy='172' r='3' fill='%233d2b1f' /%3E%3C/svg%3E");
+            background-size: 100% 100%;
+            transition: all 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+            display: flex; align-items: center; justify-content: center;
+            writing-mode: vertical-rl;
+            font-family: 'Ma Shan Zheng', cursive;
+            overflow: hidden;
         }
+
+        .main-leaf {
+            z-index: 20;
+            font-size: calc(3.2 * var(--unit));
+            color: var(--ink);
+            filter: drop-shadow(0.6vh 1vh 1.2vh rgba(0,0,0,0.1));
+        }
+
+        .side-leaf {
+            z-index: 10;
+            font-size: calc(1.9 * var(--unit));
+            color: rgba(44,44,44,0.4);
+            opacity: 0;
+            transform: scaleY(0.94);
+        }
+
+        /* --- 交互展开 --- */
+        .jade-group:hover .main-leaf { 
+            color: var(--seal); 
+            transform: translateY(calc(-2 * var(--unit))); 
+        }
+        .jade-group:hover .leaf-left { 
+            opacity: 1; 
+            transform: translateX(calc(-10.2 * var(--unit))) scaleY(0.94) rotate(-4deg); 
+        }
+        .jade-group:hover .leaf-right { 
+            opacity: 1; 
+            transform: translateX(calc(10.2 * var(--unit))) scaleY(0.94) rotate(4deg); 
+        }
+
+        .jade-leaf span { letter-spacing: 0.3em; padding: calc(2 * var(--unit)) 0; }
+
+        /* --- 右下角落款 --- */
+        .seal-box {
+            position: fixed; bottom: calc(6 * var(--unit)); right: calc(6 * var(--unit));
+            width: calc(10 * var(--unit)); height: calc(10 * var(--unit));
+            border: calc(0.35 * var(--unit)) solid var(--seal);
+            display: grid; grid-template-columns: 1fr 1fr;
+            color: var(--seal); font-family: 'Ma Shan Zheng', cursive;
+            font-size: calc(3.5 * var(--unit)); 
+            opacity: 0.8; transform: rotate(-2deg);
+            pointer-events: none;
+        }
+        .seal-box div { display: flex; align-items: center; justify-content: center; writing-mode: vertical-rl; line-height: 1.1; }
     </style>
 </head>
 <body>
+    <div class="paper-overlay"></div>
+    
+    <!-- 诗文瀑布容器 -->
+    <div id="waterfall-container"></div>
 
-    <!-- 背景装饰 -->
-    <div class="ink-blur" style="top: 10%; left: 15%;"></div>
-    <div class="ink-blur" style="bottom: 10%; right: 15%;"></div>
+    <header class="title-wrap">
+        <h1 class="main-title">山海機局</h1>
+        <p class="text-stone-400 tracking-[1.5em] text-[1.2vh] mt-4 ml-6 uppercase">Shanhai Strategy</p>
+    </header>
 
-    <!-- 装饰红绳 -->
-    <div class="decoration-cord" style="left: 10%;"></div>
-    <div class="decoration-cord" style="left: calc(10% + 4px);"></div>
-
-    <div class="flex flex-col items-center">
-        <!-- 游戏标题 -->
-        <div class="game-title-wrap">
-            <h1 class="main-title font-calligraphy">山海機局</h1>
-            <p class="sub-title uppercase">Shanhai Strategy Chronicles</p>
+    <main class="menu-container">
+        <!-- 1. 开始 -->
+        <div class="jade-group">
+            <div class="jade-leaf side-leaf leaf-left"><span>云深不知处</span></div>
+            <div class="jade-leaf main-leaf"><span>踏入仙途</span></div>
+            <div class="jade-leaf side-leaf leaf-right"><span>山海觅长生</span></div>
         </div>
-
-        <!-- 菜单选项 -->
-        <nav class="menu-container">
-            <!-- 每一个 scroll-item 都是一个菜单项 -->
-            <div class="scroll-item" onclick="navigate('new')">
-                <div class="scroll-axis axis-top"></div>
-                <div class="scroll-body font-calligraphy">初入仙途</div>
-                <div class="scroll-axis axis-bottom"></div>
-            </div>
-
-            <div class="scroll-item" onclick="navigate('load')">
-                <div class="scroll-axis axis-top"></div>
-                <div class="scroll-body font-calligraphy">舊夢重溫</div>
-                <div class="scroll-axis axis-bottom"></div>
-            </div>
-
-            <div class="scroll-item" onclick="navigate('settings')">
-                <div class="scroll-axis axis-top"></div>
-                <div class="scroll-body font-calligraphy">修法配置</div>
-                <div class="scroll-axis axis-bottom"></div>
-            </div>
-
-            <div class="scroll-item" onclick="window.close()">
-                <div class="scroll-axis axis-top"></div>
-                <div class="scroll-body font-calligraphy">切斷因果</div>
-                <div class="scroll-axis axis-bottom"></div>
-            </div>
-        </nav>
-
-        <!-- 主入口：盖章开始 -->
-        <div class="start-seal-wrap">
-            <div class="seal-btn" onclick="startGame()">入世</div>
-            <p class="hint-text">—— 击印以开启画卷 ——</p>
+        <!-- 2. 读取 -->
+        <div class="jade-group">
+            <div class="jade-leaf side-leaf leaf-left"><span>梦回旧山河</span></div>
+            <div class="jade-leaf main-leaf"><span>往昔因果</span></div>
+            <div class="jade-leaf side-leaf leaf-right"><span>缘起落花时</span></div>
         </div>
+        <!-- 3. 设置 -->
+        <div class="jade-group">
+            <div class="jade-leaf side-leaf leaf-left"><span>乾坤归造化</span></div>
+            <div class="jade-leaf main-leaf"><span>万象方寸</span></div>
+            <div class="jade-leaf side-leaf leaf-right"><span>静思理玄机</span></div>
+        </div>
+        <!-- 4. MOD -->
+        <div class="jade-group">
+            <div class="jade-leaf side-leaf leaf-left"><span>旁門参造化</span></div>
+            <div class="jade-leaf main-leaf"><span>奇門遁甲</span></div>
+            <div class="jade-leaf side-leaf leaf-right"><span>幻影变乾坤</span></div>
+        </div>
+        <!-- 5. 退出 -->
+        <div class="jade-group">
+            <div class="jade-leaf side-leaf leaf-left"><span>挥袖远红尘</span></div>
+            <div class="jade-leaf main-leaf"><span>离线归真</span></div>
+            <div class="jade-leaf side-leaf leaf-right"><span>拂衣入大荒</span></div>
+        </div>
+    </main>
+
+    <!-- 落款 -->
+    <div class="seal-box">
+        <div>谨</div><div>山</div>
+        <div>制</div><div>海</div>
     </div>
 
-    <!-- 底部版本信息 -->
-    <footer class="absolute bottom-6 w-full text-center">
-        <p class="text-[10px] text-stone-400 tracking-widest font-light">
-            天機閣出品 &copy; 庚子年三月 | VERSION 0.9.2 BETA
-        </p>
-    </footer>
-
     <script>
-        function startGame() {
-            // 播放一个简单的点击反馈
-            console.log("游戏开始，进入过场动画...");
-            document.body.style.transition = "all 1.5s";
-            document.body.style.backgroundColor = "#2c2c2c";
-            document.body.style.opacity = "0";
+        const poems = [
+            "北冥有鱼，其名为鲲。鲲之大，不知其几千里也。",
+            "天地与我并生，而万物与我为一。",
+            "道可道，非常道；名可名，非常名。",
+            "上善若水。水善利万物而不争。",
+            "飘飘乎如遗世独立，羽化而登仙。",
+            "御剑乘风来，除魔天地间。",
+            "山不在高，有仙则名；水不在深，有龙则灵。",
+            "天之道，损有余而补不足。",
+            "夫英雄者，胸怀大志，腹有良谋。",
+            "所谓太极，无极而生，动静之机也。"
+        ];
+
+        const container = document.getElementById('waterfall-container');
+        const poemCount = 14; 
+
+        function createPoemLine() {
+            const line = document.createElement('div');
+            line.className = 'poem-waterfall';
+            line.innerText = poems[Math.floor(Math.random() * poems.length)];
             
-            setTimeout(() => {
-                alert("乾坤倒转，正在进入山海世界...");
-                // 此处跳转到你的主游戏页面
-                // window.location.href = "主页.html";
-            }, 1000);
+            const leftPos = Math.random() * 100;
+            const duration = 20 + Math.random() * 25; 
+            const delay = Math.random() * -30;
+            const fontSize = 1.4 + Math.random() * 1.6; 
+            
+            line.style.left = leftPos + 'vw';
+            line.style.animationDuration = duration + 's';
+            line.style.animationDelay = delay + 's';
+            line.style.fontSize = fontSize + 'vh';
+            
+            container.appendChild(line);
+
+            line.addEventListener('animationiteration', () => {
+                line.innerText = poems[Math.floor(Math.random() * poems.length)];
+                line.style.left = Math.random() * 100 + 'vw';
+            });
         }
 
-        function navigate(type) {
-            console.log("导航至: " + type);
-            // 这里可以添加对应的逻辑
+        for (let i = 0; i < poemCount; i++) {
+            createPoemLine();
         }
     </script>
 </body>

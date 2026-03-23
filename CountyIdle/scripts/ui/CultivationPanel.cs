@@ -119,16 +119,20 @@ public partial class CultivationPanel : PopupPanelBase
 
 	private static readonly string[] ChineseTierDigits = ["零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖"];
 	private const float RosterMutedAlpha = 0.55f;
+	private static readonly Color HeartSlotActiveFill = new(0.698f, 0.133f, 0.133f, 0.96f);
+	private static readonly Color HeartSlotActiveBorder = new(0.698f, 0.133f, 0.133f, 1f);
+	private static readonly Color HeartSlotIdleFill = new(0.796f, 0.863f, 0.816f, 0.10f);
+	private static readonly Color HeartSlotIdleBorder = new(0.796f, 0.863f, 0.816f, 0.92f);
 	/// <summary>
 	/// 火候菱形刻度的常规/填充样式，避免每次刷新都新建样式对象。
 	/// </summary>
 	private static readonly StyleBoxFlat DiamondEmptyStyle = BuildDiamondStyle(
-		new Color(0f, 0f, 0f, 0.45f),
-		new Color(0.42f, 0.38f, 0.27f, 0.9f),
+		new Color(0.796f, 0.863f, 0.816f, 0.08f),
+		new Color(0.725f, 0.804f, 0.757f, 0.85f),
 		false);
 	private static readonly StyleBoxFlat DiamondFilledStyle = BuildDiamondStyle(
-		new Color(0.894f, 0.753f, 0.310f, 1f),
-		new Color(1f, 1f, 1f, 0.9f),
+		new Color(0.639f, 0.780f, 0.702f, 0.98f),
+		new Color(0.929f, 0.973f, 0.949f, 0.96f),
 		true);
 
 	private Label _populationValueLabel = null!;
@@ -150,11 +154,13 @@ public partial class CultivationPanel : PopupPanelBase
 	private Label _selectedDiscipleStatusLabel = null!;
 	private Label _selectedDiscipleStatusHighlightLabel = null!;
 	private Label _selectedDiscipleInsightLabel = null!;
+	private Label _heartSlotTitleLabel = null!;
 	private Button _previousDiscipleButton = null!;
 	private Button _nextDiscipleButton = null!;
 	private Button? _closeButton;
 	private VBoxContainer _discipleRosterList = null!;
 	private Button _discipleRosterButtonTemplate = null!;
+	private readonly List<PanelContainer> _heartSlots = [];
 	private Node? _visualFx;
 
 	private readonly Dictionary<DiscipleCultivationAssignmentType, ActionCard> _actionCards = new();
@@ -291,11 +297,25 @@ public partial class CultivationPanel : PopupPanelBase
 		_selectedDiscipleStatusLabel = GetNode<Label>("ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/FocusFooter/FooterMargin/FooterColumn/FooterHeaderRow/FooterTextColumn/SelectedDiscipleStatusLabel");
 		_selectedDiscipleStatusHighlightLabel = GetNode<Label>("ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/FocusFooter/FooterMargin/FooterColumn/FooterHeaderRow/SelectedDiscipleStatusHighlightLabel");
 		_selectedDiscipleInsightLabel = GetNode<Label>("ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/FocusFooter/FooterMargin/FooterColumn/SelectedDiscipleInsightLabel");
+		_heartSlotTitleLabel = GetNode<Label>("ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow/ActionPointBadge/ActionPointRow/ActionPointTextLabel");
 		_previousDiscipleButton = GetNode<Button>("ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/DiscipleNavRow/PreviousDiscipleButton");
 		_nextDiscipleButton = GetNode<Button>("ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/DiscipleNavRow/NextDiscipleButton");
 		// 响应式改版期间顶部返回层可能尚未接回，关闭按钮允许缺席并由其他入口兜底关闭。
 		_closeButton = GetNodeOrNull<Button>("TopOverlay/TopMargin/TopRow/CloseButton");
 		_visualFx = GetNodeOrNull<Node>("VisualFx");
+		_heartSlots.Clear();
+		foreach (var heartPath in new[]
+		{
+			"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow/ActionPointBadge/ActionPointRow/ActionPointDot1",
+			"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow/ActionPointBadge/ActionPointRow/ActionPointDot2",
+			"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow/ActionPointBadge/ActionPointRow/ActionPointDot3"
+		})
+		{
+			if (GetNodeOrNull<PanelContainer>(heartPath) is { } heartSlot)
+			{
+				_heartSlots.Add(heartSlot);
+			}
+		}
 	}
 
 	private void BindEvents()
@@ -542,6 +562,8 @@ public partial class CultivationPanel : PopupPanelBase
 			_selectedDiscipleStatusHighlightLabel.Text = "未运转";
 			_selectedDiscipleStatusHighlightLabel.Visible = true;
 			_selectedDiscipleInsightLabel.Visible = false;
+			_heartSlotTitleLabel.Text = "玲珑心位";
+			RefreshHeartSlots(null, DiscipleCultivationAssignmentType.None);
 			_previousDiscipleButton.Disabled = true;
 			_nextDiscipleButton.Disabled = true;
 			return;
@@ -562,21 +584,22 @@ public partial class CultivationPanel : PopupPanelBase
 		_coreLetterLabel.Text = ResolveCoreGlyph(profile.Name);
 		_footerIconLabel.Text = ResolveAssignmentGlyph(assignment);
 		// 状态槽仅保留短文案，避免长段说明挤压卷面。
-		_footerTitleLabel.Text = "当前运转周天";
+		_footerTitleLabel.Text = "敕令批注";
 		if (assignment == DiscipleCultivationAssignmentType.None)
 		{
 			_selectedDiscipleStatusLabel.Text = "待命修炼";
-			_selectedDiscipleStatusHighlightLabel.Text = "待命";
+			_selectedDiscipleStatusHighlightLabel.Text = "未落印";
 			_selectedDiscipleStatusHighlightLabel.Visible = true;
 		}
 		else
 		{
 			_selectedDiscipleStatusLabel.Text = assignmentText;
-			_selectedDiscipleStatusHighlightLabel.Text = "运转中";
+			_selectedDiscipleStatusHighlightLabel.Text = "已落印";
 			_selectedDiscipleStatusHighlightLabel.Visible = true;
 		}
 		_selectedDiscipleInsightLabel.Text = $"最近感悟：{latestInsight}";
 		_selectedDiscipleInsightLabel.Visible = false;
+		RefreshHeartSlots(profile, assignment);
 
 		var canStep = _profiles.Count > 1;
 		_previousDiscipleButton.Disabled = !canStep;
@@ -777,6 +800,34 @@ public partial class CultivationPanel : PopupPanelBase
 		effectPanel.AddThemeStyleboxOverride("panel", BuildActionEffectStyle(isActive));
 	}
 
+	/// <summary>
+	/// 根据弟子资质显示玲珑心位数量，并用朱砂落印表示当前主修已选中。
+	/// </summary>
+	private void RefreshHeartSlots(DiscipleProfile? profile, DiscipleCultivationAssignmentType assignmentType)
+	{
+		if (_heartSlots.Count <= 0)
+		{
+			return;
+		}
+
+		var availableSlots = profile == null ? 0 : ResolveHeartSlotCount(profile);
+		var activeSlots = profile == null || assignmentType == DiscipleCultivationAssignmentType.None ? 0 : 1;
+		for (var index = 0; index < _heartSlots.Count; index++)
+		{
+			var heartSlot = _heartSlots[index];
+			var isUnlocked = index < availableSlots;
+			var isActive = index < activeSlots;
+			heartSlot.Visible = true;
+			heartSlot.Modulate = new Color(1f, 1f, 1f, isUnlocked ? 1f : 0.22f);
+			heartSlot.AddThemeStyleboxOverride("panel", BuildHeartSlotStyle(isActive));
+			heartSlot.TooltipText = !isUnlocked
+				? "此枚玲珑心位尚未开显。"
+				: isActive
+					? $"当前敕令已落于第 {index + 1} 枚玲珑心位。"
+					: $"第 {index + 1} 枚玲珑心位待命，可承下一道敕令。";
+		}
+	}
+
 	private static void ApplyActionIconStyle(PanelContainer iconBadge, Label iconLabel, bool isActive)
 	{
 		iconBadge.AddThemeStyleboxOverride("panel", BuildActionIconStyle(isActive));
@@ -793,16 +844,16 @@ public partial class CultivationPanel : PopupPanelBase
 
 		if (isActive)
 		{
-			style.BgColor = new Color(0.894f, 0.753f, 0.310f, 0.03f);
+			style.BgColor = new Color(0.945f, 0.882f, 0.741f, 0.35f);
 			style.BorderWidthLeft = 1;
 			style.BorderWidthTop = 1;
 			style.BorderWidthRight = 1;
 			style.BorderWidthBottom = 1;
-			style.BorderColor = new Color(0.894f, 0.753f, 0.310f, 0.3f);
+			style.BorderColor = new Color(0.698f, 0.133f, 0.133f, 0.26f);
 			return style;
 		}
 
-		style.BgColor = new Color(0f, 0f, 0f, 0.3f);
+		style.BgColor = new Color(0.917f, 0.945f, 0.929f, 0.35f);
 		return style;
 	}
 
@@ -816,18 +867,18 @@ public partial class CultivationPanel : PopupPanelBase
 
 		if (isActive)
 		{
-			style.BgColor = new Color(0.894f, 0.753f, 0.310f, 1f);
-			style.ShadowColor = new Color(0.894f, 0.753f, 0.310f, 0.3f);
+			style.BgColor = new Color(0.698f, 0.133f, 0.133f, 1f);
+			style.ShadowColor = new Color(0.698f, 0.133f, 0.133f, 0.28f);
 			style.ShadowSize = 8;
 			return style;
 		}
 
-		style.BgColor = new Color(0.894f, 0.753f, 0.310f, 0.03f);
+		style.BgColor = new Color(0.796f, 0.863f, 0.816f, 0.18f);
 		style.BorderWidthLeft = 1;
 		style.BorderWidthTop = 1;
 		style.BorderWidthRight = 1;
 		style.BorderWidthBottom = 1;
-		style.BorderColor = new Color(0.42f, 0.38f, 0.27f, 0.9f);
+		style.BorderColor = new Color(0.725f, 0.804f, 0.757f, 0.95f);
 		return style;
 	}
 
@@ -849,8 +900,32 @@ public partial class CultivationPanel : PopupPanelBase
 		style.CornerRadiusBottomLeft = 2;
 		if (withGlow)
 		{
-			style.ShadowColor = new Color(0.894f, 0.753f, 0.310f, 0.6f);
+			style.ShadowColor = new Color(0.639f, 0.780f, 0.702f, 0.45f);
 			style.ShadowSize = 6;
+		}
+		return style;
+	}
+
+	/// <summary>
+	/// 玲珑心位的菱形槽位样式：未激活时为玉色描边，激活后转为朱砂印记。
+	/// </summary>
+	private static StyleBoxFlat BuildHeartSlotStyle(bool isActive)
+	{
+		var style = new StyleBoxFlat();
+		style.CornerRadiusTopLeft = 4;
+		style.CornerRadiusTopRight = 4;
+		style.CornerRadiusBottomRight = 4;
+		style.CornerRadiusBottomLeft = 4;
+		style.BgColor = isActive ? HeartSlotActiveFill : HeartSlotIdleFill;
+		style.BorderWidthLeft = 1;
+		style.BorderWidthTop = 1;
+		style.BorderWidthRight = 1;
+		style.BorderWidthBottom = 1;
+		style.BorderColor = isActive ? HeartSlotActiveBorder : HeartSlotIdleBorder;
+		if (isActive)
+		{
+			style.ShadowColor = new Color(0.698f, 0.133f, 0.133f, 0.28f);
+			style.ShadowSize = 12;
 		}
 		return style;
 	}
@@ -965,5 +1040,23 @@ public partial class CultivationPanel : PopupPanelBase
 		}
 
 		return isActive ? $"{stageLabel} · 主修" : stageLabel;
+	}
+
+	/// <summary>
+	/// 玲珑心位暂以弟子的潜力与精英标记折算：常弟子 1~2 格，天才/精英可显 3 格。
+	/// </summary>
+	private static int ResolveHeartSlotCount(DiscipleProfile profile)
+	{
+		if (profile.IsElite || profile.Potential >= 82 || profile.Insight >= 82)
+		{
+			return 3;
+		}
+
+		if (profile.Potential >= 56 || profile.Insight >= 60)
+		{
+			return 2;
+		}
+
+		return 1;
 	}
 }

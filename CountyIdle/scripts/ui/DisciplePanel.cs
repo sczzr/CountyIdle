@@ -13,12 +13,24 @@ public partial class DisciplePanel : PopupPanelBase
 	private static readonly Color InkGrayColor = new(0.478f, 0.478f, 0.478f, 1f);
 	private static readonly Color CinnabarColor = new(0.651f, 0.192f, 0.165f, 1f);
 	private static readonly Color CeladonColor = new(0.439f, 0.553f, 0.506f, 1f);
+	private static readonly Color PaperColor = new(0.922f, 0.906f, 0.867f, 1f);
+	private static readonly Color PaperHighlightColor = new(0.992f, 0.992f, 0.988f, 1f);
+	private static readonly Color JadeMistColor = new(0.831f, 0.898f, 0.851f, 1f);
+	private static readonly Color DividerColor = new(0.812f, 0.792f, 0.753f, 1f);
 	private const string MetricGridPath =
 		"ScreenMargin/ScreenRoot/ProfilePage/ProfileColumn/ProfileRow/MiddlePanel/MiddleMargin/MiddleColumn/MetricGrid";
 	private const int RandomRosterMinCount = 12;
 	private const int RandomRosterMaxCount = 48;
 	private const string RandomRosterButtonIdleText = "调试：随机名册";
 	private const string RandomRosterButtonActiveText = "调试：恢复宗门名册";
+	private const float SidebarWidth = 308f;
+	private const float TreeNodeWidth = 64f;
+	private const float TreeNodeHeight = 180f;
+	private const float TreeNodeGap = 140f;
+	private const float TreeNodeRowGap = 238f;
+	private const float TreeCanvasMinWidth = 1120f;
+	private const float TreeCanvasBaseHeight = 760f;
+	private const float TreeLabelWidth = 184f;
 
 	private enum FilterMode
 	{
@@ -96,15 +108,26 @@ public partial class DisciplePanel : PopupPanelBase
 	private readonly List<DiscipleProfile> _visibleProfiles = new();
 	private readonly List<DiscipleProfile> _randomRosterProfiles = new();
 	private readonly Dictionary<int, PanelContainer> _rosterCardButtons = new();
+	private readonly Dictionary<string, Button> _branchTabButtons = new();
+	private readonly Dictionary<int, Control> _lineageNodeHosts = new();
 	private Node? _visualFx;
 	private bool _uiBound;
 	private bool _randomRosterPreviewActive;
+	private bool _minimalistTreeLayoutBuilt;
 	private int? _randomRosterSeed;
+	private string? _selectedPeakKey;
 
 	private GameState _state = new();
 	private int _selectedDiscipleId = 1;
 	private FilterMode _filterMode;
 	private SortMode _sortMode;
+	private Control _minimalistHost = null!;
+	private VBoxContainer _sidebarBranchList = null!;
+	private ScrollContainer _treeCanvasScroll = null!;
+	private Control _treeCanvas = null!;
+	private Label _treeAreaTitleLabel = null!;
+	private Label _treeAreaSubtitleLabel = null!;
+	private Label _watermarkLabel = null!;
 
 	public event Action<int, DiscipleDirectiveType>? DirectiveRequested;
 	public event Action<int>? CultivationRequested;
@@ -305,6 +328,7 @@ public partial class DisciplePanel : PopupPanelBase
 			_debugPanel.Visible = OS.IsDebugBuild();
 		}
 
+		BuildMinimalistTreeLayout();
 		UpdateRandomRosterButton();
 		ShowTreePage();
 
@@ -442,6 +466,7 @@ public partial class DisciplePanel : PopupPanelBase
 		}
 		_governanceLabel.Text =
 			$"当前治宗：{direction.DisplayName} / {law.DisplayName} / {talentPlan.DisplayName}";
+		RefreshMinimalistTreeHeader();
 	}
 
 	private void RebuildDiscipleList()
@@ -449,6 +474,12 @@ public partial class DisciplePanel : PopupPanelBase
 		_visibleProfiles.Clear();
 		_visibleProfiles.AddRange(_allProfiles.Where(MatchesFilter));
 		SortProfiles(_visibleProfiles);
+
+		if (_minimalistTreeLayoutBuilt)
+		{
+			RebuildMinimalistTree();
+			return;
+		}
 
 		_rosterCardButtons.Clear();
 		ClearPeakColumns();
@@ -647,7 +678,9 @@ public partial class DisciplePanel : PopupPanelBase
 		}
 
 		_selectedDiscipleId = discipleId;
+		_selectedPeakKey = ResolveRosterPeakKey(profile);
 		SelectRosterCard(discipleId);
+		SelectLineageNode(discipleId);
 		RefreshDetail(profile);
 		ShowProfilePage();
 	}
@@ -738,6 +771,852 @@ public partial class DisciplePanel : PopupPanelBase
 	{
 		var compare = rightValue.CompareTo(leftValue);
 		return compare != 0 ? compare : leftId.CompareTo(rightId);
+	}
+
+	private void BuildMinimalistTreeLayout()
+	{
+		if (_minimalistTreeLayoutBuilt)
+		{
+			return;
+		}
+
+		// “灵鉴录·清简留白”重构：树页改为左侧支脉导航、右侧血脉族谱。
+		var treePage = GetNode<Control>("ScreenMargin/ScreenRoot/TreePage");
+		var treeColumn = GetNode<Control>("ScreenMargin/ScreenRoot/TreePage/TreeColumn");
+		var headerRow = GetNode<HBoxContainer>("ScreenMargin/ScreenRoot/TreePage/TreeColumn/HeaderRow");
+		var titleGroup = GetNode<Control>("ScreenMargin/ScreenRoot/TreePage/TreeColumn/HeaderRow/TitleGroup");
+		var treeCountBadge = GetNode<Control>("ScreenMargin/ScreenRoot/TreePage/TreeColumn/HeaderRow/TreeCountBadge");
+		var summaryPanel = GetNode<PanelContainer>("ScreenMargin/ScreenRoot/TreePage/TreeColumn/SummaryPanel");
+		var filterPanel = GetNode<PanelContainer>("ScreenMargin/ScreenRoot/TreePage/TreeColumn/FilterPanel");
+
+		_minimalistHost = new Control
+		{
+			Name = "MinimalistJadeRosterHost",
+			LayoutMode = 1
+		};
+		_minimalistHost.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+		_minimalistHost.GrowHorizontal = Control.GrowDirection.Both;
+		_minimalistHost.GrowVertical = Control.GrowDirection.Both;
+		treePage.AddChild(_minimalistHost);
+
+		var mainRow = new HBoxContainer
+		{
+			Name = "MainRow",
+			LayoutMode = 1
+		};
+		mainRow.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+		mainRow.GrowHorizontal = Control.GrowDirection.Both;
+		mainRow.GrowVertical = Control.GrowDirection.Both;
+		mainRow.AddThemeConstantOverride("separation", 30);
+		_minimalistHost.AddChild(mainRow);
+
+		var sidebar = new VBoxContainer
+		{
+			Name = "Sidebar",
+			CustomMinimumSize = new Vector2(SidebarWidth, 0f),
+			SizeFlagsHorizontal = Control.SizeFlags.Fill,
+			SizeFlagsVertical = Control.SizeFlags.Fill
+		};
+		sidebar.AddThemeConstantOverride("separation", 14);
+		mainRow.AddChild(sidebar);
+
+		var divider = new ColorRect
+		{
+			Name = "Divider",
+			CustomMinimumSize = new Vector2(1f, 0f),
+			Color = new Color(DividerColor.R, DividerColor.G, DividerColor.B, 0.55f)
+		};
+		divider.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
+		mainRow.AddChild(divider);
+
+		var treeArea = new Control
+		{
+			Name = "TreeArea",
+			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+			SizeFlagsVertical = Control.SizeFlags.ExpandFill,
+			ClipContents = true
+		};
+		mainRow.AddChild(treeArea);
+
+		var treeOverlay = new VBoxContainer
+		{
+			Name = "TreeOverlay",
+			LayoutMode = 1
+		};
+		treeOverlay.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+		treeOverlay.GrowHorizontal = Control.GrowDirection.Both;
+		treeOverlay.GrowVertical = Control.GrowDirection.Both;
+		treeOverlay.AddThemeConstantOverride("separation", 10);
+		treeArea.AddChild(treeOverlay);
+
+		var treeHeader = new VBoxContainer
+		{
+			Name = "TreeHeader",
+			LayoutMode = 2
+		};
+		treeHeader.AddThemeConstantOverride("separation", 4);
+		treeOverlay.AddChild(treeHeader);
+
+		_treeAreaTitleLabel = new Label
+		{
+			Name = "TreeAreaTitleLabel",
+			Text = "血脉族谱",
+			HorizontalAlignment = HorizontalAlignment.Left
+		};
+		_treeAreaTitleLabel.AddThemeColorOverride("font_color", InkBlackColor);
+		_treeAreaTitleLabel.AddThemeFontSizeOverride("font_size", 24);
+		treeHeader.AddChild(_treeAreaTitleLabel);
+
+		_treeAreaSubtitleLabel = new Label
+		{
+			Name = "TreeAreaSubtitleLabel",
+			Text = "请先选定左侧支脉。",
+			AutowrapMode = TextServer.AutowrapMode.WordSmart
+		};
+		_treeAreaSubtitleLabel.AddThemeColorOverride("font_color", InkGrayColor);
+		_treeAreaSubtitleLabel.AddThemeFontSizeOverride("font_size", 11);
+		treeHeader.AddChild(_treeAreaSubtitleLabel);
+
+		_treeCanvasScroll = new ScrollContainer
+		{
+			Name = "TreeCanvasScroll",
+			LayoutMode = 2,
+			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+			SizeFlagsVertical = Control.SizeFlags.ExpandFill,
+			HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled,
+			VerticalScrollMode = ScrollContainer.ScrollMode.Auto
+		};
+		treeOverlay.AddChild(_treeCanvasScroll);
+
+		_treeCanvas = new Control
+		{
+			Name = "TreeCanvas",
+			CustomMinimumSize = new Vector2(TreeCanvasMinWidth, TreeCanvasBaseHeight),
+			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
+		};
+		_treeCanvasScroll.AddChild(_treeCanvas);
+
+		_watermarkLabel = new Label
+		{
+			Name = "WatermarkLabel",
+			Text = "浮云宗大谱",
+			LayoutMode = 0,
+			RotationDegrees = 90f,
+			Modulate = new Color(0f, 0f, 0f, 0.04f)
+		};
+		_watermarkLabel.AddThemeFontSizeOverride("font_size", 108);
+		_watermarkLabel.AddThemeColorOverride("font_color", InkBlackColor);
+		_treeCanvas.AddChild(_watermarkLabel);
+		_watermarkLabel.Position = new Vector2(250f, 460f);
+
+		ReparentTreeControl(sidebar, titleGroup);
+		ReparentTreeControl(sidebar, treeCountBadge);
+		ReparentTreeControl(sidebar, summaryPanel);
+		ReparentTreeControl(sidebar, filterPanel);
+		if (_debugPanel != null)
+		{
+			ReparentTreeControl(sidebar, _debugPanel);
+		}
+
+		var branchTitle = new Label
+		{
+			Name = "BranchTitle",
+			Text = "支脉导航"
+		};
+		branchTitle.AddThemeColorOverride("font_color", CinnabarColor);
+		branchTitle.AddThemeFontSizeOverride("font_size", 14);
+		sidebar.AddChild(branchTitle);
+
+		var branchHint = new Label
+		{
+			Name = "BranchHint",
+			Text = "切换左侧支脉后，右侧只展开该脉的师承与门人。",
+			AutowrapMode = TextServer.AutowrapMode.WordSmart
+		};
+		branchHint.AddThemeColorOverride("font_color", InkGrayColor);
+		branchHint.AddThemeFontSizeOverride("font_size", 11);
+		sidebar.AddChild(branchHint);
+
+		var branchScroll = new ScrollContainer
+		{
+			Name = "BranchScroll",
+			SizeFlagsVertical = Control.SizeFlags.ExpandFill,
+			HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled,
+			VerticalScrollMode = ScrollContainer.ScrollMode.Auto
+		};
+		sidebar.AddChild(branchScroll);
+
+		_sidebarBranchList = new VBoxContainer
+		{
+			Name = "BranchList"
+		};
+		_sidebarBranchList.AddThemeConstantOverride("separation", 14);
+		branchScroll.AddChild(_sidebarBranchList);
+
+		treeColumn.Visible = false;
+		headerRow.Visible = false;
+		StyleMinimalistStaticPanels(titleGroup, treeCountBadge, summaryPanel, filterPanel, _debugPanel);
+		_minimalistTreeLayoutBuilt = true;
+	}
+
+	private void ReparentTreeControl(Control newParent, Control child)
+	{
+		var oldParent = child.GetParent();
+		oldParent?.RemoveChild(child);
+		newParent.AddChild(child);
+	}
+
+	private void StyleMinimalistStaticPanels(
+		Control titleGroup,
+		Control treeCountBadge,
+		PanelContainer summaryPanel,
+		PanelContainer filterPanel,
+		Control? debugPanel)
+	{
+		titleGroup.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+		treeCountBadge.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+		ApplyPaperCardStyle(summaryPanel, 24);
+		ApplyPaperCardStyle(filterPanel, 24);
+		if (debugPanel is PanelContainer debugCard)
+		{
+			ApplyPaperCardStyle(debugCard, 24);
+		}
+
+		if (treeCountBadge is PanelContainer badgePanel)
+		{
+			var badgeStyle = CreatePaperCardStyle(26);
+			badgeStyle.BgColor = new Color(0.971f, 0.969f, 0.956f, 0.92f);
+			badgeStyle.BorderColor = new Color(CinnabarColor.R, CinnabarColor.G, CinnabarColor.B, 0.25f);
+			badgePanel.AddThemeStyleboxOverride("panel", badgeStyle);
+		}
+
+		foreach (var panel in new[] { summaryPanel, filterPanel })
+		{
+			panel.AddThemeConstantOverride("minimum_character_width", 0);
+		}
+
+		if (titleGroup.GetNodeOrNull<PanelContainer>("TitleSeal") is { } titleSeal)
+		{
+			var sealStyle = CreatePaperCardStyle(26);
+			sealStyle.BgColor = new Color(CinnabarColor.R, CinnabarColor.G, CinnabarColor.B, 0.95f);
+			sealStyle.BorderColor = new Color(CinnabarColor.R, CinnabarColor.G, CinnabarColor.B, 0.95f);
+			titleSeal.AddThemeStyleboxOverride("panel", sealStyle);
+			if (titleSeal.GetNodeOrNull<Label>("SealLabel") is { } sealLabel)
+			{
+				sealLabel.AddThemeColorOverride("font_color", PaperHighlightColor);
+				sealLabel.AddThemeFontSizeOverride("font_size", 22);
+			}
+		}
+
+		if (titleGroup.GetNodeOrNull<Label>("TitleColumn/TitleLabel") is { } titleLabel)
+		{
+			titleLabel.AddThemeColorOverride("font_color", InkBlackColor);
+			titleLabel.AddThemeFontSizeOverride("font_size", 26);
+		}
+
+		if (titleGroup.GetNodeOrNull<Label>("TitleColumn/SubtitleLabel") is { } subtitleLabel)
+		{
+			subtitleLabel.AddThemeColorOverride("font_color", InkGrayColor);
+			subtitleLabel.AddThemeFontSizeOverride("font_size", 11);
+		}
+
+		_treeCountLabel.AddThemeColorOverride("font_color", InkBlackColor);
+		_treeCountLabel.AddThemeFontSizeOverride("font_size", 12);
+		_summaryLabel.AddThemeColorOverride("font_color", InkBlackColor);
+		_summaryLabel.AddThemeFontSizeOverride("font_size", 12);
+		_governanceLabel.AddThemeColorOverride("font_color", InkGrayColor);
+		_governanceLabel.AddThemeFontSizeOverride("font_size", 11);
+
+		_filterOption.AddThemeFontSizeOverride("font_size", 12);
+		_sortOption.AddThemeFontSizeOverride("font_size", 12);
+		ApplySoftSelectStyle(_filterOption);
+		ApplySoftSelectStyle(_sortOption);
+
+		if (_randomRosterButton != null)
+		{
+			ApplyGhostButtonStyle(_randomRosterButton);
+		}
+	}
+
+	private void RebuildMinimalistTree()
+	{
+		_rosterCardButtons.Clear();
+		_lineageNodeHosts.Clear();
+		ClearControlChildren(_sidebarBranchList);
+		ClearTreeCanvasChildren();
+
+		var peakGroups = BuildPeakSections(_visibleProfiles).ToList();
+		if (peakGroups.Count == 0)
+		{
+			_selectedPeakKey = null;
+			RefreshMinimalistTreeHeader();
+			BuildEmptyTreeState();
+			ClearDetail();
+			return;
+		}
+
+		EnsureSelectedPeak(peakGroups);
+		BuildBranchTabs(peakGroups);
+		RefreshMinimalistTreeHeader();
+
+		var selectedGroup = peakGroups.First(group => group.Key == _selectedPeakKey);
+		var selectedProfiles = selectedGroup.ToList();
+		if (selectedProfiles.All(profile => profile.Id != _selectedDiscipleId))
+		{
+			_selectedDiscipleId = selectedProfiles[0].Id;
+		}
+
+		BuildLineageTree(selectedGroup.Key, selectedProfiles);
+		SelectLineageNode(_selectedDiscipleId);
+
+		var selectedProfile = selectedProfiles.First(profile => profile.Id == _selectedDiscipleId);
+		RefreshDetail(selectedProfile);
+	}
+
+	private void EnsureSelectedPeak(IReadOnlyList<IGrouping<string, DiscipleProfile>> peakGroups)
+	{
+		string? preferredPeakKey = null;
+		var preferredProfile = _visibleProfiles.FirstOrDefault(profile => profile.Id == _selectedDiscipleId);
+		if (preferredProfile != null)
+		{
+			preferredPeakKey = ResolveRosterPeakKey(preferredProfile);
+		}
+
+		if (!string.IsNullOrWhiteSpace(preferredPeakKey) &&
+			peakGroups.Any(group => group.Key == preferredPeakKey))
+		{
+			_selectedPeakKey = preferredPeakKey;
+			return;
+		}
+
+		if (!string.IsNullOrWhiteSpace(_selectedPeakKey) &&
+			peakGroups.Any(group => group.Key == _selectedPeakKey))
+		{
+			return;
+		}
+
+		_selectedPeakKey = peakGroups[0].Key;
+	}
+
+	private void RefreshMinimalistTreeHeader()
+	{
+		if (!_minimalistTreeLayoutBuilt)
+		{
+			return;
+		}
+
+		if (string.IsNullOrWhiteSpace(_selectedPeakKey))
+		{
+			_treeAreaTitleLabel.Text = "血脉族谱";
+			_treeAreaSubtitleLabel.Text = "当前筛选下暂无可展开支脉。";
+			return;
+		}
+
+		var selectedProfiles = _visibleProfiles
+			.Where(profile => ResolveRosterPeakKey(profile) == _selectedPeakKey)
+			.ToList();
+		var branchTitle = ResolveRosterPeakTitle(_selectedPeakKey!);
+		_treeAreaTitleLabel.Text = $"{branchTitle} · 血脉族谱";
+		_treeAreaSubtitleLabel.Text =
+			$"本脉收录 {selectedProfiles.Count} 人，当前以胶囊玉简展开师承与门人。选中弟子后可转入命谱详情。";
+	}
+
+	private void BuildEmptyTreeState()
+	{
+		var emptyLabel = new Label
+		{
+			Text = "当前筛读下暂无弟子收录。",
+			AutowrapMode = TextServer.AutowrapMode.WordSmart,
+			LayoutMode = 0,
+			Position = new Vector2(120f, 180f),
+			Size = new Vector2(560f, 40f)
+		};
+		emptyLabel.AddThemeColorOverride("font_color", InkGrayColor);
+		emptyLabel.AddThemeFontSizeOverride("font_size", 18);
+		_treeCanvas.AddChild(emptyLabel);
+	}
+
+	private void BuildBranchTabs(IReadOnlyList<IGrouping<string, DiscipleProfile>> peakGroups)
+	{
+		_branchTabButtons.Clear();
+		foreach (var peakGroup in peakGroups)
+		{
+			var button = CreateBranchTabButton(peakGroup.Key, peakGroup.ToList());
+			_sidebarBranchList.AddChild(button);
+			_branchTabButtons[peakGroup.Key] = button;
+		}
+	}
+
+	private Button CreateBranchTabButton(string peakKey, IReadOnlyList<DiscipleProfile> profiles)
+	{
+		var button = new Button
+		{
+			Name = $"{peakKey}BranchTab",
+			CustomMinimumSize = new Vector2(72f, 188f),
+			SizeFlagsHorizontal = Control.SizeFlags.Fill,
+			SizeFlagsVertical = Control.SizeFlags.ShrinkCenter,
+			Flat = true,
+			Text = BuildVerticalText(ResolveRosterPeakTitle(peakKey)),
+			TooltipText = $"{ResolveRosterPeakTitle(peakKey)} · 收录 {profiles.Count} 人"
+		};
+		button.AddThemeFontSizeOverride("font_size", 18);
+		button.AddThemeConstantOverride("line_separation", 3);
+		button.Alignment = HorizontalAlignment.Center;
+		button.Pressed += () => OnBranchTabPressed(peakKey);
+		button.MouseEntered += () => button.Scale = new Vector2(1.02f, 1.02f);
+		button.MouseExited += () => button.Scale = Vector2.One;
+
+		var topDot = CreatePillDot("TopDot");
+		topDot.Position = new Vector2(32f, 12f);
+		button.AddChild(topDot);
+
+		var bottomDot = CreatePillDot("BottomDot");
+		bottomDot.Position = new Vector2(32f, 170f);
+		button.AddChild(bottomDot);
+
+		var countLabel = new Label
+		{
+			Name = "CountLabel",
+			Text = $"{profiles.Count}",
+			LayoutMode = 0,
+			Position = new Vector2(19f, 150f),
+			Size = new Vector2(34f, 18f),
+			HorizontalAlignment = HorizontalAlignment.Center
+		};
+		countLabel.AddThemeFontSizeOverride("font_size", 10);
+		button.AddChild(countLabel);
+		button.SetMeta("count_label", countLabel);
+		ApplyBranchTabStyle(button, peakKey == _selectedPeakKey);
+
+		return button;
+	}
+
+	private void OnBranchTabPressed(string peakKey)
+	{
+		_selectedPeakKey = peakKey;
+		var selectedProfiles = _visibleProfiles
+			.Where(profile => ResolveRosterPeakKey(profile) == peakKey)
+			.ToList();
+		if (selectedProfiles.Count == 0)
+		{
+			return;
+		}
+
+		if (selectedProfiles.All(profile => profile.Id != _selectedDiscipleId))
+		{
+			_selectedDiscipleId = selectedProfiles[0].Id;
+		}
+
+		RebuildMinimalistTree();
+		ShowTreePage();
+	}
+
+	private void BuildLineageTree(string peakKey, IReadOnlyList<DiscipleProfile> profiles)
+	{
+		var orderedProfiles = profiles
+			.OrderBy(profile => ResolveRosterRankOrder(profile.RankName))
+			.ThenByDescending(profile => profile.RealmTier)
+			.ThenBy(profile => profile.Id)
+			.ToList();
+		var branchTitle = ResolveRosterPeakTitle(peakKey);
+		var leader = ResolveBranchLeader(orderedProfiles);
+		var discipleRows = Math.Max(1, (int)Math.Ceiling(orderedProfiles.Count / 4f));
+		var canvasWidth = Math.Max(TreeCanvasMinWidth, 360f + Math.Min(4, orderedProfiles.Count) * TreeNodeGap);
+		var canvasHeight = Math.Max(TreeCanvasBaseHeight, 460f + discipleRows * TreeNodeRowGap);
+		_treeCanvas.CustomMinimumSize = new Vector2(canvasWidth, canvasHeight);
+		_watermarkLabel.Position = new Vector2(canvasWidth - 220f, canvasHeight * 0.66f);
+
+		var masterHost = CreateLineageNodeHost(
+			branchTitle,
+			"主脉执录",
+			$"{leader.RealmName} / {leader.CurrentAssignment}",
+			0,
+			canvasWidth * 0.5f - TreeNodeWidth * 0.5f,
+			84f,
+			false,
+			true);
+		_treeCanvas.AddChild(masterHost);
+
+		var rootLineX = masterHost.Position.X + TreeNodeWidth * 0.5f;
+		var branchLineY = 336f;
+		AddTreeLine(rootLineX, masterHost.Position.Y + TreeNodeHeight - 8f, rootLineX, branchLineY);
+
+		var columns = Math.Min(4, orderedProfiles.Count);
+		var columnSpacing = columns <= 1 ? 0f : (canvasWidth - 300f) / (columns - 1);
+		var firstColumnX = columns <= 1 ? canvasWidth * 0.5f : 150f;
+		var centers = new List<float>();
+		for (var column = 0; column < columns; column++)
+		{
+			centers.Add(columns <= 1 ? firstColumnX : firstColumnX + columnSpacing * column);
+		}
+
+		AddTreeLine(centers.First(), branchLineY, centers.Last(), branchLineY);
+
+		for (var index = 0; index < orderedProfiles.Count; index++)
+		{
+			var profile = orderedProfiles[index];
+			var column = index % columns;
+			var row = index / columns;
+			var centerX = centers[column];
+			var nodeX = centerX - TreeNodeWidth * 0.5f;
+			var nodeY = 422f + row * TreeNodeRowGap;
+			AddTreeLine(centerX, branchLineY, centerX, nodeY - 18f);
+
+			var host = CreateLineageNodeHost(
+				profile.Name,
+				ResolveRosterRankTitle(profile),
+				$"{profile.RealmName} · {ResolveRosterHallTitle(profile)} · {profile.CurrentAssignment}",
+				profile.Id,
+				nodeX,
+				nodeY,
+				profile.Id == _selectedDiscipleId,
+				false);
+			_treeCanvas.AddChild(host);
+			_lineageNodeHosts[profile.Id] = host;
+		}
+	}
+
+	private DiscipleProfile ResolveBranchLeader(IReadOnlyList<DiscipleProfile> profiles)
+	{
+		return profiles
+			.OrderByDescending(profile => profile.IsElite)
+			.ThenByDescending(profile => profile.RealmTier)
+			.ThenByDescending(profile => profile.Contribution)
+			.ThenBy(profile => profile.Id)
+			.First();
+	}
+
+	private Control CreateLineageNodeHost(
+		string title,
+		string roleText,
+		string metaText,
+		int discipleId,
+		float x,
+		float y,
+		bool selected,
+		bool forceLabelVisible)
+	{
+		var host = new Control
+		{
+			Name = discipleId == 0 ? "MasterNode" : $"DiscipleNode{discipleId}",
+			LayoutMode = 0,
+			Position = new Vector2(x, y),
+			Size = new Vector2(TreeNodeWidth + TreeLabelWidth + 18f, TreeNodeHeight)
+		};
+
+		var pill = new PanelContainer
+		{
+			Name = "Pill",
+			CustomMinimumSize = new Vector2(TreeNodeWidth, TreeNodeHeight),
+			LayoutMode = 0,
+			MouseFilter = Control.MouseFilterEnum.Stop
+		};
+		pill.Size = new Vector2(TreeNodeWidth, TreeNodeHeight);
+		ApplyPillStyle(pill, selected);
+		host.AddChild(pill);
+
+		var topDot = CreatePillDot("TopDot");
+		topDot.Position = new Vector2(TreeNodeWidth * 0.5f - 3f, 12f);
+		pill.AddChild(topDot);
+
+		var bottomDot = CreatePillDot("BottomDot");
+		bottomDot.Position = new Vector2(TreeNodeWidth * 0.5f - 3f, TreeNodeHeight - 18f);
+		pill.AddChild(bottomDot);
+
+		var nameLabel = new Label
+		{
+			Name = "NameLabel",
+			Text = BuildVerticalText(title),
+			LayoutMode = 0,
+			Position = new Vector2(16f, 30f),
+			Size = new Vector2(TreeNodeWidth - 32f, TreeNodeHeight - 60f),
+			HorizontalAlignment = HorizontalAlignment.Center,
+			VerticalAlignment = VerticalAlignment.Center
+		};
+		nameLabel.AddThemeColorOverride("font_color", selected ? PaperHighlightColor : InkBlackColor);
+		nameLabel.AddThemeFontSizeOverride("font_size", discipleId == 0 ? 20 : 16);
+		pill.AddChild(nameLabel);
+
+		var museumLabel = new VBoxContainer
+		{
+			Name = "MuseumLabel",
+			LayoutMode = 0,
+			Position = new Vector2(TreeNodeWidth + 20f, 40f),
+			SizeFlagsHorizontal = Control.SizeFlags.Fill,
+			MouseFilter = Control.MouseFilterEnum.Stop
+		};
+		museumLabel.AddThemeConstantOverride("separation", 2);
+		museumLabel.MouseDefaultCursorShape = CursorShape.PointingHand;
+		host.AddChild(museumLabel);
+
+		var roleLabel = new Label
+		{
+			Text = roleText,
+			MouseFilter = Control.MouseFilterEnum.Ignore
+		};
+		roleLabel.AddThemeColorOverride("font_color", selected ? CinnabarColor : InkBlackColor);
+		roleLabel.AddThemeFontSizeOverride("font_size", 12);
+		museumLabel.AddChild(roleLabel);
+
+		var metaLabel = new Label
+		{
+			Text = metaText,
+			AutowrapMode = TextServer.AutowrapMode.WordSmart,
+			CustomMinimumSize = new Vector2(TreeLabelWidth, 0f),
+			MouseFilter = Control.MouseFilterEnum.Ignore
+		};
+		metaLabel.AddThemeColorOverride("font_color", InkGrayColor);
+		metaLabel.AddThemeFontSizeOverride("font_size", 10);
+		museumLabel.AddChild(metaLabel);
+		museumLabel.Modulate = new Color(1f, 1f, 1f, forceLabelVisible || selected ? 1f : 0f);
+
+		if (discipleId != 0)
+		{
+			pill.GuiInput += @event => OnLineageNodeGuiInput(@event, discipleId);
+			pill.MouseEntered += () => SetLineageNodeHover(host, true);
+			pill.MouseExited += () => SetLineageNodeHover(host, false);
+			museumLabel.GuiInput += @event => OnLineageNodeGuiInput(@event, discipleId);
+			museumLabel.MouseEntered += () => SetLineageNodeHover(host, true);
+			museumLabel.MouseExited += () => SetLineageNodeHover(host, false);
+		}
+
+		host.SetMeta("pill", pill);
+		host.SetMeta("museum_label", museumLabel);
+		host.SetMeta("base_position", host.Position);
+		host.SetMeta("selected", selected);
+		return host;
+	}
+
+	private void OnLineageNodeGuiInput(InputEvent @event, int discipleId)
+	{
+		if (@event is not InputEventMouseButton mouseEvent ||
+			!mouseEvent.Pressed ||
+			mouseEvent.ButtonIndex != MouseButton.Left)
+		{
+			return;
+		}
+
+		OnRosterCardPressed(discipleId);
+	}
+
+	private void SetLineageNodeHover(Control host, bool hovered)
+	{
+		if (!host.HasMeta("base_position"))
+		{
+			return;
+		}
+		var basePosition = (Vector2)host.GetMeta("base_position");
+
+		var museumLabel = host.GetMeta("museum_label").AsGodotObject() as Control;
+		var selected = host.GetMeta("selected").AsBool();
+		var tween = CreateTween().SetParallel(true).SetTrans(Tween.TransitionType.Cubic).SetEase(Tween.EaseType.Out);
+		tween.TweenProperty(host, "position", hovered ? basePosition + new Vector2(0f, -6f) : basePosition, hovered ? 0.18 : 0.24);
+		if (museumLabel != null)
+		{
+			var targetAlpha = hovered || selected ? 1f : 0f;
+			tween.TweenProperty(museumLabel, "modulate:a", targetAlpha, hovered ? 0.18 : 0.24);
+		}
+	}
+
+	private void SelectLineageNode(int discipleId)
+	{
+		foreach (var (entryId, host) in _lineageNodeHosts)
+		{
+			var selected = entryId == discipleId;
+			host.SetMeta("selected", selected);
+			if (host.GetMeta("pill").AsGodotObject() is PanelContainer pill)
+			{
+				ApplyPillStyle(pill, selected);
+				if (pill.GetNodeOrNull<Label>("NameLabel") is { } nameLabel)
+				{
+					nameLabel.AddThemeColorOverride("font_color", selected ? PaperHighlightColor : InkBlackColor);
+				}
+			}
+
+			if (host.GetMeta("museum_label").AsGodotObject() is Control museumLabel)
+			{
+				museumLabel.Modulate = new Color(1f, 1f, 1f, selected ? 1f : 0f);
+			}
+
+			if (selected)
+			{
+				_treeCanvasScroll.EnsureControlVisible(host);
+			}
+		}
+
+		foreach (var (peakKey, button) in _branchTabButtons)
+		{
+			ApplyBranchTabStyle(button, peakKey == _selectedPeakKey);
+		}
+	}
+
+	private void AddTreeLine(float x1, float y1, float x2, float y2)
+	{
+		if (Math.Abs(x1 - x2) <= 0.1f)
+		{
+			var line = new ColorRect
+			{
+				Name = $"VLine_{x1}_{y1}",
+				LayoutMode = 0,
+				Position = new Vector2(x1 - 0.5f, Math.Min(y1, y2)),
+				Size = new Vector2(1f, Math.Abs(y2 - y1)),
+				Color = new Color(DividerColor.R, DividerColor.G, DividerColor.B, 0.88f)
+			};
+			_treeCanvas.AddChild(line);
+			return;
+		}
+
+		var horizontalLine = new ColorRect
+		{
+			Name = $"HLine_{x1}_{y1}",
+			LayoutMode = 0,
+			Position = new Vector2(Math.Min(x1, x2), y1 - 0.5f),
+			Size = new Vector2(Math.Abs(x2 - x1), 1f),
+			Color = new Color(DividerColor.R, DividerColor.G, DividerColor.B, 0.88f)
+		};
+		_treeCanvas.AddChild(horizontalLine);
+	}
+
+	private static void ClearControlChildren(Control control)
+	{
+		foreach (var child in control.GetChildren())
+		{
+			control.RemoveChild(child);
+			child.QueueFree();
+		}
+	}
+
+	private void ClearTreeCanvasChildren()
+	{
+		foreach (var child in _treeCanvas.GetChildren())
+		{
+			if (ReferenceEquals(child, _watermarkLabel))
+			{
+				continue;
+			}
+
+			_treeCanvas.RemoveChild(child);
+			child.QueueFree();
+		}
+	}
+
+	private void ApplyBranchTabStyle(Button button, bool active)
+	{
+		var style = CreatePillStyle(active);
+		button.AddThemeStyleboxOverride("normal", style);
+		button.AddThemeStyleboxOverride("hover", style);
+		button.AddThemeStyleboxOverride("pressed", style);
+		button.AddThemeStyleboxOverride("focus", style);
+		button.AddThemeColorOverride("font_color", active ? PaperHighlightColor : InkBlackColor);
+		button.AddThemeColorOverride("font_hover_color", active ? PaperHighlightColor : InkBlackColor);
+		button.AddThemeColorOverride("font_pressed_color", active ? PaperHighlightColor : InkBlackColor);
+		if (button.HasMeta("count_label") && button.GetMeta("count_label").AsGodotObject() is Label countLabel)
+		{
+			countLabel.AddThemeColorOverride("font_color", active ? PaperHighlightColor : InkGrayColor);
+		}
+	}
+
+	private void ApplyPillStyle(PanelContainer panel, bool active)
+	{
+		panel.AddThemeStyleboxOverride("panel", CreatePillStyle(active));
+	}
+
+	private StyleBoxFlat CreatePillStyle(bool active)
+	{
+		var style = new StyleBoxFlat
+		{
+			BgColor = active ? CinnabarColor : new Color(JadeMistColor.R, JadeMistColor.G, JadeMistColor.B, 0.98f),
+			BorderColor = active
+				? new Color(CinnabarColor.R, CinnabarColor.G, CinnabarColor.B, 0.96f)
+				: new Color(PaperHighlightColor.R, PaperHighlightColor.G, PaperHighlightColor.B, 0.76f),
+			DrawCenter = true,
+			CornerRadiusTopLeft = 32,
+			CornerRadiusTopRight = 32,
+			CornerRadiusBottomLeft = 32,
+			CornerRadiusBottomRight = 32,
+			ShadowColor = active
+				? new Color(CinnabarColor.R, CinnabarColor.G, CinnabarColor.B, 0.22f)
+				: new Color(0f, 0f, 0f, 0.08f),
+			ShadowSize = active ? 16 : 12,
+			ShadowOffset = new Vector2(0f, 6f)
+		};
+		style.SetBorderWidthAll(1);
+		style.ContentMarginTop = 10;
+		style.ContentMarginBottom = 10;
+		style.ContentMarginLeft = 8;
+		style.ContentMarginRight = 8;
+		return style;
+	}
+
+	private ColorRect CreatePillDot(string name)
+	{
+		return new ColorRect
+		{
+			Name = name,
+			LayoutMode = 0,
+			Color = new Color(InkBlackColor.R, InkBlackColor.G, InkBlackColor.B, 0.72f),
+			Size = new Vector2(6f, 6f)
+		};
+	}
+
+	private StyleBoxFlat CreatePaperCardStyle(int cornerRadius)
+	{
+		var style = new StyleBoxFlat
+		{
+			BgColor = new Color(PaperColor.R, PaperColor.G, PaperColor.B, 0.94f),
+			BorderColor = new Color(PaperHighlightColor.R, PaperHighlightColor.G, PaperHighlightColor.B, 0.72f),
+			CornerRadiusTopLeft = cornerRadius,
+			CornerRadiusTopRight = cornerRadius,
+			CornerRadiusBottomLeft = cornerRadius,
+			CornerRadiusBottomRight = cornerRadius,
+			ShadowColor = new Color(0f, 0f, 0f, 0.04f),
+			ShadowSize = 10,
+			ShadowOffset = new Vector2(0f, 4f)
+		};
+		style.SetBorderWidthAll(1);
+		style.ContentMarginTop = 10;
+		style.ContentMarginBottom = 10;
+		style.ContentMarginLeft = 10;
+		style.ContentMarginRight = 10;
+		return style;
+	}
+
+	private void ApplyPaperCardStyle(PanelContainer panel, int cornerRadius)
+	{
+		panel.AddThemeStyleboxOverride("panel", CreatePaperCardStyle(cornerRadius));
+	}
+
+	private void ApplySoftSelectStyle(BaseButton button)
+	{
+		var normal = CreatePaperCardStyle(18);
+		var hover = CreatePaperCardStyle(18);
+		hover.BorderColor = new Color(CinnabarColor.R, CinnabarColor.G, CinnabarColor.B, 0.22f);
+		button.AddThemeStyleboxOverride("normal", normal);
+		button.AddThemeStyleboxOverride("hover", hover);
+		button.AddThemeStyleboxOverride("pressed", hover);
+		button.AddThemeStyleboxOverride("focus", hover);
+		button.AddThemeColorOverride("font_color", InkBlackColor);
+	}
+
+	private void ApplyGhostButtonStyle(Button button)
+	{
+		var normal = CreatePaperCardStyle(18);
+		normal.BgColor = new Color(PaperHighlightColor.R, PaperHighlightColor.G, PaperHighlightColor.B, 0.90f);
+		var hover = CreatePaperCardStyle(18);
+		hover.BgColor = new Color(CinnabarColor.R, CinnabarColor.G, CinnabarColor.B, 0.12f);
+		hover.BorderColor = new Color(CinnabarColor.R, CinnabarColor.G, CinnabarColor.B, 0.20f);
+		button.AddThemeStyleboxOverride("normal", normal);
+		button.AddThemeStyleboxOverride("hover", hover);
+		button.AddThemeStyleboxOverride("pressed", hover);
+		button.AddThemeStyleboxOverride("focus", hover);
+		button.AddThemeColorOverride("font_color", InkBlackColor);
+		button.AddThemeColorOverride("font_hover_color", InkBlackColor);
+		button.AddThemeColorOverride("font_pressed_color", InkBlackColor);
+	}
+
+	private static string BuildVerticalText(string text)
+	{
+		return string.Join('\n', text.Where(character => !char.IsWhiteSpace(character)));
 	}
 
 	private void CallVisualFx(string methodName, params Variant[] args)

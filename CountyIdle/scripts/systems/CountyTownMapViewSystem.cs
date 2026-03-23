@@ -26,6 +26,8 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
     private const float PanSpeed = 520f;
     private const float TerrainHexFillScale = 1.0f;
     private const float TerrainHexSeamUvInsetPx = 20.0f;
+    private const float GoldenRatio = 1.6180339f;
+    private const float ExplicitTerrainTextureShare = 1f / (1f + GoldenRatio);
 
     // 地形/道路/建筑配色
     private static readonly Color GroundColor = new(0.23f, 0.27f, 0.21f, 1.0f);
@@ -190,6 +192,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
     private bool _usesExternalMap;
     private string _externalMapTitle = string.Empty;
     private string _externalMapInteractionHint = string.Empty;
+    private readonly HashSet<Vector2I> _explicitTerrainCells = new();
 
     // 缩放参数
     public float Zoom => _zoom;
@@ -208,6 +211,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         _externalMapTitle = string.IsNullOrWhiteSpace(titleText) ? "局部沙盘" : titleText;
         _externalMapInteractionHint = string.IsNullOrWhiteSpace(interactionHint) ? "左键点选局部地块，右键清除当前选中。" : interactionHint;
         _mapData = mapData;
+        RebuildExplicitTerrainSelection(_mapData);
         _selectedActivityAnchor = null;
         _selectedCell = null;
         _selectedResidentDiscipleId = null;
@@ -234,6 +238,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         _usesExternalMap = false;
         _externalMapTitle = string.Empty;
         _externalMapInteractionHint = string.Empty;
+        _explicitTerrainCells.Clear();
 
         if (_regenerateButton != null)
         {
@@ -614,6 +619,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
 
         _mapData = _generator.Generate(_populationHint, _housingHint, _eliteHint, _layoutSeed, _buildingHints);
         ApplyPlacedBuildings(_mapData);
+        RebuildExplicitTerrainSelection(_mapData);
         _selectedActivityAnchor = null;
         _selectedCell = null;
         _hoveredCell = null;
@@ -880,6 +886,11 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         TownTerrainType terrainType,
         TownTerrainVisualFamily visualFamily)
     {
+        if (!ShouldDrawExplicitTerrainCell(cell, terrainType))
+        {
+            return;
+        }
+
         if (TryDrawLayer1TileSetHex(cell, tile, terrainType, visualFamily))
         {
             return;
@@ -902,6 +913,272 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
             tile,
             _terrainTextures.TryGetValue(terrainType, out var texture) ? texture : null,
             GetTerrainColor(terrainType));
+    }
+
+    // 山门图 / 二级地图默认以平地留白承接底图，仅对需要强调的格子绘制基础地貌贴图。
+    private bool ShouldDrawExplicitTerrainCell(Vector2I cell, TownTerrainType terrainType)
+    {
+        return terrainType != TownTerrainType.Ground || _explicitTerrainCells.Contains(cell);
+    }
+
+    // 按黄金比例为普通地面挑选需要显式显影的地貌格；道路/院落/水体继续视为必显语义。
+    private void RebuildExplicitTerrainSelection(TownMapData? mapData)
+    {
+        _explicitTerrainCells.Clear();
+        if (mapData == null)
+        {
+            return;
+        }
+
+        var mandatoryCount = 0;
+        var anchorCells = new HashSet<Vector2I>();
+        var buildingCells = new HashSet<Vector2I>();
+        foreach (var anchor in mapData.ActivityAnchors)
+        {
+            anchorCells.Add(anchor.LotCell);
+            anchorCells.Add(anchor.RoadCell);
+        }
+
+        foreach (var building in mapData.Buildings)
+        {
+            buildingCells.Add(building.Cell);
+        }
+
+        var candidates = new List<TerrainTextureCandidate>();
+        foreach (var cell in mapData.EnumerateAllCells())
+        {
+            var terrainType = mapData.GetTerrain(cell.X, cell.Y);
+            if (terrainType != TownTerrainType.Ground)
+            {
+                mandatoryCount++;
+                continue;
+            }
+
+            var visualFamily = mapData.GetTerrainVisualFamily(cell.X, cell.Y);
+            var compound = mapData.GetCellCompound(cell);
+            var score = EvaluateTerrainTexturePriority(mapData, cell, visualFamily, compound, anchorCells, buildingCells);
+            if (score <= 0f)
+            {
+                continue;
+            }
+
+            candidates.Add(new TerrainTextureCandidate(cell, score, GetCellHash(cell, 20260323)));
+        }
+
+        if (candidates.Count == 0)
+        {
+            return;
+        }
+
+        var targetTexturedCount = Math.Clamp(
+            (int)MathF.Round((mapData.Width * mapData.Height) * ExplicitTerrainTextureShare),
+            1,
+            mapData.Width * mapData.Height);
+        var remainingBudget = Math.Max(targetTexturedCount - mandatoryCount, 0);
+        if (remainingBudget <= 0)
+        {
+            return;
+        }
+
+        candidates.Sort(static (left, right) =>
+        {
+            var scoreCompare = right.Score.CompareTo(left.Score);
+            return scoreCompare != 0 ? scoreCompare : left.TieBreak.CompareTo(right.TieBreak);
+        });
+
+        var selectedCount = Math.Min(remainingBudget, candidates.Count);
+        for (var index = 0; index < selectedCount; index++)
+        {
+            _explicitTerrainCells.Add(candidates[index].Cell);
+        }
+    }
+
+    // 对雪地 / 灵地 / 荒地与靠近功能锚点的格子提高权重；普通平地继续留白。
+    private static float EvaluateTerrainTexturePriority(
+        TownMapData mapData,
+        Vector2I cell,
+        TownTerrainVisualFamily visualFamily,
+        TownCellCompoundData? compound,
+        HashSet<Vector2I> anchorCells,
+        HashSet<Vector2I> buildingCells)
+    {
+        var score = visualFamily switch
+        {
+            // 山门图与二级地图优先保留水域/雪地，再保留灵地；荒岭继续收窄，避免底盘过花。
+            TownTerrainVisualFamily.DeepWater => 6.6f,
+            TownTerrainVisualFamily.ShallowWater => 6.0f,
+            TownTerrainVisualFamily.Snow => 5.9f,
+            TownTerrainVisualFamily.Spirit => 4.8f,
+            TownTerrainVisualFamily.Rugged => 3.6f,
+            TownTerrainVisualFamily.Plain or TownTerrainVisualFamily.Auto => 0f,
+            _ => 0f
+        };
+
+        if (anchorCells.Contains(cell))
+        {
+            score += 2.8f;
+        }
+
+        if (buildingCells.Contains(cell))
+        {
+            score += 2.1f;
+        }
+
+        if (IsNearAnyCell(cell, anchorCells, 1))
+        {
+            score += 0.9f;
+        }
+
+        if (IsNearAnyCell(cell, buildingCells, 1))
+        {
+            score += 0.6f;
+        }
+
+        if (compound != null)
+        {
+            if (compound.ContentKind is TownCellContentKind.Special or TownCellContentKind.Service)
+            {
+                score += 0.7f;
+            }
+
+            if (compound.SynergyScore >= 2.0f)
+            {
+                score += 0.5f;
+            }
+
+            if (compound.Stability < 0.92f)
+            {
+                score += 0.2f;
+            }
+        }
+
+        if (HasNearNonGroundTerrain(mapData, cell, 1))
+        {
+            score += 0.6f;
+        }
+
+        // 雪地更倾向成片保留：雪地邻格越多，越应被选中。
+        if (visualFamily == TownTerrainVisualFamily.Snow)
+        {
+            score += CountNeighborVisualFamily(mapData, cell, TownTerrainVisualFamily.Snow, 1) * 0.45f;
+        }
+
+        // 灵地改成“点状贵气”：有服务/特殊语义或靠近核心区才留，否则适度收掉。
+        if (visualFamily == TownTerrainVisualFamily.Spirit)
+        {
+            var spiritNeighbors = CountNeighborVisualFamily(mapData, cell, TownTerrainVisualFamily.Spirit, 1);
+            if (compound?.ContentKind is TownCellContentKind.Special or TownCellContentKind.Service)
+            {
+                score += 0.7f;
+            }
+            else if (spiritNeighbors >= 3)
+            {
+                score -= 0.8f;
+            }
+            else
+            {
+                score += 0.2f;
+            }
+        }
+
+        // 荒岭更多压到边缘或非平地过渡附近，减少内部大面积铺开。
+        if (visualFamily == TownTerrainVisualFamily.Rugged)
+        {
+            if (IsNearMapBoundary(mapData, cell, 1) || HasNearNonGroundTerrain(mapData, cell, 1))
+            {
+                score += 0.8f;
+            }
+            else
+            {
+                score -= 1.0f;
+            }
+        }
+
+        return score;
+    }
+
+    // 判断是否靠近已有功能锚点/建筑，避免重点区域周围全部退成纯空白。
+    private static bool IsNearAnyCell(Vector2I cell, HashSet<Vector2I> targets, int radius)
+    {
+        foreach (var target in targets)
+        {
+            if (Math.Abs(target.X - cell.X) <= radius && Math.Abs(target.Y - cell.Y) <= radius)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private readonly record struct TerrainTextureCandidate(Vector2I Cell, float Score, int TieBreak);
+
+    private static int CountNeighborVisualFamily(
+        TownMapData mapData,
+        Vector2I cell,
+        TownTerrainVisualFamily visualFamily,
+        int radius)
+    {
+        var count = 0;
+        for (var offsetY = -radius; offsetY <= radius; offsetY++)
+        {
+            for (var offsetX = -radius; offsetX <= radius; offsetX++)
+            {
+                if (offsetX == 0 && offsetY == 0)
+                {
+                    continue;
+                }
+
+                var target = new Vector2I(cell.X + offsetX, cell.Y + offsetY);
+                if (!mapData.IsInside(target))
+                {
+                    continue;
+                }
+
+                if (mapData.GetTerrainVisualFamily(target.X, target.Y) == visualFamily)
+                {
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+
+    private static bool IsNearMapBoundary(TownMapData mapData, Vector2I cell, int margin)
+    {
+        return cell.X <= margin ||
+               cell.Y <= margin ||
+               cell.X >= mapData.Width - 1 - margin ||
+               cell.Y >= mapData.Height - 1 - margin;
+    }
+
+    // 判断普通地面是否紧邻水体/道路/院落，便于边界附近保留少量地貌提示。
+    private static bool HasNearNonGroundTerrain(TownMapData mapData, Vector2I cell, int radius)
+    {
+        for (var offsetY = -radius; offsetY <= radius; offsetY++)
+        {
+            for (var offsetX = -radius; offsetX <= radius; offsetX++)
+            {
+                if (offsetX == 0 && offsetY == 0)
+                {
+                    continue;
+                }
+
+                var target = new Vector2I(cell.X + offsetX, cell.Y + offsetY);
+                if (!mapData.IsInside(target))
+                {
+                    continue;
+                }
+
+                if (mapData.GetTerrain(target.X, target.Y) != TownTerrainType.Ground)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     // 尝试使用 L1 地形图集绘制地块

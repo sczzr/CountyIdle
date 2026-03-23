@@ -153,7 +153,8 @@ func _on_time_bead_pressed(bead: BaseButton) -> void:
 func _build_item_card(icon_text: String, name_text: String) -> PanelContainer:
 	var card := PanelContainer.new()
 	card.custom_minimum_size = Vector2(132, 88)
-	card.theme_override_styles.panel = _build_card_style(Color(0.98, 0.97, 0.93, 0.76), Color(0.55, 0.45, 0.29, 0.24))
+	# PanelContainer 运行时实例需要通过主题 override API 写入样式，避免直接访问 theme_override_styles 字典时报错。
+	card.add_theme_stylebox_override("panel", _build_card_style(Color(0.98, 0.97, 0.93, 0.76), Color(0.55, 0.45, 0.29, 0.24)))
 
 	var margin := MarginContainer.new()
 	margin.add_theme_constant_override("margin_left", 10)
@@ -169,7 +170,7 @@ func _build_item_card(icon_text: String, name_text: String) -> PanelContainer:
 
 	var icon_bg := PanelContainer.new()
 	icon_bg.custom_minimum_size = Vector2(34, 34)
-	icon_bg.theme_override_styles.panel = _build_card_style(Color(0.80, 0.86, 0.82, 1.0), Color(0.55, 0.66, 0.59, 0.5), 17)
+	icon_bg.add_theme_stylebox_override("panel", _build_card_style(Color(0.80, 0.86, 0.82, 1.0), Color(0.55, 0.66, 0.59, 0.5), 17))
 	vbox.add_child(icon_bg)
 
 	var icon_label := Label.new()

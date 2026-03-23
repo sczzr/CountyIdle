@@ -290,7 +290,7 @@ size_flags_horizontal = 3
 
 [node name="FocusBannerLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/FocusBanner" unique_id=380601694]
 layout_mode = 2
-text = "当前阵眼"
+text = "弟子灵鉴"
 
 [node name="FocusBannerLineRight" type="ColorRect" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/FocusBanner" unique_id=1418067110]
 custom_minimum_size = Vector2(32, 1)
@@ -424,7 +424,7 @@ theme_override_constants/separation = 4
 
 [node name="FocusTitleLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/FocusHeader/FocusInfoColumn" unique_id=2063585369]
 layout_mode = 2
-text = "当前阵眼详情"
+text = "悬浮玉璧"
 
 [node name="FocusDivider" type="ColorRect" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn" unique_id=530597970]
 custom_minimum_size = Vector2(0, 1)
@@ -443,7 +443,7 @@ text = "◀"
 [node name="NavHintLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/DiscipleNavRow" unique_id=1509752559]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "切换阵眼"
+text = "换阅灵鉴"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -1049,14 +1049,14 @@ color = Color(0.831373, 0.686275, 0.215686, 1)
 
 [node name="ActionTitleLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow" unique_id=1739727454]
 layout_mode = 2
-text = "敕令法门"
+text = "敕令修行 · 玲珑调度"
 
 [node name="ActionTitleSpacer" type="Control" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow" unique_id=1791579352]
 layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="ActionPointBadge" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow" unique_id=218979737]
-custom_minimum_size = Vector2(184, 32)
+custom_minimum_size = Vector2(220, 42)
 layout_mode = 2
 
 [node name="ActionPointRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow/ActionPointBadge" unique_id=1014540332]
@@ -1067,26 +1067,26 @@ theme_override_constants/separation = 6
 
 [node name="ActionPointTextLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow/ActionPointBadge/ActionPointRow" unique_id=2135425752]
 layout_mode = 2
-text = "施法余力"
+text = "玲珑心位"
 
 [node name="ActionPointSpacer" type="Control" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow/ActionPointBadge/ActionPointRow" unique_id=1364566877]
 layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="ActionPointDot1" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow/ActionPointBadge/ActionPointRow" unique_id=424422268]
-custom_minimum_size = Vector2(12, 12)
+custom_minimum_size = Vector2(18, 18)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
 [node name="ActionPointDot2" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow/ActionPointBadge/ActionPointRow" unique_id=1117024204]
-custom_minimum_size = Vector2(12, 12)
+custom_minimum_size = Vector2(18, 18)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
 [node name="ActionPointDot3" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow/ActionPointBadge/ActionPointRow" unique_id=613323155]
-custom_minimum_size = Vector2(12, 12)
+custom_minimum_size = Vector2(18, 18)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -1178,7 +1178,7 @@ size_flags_horizontal = 4
 
 [node name="SealLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/CardHeaderRow/HeaderTextColumn/SealBadge" unique_id=917603000]
 layout_mode = 2
-text = "正在运转"
+text = "敕令"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -1191,20 +1191,22 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="TimeBadge" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/CardHeaderRow" unique_id=1081478646]
-custom_minimum_size = Vector2(72, 22)
+custom_minimum_size = Vector2(32, 72)
 layout_mode = 2
 
-[node name="TimeRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/CardHeaderRow/TimeBadge" unique_id=1311377886]
+[node name="TimeRow" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/CardHeaderRow/TimeBadge" unique_id=1311377886]
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 0
 
 [node name="TimeIconLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/CardHeaderRow/TimeBadge/TimeRow" unique_id=69049136]
 layout_mode = 2
-text = "⏳"
+text = ""
+horizontal_alignment = 1
 
 [node name="TimeTextLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/CardHeaderRow/TimeBadge/TimeRow" unique_id=2056126056]
 layout_mode = 2
-text = "1 时辰"
+text = "壹\n时\n辰"
+horizontal_alignment = 1
 
 [node name="Divider" type="ColorRect" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn" unique_id=317034156]
 custom_minimum_size = Vector2(0, 1)
@@ -1346,7 +1348,7 @@ size_flags_horizontal = 4
 
 [node name="SealLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/CardHeaderRow/HeaderTextColumn/SealBadge" unique_id=2041183426]
 layout_mode = 2
-text = "正在运转"
+text = "敕令"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -1359,20 +1361,22 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="TimeBadge" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/CardHeaderRow" unique_id=1007345504]
-custom_minimum_size = Vector2(72, 22)
+custom_minimum_size = Vector2(32, 72)
 layout_mode = 2
 
-[node name="TimeRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/CardHeaderRow/TimeBadge" unique_id=332437161]
+[node name="TimeRow" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/CardHeaderRow/TimeBadge" unique_id=332437161]
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 0
 
 [node name="TimeIconLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/CardHeaderRow/TimeBadge/TimeRow" unique_id=1522937476]
 layout_mode = 2
-text = "⏳"
+text = ""
+horizontal_alignment = 1
 
 [node name="TimeTextLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/CardHeaderRow/TimeBadge/TimeRow" unique_id=1432921366]
 layout_mode = 2
-text = "1 时辰"
+text = "壹\n时\n辰"
+horizontal_alignment = 1
 
 [node name="Divider" type="ColorRect" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn" unique_id=799683468]
 custom_minimum_size = Vector2(0, 1)
@@ -1514,7 +1518,7 @@ size_flags_horizontal = 4
 
 [node name="SealLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/CardHeaderRow/HeaderTextColumn/SealBadge" unique_id=1449385356]
 layout_mode = 2
-text = "正在运转"
+text = "敕令"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -1527,20 +1531,22 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="TimeBadge" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/CardHeaderRow" unique_id=949573070]
-custom_minimum_size = Vector2(72, 22)
+custom_minimum_size = Vector2(32, 72)
 layout_mode = 2
 
-[node name="TimeRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/CardHeaderRow/TimeBadge" unique_id=1132765153]
+[node name="TimeRow" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/CardHeaderRow/TimeBadge" unique_id=1132765153]
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 0
 
 [node name="TimeIconLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/CardHeaderRow/TimeBadge/TimeRow" unique_id=1979842861]
 layout_mode = 2
-text = "⏳"
+text = ""
+horizontal_alignment = 1
 
 [node name="TimeTextLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/CardHeaderRow/TimeBadge/TimeRow" unique_id=844274753]
 layout_mode = 2
-text = "1 时辰"
+text = "壹\n时\n辰"
+horizontal_alignment = 1
 
 [node name="Divider" type="ColorRect" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn" unique_id=1099523171]
 custom_minimum_size = Vector2(0, 1)
@@ -1682,7 +1688,7 @@ size_flags_horizontal = 4
 
 [node name="SealLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/CardHeaderRow/HeaderTextColumn/SealBadge" unique_id=1256717543]
 layout_mode = 2
-text = "正在运转"
+text = "敕令"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -1695,20 +1701,22 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="TimeBadge" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/CardHeaderRow" unique_id=1609953522]
-custom_minimum_size = Vector2(72, 22)
+custom_minimum_size = Vector2(32, 72)
 layout_mode = 2
 
-[node name="TimeRow" type="HBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/CardHeaderRow/TimeBadge" unique_id=1203175326]
+[node name="TimeRow" type="VBoxContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/CardHeaderRow/TimeBadge" unique_id=1203175326]
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 0
 
 [node name="TimeIconLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/CardHeaderRow/TimeBadge/TimeRow" unique_id=776892261]
 layout_mode = 2
-text = "⏳"
+text = ""
+horizontal_alignment = 1
 
 [node name="TimeTextLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/CardHeaderRow/TimeBadge/TimeRow" unique_id=667259377]
 layout_mode = 2
-text = "1 时辰"
+text = "壹\n时\n辰"
+horizontal_alignment = 1
 
 [node name="Divider" type="ColorRect" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn" unique_id=819629086]
 custom_minimum_size = Vector2(0, 1)

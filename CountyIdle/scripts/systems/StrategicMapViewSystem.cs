@@ -37,6 +37,8 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     private const float WorldHexUnderlayPaddingMin = 0.20f;
     private const float WorldHexUnderlayPaddingMax = 1.60f;
     private const float WorldHexTextureAreaScale = 0.80f;
+    private const float GoldenRatio = 1.6180339f;
+    private const float WorldExplicitTerrainTextureShare = 1f / (1f + GoldenRatio);
     private const float WorldHexOutlineWidthFactor = 0.026f;
     private const float WorldHexOutlineWidthMin = 0.42f;
     private const float WorldHexInnerOutlineWidthFactor = 0.42f;
@@ -116,6 +118,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     private Dictionary<(int Q, int R), XianxiaHexCellData> _xianxiaWorldCellLookup = [];
     private Dictionary<(int Q, int R), Vector2> _xianxiaWorldCenters = [];
     private Dictionary<(int Q, int R), Vector2I> _xianxiaWorldTileCells = [];
+    private readonly HashSet<(int Q, int R)> _worldExplicitTerrainCells = [];
     private float _xianxiaWorldHexRadius = 0.01f;
     private Vector2 _xianxiaWorldTileCenterLocal = Vector2.Zero;
     private float _xianxiaWorldTileLayoutScale = 1f;
@@ -593,6 +596,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         _xianxiaWorldCellLookup = [];
         _xianxiaWorldCenters = [];
         _xianxiaWorldTileCells = [];
+        _worldExplicitTerrainCells.Clear();
         _xianxiaWorldHexRadius = 0.01f;
         _xianxiaWorldTileCenterLocal = Vector2.Zero;
         _xianxiaWorldTileLayoutScale = 1f;
@@ -784,7 +788,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
             // 世界图底图应直接透出 `background_map.png`，这里不再额外铺任何单元格底色。
             var cellHex = BuildHexPolygon(canvasCenter, hexRadius);
             var textureHex = BuildHexPolygon(canvasCenter, textureRadius);
-            if (!TryDrawWorldLayer1TileSetHex(textureHex, cell, tint))
+            if (ShouldDrawExplicitWorldTerrain(cell) && !TryDrawWorldLayer1TileSetHex(textureHex, cell, tint))
             {
                 DrawFilledPolygon(textureHex, tint);
             }
@@ -1469,6 +1473,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         _xianxiaWorldTileCenterLocal = Vector2.Zero;
         _xianxiaWorldTileLayoutScale = 1f;
         ClearWorldTerrainTileLayer();
+        RebuildWorldExplicitTerrainSelection(worldMap);
 
         var rawCenters = new Dictionary<(int Q, int R), Vector2>(worldMap.Cells.Count);
         var minX = float.MaxValue;
@@ -2291,6 +2296,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         _xianxiaWorldTileCells = [];
         _xianxiaWorldTileCenterLocal = Vector2.Zero;
         _xianxiaWorldTileLayoutScale = 1f;
+        _worldExplicitTerrainCells.Clear();
 
         if (_worldTerrainTileLayer == null)
         {
@@ -2417,10 +2423,184 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         return new Vector2I(column, row);
     }
 
+    // 世界图默认以留白平地承接底图，因此只有进入“显式地貌名单”的格子才绘制 L1 贴图。
+    private bool ShouldDrawExplicitWorldTerrain(XianxiaHexCellData cell)
+    {
+        return _worldExplicitTerrainCells.Contains((cell.Coord.Q, cell.Coord.R));
+    }
+
+    // 预先按稳定优先级挑出“需要显式贴图”的世界格，使留白 : 地形显影接近黄金比例。
+    private void RebuildWorldExplicitTerrainSelection(XianxiaWorldMapData? worldMap)
+    {
+        _worldExplicitTerrainCells.Clear();
+        if (worldMap == null || worldMap.Cells.Count == 0)
+        {
+            return;
+        }
+
+        var targetTexturedCount = Math.Clamp(
+            (int)MathF.Round(worldMap.Cells.Count * WorldExplicitTerrainTextureShare),
+            1,
+            worldMap.Cells.Count);
+        var candidates = new List<WorldTerrainTextureCandidate>(worldMap.Cells.Count);
+
+        foreach (var cell in worldMap.Cells)
+        {
+            var priority = EvaluateWorldTerrainTexturePriority(cell);
+            if (priority <= 0f)
+            {
+                continue;
+            }
+
+            candidates.Add(new WorldTerrainTextureCandidate(
+                cell.Coord.Q,
+                cell.Coord.R,
+                priority,
+                HashCell(cell.Coord.Q, cell.Coord.R, 1607)));
+        }
+
+        if (candidates.Count == 0)
+        {
+            return;
+        }
+
+        candidates.Sort(static (left, right) =>
+        {
+            var scoreCompare = right.Score.CompareTo(left.Score);
+            return scoreCompare != 0 ? scoreCompare : left.TieBreak.CompareTo(right.TieBreak);
+        });
+
+        var selectedCount = Math.Min(targetTexturedCount, candidates.Count);
+        for (var index = 0; index < selectedCount; index++)
+        {
+            _worldExplicitTerrainCells.Add((candidates[index].Q, candidates[index].R));
+        }
+    }
+
+    // 对需要被玩家快速读出来的地貌赋予更高权重；普通平地默认不进入显式贴图名单。
+    private static float EvaluateWorldTerrainTexturePriority(XianxiaHexCellData cell)
+    {
+        var visualFamily = WorldTerrainVisualRules.ResolveWorldVisualFamily(cell);
+        var score = visualFamily switch
+        {
+            // 水域与雪地最先保留；灵地次之；荒岭继续收紧，避免地图重新变得过满。
+            TownTerrainVisualFamily.DeepWater => 8.2f,
+            TownTerrainVisualFamily.ShallowWater => 7.2f,
+            TownTerrainVisualFamily.Snow => 6.1f,
+            TownTerrainVisualFamily.Spirit => 5.1f,
+            TownTerrainVisualFamily.Rugged => 4.1f,
+            _ => 0f
+        };
+
+        if (cell.Wonder != XianxiaWonderType.None)
+        {
+            score += 4.8f;
+        }
+
+        if (cell.Structure != XianxiaStructureType.None)
+        {
+            score += 2.9f;
+        }
+
+        if (cell.SpiritualZone != XianxiaSpiritualZoneType.None)
+        {
+            score += 1.6f;
+        }
+
+        if (cell.Resource != XianxiaResourceType.None)
+        {
+            score += 1.0f;
+        }
+
+        if (cell.IsDragonVeinCore)
+        {
+            score += 3.4f;
+        }
+
+        if (cell.IsSectCandidate)
+        {
+            score += 2.1f;
+        }
+
+        if (cell.IsLake)
+        {
+            score += 1.1f;
+        }
+
+        if (cell.RiverMask != HexDirectionMask.None)
+        {
+            score += 0.8f;
+        }
+
+        if (cell.CliffMask != HexDirectionMask.None)
+        {
+            score += 0.9f;
+        }
+
+        if (cell.QiDensity >= 0.74f)
+        {
+            score += 0.5f;
+        }
+
+        if (cell.Corruption >= 0.60f)
+        {
+            score += 0.4f;
+        }
+
+        if (cell.MonsterThreat >= 0.72f)
+        {
+            score += 0.4f;
+        }
+
+        // 雪地更偏整片连续，雪峰 / 雪原本体继续抬高。
+        if (visualFamily == TownTerrainVisualFamily.Snow &&
+            (cell.Biome == XianxiaBiomeType.SnowPeaks ||
+             cell.Terrain is XianxiaTerrainType.SnowPlain or XianxiaTerrainType.SnowRock))
+        {
+            score += 1.0f;
+        }
+
+        // 灵地改成“点状贵气”：有明确灵脉/龙脉/结构才更容易显影，纯高灵气灵地收一点。
+        if (visualFamily == TownTerrainVisualFamily.Spirit &&
+            cell.SpiritualZone == XianxiaSpiritualZoneType.None &&
+            !cell.IsDragonVeinCore &&
+            cell.Wonder == XianxiaWonderType.None &&
+            cell.Structure == XianxiaStructureType.None)
+        {
+            score -= 1.2f;
+        }
+
+        // 荒岭尽量压到边缘/高差/高山语义附近，普通粗犷地貌继续减少。
+        if (visualFamily == TownTerrainVisualFamily.Rugged)
+        {
+            if (cell.CliffMask != HexDirectionMask.None ||
+                cell.Height >= 72 ||
+                cell.Biome is XianxiaBiomeType.MistyMountains or XianxiaBiomeType.JadeHighlands or XianxiaBiomeType.SnowPeaks ||
+                cell.Terrain is XianxiaTerrainType.MountainRock or XianxiaTerrainType.MountainMoss or XianxiaTerrainType.MountainPlateau)
+            {
+                score += 0.8f;
+            }
+            else
+            {
+                score -= 1.1f;
+            }
+        }
+
+        // 普通平地默认留白；但若叠加了奇观/灵脉/资源等强语义，仍允许进入显式显影名单。
+        if (visualFamily == TownTerrainVisualFamily.Plain && score < 1.2f)
+        {
+            return 0f;
+        }
+
+        return score;
+    }
+
     private static float ResolveWorldUnderlayPadding(float radius)
     {
         return Mathf.Clamp(radius * WorldHexUnderlayPaddingFactor, WorldHexUnderlayPaddingMin, WorldHexUnderlayPaddingMax);
     }
+
+    private readonly record struct WorldTerrainTextureCandidate(int Q, int R, float Score, int TieBreak);
 }
 
 

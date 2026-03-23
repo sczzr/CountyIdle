@@ -1,0 +1,5 @@
+<svg width="400" height="200" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+  <rect x="5" y="5" width="390" height="190" fill="#ffffff" fill-opacity="0.7" stroke="#8c734b" stroke-width="0.5" />
+  <path d="M180 5 L220 5 L215 15 L185 15 Z" fill="#8c734b" opacity="0.2" />
+  <text x="350" y="150" font-family="serif" font-size="60" fill="#8c734b" fill-opacity="0.05" transform="rotate(-15 350 150)">敕</text>
+</svg>

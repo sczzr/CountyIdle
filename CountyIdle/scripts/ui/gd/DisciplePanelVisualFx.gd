@@ -1,12 +1,12 @@
 extends Node
 
-const BG_DARK := Color(0.027, 0.033, 0.030, 0.96)
-const PANEL_DARK := Color(0.075, 0.085, 0.081, 0.90)
-const PANEL_EDGE := Color(0.420, 0.384, 0.267, 0.45)
+const BG_DARK := Color(0.922, 0.906, 0.867, 0.98)
+const PANEL_DARK := Color(0.968, 0.958, 0.936, 0.96)
+const PANEL_EDGE := Color(0.780, 0.736, 0.640, 0.45)
 const GOLD := Color(0.894, 0.753, 0.310, 1.0)
 const GOLD_DIM := Color(0.420, 0.384, 0.267, 1.0)
-const INK_MAIN := Color(0.910, 0.922, 0.914, 1.0)
-const INK_MUTED := Color(0.557, 0.596, 0.580, 1.0)
+const INK_MAIN := Color(0.173, 0.173, 0.173, 1.0)
+const INK_MUTED := Color(0.420, 0.396, 0.345, 1.0)
 const INK_DIM := Color(0.420, 0.384, 0.267, 0.85)
 const ACCENT := Color(0.247, 0.851, 0.659, 1.0)
 const DANGER := Color(0.851, 0.282, 0.220, 1.0)
@@ -42,11 +42,12 @@ func _ready() -> void:
 
 func apply_theme_styles() -> void:
 	var root := get_parent()
+	# 用户已明确要求弟子谱底色回到浅纸色，不再沿用旧暗底。
 	_backdrop.color = BG_DARK
 
 	var hex_grid := root.get_node_or_null("HexGrid") as TextureRect
 	if hex_grid != null:
-		hex_grid.self_modulate = Color(1, 1, 1, 0.08)
+		hex_grid.self_modulate = Color(0.35, 0.36, 0.33, 0.05)
 
 	for path in [
 		"ScreenMargin/ScreenRoot/TreePage/TreeColumn/SummaryPanel",
@@ -383,14 +384,14 @@ func _create_panel_glass_style(alpha: float = 0.82) -> StyleBoxFlat:
 	style.corner_radius_top_right = 6
 	style.corner_radius_bottom_right = 6
 	style.corner_radius_bottom_left = 6
-	style.shadow_color = Color(0, 0, 0, 0.45)
-	style.shadow_size = 12
+	style.shadow_color = Color(0, 0, 0, 0.06)
+	style.shadow_size = 8
 	return style
 
 
 func _create_metric_tile_style() -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(PANEL_DARK.r, PANEL_DARK.g, PANEL_DARK.b, 0.65)
+	style.bg_color = Color(PANEL_DARK.r, PANEL_DARK.g, PANEL_DARK.b, 0.92)
 	style.border_width_left = 1
 	style.border_width_top = 1
 	style.border_width_right = 1
@@ -405,7 +406,7 @@ func _create_metric_tile_style() -> StyleBoxFlat:
 
 func _create_peak_card_style() -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.09, 0.12, 0.11, 0.92)
+	style.bg_color = Color(0.948, 0.962, 0.952, 0.98)
 	style.border_width_left = 1
 	style.border_width_top = 1
 	style.border_width_right = 1
@@ -415,14 +416,14 @@ func _create_peak_card_style() -> StyleBoxFlat:
 	style.corner_radius_top_right = 5
 	style.corner_radius_bottom_right = 5
 	style.corner_radius_bottom_left = 5
-	style.shadow_color = Color(0, 0, 0, 0.25)
-	style.shadow_size = 8
+	style.shadow_color = Color(0, 0, 0, 0.05)
+	style.shadow_size = 6
 	return style
 
 
 func _create_hall_card_style() -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(PANEL_DARK.r, PANEL_DARK.g, PANEL_DARK.b, 0.76)
+	style.bg_color = Color(PANEL_DARK.r, PANEL_DARK.g, PANEL_DARK.b, 0.94)
 	style.border_width_left = 1
 	style.border_width_top = 1
 	style.border_width_right = 1
@@ -444,7 +445,7 @@ func _create_roster_card_style(is_selected: bool) -> StyleBoxFlat:
 		bg_alpha = 0.18
 		border_alpha = 0.72
 		shadow_alpha = 0.26
-	style.bg_color = Color(0.10, 0.12, 0.11, bg_alpha)
+	style.bg_color = Color(0.97, 0.965, 0.948, bg_alpha * 3.0)
 	style.border_width_left = 1
 	style.border_width_top = 1
 	style.border_width_right = 1
@@ -463,7 +464,7 @@ func _create_roster_card_style(is_selected: bool) -> StyleBoxFlat:
 	style.content_margin_top = 0
 	style.content_margin_right = 0
 	style.content_margin_bottom = 0
-	style.shadow_color = Color(GOLD.r, GOLD.g, GOLD.b, shadow_alpha)
+	style.shadow_color = Color(0, 0, 0, shadow_alpha * 0.35)
 	style.shadow_size = 8 if is_selected else 4
 	return style
 
@@ -475,7 +476,7 @@ func _create_button_style(is_hovered: bool, is_disabled: bool = false) -> StyleB
 	if is_disabled:
 		bg_alpha = 0.02
 		border_alpha = 0.12
-	style.bg_color = Color(0.10, 0.12, 0.11, bg_alpha)
+	style.bg_color = Color(0.985, 0.978, 0.962, bg_alpha * 3.2)
 	style.border_width_left = 1
 	style.border_width_top = 1
 	style.border_width_right = 1
@@ -505,7 +506,7 @@ func _create_selection_style(is_focus: bool = false) -> StyleBoxFlat:
 
 func _create_progress_bg() -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0, 0, 0, 0.35)
+	style.bg_color = Color(0.60, 0.56, 0.48, 0.18)
 	style.corner_radius_top_left = 4
 	style.corner_radius_top_right = 4
 	style.corner_radius_bottom_right = 4
@@ -527,7 +528,7 @@ func _create_progress_fill(color: Color) -> StyleBoxFlat:
 
 func _create_circle_style() -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.10, 0.12, 0.11, 0.75)
+	style.bg_color = Color(0.985, 0.978, 0.962, 0.92)
 	style.border_width_left = 2
 	style.border_width_top = 2
 	style.border_width_right = 2
