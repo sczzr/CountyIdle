@@ -50,7 +50,7 @@
 
 | ID | 功能包 | 当前状态 | 飞轮环节 | 完成标准（DoD） |
 | --- | --- | --- | --- | --- |
-| DL-001 | 战略地图配置驱动接入 | IN_PROGRESS（双轨调试入口已补） | 反哺宗门 | 世界/江陵府外域图由 `data/strategic_maps.json` 驱动渲染，fallback 仍可运行 |
+| DL-001 | 战略地图配置驱动接入 | IN_PROGRESS（配置交互数据块接入，headless 已补） | 反哺宗门 | 世界/江陵府外域图由 `data/strategic_maps.json` 驱动渲染，fallback 仍可运行；本轮已补世界/外域配置的轮廓、河流、节点类型与标签，并让江陵府外域备用图默认走配置源；当前继续为世界图配置源接入 `interactive_world`，使配置源可保留 hex 点选、站点详情与二级入口的最小链路；`dotnet build`、配置反序列化与 `WorldPanel.tscn` Godot 4.6 headless 已通过，世界图默认仍保留程序生成主链，待配置 cell/site 覆盖面和 F5 点选验证充分后再评估默认切回 |
 | DL-002 | 外域历练地图玩法闭环 | TODO | 武装探险 | `ExpeditionMapView` 接入节点、路线风险、遭遇结果并反馈到 `GameState` |
 | DL-003 | 宗门见闻与统计报表实时化 | IN_PROGRESS（一期：见闻报表卷原型） | 反哺宗门 | 右栏纪事可展开为“见闻报表卷”，卷内显示实时警讯、分类筛读近时札记、经营快照、近几次时辰结算回看与季度/年度摘要；后续继续补更长周期统计与分类筛阅 |
 | DL-004 | 职司优先级调配策略 | TODO | 职业分化 | 优先级按钮影响岗位自动回退 / 分配顺序，并有日志可解释 |
@@ -94,7 +94,7 @@
 | DL-044 | 门规树（一期：三支门规纲目） | DONE（本轮） | 产业供养→传承研修→人口繁衍→反哺宗门 | 宗主中枢新增 `庶务 / 传功 / 巡山` 三支门规纲目，门规会真实影响收益、人口、威胁与工器锻制；`dotnet build .\\Finally.sln` 通过 |
 | DL-045 | 主界面六边形沙盘重构 | DONE（本轮） | 反哺宗门 | 主界面改为“中央 hex 沙盘 + 左侧地块检视 + 右侧宗门纪事 + 底部控制台”布局；天衍峰场所选中会同步刷新地块检视卡；不改小时结算与存档结构；`dotnet build .\\Finally.sln` 通过 |
 | DL-046 | 交互 icon 规范文档 | DONE（本轮） | 反哺宗门 | 输出 UI 交互 icon 清单、命名规范、尺寸/状态与入口映射文档（`docs/10_ui_icon_guide.md`） |
-| DL-047 | 天衍峰院域坊局与全格检视系统 | IN_PROGRESS（代码三期：建筑列表补齐） | 产业涌现→科技涌现→人口繁衍→反哺宗门 | 天衍峰任意 hex 可点击检视；地块具备固定灵气池、坊位数、天然特征与分区；同地块支持多建筑坊局组合、共享灵气与协同/互扰规则；随机性来自地块 traits、节气、局部事件与驻守差异，而非纯硬摇点 |
+| DL-047 | 天衍峰院域坊局与全格检视系统 | IN_PROGRESS（代码四期：同地块多建筑落位） | 产业涌现→科技涌现→人口繁衍→反哺宗门 | 天衍峰任意 hex 可点击检视；地块具备固定灵气池、坊位数、天然特征与分区；同地块支持多建筑坊局组合、共享灵气与协同/互扰规则；当前继续把运行版从“单格单建筑”补齐到按槽位支持同格多建筑落位、同格显影与卷面摘要 |
 | DL-048 | 世界格二级地图分层与入口系统 | IN_PROGRESS（运行时八期：局部检视闭环） | 反哺宗门→产业涌现→武装探险 | 世界地图任意 hex 点选后都会先在左侧刷新该格详情；玩家通过进入按钮可打开 `SecondaryMapView`，并基于该格的 `Biome / Terrain / Water / Wonder / Structure / QiDensity / Corruption / MonsterThreat / Fertility` 生成一张与山门沙盘同形的下一层 hex 沙盘；局部沙盘点选后会继续复用左侧检视器与缩放链路，未选中局部 hex 时则回退显示世界点位摘要；已有站点继续沿用原生 `PrimaryType / SecondaryTag / RegionId / RarityTier / UnlockTier`，非站点格则回退生成格子级入口语义；`Wilderness` 已进入点击链路与占位页模板，后续继续细化专属模板与真实玩法 |
 | DL-049 | 地图素材生产规格与分层资产流水线 | IN_PROGRESS（运行时四期：世界图底盘回收到 hex polygon 投影） | 反哺宗门→产业涌现→武装探险 | 已形成正式地图素材规格文档，并新增 L1-L5 绘制实施方案；当前宗门图已接入 `Layer 1` atlas manifest、`Layer 2` decal / connector 链路，并进一步补上 `Layer 3` 最小运行时闭环；世界图基础地块现继续复用 `L1_hex_tileset.tres`，但正式运行时底盘已回收到 hex polygon 投 atlas 区域的绘制方式，避免 `TileMapLayer` 方片排布产生白缝，后续可继续扩到正式国风地块、宗门图立体物件、世界图高层 overlay 与二级地图 |
 | DL-050 | 三相治宗循环重设计（季度战略相位 + 双层时间制） | TODO（文档重设计中） | 门人生息→产业供养→传承研修→职司分化→武装历练→反哺宗门 | 将玩法主循环收口为“季度立纲 -> 月度筹划 -> 小时结算”三相节奏，并补入“细时间运转 + 长时间岁月感”的双层时间制；完成 `docs/01` 重写、`docs/02` 可执行规格补充、`feature-card + change-proposal` 归档，并给出首批可实现工单 |
@@ -130,21 +130,21 @@
 | DL-086 | 建筑列表与快捷建造 | DONE（右栏营建清单） | 产业涌现→反哺宗门 | 右栏新增“营建清单”面板，展示可建造建筑的数量、消耗与建造按钮；按钮触发现有建造逻辑与日志；不改核心结算与存档；`dotnet build .\Finally.sln` 通过 |
 | DL-087 | 建筑落地可视化（山门图建筑显影） | DONE（二期：落点持久化） | 产业涌现→反哺宗门 | 建造后山门图出现对应建筑；建筑数量映射为可见锚点数量；落点写入存档可恢复；`dotnet build .\Finally.sln` 通过 |
 | DL-088 | 弟子修炼卷（修炼安排页） | IN_PROGRESS（十四期：结果页专精回响已接入） | 门人→传承研修→反哺宗门 | 主界面新增修炼卷入口与弹窗；支持按弟子登记技能修炼 / 功法打磨 / 技艺练习 / 打坐修炼四类主修安排，并写入 `GameState`；可从弟子谱直接跳转定位；当前已接入时辰结算聚合收益、逐弟子长期成长摘要、近时履历回看、个体表现联动、培养路数/路数批语展示、外务候补 / 执事培养 / 内务补位的轻量差事优势联动，以及周期生成的修炼感悟札记与轻量机缘；卷面也已重构为“左侧弟子点名册 + 当前阵眼 HUD，右侧 2x2 玉简法门矩阵”的全屏沉浸式布局，且点名册已进一步卡牌化为字章 / 境界 / 主修 / 分支短签联读，并完成卷面视觉图形化（标签化身份、菱形刻度火候、属性块收益、状态槽式当前运转周天）；同一路数还能继续细化为专修分支，并进一步映照进功法/技艺专精、分支成形履历与专精效用；本轮又把这些专精效用继续接回任务详情、外务战报与差事说明，后续继续补更细培养联动 |
-| DL-088 | 宗门命名自定义（宗门/峰/堂口全替换显示名） | TODO | 反哺宗门 | 宗主中枢/宗门档案支持自定义宗门、峰与堂口显示名；山门图/卷宗/日志/事件/调度提示统一读取显示名；旧存档缺失时回落默认名；提供恢复默认；`dotnet build .\Finally.sln` 通过 |
-| DL-089 | 外务行囊与宗门库藏分离 | IN_PROGRESS | 武装探险→反哺宗门 | 外务/历练掉落先进入行囊而非宗库；工坊手作成品进入暂存；仓储卷显示行囊与成品摘要并提供入库；交回后才计入仓储与存档摘要；`dotnet build .\Finally.sln` 当前失败（`MainSectTileInspector.cs` 编译错误），仍缺 Godot/F5 与存档/结算烟测 |
+| DL-089 | 外务行囊与宗门库藏分离 | IN_PROGRESS | 武装探险→反哺宗门 | 外务/历练掉落先进入行囊而非宗库；工坊手作成品进入暂存；仓储卷显示行囊与成品摘要并提供入库；交回后才计入仓储与存档摘要；当前工作区 `dotnet build .\Finally.sln` 与 `tools/SaveSmoke` 已通过，已脱离此前 `MainSectTileInspector.cs` 编译失败的旧状态，仍缺 Godot/F5 与“暂存 -> 入库 -> 存档摘要”联动烟测 |
 | DL-090 | 文明式营建卷（城建建造与 UI 布局改造） | DONE（本轮：队列/进度闭环） | 产业涌现→人口繁衍→反哺宗门 | 营建卷已支持建筑列表/详情对比/队列进度与地块建造联动，营建按时辰结算推进并可撤销排队；保持宗门经营语义，不退化为纯城建；`dotnet build .\Finally.sln` 通过 |
-| DL-091 | UI 响应式布局标准化（主界面与卷册） | IN_PROGRESS（设置卷分类辞书已补） | 反哺宗门 | 主界面与核心卷册改为锚点 + 容器化布局，避免根节点硬编码超视口尺寸；项目基础视口与窗口最小尺寸已收口到 `1280x720 (720p)`；设置卷现已进一步重构为“左玉简页签 + 右宣纸正文 + 诗文瀑布背景”的机宜卷布局，并保留全屏复选框、动态窗口分辨率、画面缩放滑条与快捷键录入逻辑；卷首标题现会随“万象声色 / 敕令符节 / 世间法则”三类切换同步更新，且游戏性页签文案已改为“世间法则”；高分辨率默认显示更多内容而不是放大画面；本轮继续为 `DisciplePanel` 命谱页、`CultivationPanel` 主卷页补纵向滚动，把 `SectChroniclePanel` / `SectNamePanel` 改成边距化满屏承载，并把 `WorldPanel` 底部控制条改为全宽锚点布局、给 `MapViewport` 补专用地图背景图与半透明压暗泛黄蒙层、`SettingsPanel` 改为设置区滚动承载并补齐全屏铺底背景与拉伸布局；同时将 `JobsPanel` 从固定左栏改造成常驻浮动“院域营建卷”，开局即展示，并进一步收口为仅保留地貌 / 位序 / 建筑摘要与“对该地块营建”入口的建造专用卷册，卷内旧的弟子 / 仓储 / 调度动作按钮与无关字段绑定已移除，且已将“建筑总览 + 建造按钮”前置到摘要顶部，同时弱化院域态势 / 位序等辅助信息层级，右侧 `EventLogPanel` 默认收起并改由玩家手动展开，并补设置卷页签选中缩放定位修正及确认按钮悬停动效；`dotnet build .\Finally.sln` 已通过，仍待补设置卷场景级 headless / F5 走查 |
-| DL-092 | 弟子谱双页拆分（宗门大谱 / 命谱详情） | IN_PROGRESS（清简玉简树页已重构，`dotnet build` 已通过，待 Godot/F5 走查） | 门人→职司分化→反哺宗门 | 树页已重构为“左侧支脉导航 + 右侧血脉族谱”的极简玉简方案，弟子节点可点击进入命谱详情并保留当前支脉上下文；仍待实机场景走查 |
-| DL-093 | 修仙控件 SVG 主题图标包 | IN_PROGRESS（`dotnet build` 已通过，待 Godot/F5 走查） | 反哺宗门 | 已为 `CheckBox / CheckButton / OptionButton / HSlider / VSlider / Tree` 接入统一的 SVG 图标资源，且同时同步到 `HanCourtyardTheme.tres` 与 `xianxia.tres`；`SettingsPanelVisualFx.gd` 也已改为复用共享 slider 贴图；`dotnet build .\Finally.sln` 通过 |
-| DL-094 | 弟子谱 CSS 主题原型（godot-css-theme） | IN_PROGRESS（树页已转向清简玉简方案，详情页 Theme 仍保留；`dotnet build` 已通过，待 Godot/F5 走查） | 门人→反哺宗门 | `xianxia.css` 继续作为命谱详情局部主题底座，树页则进一步收口为纸底 + 朱砂/白绿玉简 + 极细连枝线；当前仍只覆盖弟子谱，不扩散到全局主题；`dotnet build .\Finally.sln` 通过 |
-| DL-095 | 修炼卷可复用修仙控件场景（SoulCore / JadeSlipCard / SpiritStatBar） | IN_PROGRESS（立项中，待组件抽取与 CultivationPanel 接入） | 门人→传承研修→反哺宗门 | 将修炼卷里的阵眼 HUD、玉简决策卡与菱形火候条抽成可复用场景，统一复用 `xianxia.css` 与 SVG 资源，并在 `CultivationPanel` 完成首轮落地；`dotnet build .\Finally.sln` 通过 |
-| DL-096 | 国风题屏主菜单（玉简起卷） | IN_PROGRESS（题屏 scene / shader / 接线实现中，待构建与 Godot 走查） | 反哺宗门 | 为 `Main.tscn` 补一套题屏启动遮罩：宣纸底、诗文瀑布、五组玉简菜单与印章落款；`开始 / 读取 / 设置 / 退出` 对接现有正式入口，`MOD` 暂保留提示占位；需验证题屏期间主循环暂停、快捷键让行与弹窗层级 |
-| DL-097 | 全景主操作 HUD（天地人一体） | IN_PROGRESS（一期：CanvasLayer 主界面总纲已接入） | 反哺宗门 | 主界面改为 `CanvasLayer` 全屏 HUD：顶栏整合节气/日期/核心资源，左右浮窗承载地块检视与宗门纪事，底栏以令箭中枢承载库房/中枢/谱系/天工/政令主操作，并保持地图点击与 HUD 交互分层穿透；`dotnet build .\Finally.sln` 通过 |
+| DL-091 | UI 响应式布局标准化（主界面与卷册） | IN_PROGRESS（设置卷分类辞书已补） | 反哺宗门 | 主界面与核心卷册改为锚点 + 容器化布局，避免根节点硬编码超视口尺寸；项目基础视口与窗口最小尺寸已收口到 `1280x720 (720p)`；设置卷现已进一步重构为“左玉简页签 + 右宣纸正文 + 诗文瀑布背景”的机宜卷布局，并保留全屏复选框、动态窗口分辨率、画面缩放滑条与快捷键录入逻辑；卷首标题现会随“万象声色 / 敕令符节 / 世间法则”三类切换同步更新，且游戏性页签文案已改为“世间法则”；高分辨率默认显示更多内容而不是放大画面；本轮继续为 `DisciplePanel` 命谱页、`CultivationPanel` 主卷页补纵向滚动，把 `SectChroniclePanel` / `SectNamePanel` 改成边距化满屏承载，并把 `WorldPanel` 底部控制条改为全宽锚点布局、给 `MapViewport` 补专用地图背景图与半透明压暗泛黄蒙层、`SettingsPanel` 改为设置区滚动承载并补齐全屏铺底背景与拉伸布局；同时将 `JobsPanel` 从固定左栏改造成常驻浮动“院域营建卷”，开局即展示，并进一步收口为仅保留地貌 / 位序 / 建筑摘要与“对该地块营建”入口的建造专用卷册，卷内旧的弟子 / 仓储 / 调度动作按钮与无关字段绑定已移除，且已将“建筑总览 + 建造按钮”前置到摘要顶部，同时弱化院域态势 / 位序等辅助信息层级，并补上剩余坊位 / 已满状态提示，右侧 `EventLogPanel` 默认收起并改由玩家手动展开，并补设置卷页签选中缩放定位修正及确认按钮悬停动效；`dotnet build .\Finally.sln`、`tools/SaveSmoke` 与当前 Godot 4.6 的 `Main / SettingsPanel / MainOperation / DisciplePanel / CultivationPanel / TitleMenuOverlay` headless 场景验证已通过，仍待 F5 交互走查 |
+| DL-092 | 弟子谱双页拆分（宗门大谱 / 命谱详情） | IN_PROGRESS（清简玉简树页已重构，`dotnet build` 与当前 Godot 4.6 的 `DisciplePanel` headless 场景验证已通过，待 F5 走查） | 门人→职司分化→反哺宗门 | 树页已重构为“左侧支脉导航 + 右侧血脉族谱”的极简玉简方案，弟子节点可点击进入命谱详情并保留当前支脉上下文；仍待实机场景走查 |
+| DL-093 | 修仙控件 SVG 主题图标包 | IN_PROGRESS（`dotnet build` 已通过，且本轮已补 `SettingsPanel / DisciplePanel` 的当前 Godot 4.6 headless 场景验证，待 F5 走查） | 反哺宗门 | 已为 `CheckBox / CheckButton / OptionButton / HSlider / VSlider / Tree` 接入统一的 SVG 图标资源，且同时同步到 `HanCourtyardTheme.tres` 与 `xianxia.tres`；`SettingsPanelVisualFx.gd` 也已改为复用共享 slider 贴图；`dotnet build .\Finally.sln` 通过 |
+| DL-094 | 弟子谱 CSS 主题原型（godot-css-theme） | IN_PROGRESS（树页已转向清简玉简方案，详情页 Theme 仍保留；`dotnet build` 与当前 Godot 4.6 的 `DisciplePanel` headless 场景验证已通过，待 F5 走查） | 门人→反哺宗门 | `xianxia.css` 继续作为命谱详情局部主题底座，树页则进一步收口为纸底 + 朱砂/白绿玉简 + 极细连枝线；当前仍只覆盖弟子谱，不扩散到全局主题；`dotnet build .\Finally.sln` 通过 |
+| DL-095 | 修炼卷可复用修仙控件场景（SoulCore / JadeSlipCard / SpiritStatBar） | IN_PROGRESS（首轮已落地到 `CultivationPanel`，`dotnet build` 与当前 Godot 4.6 的 `CultivationPanel` headless 场景验证已通过，待 F5 表现确认） | 门人→传承研修→反哺宗门 | 将修炼卷里的阵眼 HUD、玉简决策卡与菱形火候条抽成可复用场景，统一复用 `xianxia.css` 与 SVG 资源，并在 `CultivationPanel` 完成首轮落地；`dotnet build .\Finally.sln` 通过 |
+| DL-096 | 国风题屏主菜单（玉简起卷） | IN_PROGRESS（题屏 scene / shader / 接线实现中，`dotnet build` 与当前 Godot 4.6 的 `TitleMenuOverlay / Main.tscn` headless 场景验证已通过，待 F5 走查） | 反哺宗门 | 为 `Main.tscn` 补一套题屏启动遮罩：宣纸底、诗文瀑布、五组玉简菜单与印章落款；`开始 / 读取 / 设置 / 退出` 对接现有正式入口，`MOD` 暂保留提示占位；需验证题屏期间主循环暂停、快捷键让行与弹窗层级 |
+| DL-097 | 全景主操作 HUD（天地人一体） | IN_PROGRESS（一期：CanvasLayer 主界面总纲已接入） | 反哺宗门 | 主界面改为 `CanvasLayer` 全屏 HUD：顶栏整合节气/日期/核心资源，左右浮窗承载地块检视与宗门纪事，底栏以令箭中枢承载库房/中枢/谱系/天工/政令主操作，并保持地图点击与 HUD 交互分层穿透；`dotnet build .\Finally.sln` 与当前 Godot 4.6 的 `Main.tscn` headless 场景验证已通过，仍待 F5 交互走查 |
 
-| DL-098 | 主操作页面（TopBar / BottomBar / 地图） | IN_PROGRESS（场景完成，dotnet build 已通过，待 Godot 走查） | 反哺宗门 | 新增 `MainOperation.tscn`，仅保留 TopBar/WorldPanel/BottomBar 三段布局，中部地图自适应拉伸，不影响现有 `Main.tscn` 主接线；`dotnet build .\Finally.sln` 通过 |
+| DL-098 | 主操作页面（TopBar / BottomBar / 地图） | IN_PROGRESS（场景完成，`dotnet build` 与当前 Godot 4.6 的 `MainOperation.tscn` headless 场景验证已通过，待 F5 走查） | 反哺宗门 | 新增 `MainOperation.tscn`，仅保留 TopBar/WorldPanel/BottomBar 三段布局，中部地图自适应拉伸，不影响现有 `Main.tscn` 主接线；`dotnet build .\Finally.sln` 通过 |
 | DL-099 | 印章确认按钮可复用控件 | DONE | 反哺宗门 | 抽出 SettingsPanel 右下角确认按钮为独立组件，提供悬停放大/旋转/朱红填充动效，可在其它卷册直接复用；首轮替换 SettingsPanel 并保留自定义尺寸能力；`dotnet build .\Finally.sln` 通过 ；新增 `SealConfirmButton` 组件并替换 Settings/Task/SaveSlots/Disciple/SectOrganization 的印章按钮，统一悬停放大旋转与朱红填充反馈 |
-| DL-100 | 修炼卷宣纸化重构（敕令修行 · 玲珑调度） | IN_PROGRESS（宣纸/玉璧/朱砂首轮已接入，待构建与 Godot 走查） | 门人→传承研修→反哺宗门 | 在不改修炼卷单主修与结算权威逻辑的前提下，将 `CultivationPanel` 收口为“弟子灵鉴 + 玲珑心位 + 符纸法门”卷面：左侧转为宣纸玉璧与玉色火候条，右上状态区切到“玲珑心位”并按弟子资质显示 1~3 枚槽位，法门卡改成更轻的符纸样式与竖排“壹时辰”时长表达，同时补入 `exquisite_heart.svg / decree_talisman.svg` 资源底座；`dotnet build .\Finally.sln` 通过 |
+| DL-100 | 修炼卷宣纸化重构（敕令修行 · 玲珑调度） | IN_PROGRESS（心位/符纸 SVG、中央朱砂印痕与盖印动效已接入，`dotnet build` 与当前 Godot 4.6 的 `CultivationPanel` headless 场景验证已通过，待 F5 走查） | 门人→传承研修→反哺宗门 | 在不改修炼卷单主修与结算权威逻辑的前提下，将 `CultivationPanel` 收口为“弟子灵鉴 + 玲珑心位 + 符纸法门”卷面：左侧转为宣纸玉璧与玉色火候条，右上状态区切到“玲珑心位”并按弟子资质显示 1~3 枚槽位，法门卡改成更轻的符纸样式与竖排“壹时辰”时长表达；本轮又把 `exquisite_heart.svg / decree_talisman.svg` 真正挂到心位与法门卡节点，并补入切换主修时的 Godot 原生“朱砂盖印”轻动效，以及四张卡中央 `SealSplash` 印痕扩散与符纸金纹显影；`dotnet build .\Finally.sln` 通过 |
 | DL-101 | 地图平地留白与黄金比例地形显影 | IN_PROGRESS（二期：同步到山门图 / 二级地图） | 反哺宗门 | 世界图、山门图与二级地图默认以留白平地承接底图，仅对需要强调的地貌绘制 L1 贴图；空白 hex 与显式地形贴图 hex 目标比例约为 `1.618 : 1`；`dotnet build .\Finally.sln` 通过 |
+| DL-102 | 宗门命名自定义（宗门/峰/堂口全替换显示名） | TODO | 反哺宗门 | 宗主中枢/宗门档案支持自定义宗门、峰与堂口显示名；山门图/卷宗/日志/事件/调度提示统一读取显示名；旧存档缺失时回落默认名；提供恢复默认；`dotnet build .\Finally.sln` 通过 |
 
 ### 3.1 DL-019 功能包详情（宗门弟子可视移动）
 
@@ -173,7 +173,7 @@
 
 ### 3.72 DL-100 功能包详情（修炼卷宣纸化重构：敕令修行 · 玲珑调度）
 
-- 当前状态：IN_PROGRESS（已把 `CultivationPanel` 首轮改为宣纸底、玉色火候与朱砂敕令语义，待 `dotnet build` 与 Godot/F5 走查）。
+- 当前状态：IN_PROGRESS（已把 `CultivationPanel` 首轮改为宣纸底、玉色火候与朱砂敕令语义；本轮继续把 `exquisite_heart.svg / decree_talisman.svg` 真挂入场景，并补上切换主修时的盖印 tween、中央 `SealSplash` 印痕扩散与符纸金纹显影，`dotnet build` 与当前 Godot 4.6 headless 已通过，待 Godot/F5 走查）。
 - 目标（玩家价值）：让玩家打开修炼卷时，立即从视觉上读到“弟子灵鉴 / 玲珑心位 / 符纸法门”三层信息，不再像厚重后台面板，而更像正在纸上落印调度弟子的卷册。
 - 飞轮环节：门人 → 传承研修 → 反哺宗门（本轮只改表现层与少量 UI 状态映射，不改修炼结算与存档结构）。
 - 依赖（前置系统）：`DL-088` 弟子修炼卷、`DL-095` 修炼卷可复用修仙控件场景、`CultivationPanel.cs`、`CultivationPanelVisualFx.gd`。
@@ -182,8 +182,10 @@
   - 右上角心位区会依据弟子资质显示 1~3 枚槽位，当前主修激活时至少点亮一枚朱砂心位；
   - 四张法门卡的时长徽记改成竖排“壹时辰”，激活态统一使用“敕令”印章口径；
   - 左侧火候刻度改为玉色主填充，整卷改为宣纸底、淡金墨线与朱砂激活态；
+  - `exquisite_heart.svg / decree_talisman.svg` 已真正挂到 `CultivationPanel.tscn` 的心位与法门卡节点，不再只是资源底座；
+  - 切换主修时会触发一段 Godot 原生 tween 的“朱砂盖印”轻动效，中央 `SealSplash` 会短暂扩散淡出，符纸底纹会同步提亮为金纹显影，但不引入新插件与规则改动；
   - 不改 `GameState` 修炼安排字段、不把单主修逻辑改成多法门并行；
-  - `dotnet build .\Finally.sln` 通过。
+  - `dotnet build .\Finally.sln` 与 `Godot_v4.6-stable_mono_win64_console.exe --headless --scene res://scenes/ui/CultivationPanel.tscn --quit-after 1` 通过。
 - 依赖（前置系统）：`GameLoop`、`MainUI`、`Figma UI`、`CountyTownMapViewSystem`、读档流程。
 - 完成标准（DoD）：
   - 顶栏显示为架空农历日期，并融入 `24` 节气；
@@ -1297,7 +1299,7 @@
 
 ### 3.67 DL-090 功能包详情（文明式营建卷 / 城建布局改造）
 
-- 当前状态：营建卷已补齐建造队列/进度与时辰结算推进，支持撤销排队与停工；营建完工后会回写山门图落点与日志，闭环完成并通过构建验证。
+- 当前状态：营建卷已补齐建造队列/进度与时辰结算推进，支持撤销排队与停工；营建完工后会回写山门图落点与日志，当前继续补齐“同地块按槽位支持多建筑落位”的二期能力并通过构建验证。
 - 目标（玩家价值）：让建造入口像文明五城市建造一样可挑选、可比较、可排队，同时保持宗门经营与院域坊局联动。
 - 飞轮环节：产业涌现 → 人口繁衍 → 反哺宗门。
 - 依赖（前置系统）：`DL-047` 院域坊局检视、`DL-086` 建筑列表与快捷建造、`IndustrySystem`、`CountyTownMapViewSystem`、`MainSectTileInspector`、右栏营建清单。
@@ -1306,6 +1308,7 @@
   - 建筑条目显示成本、收益摘要、依赖与限制（坊位数、灵气、人口/职司）；
   - 卷内包含“建造队列/进度”区域，可显示当前在建项目或占位说明；
   - 建造结果与选中地块绑定，落地可视化与地块检视同步刷新；
+  - 同一地块在 `BuildSlotCount` 未满前，支持连续落入多种建筑，且点中已有建筑锚点时仍可继续同格营建；
   - 不引入纯建筑摆放玩法，仍由宗门经营/人口/职司驱动；
 - `dotnet build .\Finally.sln` 通过。
 

@@ -18,7 +18,9 @@
   - 将 `CultivationPanel` 主视觉从深色玻璃卡改为宣纸底、淡金墨线、玉色进度与朱砂激活态。
   - 将右上角状态徽记重构为“玲珑心位”语义，并按弟子资质显示 1~3 枚槽位。
   - 将法门卡的时长改为竖排“壹时辰”小楷表达，激活态统一为“敕令”印章语义。
-  - 补入 `exquisite_heart.svg` 与 `decree_talisman.svg` 作为后续可复用的修炼卷资源底座。
+  - 补入 `exquisite_heart.svg` 与 `decree_talisman.svg`，并把两者真正挂到 `CultivationPanel.tscn` 的心位节点与法门卡节点上。
+  - 在 `CultivationPanelVisualFx.gd` 中补一段 Godot 原生 tween 的“朱砂盖印”轻动效。
+  - 在四张法门卡中补 `SealSplash` 中央印痕层，让敕令落下时出现短暂扩散的朱砂印泥效果，并让符纸纹理同步提亮为金纹显影。
 - 不包含：
   - 改动 `GameState` 结构或把单主修规则改为多法门同时激活。
   - 新增复杂粒子、Lottie、专门的 Godot 插件依赖。
@@ -34,12 +36,16 @@
 
 ## 验收标准（可测试）
 
-- [ ] 修炼卷标题已更新为“敕令修行 · 玲珑调度”，左侧锚点语义更新为“弟子灵鉴”。
-- [ ] 右上角状态区已显示“玲珑心位”，并会按弟子资质显示 1~3 枚心位；当前主修激活时至少点亮 1 枚朱砂槽位。
-- [ ] 四张法门卡的时长徽记已改成竖排“壹时辰”表达，激活标记统一为“敕令”。
-- [ ] 左侧火候刻度已切到玉色填充，整体卷面不再以黑底金边为主色。
+- [x] 修炼卷标题已更新为“敕令修行 · 玲珑调度”，左侧锚点语义更新为“弟子灵鉴”。
+- [x] 右上角状态区已显示“玲珑心位”，并会按弟子资质显示 1~3 枚心位；当前主修激活时至少点亮 1 枚朱砂槽位。
+- [x] 四张法门卡的时长徽记已改成竖排“壹时辰”表达，激活标记统一为“敕令”。
+- [x] 左侧火候刻度已切到玉色填充，整体卷面不再以黑底金边为主色。
+- [x] `exquisite_heart.svg / decree_talisman.svg` 已真正接到 `CultivationPanel.tscn` 的心位与法门卡节点，而不只是资源落盘占位。
+- [x] 点击法门切换主修时，会触发一段不改规则的“朱砂盖印”轻动效。
+- [x] 四张法门卡均已补 `SealSplash` 中央印痕节点，盖印时会扩散后淡出，并同步提亮符纸底纹。
 - [ ] 不改修炼卷现有 `GameState` 持久化、弟子切换、弟子谱跳转与时辰结算链路。
-- [ ] `dotnet build .\Finally.sln` 通过。
+- [x] `dotnet build .\Finally.sln` 通过。
+- [x] `Godot_v4.6-stable_mono_win64_console.exe --headless --path .\\CountyIdle --scene res://scenes/ui/CultivationPanel.tscn --quit-after 1` 通过。
 
 ## 风险与回滚
 

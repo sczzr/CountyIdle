@@ -241,6 +241,19 @@ func apply_theme_styles() -> void:
 			continue
 		_apply_action_card_style(action_card)
 
+	for path in [
+		"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/SealSplash",
+		"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/SealSplash",
+		"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/SealSplash",
+		"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/SealSplash"
+	]:
+		_apply_stylebox_safe(root, path, "panel", _create_seal_splash_style())
+		var seal_splash := root.get_node_or_null(path) as Control
+		if seal_splash != null:
+			seal_splash.visible = false
+			seal_splash.modulate = Color(1, 1, 1, 0.0)
+			seal_splash.scale = Vector2.ONE
+
 	var prev_button: Button = root.get_node_or_null("ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/DiscipleNavRow/PreviousDiscipleButton") as Button
 	if prev_button == null:
 		push_warning("CultivationPanelVisualFx missing node: ScreenMargin/ScreenRoot/RootColumn/BodyRow/LeftPanel/LeftMargin/LeftColumn/DiscipleNavRow/PreviousDiscipleButton")
@@ -318,6 +331,92 @@ func reset_state() -> void:
 func pulse_soul_core() -> void:
 	# 切换弟子时重置脉冲节奏，给玩家一个“阵眼换人”的细小反馈。
 	_pulse_time = 0.0
+
+
+# 新敕令落下时，给符纸与玲珑心位补一段短促盖印反馈。
+func play_assignment_seal(assignment_value: int) -> void:
+	var root := get_parent()
+	var card_path := _resolve_action_card_path(assignment_value)
+	if card_path.is_empty():
+		return
+
+	var card := root.get_node_or_null(card_path) as Button
+	if card == null:
+		push_warning("CultivationPanelVisualFx missing action card for assignment: %s" % assignment_value)
+		return
+
+	var talisman_texture := root.get_node_or_null("%s/TalismanTexture" % card_path) as TextureRect
+	var seal_badge := root.get_node_or_null("%s/CardMargin/CardColumn/CardHeaderRow/HeaderTextColumn/SealBadge" % card_path) as Control
+	var seal_splash := root.get_node_or_null("%s/SealSplash" % card_path) as Control
+	var active_heart := _find_active_heart_rune(root)
+	var tween := create_tween()
+	tween.set_parallel(true)
+
+	# 卡片本体轻微压下再回弹，模拟“印章盖下”的力道。
+	card.scale = Vector2(0.988, 0.988)
+	tween.tween_property(card, "scale", Vector2.ONE, 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+	if talisman_texture != null:
+		talisman_texture.self_modulate = Color(1, 0.97, 0.86, 0.16)
+		tween.tween_property(talisman_texture, "self_modulate", Color(1, 0.95, 0.68, 0.44), 0.16).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+
+	if seal_badge != null:
+		seal_badge.visible = true
+		seal_badge.scale = Vector2(1.32, 1.32)
+		seal_badge.rotation_degrees = -10.0
+		seal_badge.modulate = Color(1, 1, 1, 0.0)
+		tween.tween_property(seal_badge, "scale", Vector2.ONE, 0.16).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		tween.tween_property(seal_badge, "rotation_degrees", -2.0, 0.16).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		tween.tween_property(seal_badge, "modulate", Color(1, 1, 1, 1.0), 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+
+	if seal_splash != null:
+		# 中央朱砂印痕先扩开再淡出，模拟印泥压上纸面的瞬间。
+		seal_splash.visible = true
+		seal_splash.scale = Vector2(0.38, 0.38)
+		seal_splash.rotation_degrees = -12.0
+		seal_splash.modulate = Color(1, 1, 1, 0.0)
+		var splash_tween := create_tween()
+		splash_tween.set_parallel(true)
+		splash_tween.tween_property(seal_splash, "modulate", Color(1, 1, 1, 0.82), 0.08).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		splash_tween.tween_property(seal_splash, "scale", Vector2(1.10, 1.10), 0.16).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		splash_tween.tween_property(seal_splash, "rotation_degrees", 3.0, 0.16).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		splash_tween.chain().tween_interval(0.10)
+		splash_tween.chain().tween_property(seal_splash, "modulate", Color(1, 1, 1, 0.0), 0.18).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+		splash_tween.chain().tween_callback(Callable(seal_splash, "hide"))
+
+	if active_heart != null:
+		active_heart.scale = Vector2(1.28, 1.28)
+		active_heart.modulate = Color(1, 1, 1, 0.35)
+		tween.tween_property(active_heart, "scale", Vector2.ONE, 0.18).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		tween.tween_property(active_heart, "modulate", Color(1, 1, 1, 1.0), 0.14).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+
+	pulse_soul_core()
+
+
+func _resolve_action_card_path(assignment_value: int) -> String:
+	match assignment_value:
+		1:
+			return "ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard"
+		2:
+			return "ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard"
+		3:
+			return "ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard"
+		4:
+			return "ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard"
+		_:
+			return ""
+
+
+func _find_active_heart_rune(root: Node) -> TextureRect:
+	for path in [
+		"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow/ActionPointBadge/ActionPointRow/ActionPointDot1/HeartRune",
+		"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow/ActionPointBadge/ActionPointRow/ActionPointDot2/HeartRune",
+		"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow/ActionPointBadge/ActionPointRow/ActionPointDot3/HeartRune"
+	]:
+		var heart_rune := root.get_node_or_null(path) as TextureRect
+		if heart_rune != null and heart_rune.visible:
+			return heart_rune
+	return null
 
 
 func _apply_label_styles(root: Node) -> void:
@@ -586,6 +685,17 @@ func _apply_label_styles(root: Node) -> void:
 		var seal_text: Label = root.get_node(path)
 		seal_text.add_theme_font_size_override("font_size", 12)
 		seal_text.add_theme_color_override("font_color", BG_DARK)
+
+	for path in [
+		"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/SealSplash/SealSplashLabel",
+		"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/SealSplash/SealSplashLabel",
+		"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/SealSplash/SealSplashLabel",
+		"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/SealSplash/SealSplashLabel"
+	]:
+		var seal_splash_label: Label = root.get_node(path)
+		seal_splash_label.add_theme_font_size_override("font_size", 44)
+		seal_splash_label.add_theme_color_override("font_color", Color(1.0, 0.93, 0.88, 0.96))
+		seal_splash_label.add_theme_font_override("font", FONT_TITLE)
 
 	for path in [
 		"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/EffectRow/PrimaryEffect/EffectMargin/EffectContentRow/EffectColumn/TitleLabel",
@@ -998,6 +1108,23 @@ func _create_seal_style() -> StyleBoxFlat:
 	style.corner_radius_bottom_left = 2
 	style.shadow_color = Color(SEAL_RED.r, SEAL_RED.g, SEAL_RED.b, 0.22)
 	style.shadow_size = 6
+	return style
+
+
+func _create_seal_splash_style() -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(SEAL_RED.r, SEAL_RED.g, SEAL_RED.b, 0.74)
+	style.border_width_left = 2
+	style.border_width_top = 2
+	style.border_width_right = 2
+	style.border_width_bottom = 2
+	style.border_color = Color(0.95, 0.68, 0.60, 0.42)
+	style.corner_radius_top_left = 999
+	style.corner_radius_top_right = 999
+	style.corner_radius_bottom_right = 999
+	style.corner_radius_bottom_left = 999
+	style.shadow_color = Color(SEAL_RED.r, SEAL_RED.g, SEAL_RED.b, 0.24)
+	style.shadow_size = 18
 	return style
 
 

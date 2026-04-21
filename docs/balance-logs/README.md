@@ -15,6 +15,7 @@
 - 组织谱系类：九峰概览、峰脉详情、附属部门可视化、协同峰法旨
 - 宗门原型类：浮云宗、天衍峰、青云峰三总殿等默认设定锚定
 - 归档桥接类：历史正文的当前语义提示、标题与摘要层收口
+- 战略地图配置类：配置驱动基线、配置校验、双轨切换、覆盖补强与配置源交互数据
 
 ## 最低记录标准
 
@@ -50,5 +51,6 @@
 | `sect-peak-support-directives` | `BL-20260309-sect-peak-support-directives.md` |
 | `fuyun-sect-tianyan-setting-alignment` | `BL-20260309-fuyun-sect-tianyan-setting-alignment.md` |
 | `archive-semantic-bridges` | `BL-20260308-archive-semantic-bridges.md` |
+| `strategic-map-config-*` | `BL-20260306-strategic-map-config-driven.md`、`BL-20260306-strategic-map-config-validator.md`、`BL-20260318-strategic-map-config-dual-track.md`、`BL-20260420-strategic-map-config-coverage.md`、`BL-20260420-strategic-map-config-interaction.md` |
 | 单体机制/功能 | `BL-20260305-research-breakthrough.md`、`BL-20260306-industrial-job-logic.md`、`BL-20260306-equipment-rarity-affix-drop.md`、`BL-20260306-county-dynamic-events.md`、`BL-20260306-ui-interaction-rewire.md`、`BL-20260306-all-buttons-interactive.md`、`BL-20260306-three-map-render-zoom.md` |
 

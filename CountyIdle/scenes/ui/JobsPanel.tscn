@@ -199,6 +199,12 @@ theme_override_font_sizes/font_size = 13
 text = "待选中"
 autowrap_mode = 3
 
+[node name="BuildingSlotLabel" type="Label" parent="PanelContent/ContentScroll/JobsVBox/IndustryEfficiency/InspectorVBox/BuildingListBox/BuildingListVBox" unique_id=184663420]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.294118, 0.247059, 0.2, 0.9)
+theme_override_font_sizes/font_size = 11
+text = "坊位：待选中"
+
 [node name="OpenConstructionButton" type="Button" parent="PanelContent/ContentScroll/JobsVBox/IndustryEfficiency/InspectorVBox/BuildingListBox/BuildingListVBox" unique_id=2027221962]
 custom_minimum_size = Vector2(0, 28)
 layout_mode = 2

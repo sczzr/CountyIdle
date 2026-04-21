@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Godot;
 using CountyIdle.Models;
 
@@ -20,7 +21,9 @@ public class StrategicMapConfigSystem
     private static readonly Regex HexColorRegex = new("^#(?:[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$", RegexOptions.Compiled);
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
-        PropertyNameCaseInsensitive = true
+        PropertyNameCaseInsensitive = true,
+        // 配置文件面向策划维护，枚举字段允许写成可读字符串，避免只能填写数字序号。
+        Converters = { new JsonStringEnumConverter() }
     };
 
     private static StrategicMapConfig? _cachedConfig;
@@ -33,6 +36,12 @@ public class StrategicMapConfigSystem
     public StrategicMapDefinition GetPrefectureDefinition()
     {
         return Load().Prefecture!;
+    }
+
+    public XianxiaWorldMapData? GetWorldInteractiveMap()
+    {
+        var worldMap = Load().World?.InteractiveWorld;
+        return worldMap is { Cells.Count: > 0 } ? worldMap : null;
     }
 
     private static StrategicMapConfig Load()
@@ -147,6 +156,11 @@ public class StrategicMapConfigSystem
         ValidatePolylines(definition.Rivers, $"{mapKey}.rivers", warnings);
         ValidateNodes(definition.Nodes, mapKey, warnings);
         ValidateLabels(definition.Labels, mapKey, warnings);
+
+        if (definition.InteractiveWorld != null)
+        {
+            NormalizeInteractiveWorld(definition.InteractiveWorld, $"{mapKey}.interactive_world", warnings);
+        }
     }
 
     private static void ValidateRegions(
@@ -300,6 +314,99 @@ public class StrategicMapConfigSystem
     private static bool IsColorHexValid(string colorText)
     {
         return !string.IsNullOrWhiteSpace(colorText) && HexColorRegex.IsMatch(colorText);
+    }
+
+    private static void NormalizeInteractiveWorld(
+        XianxiaWorldMapData worldMap,
+        string mapPath,
+        List<string> warnings)
+    {
+        worldMap.Cells ??= [];
+        worldMap.DragonVeins ??= [];
+        worldMap.Rivers ??= [];
+        worldMap.SectCandidates ??= [];
+        worldMap.Wonders ??= [];
+        worldMap.Sites ??= [];
+
+        var seenCells = new HashSet<(int Q, int R)>();
+        var normalizedCells = new List<XianxiaHexCellData>(worldMap.Cells.Count);
+
+        for (var index = 0; index < worldMap.Cells.Count; index++)
+        {
+            var cell = worldMap.Cells[index];
+            cell.Coord ??= new HexAxialCoordData();
+            var key = (cell.Coord.Q, cell.Coord.R);
+
+            if (!seenCells.Add(key))
+            {
+                warnings.Add($"{mapPath}.cells[{index}] 坐标 ({key.Q}, {key.R}) 重复，已忽略后出现的 cell。");
+                continue;
+            }
+
+            // 交互配置只要求提供玩法语义字段；数值类字段统一夹紧，避免局部地图生成时读到异常值。
+            cell.Fertility = Mathf.Clamp(cell.Fertility, 0f, 1f);
+            cell.Corruption = Mathf.Clamp(cell.Corruption, 0f, 1f);
+            cell.QiDensity = Mathf.Clamp(cell.QiDensity, 0f, 1f);
+            cell.MonsterThreat = Mathf.Clamp(cell.MonsterThreat, 0f, 1f);
+            normalizedCells.Add(cell);
+        }
+
+        worldMap.Cells = normalizedCells;
+
+        for (var index = 0; index < worldMap.Sites.Count; index++)
+        {
+            var site = worldMap.Sites[index];
+            site.Coord ??= new HexAxialCoordData();
+            var key = (site.Coord.Q, site.Coord.R);
+
+            if (!seenCells.Contains(key))
+            {
+                warnings.Add($"{mapPath}.sites[{index}] 引用坐标 ({key.Q}, {key.R})，但 cells 中没有对应 hex。");
+            }
+
+            if (string.IsNullOrWhiteSpace(site.PrimaryType))
+            {
+                site.PrimaryType = site.Role.ToString();
+            }
+
+            if (string.IsNullOrWhiteSpace(site.SecondaryTag))
+            {
+                site.SecondaryTag = "Configured";
+            }
+
+            if (string.IsNullOrWhiteSpace(site.RegionId))
+            {
+                site.RegionId = ResolveConfiguredWorldRegionId(site.Coord);
+            }
+
+            if (string.IsNullOrWhiteSpace(site.RarityTier))
+            {
+                site.RarityTier = "Common";
+            }
+
+            if (string.IsNullOrWhiteSpace(site.Label))
+            {
+                site.Label = $"{site.PrimaryType} [{site.Coord.Q},{site.Coord.R}]";
+            }
+
+            site.Importance = Math.Clamp(site.Importance, 1, 5);
+            site.UnlockTier = Math.Max(site.UnlockTier, 0);
+        }
+    }
+
+    private static string ResolveConfiguredWorldRegionId(HexAxialCoordData coord)
+    {
+        if (coord.R <= -1)
+        {
+            return "north";
+        }
+
+        if (coord.R >= 1)
+        {
+            return "south";
+        }
+
+        return coord.Q < 0 ? "west" : coord.Q > 0 ? "east" : "center";
     }
 
     private static StrategicMapConfig BuildFallbackConfig()

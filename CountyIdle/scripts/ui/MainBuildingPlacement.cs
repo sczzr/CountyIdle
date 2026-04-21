@@ -68,6 +68,7 @@ public partial class Main
         }
 
         state.TownBuildingPlacements ??= new System.Collections.Generic.List<TownBuildingPlacement>();
+        // 同地块允许累积多种建筑，但同一种建筑类型不重复写入同一格。
         for (var index = state.TownBuildingPlacements.Count - 1; index >= 0; index--)
         {
             var existing = state.TownBuildingPlacements[index];
@@ -77,14 +78,11 @@ public partial class Main
                 continue;
             }
 
-            if (existing.X == cell.X && existing.Y == cell.Y)
+            if (existing.X == cell.X &&
+                existing.Y == cell.Y &&
+                existing.BuildingType == buildingType)
             {
-                if (existing.BuildingType == buildingType)
-                {
-                    return;
-                }
-
-                state.TownBuildingPlacements.RemoveAt(index);
+                return;
             }
         }
 

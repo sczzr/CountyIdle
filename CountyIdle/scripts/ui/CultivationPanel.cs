@@ -19,6 +19,7 @@ public partial class CultivationPanel : PopupPanelBase
 			Button button,
 			Label statusLabel,
 			Control sealBadge,
+			TextureRect talismanTexture,
 			PanelContainer primaryEffect,
 			PanelContainer secondaryEffect,
 			PanelContainer iconBadge,
@@ -29,6 +30,7 @@ public partial class CultivationPanel : PopupPanelBase
 			Button = button;
 			StatusLabel = statusLabel;
 			SealBadge = sealBadge;
+			TalismanTexture = talismanTexture;
 			PrimaryEffect = primaryEffect;
 			SecondaryEffect = secondaryEffect;
 			IconBadge = iconBadge;
@@ -40,6 +42,7 @@ public partial class CultivationPanel : PopupPanelBase
 		public Button Button { get; }
 		public Label StatusLabel { get; }
 		public Control SealBadge { get; }
+		public TextureRect TalismanTexture { get; }
 		public PanelContainer PrimaryEffect { get; }
 		public PanelContainer SecondaryEffect { get; }
 		public PanelContainer IconBadge { get; }
@@ -386,6 +389,7 @@ public partial class CultivationPanel : PopupPanelBase
 			"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard",
 			"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/StatusLabel",
 			"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/CardHeaderRow/HeaderTextColumn/SealBadge",
+			"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/TalismanTexture",
 			"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/EffectRow/PrimaryEffect",
 			"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/EffectRow/SecondaryEffect",
 			"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/CardMargin/CardColumn/CardHeaderRow/IconBadge",
@@ -396,6 +400,7 @@ public partial class CultivationPanel : PopupPanelBase
 			"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard",
 			"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/StatusLabel",
 			"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/CardHeaderRow/HeaderTextColumn/SealBadge",
+			"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/TalismanTexture",
 			"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/EffectRow/PrimaryEffect",
 			"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/EffectRow/SecondaryEffect",
 			"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/CardMargin/CardColumn/CardHeaderRow/IconBadge",
@@ -406,6 +411,7 @@ public partial class CultivationPanel : PopupPanelBase
 			"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard",
 			"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/StatusLabel",
 			"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/CardHeaderRow/HeaderTextColumn/SealBadge",
+			"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/TalismanTexture",
 			"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/EffectRow/PrimaryEffect",
 			"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/EffectRow/SecondaryEffect",
 			"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/CardMargin/CardColumn/CardHeaderRow/IconBadge",
@@ -416,6 +422,7 @@ public partial class CultivationPanel : PopupPanelBase
 			"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard",
 			"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/StatusLabel",
 			"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/CardHeaderRow/HeaderTextColumn/SealBadge",
+			"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/TalismanTexture",
 			"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/EffectRow/PrimaryEffect",
 			"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/EffectRow/SecondaryEffect",
 			"ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/CardMargin/CardColumn/CardHeaderRow/IconBadge",
@@ -433,6 +440,7 @@ public partial class CultivationPanel : PopupPanelBase
 		string buttonPath,
 		string statusLabelPath,
 		string sealBadgePath,
+		string talismanTexturePath,
 		string primaryEffectPath,
 		string secondaryEffectPath,
 		string iconBadgePath,
@@ -446,6 +454,7 @@ public partial class CultivationPanel : PopupPanelBase
 			button,
 			GetNode<Label>(statusLabelPath),
 			GetNode<Control>(sealBadgePath),
+			GetNode<TextureRect>(talismanTexturePath),
 			GetNode<PanelContainer>(primaryEffectPath),
 			GetNode<PanelContainer>(secondaryEffectPath),
 			GetNode<PanelContainer>(iconBadgePath),
@@ -664,6 +673,9 @@ public partial class CultivationPanel : PopupPanelBase
 			card.Button.Disabled = profile == null;
 			card.Button.ButtonPressed = isActive;
 			card.SealBadge.Visible = isActive;
+			card.TalismanTexture.SelfModulate = isActive
+				? new Color(1f, 1f, 1f, 0.32f)
+				: new Color(1f, 1f, 1f, 0.12f);
 			ApplyActionEffectStyle(card.PrimaryEffect, isActive);
 			ApplyActionEffectStyle(card.SecondaryEffect, isActive);
 			ApplyActionIconStyle(card.IconBadge, card.IconLabel, isActive);
@@ -739,6 +751,11 @@ public partial class CultivationPanel : PopupPanelBase
 		RefreshPopupHint();
 
 		AssignmentRequested?.Invoke(profile.Id, nextAssignment);
+		if (nextAssignment != DiscipleCultivationAssignmentType.None)
+		{
+			// 仅在新敕令落下时触发表现层盖印动效，撤令仍保持静态收束。
+			CallVisualFx("play_assignment_seal", (int)nextAssignment);
+		}
 		ShowPopupStatusMessage(nextAssignment == DiscipleCultivationAssignmentType.None
 			? $"已撤去“{profile.Name}”的修炼敕令。"
 			: $"已敕令“{profile.Name}”主修「{DiscipleCultivationRules.GetAssignmentDisplayName(nextAssignment)}」。");
@@ -817,9 +834,14 @@ public partial class CultivationPanel : PopupPanelBase
 			var heartSlot = _heartSlots[index];
 			var isUnlocked = index < availableSlots;
 			var isActive = index < activeSlots;
+			var heartRune = heartSlot.GetNodeOrNull<TextureRect>("HeartRune");
 			heartSlot.Visible = true;
 			heartSlot.Modulate = new Color(1f, 1f, 1f, isUnlocked ? 1f : 0.22f);
 			heartSlot.AddThemeStyleboxOverride("panel", BuildHeartSlotStyle(isActive));
+			if (heartRune is not null)
+			{
+				heartRune.Visible = isUnlocked && isActive;
+			}
 			heartSlot.TooltipText = !isUnlocked
 				? "此枚玲珑心位尚未开显。"
 				: isActive

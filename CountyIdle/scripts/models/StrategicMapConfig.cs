@@ -57,6 +57,10 @@ public sealed class StrategicMapDefinition
     // 标签定义
     [JsonPropertyName("labels")]
     public List<StrategicLabelDefinition> Labels { get; set; } = [];
+
+    // 可选的世界图交互数据，仅世界图配置使用；用于保留 hex 点选、站点详情与二级地图入口。
+    [JsonPropertyName("interactive_world")]
+    public XianxiaWorldMapData? InteractiveWorld { get; set; }
 }
 
 /// <summary>

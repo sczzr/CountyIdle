@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using CountyIdle.Models;
 
@@ -15,7 +16,7 @@ public partial class CountyTownMapViewSystem
     {
         var baseColor = GetAnchorColor(anchor.AnchorType);
         var footprintScale = GetAnchorFootprintScale(anchor.AnchorType);
-        var center = GetTownCellCenter(anchor.LotCell, origin);
+        var center = GetAnchorVisualCenter(anchor, origin);
         var foundationRadius = GetScaledHexRadius() * Mathf.Clamp(footprintScale * 0.98f, 0.54f, 0.82f);
         var foundation = CreateHex(center + new Vector2(0f, ScaleValue(1.4f)), foundationRadius);
         DrawColoredPolygon(foundation, baseColor.Darkened(0.42f) * 0.92f);
@@ -210,7 +211,7 @@ public partial class CountyTownMapViewSystem
                 continue;
             }
 
-            var center = GetTownCellCenter(anchor.LotCell, origin);
+            var center = GetAnchorVisualCenter(anchor, origin);
             if (center.Y > selectedDepth ||
                 (Mathf.IsEqualApprox(center.Y, selectedDepth) && center.X >= selectedDepthX))
             {
@@ -226,7 +227,7 @@ public partial class CountyTownMapViewSystem
     // 判断点是否落入锚点 hitbox
     private bool IsPointInsideActivityAnchor(TownActivityAnchorData anchor, Vector2 origin, Vector2 point)
     {
-        var center = GetTownCellCenter(anchor.LotCell, origin) + new Vector2(0f, -ScaleValue(anchor.Floors == 1 ? 7f : 10f));
+        var center = GetAnchorVisualCenter(anchor, origin) + new Vector2(0f, -ScaleValue(anchor.Floors == 1 ? 7f : 10f));
         var hitbox = CreateHex(center, GetScaledHexRadius() * Mathf.Clamp(GetAnchorFootprintScale(anchor.AnchorType) * 1.16f, 0.62f, 0.92f));
         return Geometry2D.IsPointInPolygon(point, hitbox);
     }
@@ -343,6 +344,86 @@ public partial class CountyTownMapViewSystem
         return TownActivityAnchorVisualRules.GetMapBaseColor(anchorType);
     }
 
+    // 为同格多建筑分配稳定的显示偏移，避免多个建筑完全叠在同一点。
+    private Vector2 GetAnchorVisualCenter(TownActivityAnchorData anchor, Vector2 origin)
+    {
+        var center = GetTownCellCenter(anchor.LotCell, origin);
+        var slotIndex = GetAnchorSlotIndex(anchor);
+        var slotCount = GetAnchorSlotCount(anchor.LotCell);
+        return center + GetStructureVisualOffset(slotIndex, slotCount);
+    }
+
+    private int GetAnchorSlotIndex(TownActivityAnchorData anchor)
+    {
+        if (_mapData == null)
+        {
+            return 0;
+        }
+
+        var index = 0;
+        foreach (var candidate in _mapData.ActivityAnchors)
+        {
+            if (candidate.LotCell != anchor.LotCell)
+            {
+                continue;
+            }
+
+            if (ReferenceEquals(candidate, anchor))
+            {
+                return index;
+            }
+
+            index++;
+        }
+
+        return 0;
+    }
+
+    private int GetAnchorSlotCount(Vector2I cell)
+    {
+        if (_mapData == null)
+        {
+            return 1;
+        }
+
+        var count = 0;
+        foreach (var anchor in _mapData.ActivityAnchors)
+        {
+            if (anchor.LotCell == cell)
+            {
+                count++;
+            }
+        }
+
+        return Math.Max(count, 1);
+    }
+
+    private Vector2 GetStructureVisualOffset(int slotIndex, int slotCount)
+    {
+        return slotCount switch
+        {
+            2 => slotIndex switch
+            {
+                0 => new Vector2(-ScaleValue(8f), ScaleValue(3f)),
+                _ => new Vector2(ScaleValue(8f), -ScaleValue(2f))
+            },
+            3 => slotIndex switch
+            {
+                0 => new Vector2(-ScaleValue(9f), ScaleValue(3f)),
+                1 => new Vector2(ScaleValue(9f), ScaleValue(3f)),
+                _ => new Vector2(0f, -ScaleValue(7f))
+            },
+            _ when slotCount >= 4 => slotIndex switch
+            {
+                0 => new Vector2(-ScaleValue(9f), ScaleValue(4f)),
+                1 => new Vector2(ScaleValue(9f), ScaleValue(4f)),
+                2 => new Vector2(-ScaleValue(5f), -ScaleValue(6f)),
+                _ => new Vector2(ScaleValue(5f), -ScaleValue(6f))
+            },
+            _ => Vector2.Zero
+        };
+    }
+
     // 尝试在地图上放置指定建筑锚点
     public bool TryPlaceBuildingAnchor(
         IndustryBuildingType buildingType,
@@ -403,12 +484,15 @@ public partial class CountyTownMapViewSystem
     // 记录已放置建筑信息
     private void RegisterPlacement(IndustryBuildingType buildingType, Vector2I cell)
     {
+        // 同地块允许累积多种建筑，但同类型建筑不重复登记到同一格。
         for (var index = _placedBuildings.Count - 1; index >= 0; index--)
         {
             var existing = _placedBuildings[index];
-            if (existing.X == cell.X && existing.Y == cell.Y)
+            if (existing.X == cell.X &&
+                existing.Y == cell.Y &&
+                existing.BuildingType == buildingType)
             {
-                _placedBuildings.RemoveAt(index);
+                return;
             }
         }
 
@@ -423,38 +507,61 @@ public partial class CountyTownMapViewSystem
             return;
         }
 
-        var anchorCounts = new Dictionary<TownActivityAnchorType, int>();
-        foreach (var anchor in mapData.ActivityAnchors)
+        var groupedPlacements = _placedBuildings
+            .Where(placed => placed != null)
+            .GroupBy(placed => new Vector2I(placed.X, placed.Y))
+            .ToArray();
+
+        if (groupedPlacements.Length == 0)
         {
-            anchorCounts[anchor.AnchorType] = anchorCounts.GetValueOrDefault(anchor.AnchorType, 0) + 1;
+            return;
         }
 
-        foreach (var placed in _placedBuildings)
+        // 重建时先整格清空，再按格回放所有建筑，避免同格第二座建筑把第一座擦掉。
+        foreach (var group in groupedPlacements)
         {
-            var cell = new Vector2I(placed.X, placed.Y);
+            var cell = group.Key;
             if (!mapData.IsInside(cell) || mapData.GetTerrain(cell.X, cell.Y) == TownTerrainType.Water)
             {
                 continue;
             }
 
             ClearStructuresAtCell(mapData, cell);
+        }
 
-            var anchorType = ResolveAnchorType(placed.BuildingType);
-            var roadCell = FindNearestRoadCell(mapData, cell) ?? cell;
-            var facing = ResolveFacingFromRoad(cell, roadCell);
-            var floors = ResolveAnchorFloors(placed.BuildingType);
-            var visualVariant = GetCellHash(cell, ((int)placed.BuildingType * 37) + 17) % 3;
-            var label = BuildAnchorLabel(anchorType, anchorCounts);
-            var anchor = new TownActivityAnchorData(
-                anchorType,
-                roadCell,
-                cell,
-                facing,
-                floors,
-                visualVariant,
-                label);
-            mapData.AddActivityAnchor(anchor);
-            mapData.AddBuilding(new TownBuildingData(cell, facing, floors, anchorType is TownActivityAnchorType.Academy or TownActivityAnchorType.Administration));
+        var anchorCounts = new Dictionary<TownActivityAnchorType, int>();
+        foreach (var anchor in mapData.ActivityAnchors)
+        {
+            anchorCounts[anchor.AnchorType] = anchorCounts.GetValueOrDefault(anchor.AnchorType, 0) + 1;
+        }
+
+        foreach (var group in groupedPlacements)
+        {
+            var cell = group.Key;
+            if (!mapData.IsInside(cell) || mapData.GetTerrain(cell.X, cell.Y) == TownTerrainType.Water)
+            {
+                continue;
+            }
+
+            foreach (var placed in group)
+            {
+                var anchorType = ResolveAnchorType(placed.BuildingType);
+                var roadCell = FindNearestRoadCell(mapData, cell) ?? cell;
+                var facing = ResolveFacingFromRoad(cell, roadCell);
+                var floors = ResolveAnchorFloors(placed.BuildingType);
+                var visualVariant = GetCellHash(cell, ((int)placed.BuildingType * 37) + 17 + anchorCounts.GetValueOrDefault(anchorType, 0)) % 3;
+                var label = BuildAnchorLabel(anchorType, anchorCounts);
+                var anchor = new TownActivityAnchorData(
+                    anchorType,
+                    roadCell,
+                    cell,
+                    facing,
+                    floors,
+                    visualVariant,
+                    label);
+                mapData.AddActivityAnchor(anchor);
+                mapData.AddBuilding(new TownBuildingData(cell, facing, floors, anchorType is TownActivityAnchorType.Academy or TownActivityAnchorType.Administration));
+            }
         }
     }
 
@@ -502,13 +609,13 @@ public partial class CountyTownMapViewSystem
             return null;
         }
 
-        if (_selectedCell.HasValue && IsCellAvailable(_mapData, _selectedCell.Value))
+        if (_selectedCell.HasValue && CanCellAcceptBuilding(_mapData, _selectedCell.Value, buildingType))
         {
             usedSelected = true;
             return _selectedCell.Value;
         }
 
-        if (_selectedActivityAnchor != null && IsCellAvailable(_mapData, _selectedActivityAnchor.LotCell))
+        if (_selectedActivityAnchor != null && CanCellAcceptBuilding(_mapData, _selectedActivityAnchor.LotCell, buildingType))
         {
             usedSelected = true;
             return _selectedActivityAnchor.LotCell;
@@ -523,33 +630,63 @@ public partial class CountyTownMapViewSystem
     }
 
     // 判断地块是否可用
-    private static bool IsCellAvailable(TownMapData mapData, Vector2I cell)
+    private static bool CanCellAcceptBuilding(TownMapData mapData, Vector2I cell, IndustryBuildingType buildingType)
     {
-        return mapData.IsInside(cell) &&
-               mapData.GetTerrain(cell.X, cell.Y) != TownTerrainType.Water &&
-               !IsCellOccupied(mapData, cell);
+        if (!mapData.IsInside(cell) || mapData.GetTerrain(cell.X, cell.Y) == TownTerrainType.Water)
+        {
+            return false;
+        }
+
+        var compound = mapData.GetCellCompound(cell);
+        if (compound == null)
+        {
+            return false;
+        }
+
+        if (HasBuildingTypeOnCell(mapData, cell, buildingType))
+        {
+            return false;
+        }
+
+        return GetCellOccupiedSlotCount(mapData, cell) < compound.BuildSlotCount;
     }
 
-    // 判断地块是否已占用
-    private static bool IsCellOccupied(TownMapData mapData, Vector2I cell)
+    // 判断地块是否已经有同类型建筑，防止同格连续建同一种建筑。
+    private static bool HasBuildingTypeOnCell(TownMapData mapData, Vector2I cell, IndustryBuildingType buildingType)
     {
         foreach (var anchor in mapData.ActivityAnchors)
         {
-            if (anchor.LotCell == cell)
-            {
-                return true;
-            }
-        }
-
-        foreach (var building in mapData.Buildings)
-        {
-            if (building.Cell == cell)
+            if (anchor.LotCell == cell && ResolveBuildingType(anchor.AnchorType) == buildingType)
             {
                 return true;
             }
         }
 
         return false;
+    }
+
+    // 计算当前地块已占用坊位数；锚点与建筑壳体共存时只按 1 个槽位计算。
+    private static int GetCellOccupiedSlotCount(TownMapData mapData, Vector2I cell)
+    {
+        var anchorCount = 0;
+        foreach (var anchor in mapData.ActivityAnchors)
+        {
+            if (anchor.LotCell == cell)
+            {
+                anchorCount++;
+            }
+        }
+
+        var buildingCount = 0;
+        foreach (var building in mapData.Buildings)
+        {
+            if (building.Cell == cell)
+            {
+                buildingCount++;
+            }
+        }
+
+        return Math.Max(anchorCount, buildingCount);
     }
 
     // 清理指定地块上的结构
@@ -579,7 +716,7 @@ public partial class CountyTownMapViewSystem
         var bestScore = int.MinValue;
         foreach (var cell in mapData.EnumerateAllCells())
         {
-            if (!IsCellAvailable(mapData, cell))
+            if (!CanCellAcceptBuilding(mapData, cell, buildingType))
             {
                 continue;
             }
@@ -639,6 +776,20 @@ public partial class CountyTownMapViewSystem
             IndustryBuildingType.Trade => TownActivityAnchorType.Market,
             IndustryBuildingType.Administration => TownActivityAnchorType.Administration,
             _ => TownActivityAnchorType.Farmstead
+        };
+    }
+
+    // 反向映射锚点类型，供同格重复建造校验与摘要统计使用。
+    private static IndustryBuildingType ResolveBuildingType(TownActivityAnchorType anchorType)
+    {
+        return anchorType switch
+        {
+            TownActivityAnchorType.Farmstead => IndustryBuildingType.Agriculture,
+            TownActivityAnchorType.Workshop => IndustryBuildingType.Workshop,
+            TownActivityAnchorType.Academy => IndustryBuildingType.Research,
+            TownActivityAnchorType.Market => IndustryBuildingType.Trade,
+            TownActivityAnchorType.Administration => IndustryBuildingType.Administration,
+            _ => IndustryBuildingType.Agriculture
         };
     }
 

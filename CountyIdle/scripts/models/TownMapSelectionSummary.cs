@@ -12,6 +12,8 @@ public sealed class TownMapSelectionSummary
         TownActivityAnchorType? anchorType,
         TownCellContentKind? contentKind,
         IndustryBuildingType? suggestedBuildType,
+        int buildSlotCount,
+        int occupiedBuildSlotCount,
         string badgeText,
         string title,
         string subtitle,
@@ -32,6 +34,8 @@ public sealed class TownMapSelectionSummary
         AnchorType = anchorType;
         ContentKind = contentKind;
         SuggestedBuildType = suggestedBuildType;
+        BuildSlotCount = Math.Max(buildSlotCount, 0);
+        OccupiedBuildSlotCount = Math.Max(occupiedBuildSlotCount, 0);
         BadgeText = badgeText;
         Title = title;
         Subtitle = subtitle;
@@ -57,6 +61,12 @@ public sealed class TownMapSelectionSummary
     public TownCellContentKind? ContentKind { get; }
     // 推荐建设类型
     public IndustryBuildingType? SuggestedBuildType { get; }
+    // 当前地块总坊位数
+    public int BuildSlotCount { get; }
+    // 当前地块已占用坊位数
+    public int OccupiedBuildSlotCount { get; }
+    // 当前地块是否仍可继续营建
+    public bool HasBuildCapacity => HasSelection && BuildSlotCount > OccupiedBuildSlotCount;
     // 徽章文本
     public string BadgeText { get; }
     // 标题文本
@@ -104,6 +114,8 @@ public sealed class TownMapSelectionSummary
             null,
             null,
             null,
+            0,
+            0,
             "未选中地块",
             $"{safeSectName}·{safePeakName}",
             "点击任意院域检视地块详情",

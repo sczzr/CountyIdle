@@ -380,6 +380,7 @@ grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_map_layer")
 script = ExtResource("2_strategic_map")
 _mode = 1
+_useConfigDefinition = true
 
 [node name="Label" type="Label" parent="PanelContent/MapViewport/MapPages/PrefectureMapView" unique_id=1417394242]
 layout_mode = 2

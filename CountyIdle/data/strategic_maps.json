@@ -69,46 +69,132 @@
         ]
       }
     ],
+    "outlines": [
+      {
+        "color": "#D0DBF359",
+        "width": 1.1,
+        "closed": true,
+        "points": [
+          { "x": -0.92, "y": -0.82 },
+          { "x": -0.20, "y": -0.98 },
+          { "x": 0.72, "y": -0.62 },
+          { "x": 0.98, "y": -0.10 },
+          { "x": 0.50, "y": 0.82 },
+          { "x": 0.08, "y": 0.98 },
+          { "x": -0.74, "y": 0.42 },
+          { "x": -0.96, "y": -0.02 }
+        ]
+      }
+    ],
     "routes": [
       {
         "color": "#F2CA6DD1",
         "width": 2.0,
         "points": [
-          { "x": -0.10, "y": -0.18 },
-          { "x": 0.34, "y": -0.04 }
+          { "x": -0.18, "y": -0.32 },
+          { "x": 0.36, "y": 0.00 }
         ]
       },
       {
         "color": "#F2CA6DD1",
         "width": 2.0,
         "points": [
-          { "x": -0.10, "y": -0.18 },
-          { "x": 0.12, "y": 0.56 }
+          { "x": -0.18, "y": -0.32 },
+          { "x": 0.00, "y": 0.63 }
         ]
       },
       {
         "color": "#F2CA6DD1",
         "width": 2.0,
         "points": [
-          { "x": -0.10, "y": -0.18 },
-          { "x": -0.52, "y": -0.04 }
+          { "x": -0.18, "y": -0.32 },
+          { "x": -0.73, "y": 0.00 }
         ]
       },
       {
         "color": "#F2CA6DD1",
         "width": 1.4,
         "points": [
-          { "x": 0.34, "y": -0.04 },
-          { "x": 0.12, "y": 0.56 }
+          { "x": 0.36, "y": 0.00 },
+          { "x": 0.00, "y": 0.63 }
+        ]
+      }
+    ],
+    "rivers": [
+      {
+        "color": "#619EDEE0",
+        "width": 1.8,
+        "points": [
+          { "x": -0.55, "y": -0.63 },
+          { "x": -0.55, "y": -0.32 },
+          { "x": -0.36, "y": 0.00 },
+          { "x": 0.00, "y": 0.00 },
+          { "x": 0.00, "y": 0.63 },
+          { "x": 0.36, "y": 0.63 }
+        ]
+      },
+      {
+        "color": "#7FB8E0B8",
+        "width": 1.2,
+        "points": [
+          { "x": 0.55, "y": -0.32 },
+          { "x": 0.36, "y": 0.00 },
+          { "x": 0.55, "y": 0.32 }
         ]
       }
     ],
     "nodes": [
-      { "x": -0.10, "y": -0.18, "radius": 5.0, "color": "#FFEBC0FF" },
-      { "x": 0.34, "y": -0.04, "radius": 4.0, "color": "#F0DBB2FF" },
-      { "x": 0.12, "y": 0.56, "radius": 4.0, "color": "#F0DBB2FF" },
-      { "x": -0.52, "y": -0.04, "radius": 4.0, "color": "#F0DBB2FF" }
-    ]
+      { "x": -0.18, "y": -0.32, "radius": 5.0, "color": "#FFEBC0FF", "kind": "sect_candidate" },
+      { "x": 0.36, "y": 0.00, "radius": 4.2, "color": "#F0DBB2FF", "kind": "market" },
+      { "x": 0.00, "y": 0.63, "radius": 4.2, "color": "#CDE6D1FF", "kind": "spirit" },
+      { "x": -0.73, "y": 0.00, "radius": 4.2, "color": "#D9C3F0FF", "kind": "ruin" },
+      { "x": 0.55, "y": -0.32, "radius": 3.6, "color": "#F3D7A0FF", "kind": "outpost" },
+      { "x": -0.36, "y": 0.63, "radius": 3.6, "color": "#A9D8E8FF", "kind": "river_gate" }
+    ],
+    "labels": [
+      { "x": -0.26, "y": -0.40, "text": "浮云宗外域", "color": "#FFEBC0FF", "font_size": 14, "min_zoom": 0.8 },
+      { "x": 0.40, "y": -0.06, "text": "青云外坊", "color": "#F0DBB2FF", "font_size": 12, "min_zoom": 0.9 },
+      { "x": 0.06, "y": 0.58, "text": "云泽灵脉", "color": "#D8F0D8FF", "font_size": 12, "min_zoom": 1.0 },
+      { "x": -0.82, "y": -0.06, "text": "旧观遗址", "color": "#E2D2F4FF", "font_size": 12, "min_zoom": 1.0 },
+      { "x": 0.60, "y": -0.36, "text": "东荒哨台", "color": "#F2D7A7FF", "font_size": 11, "min_zoom": 1.0 },
+      { "x": -0.44, "y": 0.68, "text": "云水河门", "color": "#B7E1ECFF", "font_size": 11, "min_zoom": 1.0 },
+      { "x": -0.84, "y": -0.34, "text": "北境雪岭", "color": "#DEE6F7FF", "font_size": 11, "min_zoom": 1.2 },
+      { "x": 0.52, "y": -0.50, "text": "东荒妖岭", "color": "#F2C7A7FF", "font_size": 11, "min_zoom": 1.2 }
+    ],
+    "interactive_world": {
+      "seed": 42001,
+      "width": 5,
+      "height": 5,
+      "cells": [
+        { "coord": { "q": 0, "r": -2 }, "height": 88, "temperature": 0.18, "moisture": 0.45, "fertility": 0.28, "corruption": 0.08, "qi_density": 0.56, "element_affinity": "Metal", "biome": "SnowPeaks", "terrain": "SnowRock", "cliff": "SnowCliff", "overlay": "PineForest", "resource": "HeavenIron", "spiritual_zone": "MinorSpiritVein", "cliff_mask": "NorthEast", "monster_threat": 0.36, "faction_influence": 0 },
+        { "coord": { "q": 1, "r": -2 }, "height": 82, "temperature": 0.22, "moisture": 0.48, "fertility": 0.32, "corruption": 0.10, "qi_density": 0.58, "element_affinity": "Water", "biome": "MistyMountains", "terrain": "MountainRock", "water": "MountainSpring", "cliff": "MountainCliff", "overlay": "MossPatch", "resource": "SpiritStone", "spiritual_zone": "SpiritNode", "river_mask": "SouthWest", "monster_threat": 0.34, "faction_influence": 0 },
+        { "coord": { "q": 2, "r": -2 }, "height": 74, "temperature": 0.62, "moisture": 0.20, "fertility": 0.22, "corruption": 0.42, "qi_density": 0.50, "element_affinity": "Fire", "biome": "VolcanicWastes", "terrain": "VolcanicRock", "cliff": "RockCliff", "overlay": "RockCluster", "resource": "FireCrystal", "spiritual_zone": "FireVein", "cliff_mask": "SouthEast", "monster_threat": 0.62, "faction_influence": 0 },
+        { "coord": { "q": -1, "r": -1 }, "height": 58, "temperature": 0.42, "moisture": 0.72, "fertility": 0.66, "corruption": 0.12, "qi_density": 0.46, "element_affinity": "Wood", "biome": "SacredForest", "terrain": "AncientForestFloor", "overlay": "AncientTree", "resource": "AncientWood", "spiritual_zone": "QiRichGround", "road_mask": "East", "monster_threat": 0.28, "faction_influence": 1 },
+        { "coord": { "q": 0, "r": -1 }, "height": 64, "temperature": 0.46, "moisture": 0.60, "fertility": 0.58, "corruption": 0.06, "qi_density": 0.72, "element_affinity": "Yang", "biome": "JadeHighlands", "terrain": "MountainPlateau", "overlay": "SpiritGrass", "resource": "SpiritHerbs", "spiritual_zone": "MajorSpiritVein", "structure": "SectFoundation", "is_sect_candidate": true, "road_mask": "East", "monster_threat": 0.20, "faction_influence": 2 },
+        { "coord": { "q": 1, "r": -1 }, "height": 50, "temperature": 0.48, "moisture": 0.54, "fertility": 0.62, "corruption": 0.10, "qi_density": 0.54, "element_affinity": "Earth", "biome": "TemperatePlains", "terrain": "GrassLush", "overlay": "TallGrass", "resource": "JadeBamboo", "spiritual_zone": "QiRichGround", "road_mask": "West", "monster_threat": 0.26, "faction_influence": 1 },
+        { "coord": { "q": 2, "r": -1 }, "height": 58, "temperature": 0.58, "moisture": 0.28, "fertility": 0.34, "corruption": 0.28, "qi_density": 0.48, "element_affinity": "Fire", "biome": "DesertBadlands", "terrain": "DesertRock", "cliff": "SandstoneCliff", "overlay": "StoneDebris", "resource": "ObsidianRock", "structure": "Watchtower", "road_mask": "SouthWest", "monster_threat": 0.52, "faction_influence": 1 },
+        { "coord": { "q": -2, "r": 0 }, "height": 46, "temperature": 0.40, "moisture": 0.50, "fertility": 0.38, "corruption": 0.68, "qi_density": 0.62, "element_affinity": "Yin", "biome": "AncientRuinsLand", "terrain": "AncientStone", "overlay": "AncientVines", "resource": "SoulCrystal", "spiritual_zone": "AncientCultivationGround", "structure": "AncientCityRuins", "wonder": "HeavenGateRuins", "monster_threat": 0.70, "faction_influence": 0 },
+        { "coord": { "q": -1, "r": 0 }, "height": 40, "temperature": 0.44, "moisture": 0.76, "fertility": 0.70, "corruption": 0.16, "qi_density": 0.50, "element_affinity": "Wood", "biome": "BambooValley", "terrain": "BambooGround", "overlay": "BambooGrove", "resource": "BambooResource", "spiritual_zone": "QiRichGround", "road_mask": "East", "monster_threat": 0.24, "faction_influence": 1 },
+        { "coord": { "q": 0, "r": 0 }, "height": 36, "temperature": 0.50, "moisture": 0.70, "fertility": 0.74, "corruption": 0.08, "qi_density": 0.58, "element_affinity": "Water", "biome": "TemperatePlains", "terrain": "WildflowerMeadow", "water": "RiverBankGrass", "overlay": "WildflowerField", "resource": "LotusSpirit", "spiritual_zone": "QiRichGround", "river_mask": "SouthEast", "road_mask": "East", "monster_threat": 0.18, "faction_influence": 1 },
+        { "coord": { "q": 1, "r": 0 }, "height": 38, "temperature": 0.52, "moisture": 0.58, "fertility": 0.68, "corruption": 0.10, "qi_density": 0.60, "element_affinity": "Earth", "biome": "TemperatePlains", "terrain": "GrassSparse", "overlay": "TallGrass", "resource": "SaltDeposit", "spiritual_zone": "QiRichGround", "structure": "MarketSquare", "road_mask": "West", "monster_threat": 0.20, "faction_influence": 2 },
+        { "coord": { "q": 2, "r": 0 }, "height": 56, "temperature": 0.56, "moisture": 0.38, "fertility": 0.42, "corruption": 0.22, "qi_density": 0.52, "element_affinity": "Metal", "biome": "JadeHighlands", "terrain": "MountainMoss", "overlay": "RockCluster", "resource": "JadeOre", "spiritual_zone": "MinorSpiritVein", "structure": "FortressBase", "monster_threat": 0.44, "faction_influence": 1 },
+        { "coord": { "q": -2, "r": 1 }, "height": 32, "temperature": 0.46, "moisture": 0.82, "fertility": 0.72, "corruption": 0.18, "qi_density": 0.48, "element_affinity": "Water", "biome": "SpiritSwamps", "terrain": "SwampGround", "water": "RiverBankMud", "overlay": "LotusCluster", "resource": "LotusSpirit", "river_mask": "SouthEast", "monster_threat": 0.34, "faction_influence": 0 },
+        { "coord": { "q": -1, "r": 1 }, "height": 34, "temperature": 0.48, "moisture": 0.78, "fertility": 0.70, "corruption": 0.12, "qi_density": 0.68, "element_affinity": "Water", "biome": "SpiritSwamps", "terrain": "SpiritSoil", "water": "SpiritLake", "overlay": "SpiritGrass", "resource": "SpiritHerbs", "spiritual_zone": "SpiritPool", "river_mask": "SouthEast", "monster_threat": 0.28, "faction_influence": 1 },
+        { "coord": { "q": 0, "r": 1 }, "height": 30, "temperature": 0.50, "moisture": 0.84, "fertility": 0.66, "corruption": 0.08, "qi_density": 0.62, "element_affinity": "Water", "biome": "TemperatePlains", "terrain": "WetlandMud", "water": "LotusLake", "overlay": "LilyCluster", "resource": "LotusSpirit", "river_mask": "SouthEast", "monster_threat": 0.22, "faction_influence": 1 },
+        { "coord": { "q": 1, "r": 1 }, "height": 42, "temperature": 0.54, "moisture": 0.62, "fertility": 0.76, "corruption": 0.08, "qi_density": 0.46, "element_affinity": "Earth", "biome": "TemperatePlains", "terrain": "GrassLush", "overlay": "WildflowerField", "resource": "SpiritHerbs", "structure": "VillageBase", "road_mask": "NorthWest", "monster_threat": 0.18, "faction_influence": 1 },
+        { "coord": { "q": -2, "r": 2 }, "height": 34, "temperature": 0.46, "moisture": 0.76, "fertility": 0.64, "corruption": 0.10, "qi_density": 0.52, "element_affinity": "Water", "biome": "TemperatePlains", "terrain": "GrassLush", "water": "RiverBankGrass", "overlay": "TallGrass", "resource": "SaltDeposit", "structure": "BridgeFoundation", "river_mask": "East", "road_mask": "East", "monster_threat": 0.20, "faction_influence": 1 },
+        { "coord": { "q": -1, "r": 2 }, "height": 44, "temperature": 0.46, "moisture": 0.72, "fertility": 0.68, "corruption": 0.06, "qi_density": 0.80, "element_affinity": "Wood", "biome": "SacredForest", "terrain": "SpiritSoil", "overlay": "SpiritTree", "resource": "SpiritCrystal", "spiritual_zone": "DragonNode", "structure": "CultivationPlatform", "is_dragon_vein_core": true, "monster_threat": 0.24, "faction_influence": 1 },
+        { "coord": { "q": 0, "r": 2 }, "height": 28, "temperature": 0.48, "moisture": 0.86, "fertility": 0.60, "corruption": 0.08, "qi_density": 0.66, "element_affinity": "Water", "biome": "SpiritSwamps", "terrain": "WetlandMud", "water": "SpiritLake", "overlay": "LotusCluster", "resource": "WaterCrystal", "spiritual_zone": "SpiritPool", "river_mask": "West", "monster_threat": 0.26, "faction_influence": 0 }
+      ],
+      "sites": [
+        { "role": "SectCandidate", "coord": { "q": 0, "r": -1 }, "structure": "SectFoundation", "label": "浮云宗外域", "importance": 5, "primary_type": "Sect", "secondary_tag": "MountainGate", "region_id": "north", "rarity_tier": "Uncommon", "unlock_tier": 0 },
+        { "role": "Settlement", "coord": { "q": 1, "r": 0 }, "structure": "MarketSquare", "label": "青云外坊", "importance": 4, "primary_type": "Market", "secondary_tag": "SectMarket", "region_id": "east", "rarity_tier": "Common", "unlock_tier": 0 },
+        { "role": "ResourceHub", "coord": { "q": -1, "r": 2 }, "structure": "CultivationPlatform", "label": "云泽灵脉", "importance": 4, "primary_type": "Wilderness", "secondary_tag": "ForestWilds", "region_id": "south", "rarity_tier": "Rare", "unlock_tier": 1 },
+        { "role": "Ruin", "coord": { "q": -2, "r": 0 }, "structure": "AncientCityRuins", "label": "旧观遗址", "importance": 4, "primary_type": "Ruin", "secondary_tag": "TrialRealm", "region_id": "west", "rarity_tier": "Rare", "unlock_tier": 1 },
+        { "role": "Settlement", "coord": { "q": 2, "r": -1 }, "structure": "Watchtower", "label": "东荒哨台", "importance": 3, "primary_type": "CultivatorClan", "secondary_tag": "GuestHall", "region_id": "east", "rarity_tier": "Common", "unlock_tier": 0 },
+        { "role": "ResourceHub", "coord": { "q": -2, "r": 2 }, "structure": "BridgeFoundation", "label": "云水河门", "importance": 3, "primary_type": "MortalRealm", "secondary_tag": "RiverTown", "region_id": "south", "rarity_tier": "Common", "unlock_tier": 0 }
+      ]
+    }
   },
   "prefecture": {
     "title": "江陵府外域",
@@ -228,15 +314,28 @@
       }
     ],
     "nodes": [
-      { "x": -0.62, "y": -0.42, "radius": 4.0, "color": "#DEE6F7FF" },
-      { "x": -0.20, "y": -0.58, "radius": 4.0, "color": "#DEE6F7FF" },
-      { "x": 0.24, "y": -0.48, "radius": 4.0, "color": "#DEE6F7FF" },
-      { "x": 0.62, "y": -0.20, "radius": 4.0, "color": "#DEE6F7FF" },
-      { "x": 0.54, "y": 0.28, "radius": 4.0, "color": "#DEE6F7FF" },
-      { "x": 0.10, "y": 0.52, "radius": 4.0, "color": "#DEE6F7FF" },
-      { "x": -0.34, "y": 0.46, "radius": 4.0, "color": "#DEE6F7FF" },
-      { "x": -0.64, "y": 0.10, "radius": 4.0, "color": "#DEE6F7FF" },
-      { "x": -0.02, "y": -0.02, "radius": 6.0, "color": "#FFE6B2FF" }
+      { "x": -0.62, "y": -0.42, "radius": 4.0, "color": "#DEE6F7FF", "kind": "settlement" },
+      { "x": -0.20, "y": -0.58, "radius": 4.0, "color": "#DEE6F7FF", "kind": "raw_source" },
+      { "x": 0.24, "y": -0.48, "radius": 4.0, "color": "#DEE6F7FF", "kind": "settlement" },
+      { "x": 0.62, "y": -0.20, "radius": 4.0, "color": "#DEE6F7FF", "kind": "landmark" },
+      { "x": 0.54, "y": 0.28, "radius": 4.0, "color": "#DEE6F7FF", "kind": "raw_source" },
+      { "x": 0.10, "y": 0.52, "radius": 4.0, "color": "#DEE6F7FF", "kind": "settlement" },
+      { "x": -0.34, "y": 0.46, "radius": 4.0, "color": "#DEE6F7FF", "kind": "landmark" },
+      { "x": -0.64, "y": 0.10, "radius": 4.0, "color": "#DEE6F7FF", "kind": "raw_source" },
+      { "x": -0.02, "y": -0.02, "radius": 6.0, "color": "#FFE6B2FF", "kind": "city" },
+      { "x": -0.10, "y": -0.12, "radius": 3.2, "color": "#E8D0A8FF", "kind": "ward" },
+      { "x": 0.08, "y": -0.10, "radius": 3.2, "color": "#E8D0A8FF", "kind": "ward" },
+      { "x": 0.08, "y": 0.08, "radius": 3.2, "color": "#E8D0A8FF", "kind": "ward" },
+      { "x": -0.12, "y": 0.10, "radius": 3.2, "color": "#E8D0A8FF", "kind": "ward" }
+    ],
+    "labels": [
+      { "x": -0.10, "y": -0.08, "text": "云泽附庸坊城", "color": "#FFE6B2FF", "font_size": 14, "min_zoom": 0.8 },
+      { "x": -0.68, "y": -0.46, "text": "灵木外庄", "color": "#DEE6F7FF", "font_size": 11, "min_zoom": 1.0 },
+      { "x": -0.24, "y": -0.62, "text": "采罡场", "color": "#DEE6F7FF", "font_size": 11, "min_zoom": 1.1 },
+      { "x": 0.28, "y": -0.52, "text": "问道长街", "color": "#DEE6F7FF", "font_size": 11, "min_zoom": 1.0 },
+      { "x": 0.64, "y": -0.24, "text": "外事别院", "color": "#DEE6F7FF", "font_size": 11, "min_zoom": 1.2 },
+      { "x": 0.54, "y": 0.24, "text": "青芦泽", "color": "#DEE6F7FF", "font_size": 11, "min_zoom": 1.1 },
+      { "x": -0.70, "y": 0.08, "text": "盐泉口", "color": "#DEE6F7FF", "font_size": 11, "min_zoom": 1.1 }
     ]
   }
 }

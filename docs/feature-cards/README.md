@@ -17,6 +17,7 @@
 - 玩法机制：`research-breakthrough`、`industrial-job-logic`、`equipment-rarity-affix-drop`、`county-dynamic-events`（当前对外语义为“宗门动态事件”）
 - 交互功能：`ui-interaction-rewire`、`all-buttons-interactive`、`client-settings-panel`
 - 地图链路：`countytown-25d-map`（当前对外语义为“天衍峰山门图”）、`map-tabs-and-viewport`
+- 战略地图配置：`strategic-map-config-driven`、`strategic-map-config-validator`、`strategic-map-config-coverage`、`strategic-map-config-interaction`
 - UI 史诗：`ui-layout-migration`
 - 资源与主题：`han-courtyard-theme-pack`、`building-elements-pack`
 - 文档治理：`sect-management-docs-reframe`
@@ -44,6 +45,7 @@
 | `sect-peak-support-directives` | `FC-20260309-sect-peak-support-directives.md` |
 | `fuyun-sect-tianyan-setting-alignment` | `FC-20260309-fuyun-sect-tianyan-setting-alignment.md` |
 | `archive-semantic-bridges` | `FC-20260308-archive-semantic-bridges.md` |
+| `strategic-map-config-*` | `FC-20260306-strategic-map-config-driven.md`、`FC-20260306-strategic-map-config-validator.md`、`FC-20260420-strategic-map-config-coverage.md`、`FC-20260420-strategic-map-config-interaction.md` |
 | 单体机制/功能 | `FC-20260305-research-breakthrough.md`、`FC-20260306-industrial-job-logic.md`、`FC-20260306-equipment-rarity-affix-drop.md`、`FC-20260306-county-dynamic-events.md`、`FC-20260306-ui-interaction-rewire.md`、`FC-20260306-all-buttons-interactive.md` |
 | 资产与工具 | `FC-20260306-building-elements-pack.md`、`FC-20260306-client-settings-panel.md` |
 

@@ -39,6 +39,7 @@ public partial class ConstructionPanel : PopupPanelBase
     private Label _buildingSummaryLabel = null!;
     private Label _buildingSummaryValueLabel = null!;
     private Label _buildingRecommendationLabel = null!;
+    private Label _buildingSlotStatusLabel = null!;
     private Label _detailTitleLabel = null!;
     private Label _detailEffectLabel = null!;
     private Label _detailCostLabel = null!;
@@ -80,6 +81,7 @@ public partial class ConstructionPanel : PopupPanelBase
         _buildingSummaryLabel = GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/SummaryRow/BuildingCard/CardMargin/CardColumn/BuildingLabel");
         _buildingSummaryValueLabel = GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/SummaryRow/BuildingCard/CardMargin/CardColumn/BuildingValue");
         _buildingRecommendationLabel = GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/SummaryRow/BuildingCard/CardMargin/CardColumn/RecommendationLabel");
+        _buildingSlotStatusLabel = GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/SummaryRow/BuildingCard/CardMargin/CardColumn/SlotStatusLabel");
         _detailTitleLabel = GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailCard/CardMargin/DetailColumn/DetailTitle");
         _detailEffectLabel = GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailCard/CardMargin/DetailColumn/DetailEffect");
         _detailCostLabel = GetNode<Label>("CenterLayer/Dialog/Margin/MainColumn/ContentRow/DetailCard/CardMargin/DetailColumn/DetailCost");
@@ -217,6 +219,7 @@ public partial class ConstructionPanel : PopupPanelBase
 
         _buildingSummaryLabel.Text = summary.BuildingLabel;
         _buildingSummaryValueLabel.Text = Resolve(BuildBuildingListText(summary));
+        _buildingSlotStatusLabel.Text = BuildSlotStatusText(summary);
         if (summary.SuggestedBuildType.HasValue)
         {
             _buildingRecommendationLabel.Text =
@@ -226,12 +229,15 @@ public partial class ConstructionPanel : PopupPanelBase
         {
             _buildingRecommendationLabel.Text = "推荐：待评估";
         }
+
+        // 在营建卷顶部直接说明剩余坊位，减少玩家来回切换后才发现当前格已满的挫败感。
+        _hintLabel.Text = BuildConstructionHeaderHint(summary);
     }
 
     private void RefreshEntries(GameState state, TownMapSelectionSummary summary)
     {
         var recommended = summary.SuggestedBuildType;
-        var hasPlacementSelection = summary.HasSelection && summary.AnchorType == null;
+        var hasPlacementSelection = summary.HasBuildCapacity;
         foreach (var entry in _entries.Values)
         {
             var preview = IndustrySystem.GetBuildCostPreview(entry.BuildingType);
@@ -408,9 +414,14 @@ public partial class ConstructionPanel : PopupPanelBase
             return "尚未选中院域地块，营建卷仅显示总览与推荐提示。请先点选院域后再执行建造。";
         }
 
+        if (!summary.HasBuildCapacity)
+        {
+            return $"当前院域坊位已满（{summary.OccupiedBuildSlotCount}/{summary.BuildSlotCount}），请改选其他地块或等待后续扩展机制。";
+        }
+
         if (summary.AnchorType != null)
         {
-            return "当前选中为场所锚点，请选中可用院域地块后再执行建造。";
+            return "当前点中的是此地已落成建筑；若坊位未满，仍可继续对这块地追加营建。";
         }
 
         var placementHint = "当前院域已锁定，营建入队后会优先落点到选中地块。";
@@ -421,6 +432,47 @@ public partial class ConstructionPanel : PopupPanelBase
         }
 
         return $"{placementHint}\n可结合坊位格局与灵气状况再作取舍。";
+    }
+
+    // 将槽位状态压缩成一眼能读懂的卷面提示。
+    private static string BuildSlotStatusText(TownMapSelectionSummary summary)
+    {
+        if (!summary.HasSelection)
+        {
+            return "坊位：待选中";
+        }
+
+        if (summary.BuildSlotCount <= 0)
+        {
+            return "坊位：当前地块未定义可建坊位";
+        }
+
+        var remaining = Math.Max(summary.BuildSlotCount - summary.OccupiedBuildSlotCount, 0);
+        return remaining > 0
+            ? $"坊位：{summary.OccupiedBuildSlotCount}/{summary.BuildSlotCount} 已占用，尚余 {remaining} 位"
+            : $"坊位：{summary.OccupiedBuildSlotCount}/{summary.BuildSlotCount} 已满";
+    }
+
+    // 让卷首提示跟着地块槽位状态变化，优先强调“还能不能继续在这格建”。
+    private static string BuildConstructionHeaderHint(TownMapSelectionSummary summary)
+    {
+        if (!summary.HasSelection)
+        {
+            return "挑选宗门营建并与院域坊局联动，建造会优先落点到当前选中院域。";
+        }
+
+        if (summary.BuildSlotCount <= 0)
+        {
+            return "当前选中地块尚未定义可建坊位，请改选其他院域。";
+        }
+
+        var remaining = Math.Max(summary.BuildSlotCount - summary.OccupiedBuildSlotCount, 0);
+        if (remaining <= 0)
+        {
+            return $"当前院域坊位已满（{summary.OccupiedBuildSlotCount}/{summary.BuildSlotCount}），请改选其他地块继续营建。";
+        }
+
+        return $"当前院域尚余 {remaining} 个坊位，可继续像文明城市那样往同一地块追加不同建筑。";
     }
 
     private static int GetBuildingCount(GameState state, IndustryBuildingType buildingType)
@@ -539,7 +591,7 @@ public partial class ConstructionPanel : PopupPanelBase
 
     private static string BuildRequirementText(GameState state, TownMapSelectionSummary summary, IndustryBuildingType buildingType)
     {
-        var hasPlacementSelection = summary.HasSelection && summary.AnchorType == null;
+        var hasPlacementSelection = summary.HasBuildCapacity;
         var slotText = hasPlacementSelection ? summary.ResidentText : "需先选中院域";
         var qiText = hasPlacementSelection ? summary.TransitText : "需先选中院域";
         var workforceText = $"人口 {state.Population} · 管理 {state.Workers}";

@@ -27,6 +27,7 @@
 | `countytown-*` / 县城地图 | 天衍峰山门图 / 天衍峰驻地 / 弟子活动可视化 |
 | `prefecture-*` / 郡图 / 郡城 | 江陵府外域 / 外域主附庸据点 / 外域主城 |
 | `three-map-*` / 三地图 | 当前主流程的双地图（宗门 / 世界）+ 江陵府外域备用视图 |
+| `strategic-map-config-*` / 战略地图配置 | 世界图 / 江陵府外域配置驱动链路、配置验证与默认源裁定 |
 | `han-courtyard-*` | 古风庭院美术基底，可继续服务修仙宗门表现 |
 
 ## 2. Canonical Topic 注册表
@@ -69,6 +70,11 @@
 | `building-list` | FC/BL（本次新增） | 演进 | 用于“建筑列表 / 快捷建造”链路 |
 | `building-visualization` | FC/CP/BL（本次新增） | 演进 | 用于“建筑显影 / 山门图建筑落地可视化”链路 |
 | `sect-hex-compound-inspector` | FC/CP/BL 全量齐备 | 演进 | 用于“天衍峰院域坊局 / 左侧地块检视”链路 |
+| `strategic-map-config-driven` | FC/BL 全量齐备 | 稳定 | 用于“战略地图从硬编码转为配置渲染”的基线链路；与 `strategic-map-config-validator`、`strategic-map-config-dual-track`、`strategic-map-config-coverage` 共同并入同一史诗 |
+| `strategic-map-config-validator` | FC/BL 全量齐备 | 稳定 | 用于“战略地图配置合法性检查”；作为配置驱动链的护栏，后续继续并入 `strategic-map-config` 史诗 |
+| `strategic-map-config-dual-track` | CP/BL 全量齐备 | 演进 | 用于“配置源 / 生成源双轨切换与调试入口”；后续并入 `strategic-map-config` 史诗 |
+| `strategic-map-config-coverage` | FC/CP/BL 全量齐备 | 演进 | 用于“配置覆盖补强、默认源裁定与外域备用图默认配置驱动”链路；后续继续承接世界图配置模型扩展 |
+| `strategic-map-config-interaction` | FC/CP/BL（本次新增） | 演进 | 用于“世界图配置源承载 `interactive_world` 并保留 hex 点选、站点详情与二级入口”的最小交互链路 |
 
 ## 3. 建议收敛的“归档史诗”分组
 
@@ -80,6 +86,8 @@
    覆盖：`countytown-25d-generator`、`countytown-25d-textured-render`
 4. `han-courtyard-theme-pack`  
    覆盖：`han-courtyard-theme`、`han-courtyard-textured-theme`、`lantern-hover-pulse`
+5. `strategic-map-config`  
+   覆盖：`strategic-map-config-driven`、`strategic-map-config-validator`、`strategic-map-config-dual-track`、`strategic-map-config-coverage`、`strategic-map-config-interaction`
 
 > 裁定说明：历史文件不强制重命名；后续新增改动直接按史诗 topic 归档，减少同义命名扩散。若 topic 含旧世界观词汇，优先在正文和索引层补“当前语义解释”，不强行改历史 topic。
 
@@ -88,6 +96,7 @@
 - 功能卡：`FC-YYYYMMDD-<canonical-topic>[-NN].md`
 - 改动提案：`CP-YYYYMMDD-<canonical-topic>[-NN].md`
 - 平衡日志：`BL-YYYYMMDD-<canonical-topic>[-NN].md`
+- 交接记录：`HO-YYYYMMDD-<canonical-topic>.md`
 
 `<canonical-topic>` 要求：
 
@@ -100,6 +109,7 @@
 1. 机制或平衡改动：必须落 FC + CP + BL。
 2. 纯表现层改动：至少落 FC + BL；若影响玩法感知阈值，补 CP。
 3. 每月整理一次注册表，把“演进/历史”归并到对应史诗。
+4. 跨阶段任务、运行态收口或责任切换时，补 `handoffs/` 交接记录；`HO` 不参与 `canonical-topic` 史诗归并，但应在索引中登记。
 
 
 

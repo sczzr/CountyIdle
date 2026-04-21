@@ -82,6 +82,7 @@
 - `feature-cards/`：功能卡归档（见 `feature-cards/README.md`）
 - `change-proposals/`：提案归档（见 `change-proposals/README.md`）
 - `balance-logs/`：结果归档（见 `balance-logs/README.md`）
+- `handoffs/`：交接记录归档（见 `handoffs/README.md`）
 
 > 归档用于追溯，不作为当前规则的唯一来源。  
 > 设定语义以 `09_xianxia_sect_setting.md` 为准，系统规则以 `02_system_specs.md` 为准。
@@ -102,6 +103,7 @@
 - **规则单一事实源**：公式、顺序、边界只在 `02_system_specs.md` 维护
 - **看板驱动开发**：实现状态看 `05`，顺序推进看 `08`
 - **历史归档化**：阶段性过程进入 `feature-cards/`、`change-proposals/`、`balance-logs/`
+- **交接显式化**：跨阶段任务、验证收口轮次与负责人切换优先写入 `handoffs/`
 - **先对齐后编码**：涉及机制、术语、边界的改动，先改文档再写代码
 
 

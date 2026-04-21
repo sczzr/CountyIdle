@@ -1,3 +1,4 @@
+using System;
 using Godot;
 using CountyIdle.Models;
 using CountyIdle.Systems;
@@ -15,6 +16,7 @@ public partial class Main
 	private Label? _tileInspectorLocationValueLabel;
 	private Label? _tileInspectorBuildingLabel;
 	private Label? _tileInspectorBuildingValueLabel;
+	private Label? _tileInspectorBuildingSlotLabel;
 	private Label? _tileInspectorDescriptionLabel;
 	private Label? _tileInspectorActionHintLabel;
 	private Button? _tileInspectorConstructionButton;
@@ -33,6 +35,7 @@ public partial class Main
 		_tileInspectorLocationValueLabel = GetNodeOrNull<Label>($"{InspectorRootPath}/AttrGrid/LocationBox/AttrVBox/AttrValue");
 		_tileInspectorBuildingLabel = GetNodeOrNull<Label>($"{InspectorRootPath}/BuildingListBox/BuildingListVBox/BuildingListLabel");
 		_tileInspectorBuildingValueLabel = GetNodeOrNull<Label>($"{InspectorRootPath}/BuildingListBox/BuildingListVBox/BuildingListValue");
+		_tileInspectorBuildingSlotLabel = GetNodeOrNull<Label>($"{InspectorRootPath}/BuildingListBox/BuildingListVBox/BuildingSlotLabel");
 		_tileInspectorConstructionButton = GetNodeOrNull<Button>($"{InspectorRootPath}/BuildingListBox/BuildingListVBox/OpenConstructionButton");
 		_tileInspectorDescriptionLabel = GetNodeOrNull<Label>($"{InspectorRootPath}/InspectorDescription");
 		_tileInspectorActionHintLabel = GetNodeOrNull<Label>($"{InspectorRootPath}/ActionHintPanel/ActionHintLabel");
@@ -52,6 +55,7 @@ public partial class Main
 		_tileInspectorLocationValueLabel = null;
 		_tileInspectorBuildingLabel = null;
 		_tileInspectorBuildingValueLabel = null;
+		_tileInspectorBuildingSlotLabel = null;
 		_tileInspectorConstructionButton = null;
 		_tileInspectorDescriptionLabel = null;
 		_tileInspectorActionHintLabel = null;
@@ -127,6 +131,7 @@ public partial class Main
 			_tileInspectorLocationValueLabel == null ||
 			_tileInspectorBuildingLabel == null ||
 			_tileInspectorBuildingValueLabel == null ||
+			_tileInspectorBuildingSlotLabel == null ||
 			_tileInspectorDescriptionLabel == null ||
 			_tileInspectorActionHintLabel == null)
 		{
@@ -144,6 +149,7 @@ public partial class Main
 		_tileInspectorLocationValueLabel.Text = Resolve(summary.LocationText);
 		_tileInspectorBuildingLabel.Text = summary.BuildingLabel;
 		_tileInspectorBuildingValueLabel.Text = Resolve(BuildBuildingListText(summary));
+		_tileInspectorBuildingSlotLabel.Text = BuildBuildingSlotText(summary);
 		_tileInspectorDescriptionLabel.Text = Resolve(summary.DescriptionText);
 
 		UpdateConstructionEntryHint(summary);
@@ -164,6 +170,7 @@ public partial class Main
 			_tileInspectorLocationValueLabel == null ||
 			_tileInspectorBuildingLabel == null ||
 			_tileInspectorBuildingValueLabel == null ||
+			_tileInspectorBuildingSlotLabel == null ||
 			_tileInspectorDescriptionLabel == null ||
 			_tileInspectorActionHintLabel == null)
 		{
@@ -183,6 +190,7 @@ public partial class Main
 			_tileInspectorLocationValueLabel.Text = "待识别";
 			_tileInspectorBuildingLabel.Text = "建筑概况";
 			_tileInspectorBuildingValueLabel.Text = "世界层无院域建筑";
+			_tileInspectorBuildingSlotLabel.Text = "坊位：世界层不可直接营建";
 			_tileInspectorDescriptionLabel.Text = "左键点选世界地图中的宗门、凡俗据点、坊市、世家、仙城或遗迹节点后，这里会显示对应点位的情报摘要。";
 			ApplyWorldInspectorVisualTone("world", false);
 			ConfigureBuildOnlyInspector(TownMapSelectionSummary.CreateDefault());
@@ -200,6 +208,7 @@ public partial class Main
 		_tileInspectorLocationValueLabel.Text = ResolveWorldRegionText(site.RegionId);
 		_tileInspectorBuildingLabel.Text = "建筑概况";
 		_tileInspectorBuildingValueLabel.Text = "世界层无院域建筑";
+		_tileInspectorBuildingSlotLabel.Text = "坊位：世界层不可直接营建";
 		_tileInspectorDescriptionLabel.Text = BuildWorldSiteDescription(site, primaryTypeText, rarityText);
 		ConfigureBuildOnlyInspector(TownMapSelectionSummary.CreateDefault());
 		ApplyWorldInspectorVisualTone(site.PrimaryType, true);
@@ -225,9 +234,15 @@ public partial class Main
 			return;
 		}
 
+		if (!summary.HasBuildCapacity)
+		{
+			ApplyTileInspectorActionHint($"当前院域坊位已满（{summary.OccupiedBuildSlotCount}/{summary.BuildSlotCount}），请改选其他地块继续营建。");
+			return;
+		}
+
 		if (summary.AnchorType != null)
 		{
-			ApplyTileInspectorActionHint("当前选中为场所锚点，只能查阅现状；若要建造建筑，请改选一块可营建的空白院域。");
+			ApplyTileInspectorActionHint($"当前点中的是此地已落成建筑；当前坊位 {summary.OccupiedBuildSlotCount}/{summary.BuildSlotCount}，仍可继续对这块地追加营建。");
 			return;
 		}
 
@@ -249,6 +264,25 @@ public partial class Main
 		}
 
 		return string.Join("\n", lines);
+	}
+
+	// 将剩余坊位折成一行，保证左侧营建卷不开营建面板也能看到当前地块还能再塞几座建筑。
+	private static string BuildBuildingSlotText(TownMapSelectionSummary summary)
+	{
+		if (!summary.HasSelection)
+		{
+			return "坊位：待选中";
+		}
+
+		if (summary.BuildSlotCount <= 0)
+		{
+			return "坊位：当前地块未定义可建坊位";
+		}
+
+		var remaining = Math.Max(summary.BuildSlotCount - summary.OccupiedBuildSlotCount, 0);
+		return remaining > 0
+			? $"坊位：{summary.OccupiedBuildSlotCount}/{summary.BuildSlotCount} 已占用，尚余 {remaining} 位"
+			: $"坊位：{summary.OccupiedBuildSlotCount}/{summary.BuildSlotCount} 已满";
 	}
 
 	private void ApplyTileInspectorActionHint(string hintText)
@@ -285,10 +319,17 @@ public partial class Main
 			return;
 		}
 
+		if (!summary.HasBuildCapacity)
+		{
+			_tileInspectorConstructionButton.Disabled = true;
+			_tileInspectorConstructionButton.TooltipText = $"当前院域坊位已满（{summary.OccupiedBuildSlotCount}/{summary.BuildSlotCount}），请改选其他地块继续营建。";
+			return;
+		}
+
 		if (summary.AnchorType != null)
 		{
 			_tileInspectorConstructionButton.Disabled = false;
-			_tileInspectorConstructionButton.TooltipText = "当前选中为场所锚点，请改选可营建的空白院域地块后再执行营建排队。";
+			_tileInspectorConstructionButton.TooltipText = $"当前点中的是此地已落成建筑；当前坊位 {summary.OccupiedBuildSlotCount}/{summary.BuildSlotCount}，仍可继续对该地块追加营建。";
 			return;
 		}
 

@@ -143,6 +143,12 @@ autowrap_mode = 3
 layout_mode = 2
 text = "推荐：待评估"
 
+[node name="SlotStatusLabel" type="Label" parent="CenterLayer/Dialog/Margin/MainColumn/SummaryRow/BuildingCard/CardMargin/CardColumn" unique_id=174205681]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.294118, 0.247059, 0.2, 0.96)
+theme_override_font_sizes/font_size = 12
+text = "坊位：待评估"
+
 [node name="ContentRow" type="HBoxContainer" parent="CenterLayer/Dialog/Margin/MainColumn" unique_id=1935444745]
 layout_mode = 2
 size_flags_vertical = 3

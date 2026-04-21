@@ -296,6 +296,11 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
 
         if (_mode == StrategicMapMode.World && _xianxiaWorldMap != null)
         {
+            if (_useConfigDefinition)
+            {
+                DrawRegions(center, unit);
+            }
+
             DrawWorldTextureCells(center, unit);
         }
         else
@@ -315,7 +320,7 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
 
         DrawPolylines(center, unit, _mapDefinition.Outlines, _operationalStyle.OutlineColor, 1.2f);
         DrawPolylines(center, unit, _mapDefinition.Routes, _operationalStyle.RouteColor, 1.4f);
-        if (!(_mode == StrategicMapMode.World && _xianxiaWorldMap != null))
+        if (!(_mode == StrategicMapMode.World && _xianxiaWorldMap != null && !_useConfigDefinition))
         {
             DrawPolylines(center, unit, _mapDefinition.Rivers, _operationalStyle.RiverColor, 1.8f);
         }
@@ -592,6 +597,15 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
     private void ApplyWorldConfigDefinition()
     {
         _mapDefinition = _configSystem.GetWorldDefinition();
+        ClearWorldSiteSelection();
+
+        var configuredWorldMap = _configSystem.GetWorldInteractiveMap();
+        if (configuredWorldMap != null)
+        {
+            CacheWorldLayout(configuredWorldMap);
+            return;
+        }
+
         _xianxiaWorldMap = null;
         _xianxiaWorldCellLookup = [];
         _xianxiaWorldCenters = [];
@@ -601,7 +615,6 @@ public partial class StrategicMapViewSystem : PanelContainer, IMapZoomView
         _xianxiaWorldTileCenterLocal = Vector2.Zero;
         _xianxiaWorldTileLayoutScale = 1f;
         ClearWorldTerrainTileLayer();
-        ClearWorldSiteSelection();
     }
 
     private void ApplyPrefectureGeneratorDefinition(int populationHint, int housingHint, double threatHint, int hourSettlements)

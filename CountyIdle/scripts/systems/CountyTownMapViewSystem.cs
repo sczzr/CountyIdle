@@ -1661,13 +1661,13 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         var sortedStructures = new List<(float DepthY, float DepthX, int Priority, TownBuildingData? Building, TownActivityAnchorData? Anchor)>();
         foreach (var building in mapData.Buildings)
         {
-            var center = GetTownCellCenter(building.Cell, origin);
+            var center = GetBuildingVisualCenter(building, origin);
             sortedStructures.Add((center.Y, center.X, 0, building, null));
         }
 
         foreach (var anchor in mapData.ActivityAnchors)
         {
-            var center = GetTownCellCenter(anchor.LotCell, origin);
+            var center = GetAnchorVisualCenter(anchor, origin);
             sortedStructures.Add((center.Y, center.X, 1, null, anchor));
         }
 
@@ -1706,7 +1706,7 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
     // 绘制常规建筑
     private void DrawBuilding(TownBuildingData building, Vector2 origin)
     {
-        var center = GetTownCellCenter(building.Cell, origin);
+        var center = GetBuildingVisualCenter(building, origin);
         var footprintPlate = CreateHex(center + new Vector2(0f, ScaleValue(1.6f)), GetScaledHexRadius() * 0.72f);
         DrawColoredPolygon(footprintPlate, TintColor(BuildingFootprintColor, _operationalStyle.BuildingTint));
         DrawPolyline(footprintPlate, TintColor(BuildingFootprintEdgeColor, _operationalStyle.BuildingTint), Math.Max(0.9f, ScaleValue(1.0f)), true);
@@ -1759,6 +1759,43 @@ public partial class CountyTownMapViewSystem : PanelContainer, IMapZoomView
         {
             DrawMoonGate(baseBottom, building.Facing);
         }
+    }
+
+    // 同格多建筑时，让建筑底座与锚点使用同一套分位偏移，避免视觉上完全重叠。
+    private Vector2 GetBuildingVisualCenter(TownBuildingData building, Vector2 origin)
+    {
+        var center = GetTownCellCenter(building.Cell, origin);
+        if (_mapData == null)
+        {
+            return center;
+        }
+
+        var slotIndex = 0;
+        foreach (var candidate in _mapData.Buildings)
+        {
+            if (candidate.Cell != building.Cell)
+            {
+                continue;
+            }
+
+            if (ReferenceEquals(candidate, building))
+            {
+                break;
+            }
+
+            slotIndex++;
+        }
+
+        var slotCount = 0;
+        foreach (var candidate in _mapData.Buildings)
+        {
+            if (candidate.Cell == building.Cell)
+            {
+                slotCount++;
+            }
+        }
+
+        return center + GetStructureVisualOffset(slotIndex, Math.Max(slotCount, 1));
     }
 
     // 绘制月门与装饰

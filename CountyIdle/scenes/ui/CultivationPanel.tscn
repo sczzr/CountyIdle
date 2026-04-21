@@ -3,6 +3,8 @@
 [ext_resource type="Script" uid="uid://tt1uf30l78o8" path="res://scripts/ui/CultivationPanel.cs" id="1_cultivation"]
 [ext_resource type="Script" uid="uid://o3luamk7oqln" path="res://scripts/ui/gd/CultivationPanelVisualFx.gd" id="2_cultivation_fx"]
 [ext_resource type="Texture2D" uid="uid://c2bldbnt0q1yo" path="res://assets/ui/background/cultivation_hex_grid.svg" id="3_hex_grid"]
+[ext_resource type="Texture2D" path="res://assets/ui/cultivation/exquisite_heart.svg" id="4_heart"]
+[ext_resource type="Texture2D" path="res://assets/ui/cultivation/decree_talisman.svg" id="5_talisman"]
 
 [node name="CultivationPanel" type="Control" unique_id=1072524990]
 layout_mode = 3
@@ -1079,17 +1081,62 @@ layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
+[node name="HeartRune" type="TextureRect" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow/ActionPointBadge/ActionPointRow/ActionPointDot1"]
+visible = false
+z_index = 1
+mouse_filter = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+rotation_degrees = -45.0
+texture = ExtResource("4_heart")
+expand_mode = 1
+stretch_mode = 1
+
 [node name="ActionPointDot2" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow/ActionPointBadge/ActionPointRow" unique_id=1117024204]
 custom_minimum_size = Vector2(18, 18)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
+[node name="HeartRune" type="TextureRect" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow/ActionPointBadge/ActionPointRow/ActionPointDot2"]
+visible = false
+z_index = 1
+mouse_filter = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+rotation_degrees = -45.0
+texture = ExtResource("4_heart")
+expand_mode = 1
+stretch_mode = 1
+
 [node name="ActionPointDot3" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow/ActionPointBadge/ActionPointRow" unique_id=613323155]
 custom_minimum_size = Vector2(18, 18)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+
+[node name="HeartRune" type="TextureRect" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow/ActionTitleRow/ActionPointBadge/ActionPointRow/ActionPointDot3"]
+visible = false
+z_index = 1
+mouse_filter = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+rotation_degrees = -45.0
+texture = ExtResource("4_heart")
+expand_mode = 1
+stretch_mode = 1
 
 [node name="HintPanel" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionHeaderRow" unique_id=526137909]
 layout_mode = 2
@@ -1129,6 +1176,41 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 toggle_mode = true
+
+[node name="TalismanTexture" type="TextureRect" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard"]
+self_modulate = Color(1, 1, 1, 0.12)
+z_index = -1
+mouse_filter = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("5_talisman")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="SealSplash" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard"]
+visible = false
+z_index = 3
+custom_minimum_size = Vector2(76, 76)
+mouse_filter = 2
+layout_mode = 1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -38.0
+offset_top = -38.0
+offset_right = 38.0
+offset_bottom = 38.0
+
+[node name="SealSplashLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard/SealSplash"]
+layout_mode = 2
+text = "敕"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="CardMargin" type="MarginContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/SkillTrainingCard" unique_id=2089947131]
 layout_mode = 1
@@ -1300,6 +1382,41 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 toggle_mode = true
 
+[node name="TalismanTexture" type="TextureRect" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard"]
+self_modulate = Color(1, 1, 1, 0.12)
+z_index = -1
+mouse_filter = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("5_talisman")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="SealSplash" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard"]
+visible = false
+z_index = 3
+custom_minimum_size = Vector2(76, 76)
+mouse_filter = 2
+layout_mode = 1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -38.0
+offset_top = -38.0
+offset_right = 38.0
+offset_bottom = 38.0
+
+[node name="SealSplashLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard/SealSplash"]
+layout_mode = 2
+text = "敕"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="CardMargin" type="MarginContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/TechniquePolishCard" unique_id=526042645]
 layout_mode = 1
 anchors_preset = 15
@@ -1470,6 +1587,41 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 toggle_mode = true
 
+[node name="TalismanTexture" type="TextureRect" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard"]
+self_modulate = Color(1, 1, 1, 0.12)
+z_index = -1
+mouse_filter = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("5_talisman")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="SealSplash" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard"]
+visible = false
+z_index = 3
+custom_minimum_size = Vector2(76, 76)
+mouse_filter = 2
+layout_mode = 1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -38.0
+offset_top = -38.0
+offset_right = 38.0
+offset_bottom = 38.0
+
+[node name="SealSplashLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard/SealSplash"]
+layout_mode = 2
+text = "敕"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="CardMargin" type="MarginContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/CraftPracticeCard" unique_id=321654174]
 layout_mode = 1
 anchors_preset = 15
@@ -1639,6 +1791,41 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 toggle_mode = true
+
+[node name="TalismanTexture" type="TextureRect" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard"]
+self_modulate = Color(1, 1, 1, 0.12)
+z_index = -1
+mouse_filter = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("5_talisman")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="SealSplash" type="PanelContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard"]
+visible = false
+z_index = 3
+custom_minimum_size = Vector2(76, 76)
+mouse_filter = 2
+layout_mode = 1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -38.0
+offset_top = -38.0
+offset_right = 38.0
+offset_bottom = 38.0
+
+[node name="SealSplashLabel" type="Label" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard/SealSplash"]
+layout_mode = 2
+text = "敕"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="CardMargin" type="MarginContainer" parent="ScreenMargin/ScreenRoot/RootColumn/BodyRow/RightLayer/RightColumn/ActionGrid/MeditationCard" unique_id=1874416250]
 layout_mode = 1
